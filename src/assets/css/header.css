@@ -1,0 +1,137 @@
+@font-face {
+  /* 1. 앞으로 CSS에서 부를 폰트 이름을 내 마음대로 정합니다 */
+  font-family: 'GriunFont'; 
+  
+  /* 2. 폰트 파일이 있는 상대 경로를 적어줍니다. */
+  /* .ttf 파일은 format('truetype') 이라고 명시해 줍니다. */
+  src: url('../fonts/Griun_PolSensibility-Rg.ttf') format('truetype');
+  
+  /* 3. 굵기와 스타일을 지정합니다 (선택사항) */
+  font-weight: 900;
+  font-style: normal;
+}
+
+/* 전체 헤더 배경 및 하단 선 */
+.header-container {
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* 다른 요소들보다 항상 위에 보이도록 설정 */
+}
+
+/* 1920px 중앙 정렬 기준 영역 */
+.header-inner {
+  max-width: 100%;
+  margin: 0 auto; /* 중앙 정렬 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 250px;
+}
+
+/* 로고 스타일 */
+.header-logo a {
+  text-decoration: none;
+  color: #000;
+  font-size: 28px;
+  font-weight: 900;
+  font-family: 'GriunFont', sans-serif;
+}
+
+/* 데스크톱 네비게이션 */
+.desktop-nav {
+  display: flex;
+  gap: 30px;
+}
+
+.desktop-nav a {
+  text-decoration: none;
+  color: #000;
+  font-size: 18px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.desktop-nav a:hover {
+  color: #0F9B73;
+}
+
+/* 우측 버튼 영역 */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.search-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.login-btn {
+  background-color: #0F9B73;
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* 햄버거 버튼 (데스크톱에서는 숨김) */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: #333;
+}
+
+/* 모바일 네비게이션 드롭다운 (데스크톱에서는 숨김) */
+.mobile-nav {
+  display: none;
+}
+
+/* =========================================
+   반응형 (모바일 768px 이하) 설정
+========================================= */
+@media screen and (max-width: 768px) {
+  .header-inner {
+    padding: 15px 20px; /* 모바일 여백 축소 */
+  }
+
+  .desktop-nav {
+    display: none; /* 기존 가로 메뉴 숨김 */
+  }
+
+  .hamburger-btn {
+    display: block; /* 햄버거 버튼 표시 */
+  }
+
+  /* 모바일 드롭다운 메뉴 활성화 시 스타일 */
+  .mobile-nav.open {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-top: 1px solid #eeeeee;
+    padding: 10px 0;
+  }
+
+  .mobile-nav a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .mobile-nav a:hover {
+    background-color: #f9f9f9;
+  }
+}

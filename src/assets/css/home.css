@@ -1,0 +1,38 @@
+/* src/assets/css/home.css */
+.home-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* UserLayout의 헤더/푸터를 제외한 공간에서 중앙에 오도록 높이 설정 */
+  min-height: calc(100vh - 300px); 
+  text-align: center;
+}
+
+.hero-content h1 {
+  font-size: 42px;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+.hero-content p {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.start-btn {
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #0F9B73;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.start-btn:hover {
+  background-color: #0b7858;
+}
