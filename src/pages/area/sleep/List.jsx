@@ -9,7 +9,7 @@ import Header from '@components/common/Header';
 const SleepList = () => {
     return (
         <>
-        <div>sleepList</div>
+        <div>SleepList</div>
         </>
     )
 };
