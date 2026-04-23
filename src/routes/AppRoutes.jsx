@@ -10,6 +10,8 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
+import Notice from "@pages/customer/Notice";
+
 
 const AppRoutes = () => {
   return (
@@ -23,6 +25,9 @@ const AppRoutes = () => {
         <Route path="/user" element={<UserLayout />}>
           <Route index element={<UserHome />} />
           <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
+        </Route>
+        <Route path="/customer" element={<UserLayout />}>
+          <Route path="notice" element={<Notice />} />
         </Route>
       </Route>
 

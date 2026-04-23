@@ -1,5 +1,6 @@
 import React from 'react';
 import '@assets/css/footer.css'; // 분리한 CSS 파일 임포트
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -18,7 +19,7 @@ const Footer = () => {
             <p><strong>대표전화 010-8728-4276</strong> | <strong>팩스 02-123-1234</strong></p>
           </div>
           <div className="footer-links">
-            <span>고객지원</span>
+            <Link to="/customer/notice" style={{ color: "#fff" }}><span>고객지원</span></Link>
             <span>공지사항</span>
             <span>자주하는 질문</span>
           </div>
