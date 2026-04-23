@@ -51,7 +51,11 @@ const Header = () => {
         {/* 데스크톱 네비게이션 */}
         <nav className="hidden md:flex gap-[30px]">
           {navItems.map((item) => (
+<<<<<<< HEAD
+            <Link key={item.name} to={item.path}>
+=======
             <Link key={item.name} to={item.path} className="text-black text-lg font-medium hover:text-primary transition-colors">
+>>>>>>> develop
               {item.name}
             </Link>
           ))}
@@ -112,7 +116,11 @@ const Header = () => {
       {/* --- 모바일 전용 드롭다운 메뉴 --- */}
       <nav className={`${isMenuOpen ? 'flex' : 'hidden'} md:hidden flex-col bg-white border-t border-gray-100 py-2.5`}>
         {navItems.map((item) => (
+<<<<<<< HEAD
+          <Link key={item.name} to={item.path} onClick={closeMenu}>
+=======
           <Link key={item.name} to={item.path} onClick={closeMenu} className="text-gray-800 text-[16px] py-[15px] px-5 border-b border-gray-50 hover:bg-gray-50 no-underline">
+>>>>>>> develop
             {item.name}
           </Link>
         ))}
