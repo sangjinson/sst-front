@@ -14,6 +14,10 @@ import Notice from "@pages/customersupport/Notice";
 import NoticeDetail from "@pages/customersupport/NoticeDetail";
 import Faq from "@pages/customersupport/Faq";
 import FaqDetail from "@pages/customersupport/FaqDetail";
+import AreaBaseTemplate from '@pages/area/AreaBaseTemplate';
+import AreaListTemplate from '@pages/area/AreaListTemplate';
+import AreaViewTemplate from '@pages/area/AreaViewTemplate';
+
 
 const AppRoutes = () => {
   return (
@@ -34,6 +38,13 @@ const AppRoutes = () => {
           <Route path="faq" element={<Faq />} />
           <Route path="faq/:id" element={<FaqDetail />} />
         </Route>
+
+        {/* 놀거리 */}
+        <Route path="/area" element={<AreaBaseTemplate />}>
+          <Route path=":type/list" element={<AreaListTemplate />} />
+          <Route path=":type/view" element={<AreaViewTemplate />} />
+        </Route>
+
       </Route>
 
       {/* 관리자 전용 권한 (ADMIN) */}
@@ -42,6 +53,9 @@ const AppRoutes = () => {
           <Route index element={<AdminDashboard />} />
         </Route>
       </Route>
+
+      
+
     </Routes>
   );
 };
