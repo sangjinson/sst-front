@@ -10,9 +10,9 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
-import AreaBaseTempate from '@pages/area/AreaBaseTemplate';
-import AreaListTempate from '@pages/area/AreaListTemplate';
-import AreaViewTempate from '@pages/area/AreaViewTemplate';
+import AreaBaseTemplate from '@pages/area/AreaBaseTemplate';
+import AreaListTemplate from '@pages/area/AreaListTemplate';
+import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 
 
 const AppRoutes = () => {
