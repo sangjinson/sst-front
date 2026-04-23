@@ -10,7 +10,7 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
-import AttractionPage from '@pages/landing/AttractionPage';
+import SeeList from '@pages/area/see/List';
 
 import AreaBaseTemplate from '@pages/area/AreaBaseTemplate';
 import AreaListTemplate from '@pages/area/AreaListTemplate';
@@ -25,7 +25,7 @@ const AppRoutes = () => {
       <Route path="/unauthorized" element={<Unauthorized />} />
       
       {/* 볼거리 페이지 */}
-      <Route path="/attraction" element={<AttractionPage />} />
+      <Route path="/see" element={<SeeList />} />
 
       {/* 일반 사용자 권한 (USER, ADMIN) */}
       <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
