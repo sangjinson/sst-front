@@ -22,7 +22,7 @@ const Notice = () => {
 
           <div className="space-y-4">
             <Link to="/customersupport/notice"><p className="text-gray-900 font-medium mb-4">공지사항</p></Link>
-            <p className="text-gray-500">자주하는 질문</p>
+            <Link to="/customersupport/faq"><p className="text-gray-500">자주하는 질문</p></Link>
           </div>
         </div>
 
@@ -30,7 +30,7 @@ const Notice = () => {
         <div className="flex-1">
 
           {/* breadcrumb */}
-          <div className="text-sm text-gray-400 mb-2">
+          <div className="text-sm text-gray-400 mb-4">
             홈 &gt; 고객지원 &gt; 
             <span className="font-semibold text-gray-600">
                 자주하는 질문
@@ -46,7 +46,7 @@ const Notice = () => {
             <table className="w-full table-fixed">
               
               {/* 헤더 */}
-              <thead className="bg-gray-100 text-gray-700">
+              <thead className="bg-gray-200 text-gray-700">
                 <tr>
                   <th className="py-3 px-6 text-left w-20">번호</th>
                   <th className="py-3 px-6 text-left">제목</th>
@@ -60,7 +60,7 @@ const Notice = () => {
                 
                 <tr className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer">
                   <td className="py-5 px-6 text-center">3</td>
-                  <td className="py-5 px-6">추천 결과가 마음에 들지 않으면 어떻게 하나요?</td>
+                  <td className="py-5 px-6"><Link to="/customersupport/faq/3" className="hover:underline">로그인을 하지 않아도 일정을 저장할 수 있나요?</Link></td>
                   <td className="py-5 px-6 text-gray-500">2026.02.25</td>
                   <td className="py-5 px-6">
                     <span className="whitespace-nowrap bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
@@ -71,7 +71,7 @@ const Notice = () => {
 
                 <tr className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer">
                   <td className="py-5 px-6 text-center">2</td>
-                  <td className="py-5 px-6">일정은 수정할 수 있나요?</td>
+                  <td className="py-5 px-6"><Link to="/customersupport/faq/2" className="hover:underline">생성된 일정을 일행과 공유할 수 있나요?</Link></td>
                   <td className="py-5 px-6 text-gray-500">2026.03.30</td>
                   <td className="py-5 px-6">
                     <span className="whitespace-nowrap bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
@@ -82,7 +82,7 @@ const Notice = () => {
 
                 <tr className="hover:bg-gray-50 cursor-pointer">
                   <td className="py-5 px-6 text-center">1</td>
-                  <td className="py-5 px-6">AI 여행 일정은 어떻게 생성되나요?</td>
+                  <td className="py-5 px-6"><Link to="/customersupport/faq/1" className="hover:underline">AI 여행 일정은 어떻게 생성되나요?</Link></td>
                   <td className="py-5 px-6 text-gray-500">2026.03.20</td>
                   <td className="py-5 px-6">
                     <span className="whitespace-nowrap bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">

@@ -22,7 +22,7 @@ const Notice = () => {
           <div className="border-t border-gray-300 mb-6"></div>
 
           <div className="space-y-4">
-            <p className="text-gray-500">공지사항</p>
+            <Link to="/customersupport/notice"><p className="text-gray-500 mb-4">공지사항</p></Link>
             <Link to="/customersupport/Faq"><p className="text-gray-900 font-medium">자주하는 질문</p></Link>
           </div>
         </div>
@@ -31,7 +31,7 @@ const Notice = () => {
         <div className="flex-1">
 
           {/* breadcrumb */}
-          <div className="text-sm text-gray-400 mb-2">
+          <div className="text-sm text-gray-400 mb-4">
             홈 &gt; 고객지원 &gt; 
             <span className="font-semibold text-gray-600">
                 공지사항
@@ -47,7 +47,7 @@ const Notice = () => {
             <table className="w-full table-fixed">
               
               {/* 헤더 */}
-              <thead className="bg-gray-100 text-gray-700">
+              <thead className="bg-gray-200 text-gray-700">
                 <tr>
                   <th className="py-3 px-6 text-left w-20">번호</th>
                   <th className="py-3 px-6 text-left">제목</th>
@@ -61,7 +61,7 @@ const Notice = () => {
                 
                 <tr className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer">
                   <td className="py-5 px-6 text-center">3</td>
-                  <td className="py-5 px-6">운영 시간 변경 안내</td>
+                  <td className="py-5 px-6"><Link to="/customersupport/notice/3" className="hover:underline">운영 시간 변경 안내</Link></td>
                   <td className="py-5 px-6 text-gray-500">2026.02.25</td>
                   <td className="py-5 px-6">
                     <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
@@ -72,7 +72,7 @@ const Notice = () => {
 
                 <tr className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer">
                   <td className="py-5 px-6 text-center">2</td>
-                  <td className="py-5 px-6">시스템 점검 안내</td>
+                  <td className="py-5 px-6"><Link to="/customersupport/notice/2" className="hover:underline">시스템 점검 안내</Link></td>
                   <td className="py-5 px-6 text-gray-500">2026.03.30</td>
                   <td className="py-5 px-6">
                     <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
@@ -83,7 +83,7 @@ const Notice = () => {
 
                 <tr className="hover:bg-gray-50 cursor-pointer">
                   <td className="py-5 px-6 text-center">1</td>
-                  <td className="py-5 px-6">신규 서비스 오픈 안내</td>
+                  <td className="py-5 px-6"><Link to="/customersupport/notice/1" className="hover:underline">신규 서비스 오픈 안내</Link></td>
                   <td className="py-5 px-6 text-gray-500">2026.03.20</td>
                   <td className="py-5 px-6">
                     <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">

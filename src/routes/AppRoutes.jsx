@@ -11,7 +11,9 @@ import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
 import Notice from "@pages/customersupport/Notice";
+import NoticeDetail from "@pages/customersupport/NoticeDetail";
 import Faq from "@pages/customersupport/Faq";
+import FaqDetail from "@pages/customersupport/FaqDetail";
 
 const AppRoutes = () => {
   return (
@@ -28,9 +30,9 @@ const AppRoutes = () => {
         </Route>
         <Route path="/customersupport" element={<UserLayout />}>
           <Route path="notice" element={<Notice />} />
-        </Route>
-        <Route path="/customersupport" element={<UserLayout />}>
+          <Route path="notice/:id" element={<NoticeDetail />} />
           <Route path="faq" element={<Faq />} />
+          <Route path="faq/:id" element={<FaqDetail />} />
         </Route>
       </Route>
 
