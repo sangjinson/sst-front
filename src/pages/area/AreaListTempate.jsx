@@ -1,10 +1,10 @@
 import { lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 
-const PlayList = lazy(() => import('./play/list'));
-const FoodList = lazy(() => import('./food/list'));
-const SeeList = lazy(() => import('./see/list'));
-const SleepList = lazy(() => import('./sleep/list'));
+const PlayList = lazy(() => import('./play/PlayList'));
+const FoodList = lazy(() => import('./food/FoodList'));
+const SeeList = lazy(() => import('./see/SeeList'));
+const SleepList = lazy(() => import('./sleep/SleepList'));
 
 
 function AreaListTempate() {
