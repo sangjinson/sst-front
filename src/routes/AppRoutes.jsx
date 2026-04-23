@@ -10,6 +10,8 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
+import AttractionPage from '@pages/landing/AttractionPage';
+
 
 const AppRoutes = () => {
   return (
@@ -17,6 +19,9 @@ const AppRoutes = () => {
       {/* 공개 접근 가능 페이지 */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
+      
+      {/* 볼거리 페이지 */}
+      <Route path="/attraction" element={<AttractionPage />} />
 
       {/* 일반 사용자 권한 (USER, ADMIN) */}
       <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
