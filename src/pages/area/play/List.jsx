@@ -5,11 +5,14 @@ import '@assets/css/landing.css';
 
 import { Outlet } from 'react-router-dom';
 import Header from '@components/common/Header';
+import IconSVG from '../../../components/Icon/IconSVG';
 
 const PlayList = () => {
     return (
         <>
-        <div>PlayList</div>
+        <div>PlayLis</div>
+        <IconSVG name="park" className="text-blue-500 hover:text-red-500" />
+        <IconSVG name="huney" className="text-blue-500 hover:text-red-500" />
         </>
     )
 };
