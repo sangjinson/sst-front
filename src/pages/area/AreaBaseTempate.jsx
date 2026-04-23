@@ -6,7 +6,7 @@ import '@assets/css/landing.css';
 import { Outlet } from 'react-router-dom';
 import Header from '@components/common/Header';
 
-const FunZoneBase = () => {
+const AreaBaseTempate = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Header />
@@ -18,4 +18,4 @@ const FunZoneBase = () => {
     )
 };
 
-export default FunZoneBase;
+export default AreaBaseTempate;

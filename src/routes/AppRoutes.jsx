@@ -10,8 +10,9 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
-import FunZoneBase from '@pages/funzone/FunZoneBase';
-import FunZoneIndex from '@pages/funzone/FunZoneIndex';
+import AreaBaseTempate from '@pages/area/AreaBaseTempate';
+import AreaListTempate from '@pages/area/AreaListTempate';
+import AreaViewTempate from '@pages/area/AreaViewTempate';
 
 
 const AppRoutes = () => {
@@ -29,9 +30,9 @@ const AppRoutes = () => {
         </Route>
 
         {/* 놀거리 */}
-        <Route path="/funzone" element={<FunZoneBase />}>
-          <Route index element={<FunZoneIndex />} />
-
+        <Route path="/area" element={<AreaBaseTempate />}>
+          <Route path=":type/list" element={<AreaListTempate />} />
+          <Route path=":type/view" element={<AreaViewTempate />} />
         </Route>
 
       </Route>
