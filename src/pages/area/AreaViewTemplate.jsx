@@ -6,7 +6,7 @@ import InListCard from '@components/card/InListCard'; // 경로에 맞춰 수정
 import '@assets/css/landing.css';
 
 const AreaViewTemplate = () => {
- 
+
 };
 
 export default AreaViewTemplate;

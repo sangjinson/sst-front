@@ -9,7 +9,6 @@ const SleepList = lazy(() => import('./sleep/List'));
 
 function AreaListTemplate() {
   const { type } = useParams();
-
   const renderList = () => {
     switch (type) {
       case 'play':
