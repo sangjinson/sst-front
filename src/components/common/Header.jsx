@@ -6,7 +6,14 @@ const Header = () => {
   // 모바일 햄버거 메뉴 상태 관리
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const navItems = ['볼거리', '먹거리', '잘거리', '놀거리', '뽐낼거리', '내거리'];
+  const navItems = [
+    { name: '볼거리', path: '/sights' },
+    { name: '먹거리', path: '/food' },
+    { name: '잘거리', path: '/stay' },
+    { name: '놀거리', path: '/funzone' },
+    { name: '뽐낼거리', path: '/showcase' },
+    { name: '내거리', path: '/my' },
+  ];
 
   // 메뉴 토글 함수
   const toggleMenu = () => {
@@ -29,7 +36,9 @@ const Header = () => {
         {/* 데스크톱용 메뉴 */}
         <nav className="desktop-nav">
           {navItems.map((item) => (
-            <Link key={item} to="/user">{item}</Link>
+            <Link key={item.name} to={item.path}>
+              {item.name}
+            </Link>
           ))}
         </nav>
 
@@ -48,8 +57,8 @@ const Header = () => {
       {/* 모바일용 드롭다운 메뉴 (조건부 클래스 렌더링) */}
       <nav className={`mobile-nav ${isMenuOpen ? 'open' : ''}`}>
         {navItems.map((item) => (
-          <Link key={item} to="/user" onClick={closeMenu}>
-            {item}
+          <Link key={item.name} to={item.path} onClick={closeMenu}>
+            {item.name}
           </Link>
         ))}
       </nav>

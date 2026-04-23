@@ -10,6 +10,9 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
+import FunZoneBase from '@pages/funzone/FunZoneBase';
+import FunZoneIndex from '@pages/funzone/FunZoneIndex';
+
 
 const AppRoutes = () => {
   return (
@@ -24,6 +27,13 @@ const AppRoutes = () => {
           <Route index element={<UserHome />} />
           <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
         </Route>
+
+        {/* 놀거리 */}
+        <Route path="/funzone" element={<FunZoneBase />}>
+          <Route index element={<FunZoneIndex />} />
+
+        </Route>
+
       </Route>
 
       {/* 관리자 전용 권한 (ADMIN) */}
@@ -32,6 +42,9 @@ const AppRoutes = () => {
           <Route index element={<AdminDashboard />} />
         </Route>
       </Route>
+
+      
+
     </Routes>
   );
 };
