@@ -10,13 +10,10 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
-<<<<<<< HEAD
 import AttractionPage from '@pages/landing/AttractionPage';
-=======
 import AreaBaseTempate from '@pages/area/AreaBaseTempate';
 import AreaListTempate from '@pages/area/AreaListTempate';
 import AreaViewTempate from '@pages/area/AreaViewTempate';
->>>>>>> develop
 
 
 const AppRoutes = () => {
