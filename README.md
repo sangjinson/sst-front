@@ -1,5 +1,7 @@
 // 서버 실행
->> yarn dev
+```
+yarn dev
+```
 
 // tailwind 설치
 >> yarn add tailwindcss @tailwindcss/vite
