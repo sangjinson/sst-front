@@ -11,9 +11,7 @@ import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
 import AttractionPage from '@pages/landing/AttractionPage';
-import AreaBaseTempate from '@pages/area/AreaBaseTempate';
-import AreaListTempate from '@pages/area/AreaListTempate';
-import AreaViewTempate from '@pages/area/AreaViewTempate';
+
 import AreaBaseTemplate from '@pages/area/AreaBaseTemplate';
 import AreaListTemplate from '@pages/area/AreaListTemplate';
 import AreaViewTemplate from '@pages/area/AreaViewTemplate';
