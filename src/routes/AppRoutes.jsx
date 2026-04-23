@@ -29,7 +29,7 @@ const AppRoutes = () => {
           <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
         </Route>
 
-        {/* 놀거리 */}
+        {/* 사거리 탬플릿 */}
         <Route path="/area" element={<AreaBaseTemplate />}>
           <Route path=":type/list" element={<AreaListTemplate />} />
           <Route path=":type/view" element={<AreaViewTemplate />} />
