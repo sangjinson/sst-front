@@ -31,6 +31,11 @@ a {
   color: inherit;
 }
 
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
 table {
   border-collapse: collapse;
   border-spacing: 0;
