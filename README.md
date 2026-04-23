@@ -1,16 +1,41 @@
-# React + Vite
+// 서버 실행
+```
+yarn dev
+```
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+// tailwind 설치
+```
+yarn add tailwindcss @tailwindcss/vite
+```
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+// 구조
+```
+src/
+├── assets/               # CSS, 이미지, 폰트 등 정적 리소스
+│   ├── css/landing.css
+│   └── images/logo.png
+├── components/           # 공통/역할별 UI 컴포넌트
+│   ├── common/Header.jsx
+│   └── common/Footer.jsx
+├── context/              # 전역 상태 관리
+│   └── AuthContext.jsx
+├── hooks/                # 커스텀 훅 모음
+│   ├── useAuth.js
+│   └── useApi.js
+├── layouts/              # 공통 레이아웃
+│   ├── UserLayout.jsx
+│   └── AdminLayout.jsx
+├── pages/                # 실제 렌더링되는 페이지들
+│   ├── landing/LandingPage.jsx
+│   ├── user/Home.jsx
+│   ├── admin/Dashboard.jsx
+│   └── error/Unauthorized.jsx
+├── routes/               # 라우팅 및 권한 가드
+│   ├── AppRoutes.jsx
+│   └── ProtectedRoute.jsx
+├── utils/                # 설정 및 유틸 함수
+│   ├── axiosInstance.js
+│   └── api.js
+├── App.jsx               # 최상위 컴포넌트
+└── main.jsx              # React 진입점
+```
