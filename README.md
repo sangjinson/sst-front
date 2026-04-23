@@ -1,5 +1,6 @@
-// 서버 실행
+// yarn 서버 설치 및 실행
 ```
+npm install -g yarn
 yarn dev
 ```
 
