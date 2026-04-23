@@ -1,8 +1,5 @@
-@import "tailwindcss";
-@import "./assets/fonts/Paperlogy.css";
-
 /* ===== CSS Reset 문법 추가는 가능하나, 내용은 수정 금지 =====*/
-html, body, div, span, applet, object, iframe,
+html, body, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, address, big, cite, code,
 del, dfn, em, img, ins, kbd, q, s, samp,
@@ -40,6 +37,8 @@ html, body, *{font-family: 'Paperlogy', system-ui, -apple-system, BlinkMacSystem
 
 /* ===== CSS Reset 문법 추가는 가능하나, 내용은 수정 금지 =====*/
 
+@import "tailwindcss";
+@import "./assets/fonts/Paperlogy.css";
 
 .counter {
   font-size: 16px;
