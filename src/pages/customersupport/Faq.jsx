@@ -31,7 +31,10 @@ const Notice = () => {
 
           {/* breadcrumb */}
           <div className="text-sm text-gray-400 mb-2">
-            홈 &gt; 고객지원 &gt; 자주하는 질문
+            홈 &gt; 고객지원 &gt; 
+            <span className="font-semibold text-gray-600">
+                자주하는 질문
+            </span>
           </div>
 
           {/* 제목 */}
@@ -60,7 +63,7 @@ const Notice = () => {
                   <td className="py-5 px-6">추천 결과가 마음에 들지 않으면 어떻게 하나요?</td>
                   <td className="py-5 px-6 text-gray-500">2026.02.25</td>
                   <td className="py-5 px-6">
-                    <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
+                    <span className="whitespace-nowrap bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
                       답변완료
                     </span>
                   </td>
@@ -71,7 +74,7 @@ const Notice = () => {
                   <td className="py-5 px-6">일정은 수정할 수 있나요?</td>
                   <td className="py-5 px-6 text-gray-500">2026.03.30</td>
                   <td className="py-5 px-6">
-                    <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
+                    <span className="whitespace-nowrap bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
                       답변완료
                     </span>
                   </td>
@@ -82,7 +85,7 @@ const Notice = () => {
                   <td className="py-5 px-6">AI 여행 일정은 어떻게 생성되나요?</td>
                   <td className="py-5 px-6 text-gray-500">2026.03.20</td>
                   <td className="py-5 px-6">
-                    <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
+                    <span className="whitespace-nowrap bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
                       답변완료
                     </span>
                   </td>

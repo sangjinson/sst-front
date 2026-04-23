@@ -19,9 +19,9 @@ const Footer = () => {
             <p><strong>대표전화 010-8728-4276</strong> | <strong>팩스 02-123-1234</strong></p>
           </div>
           <div className="footer-links">
-            <Link to="/customersupport/notice" style={{ color: "#fff" }}><span>고객지원</span></Link>
-            <Link to="/customersupport/notice" style={{ color: "#fff" }}><span>공지사항</span></Link>
-            <Link to="/customersupport/faq" style={{ color: "#fff" }}><span>자주하는 질문</span></Link>
+            <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">고객지원</Link>
+            <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">공지사항</Link>
+            <Link to="/customersupport/faq" className="text-white hover:text-sky-400! transition-colors duration-200">자주하는 질문</Link>
           </div>
         </div>
 

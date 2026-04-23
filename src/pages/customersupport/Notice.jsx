@@ -32,7 +32,10 @@ const Notice = () => {
 
           {/* breadcrumb */}
           <div className="text-sm text-gray-400 mb-2">
-            홈 &gt; 고객지원 &gt; <span className="font-semibold">공지사항</span>
+            홈 &gt; 고객지원 &gt; 
+            <span className="font-semibold text-gray-600">
+                공지사항
+            </span>
           </div>
 
           {/* 제목 */}
