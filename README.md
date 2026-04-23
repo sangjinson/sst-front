@@ -4,9 +4,12 @@ yarn dev
 ```
 
 // tailwind 설치
->> yarn add tailwindcss @tailwindcss/vite
+```
+yarn add tailwindcss @tailwindcss/vite
+```
 
 // 구조
+```
 src/
 ├── assets/               # CSS, 이미지, 폰트 등 정적 리소스
 │   ├── css/landing.css
@@ -35,3 +38,4 @@ src/
 │   └── api.js
 ├── App.jsx               # 최상위 컴포넌트
 └── main.jsx              # React 진입점
+```
