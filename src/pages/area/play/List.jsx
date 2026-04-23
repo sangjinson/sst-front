@@ -10,7 +10,9 @@ import IconSVG from '../../../components/Icon/IconSVG';
 const PlayList = () => {
     return (
         <>
-        <div>PlayLisfft</div>
+        <div>PlayLis</div>
+        <IconSVG name="park" className="text-blue-500 hover:text-red-500" />
+        <IconSVG name="huney" className="text-blue-500 hover:text-red-500" />
         </>
     )
 };
