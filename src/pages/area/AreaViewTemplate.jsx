@@ -5,8 +5,8 @@ import Footer from '@components/common/Footer';
 import InListCard from '@components/card/InListCard'; // 경로에 맞춰 수정하세요
 import '@assets/css/landing.css';
 
-const AreaViewTempate = () => {
+const AreaViewTemplate = () => {
  
 };
 
-export default AreaViewTempate;
+export default AreaViewTemplate;
