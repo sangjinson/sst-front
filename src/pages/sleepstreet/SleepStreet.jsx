@@ -1,4 +1,4 @@
-const MainPage = () => {
+const SleepStreet = () => {
 
     return (
         <div>
@@ -6,4 +6,4 @@ const MainPage = () => {
         </div>
     )
 }
-export default MainPage;
+export default SleepStreet;
