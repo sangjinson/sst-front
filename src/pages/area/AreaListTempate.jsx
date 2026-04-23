@@ -6,10 +6,8 @@ const FoodList = lazy(() => import('./food/FoodList'));
 const SeeList = lazy(() => import('./see/SeeList'));
 const SleepList = lazy(() => import('./sleep/SleepList'));
 
-
 function AreaListTempate() {
   const { type } = useParams();
-
   const renderList = () => {
     switch (type) {
       case 'play':

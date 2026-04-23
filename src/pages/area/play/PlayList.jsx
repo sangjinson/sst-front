@@ -5,11 +5,12 @@ import '@assets/css/landing.css';
 
 import { Outlet } from 'react-router-dom';
 import Header from '@components/common/Header';
+import IconSVG from '../../../components/Icon/IconSVG';
 
 const PlayList = () => {
     return (
         <>
-        <div>PlayList</div>
+        <div>PlayLisfft</div>
         </>
     )
 };
