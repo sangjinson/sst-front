@@ -1,8 +1,10 @@
 import React from 'react';
-import '@assets/css/main.css';
+import { useLocation } from 'react-router-dom';
+
 
 const MainPage = () => {
-  // --- 기존 데이터 유지 ---
+    const location = useLocation();
+    const currentRegion = location.state?.selectedRegion || '경기도';
   const streetList = [
     { id: 1, title: '예술의 거리', location: '객사 에이리', img: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=400&q=80' },
     { id: 2, title: '낭만의 거리', location: '수변 상업동', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
@@ -28,20 +30,30 @@ const MainPage = () => {
     { id: 3, tag: '먹거리', title: '행궁동 카페거리 (행리단길)', desc: '감성 넘치는 한옥뷰 카페와 맛집 투어' },
   ];
 
+  // 반복되는 카테고리 렌더링 영역
   const renderCategorySection = (title, dataList) => (
-    <section className="category-section">
-      <div className="section-header">
-        <h3 className="section-title"><span className="highlight-bar"></span>{title}</h3>
-        <button className="more-btn">더보기 <span>→</span></button>
+    <section className="mb-[60px]">
+      <div className="flex justify-between items-end mb-[25px]">
+        <h3 className="text-[22px] font-bold flex items-center gap-2.5 text-gray-900">
+          <span className="inline-block w-1 h-5 bg-[#E26338] rounded-sm"></span>
+          {title}
+        </h3>
+        <button className="bg-[#f5f5f5] border border-[#eee] py-1 px-4 rounded-full text-[12px] text-gray-600 cursor-pointer hover:bg-[#eee] transition-colors">
+          더보기 <span>→</span>
+        </button>
       </div>
-      <div className="category-grid">
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[25px]">
         {dataList.map((item) => (
-          <div key={item.id} className="category-card">
-            <div className="card-img-placeholder"></div>
-            <div className="card-content">
-              <span className="card-tag">{item.tag}</span>
-              <h4 className="card-title">{item.title}</h4>
-              <p className="card-desc">{item.desc}</p>
+          <div key={item.id} className="bg-white border border-[#eee] rounded-xl overflow-hidden cursor-pointer transition-shadow duration-200 hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] group">
+            {/* 썸네일 이미지 공간 (회색 배경) */}
+            <div className="w-full h-[180px] bg-[#f0f0f0]"></div>
+            <div className="p-5">
+              <span className="inline-block bg-[#FFF2E8] text-[#E26338] text-[11px] font-bold py-1 px-2.5 rounded mb-3">
+                {item.tag}
+              </span>
+              <h4 className="text-[18px] font-bold mb-2 text-gray-900 group-hover:text-primary transition-colors">{item.title}</h4>
+              <p className="text-[14px] text-gray-500 leading-relaxed line-clamp-2">{item.desc}</p>
             </div>
           </div>
         ))}
@@ -50,43 +62,53 @@ const MainPage = () => {
   );
 
   return (
-    <div className="home-wrapper">
+    <div className="w-full bg-white pb-[100px]">
       
-      {/* 검색창 섹션은 Header.jsx로 이동했으므로 삭제됨 */}
-
-      {/* 상단 히어로 배너 */}
-      <section className="hero-banner">
-        <div className="hero-text">
-          <h1>화성</h1>
-          <p>전통과 현대가 공존하는 도시</p>
+      {/* 1. 상단 히어로 배너 (동적 텍스트 적용) */}
+      <section 
+        className="w-full h-[400px] bg-cover bg-center flex justify-center items-center relative"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=1920&q=80')" }}
+      >
+        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="relative z-10 text-center text-white drop-shadow-md">
+          {/* 🔥 전달받은 지역 이름이 이곳에 뜹니다! */}
+          <h1 className="font-griun text-[50px] md:text-[80px] mb-[15px] font-black">
+            {currentRegion} 
+          </h1>
+          <p className="text-[18px] md:text-[24px] font-medium tracking-[2px]">전통과 현대가 공존하는 도시</p>
         </div>
       </section>
 
-      {/* 중앙 콘텐츠 영역 */}
-      <div className="main-content-container">
-        <div className="breadcrumb">홈 &gt; <strong>화성시</strong></div>
-
-        <section className="street-section">
-          <div className="center-title-container">
-            <h2 className="center-title">방방곳곳 숨어있는 거리를 찾다</h2>
+      {/* 2. 중앙 콘텐츠 영역 */}
+      <div className="max-w-[1200px] mx-auto px-5 py-10">
+        {/* 브레드크럼에도 동적 텍스트 적용 */}
+        <div className="text-[13px] text-gray-500 mb-[50px]">
+          홈 &gt; <strong className="text-gray-900">{currentRegion}</strong>
+        </div>
+        {/* 3. 숨어있는 거리 섹션 */}
+        <section className="mb-[80px]">
+          <div className="text-center mb-10 border-b-2 border-gray-800 pb-4">
+            <h2 className="text-[26px] font-bold text-gray-900">방방곳곳 숨어있는 거리를 찾다</h2>
           </div>
           
-          <div className="street-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {streetList.map((street) => (
-              <div key={street.id} className="street-card">
-                <img src={street.img} alt={street.title} className="street-img" />
-                <div className="street-overlay">
-                  <h4>{street.title}</h4>
-                  <p>{street.location}</p>
+              <div key={street.id} className="relative rounded-xl overflow-hidden aspect-[3/4] shadow-[0_4px_15px_rgba(0,0,0,0.1)] cursor-pointer hover:-translate-y-1.5 transition-transform duration-300">
+                <img src={street.img} alt={street.title} className="w-full h-full object-cover block" />
+                <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent pt-[30px] pb-5 px-5 text-white">
+                  <h4 className="text-[18px] font-bold mb-1">{street.title}</h4>
+                  <p className="text-[13px] text-gray-300">{street.location}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
+        {/* 4. 카테고리별 추천 리스트 (볼거리, 잘/놀거리, 먹거리) */}
         {renderCategorySection("놓치지 말아야 할 '볼거리'", attractions)}
         {renderCategorySection("편안한 '잘거리'와 신나는 '놀거리'", activities)}
         {renderCategorySection("수원의 맛, '먹거리'", foods)}
+
       </div>
     </div>
   );
