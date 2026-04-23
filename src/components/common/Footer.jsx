@@ -1,5 +1,6 @@
 import React from 'react';
 import '@assets/css/footer.css';
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -32,9 +33,9 @@ const Footer = () => {
               </p>
             </div>
             <div className="flex gap-6 text-gray-300">
-              <span className="hover:text-white cursor-pointer transition-colors">고객지원</span>
-              <span className="hover:text-white cursor-pointer transition-colors">공지사항</span>
-              <span className="hover:text-white cursor-pointer transition-colors">자주하는 질문</span>
+              <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">고객지원</Link>
+              <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">공지사항</Link>
+              <Link to="/customersupport/faq" className="text-white hover:text-sky-400! transition-colors duration-200">자주하는 질</Link>
             </div>
           </div>
 
