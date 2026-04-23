@@ -11,7 +11,7 @@ import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
 import Notice from "@pages/customersupport/Notice";
-
+import Faq from "@pages/customersupport/Faq";
 
 const AppRoutes = () => {
   return (
@@ -28,6 +28,9 @@ const AppRoutes = () => {
         </Route>
         <Route path="/customersupport" element={<UserLayout />}>
           <Route path="notice" element={<Notice />} />
+        </Route>
+        <Route path="/customersupport" element={<UserLayout />}>
+          <Route path="faq" element={<Faq />} />
         </Route>
       </Route>
 

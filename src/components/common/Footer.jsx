@@ -20,8 +20,8 @@ const Footer = () => {
           </div>
           <div className="footer-links">
             <Link to="/customersupport/notice" style={{ color: "#fff" }}><span>고객지원</span></Link>
-            <span>공지사항</span>
-            <span>자주하는 질문</span>
+            <Link to="/customersupport/notice" style={{ color: "#fff" }}><span>공지사항</span></Link>
+            <Link to="/customersupport/faq" style={{ color: "#fff" }}><span>자주하는 질문</span></Link>
           </div>
         </div>
 
