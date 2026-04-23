@@ -9,7 +9,7 @@ import Header from '@components/common/Header';
 const FoodList = () => {
     return (
         <>
-        <div>PlayList</div>
+        <div>FoodList</div>
         </>
     )
 };
