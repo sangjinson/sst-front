@@ -8,10 +8,10 @@ const Header = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const navItems = [
-    { name: '볼거리', path: '/area/see/list' },
-    { name: '먹거리', path: '/area/food/list' },
-    { name: '잘거리', path: '/area/sleep/list' },
-    { name: '놀거리', path: '/area/play/list' },
+    { name: '볼거리', path: '/area/see/SeeList' },
+    { name: '먹거리', path: '/area/food/FoodList' },
+    { name: '잘거리', path: '/area/sleep/SleepList' },
+    { name: '놀거리', path: '/area/play/PlayList' },
     { name: '뽐낼거리', path: '/user' },
     { name: '내거리', path: '/user/mypage' },
   ];
