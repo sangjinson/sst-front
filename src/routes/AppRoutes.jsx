@@ -10,9 +10,9 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
-import AreaBaseTempate from '@pages/area/AreaBaseTempate';
-import AreaListTempate from '@pages/area/AreaListTempate';
-import AreaViewTempate from '@pages/area/AreaViewTempate';
+import AreaBaseTempate from '@pages/area/AreaBaseTemplate';
+import AreaListTempate from '@pages/area/AreaListTemplate';
+import AreaViewTempate from '@pages/area/AreaViewTemplate';
 
 
 const AppRoutes = () => {
@@ -30,9 +30,9 @@ const AppRoutes = () => {
         </Route>
 
         {/* 놀거리 */}
-        <Route path="/area" element={<AreaBaseTempate />}>
-          <Route path=":type/list" element={<AreaListTempate />} />
-          <Route path=":type/view" element={<AreaViewTempate />} />
+        <Route path="/area" element={<AreaBaseTemplate />}>
+          <Route path=":type/list" element={<AreaListTemplate />} />
+          <Route path=":type/view" element={<AreaViewTemplate />} />
         </Route>
 
       </Route>
