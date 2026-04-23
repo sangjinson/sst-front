@@ -1,12 +1,13 @@
 import { lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 
-const PlayList = lazy(() => import('./play/PlayList'));
-const FoodList = lazy(() => import('./food/FoodList'));
-const SeeList = lazy(() => import('./see/SeeList'));
-const SleepList = lazy(() => import('./sleep/SleepList'));
+const PlayList = lazy(() => import('./play/List'));
+const FoodList = lazy(() => import('./food/List'));
+const SeeList = lazy(() => import('./see/List'));
+const SleepList = lazy(() => import('./sleep/List'));
 
-function AreaListTempate() {
+
+function AreaListTemplate() {
   const { type } = useParams();
   const renderList = () => {
     switch (type) {
@@ -31,4 +32,4 @@ function AreaListTempate() {
   );
 }
 
-export default AreaListTempate;
+export default AreaListTemplate;
