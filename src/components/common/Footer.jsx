@@ -1,4 +1,5 @@
 import React from 'react';
+import '@assets/css/footer.css';
 
 const Footer = () => {
   return (
@@ -8,7 +9,7 @@ const Footer = () => {
         
         {/* 1. 상단 섹션: 로고 단독 배치 */}
         <div className="w-full mb-10">
-          <h2 className="text-white text-[28px] font-griun font-black">
+          <h2 className="footer-logo text-white text-[28px] font-griun font-black">
             거리에섯
           </h2>
         </div>

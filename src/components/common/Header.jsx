@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import '@assets/css/header.css';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,7 +43,7 @@ const Header = () => {
       <div className="max-w-[1920px] mx-auto flex justify-between items-center py-5 px-5 lg:px-[50px] xl:px-[250px]">
         
         {/* 로고 */}
-        <div className="text-[28px] font-black font-griun text-black">
+        <div className="header-logo text-black no-underline text-[28px] my-5">
           {/* to="/user" 였던 것을 to="/" 로 변경합니다 */}
           <Link to="/" onClick={closeMenu}>거리에섯</Link>
         </div>

@@ -1,10 +1,21 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
+const bannerImages = {
+  '화성시': 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=1920&q=80', // 기존 한옥 배너
+  '수원시': 'https://images.unsplash.com/photo-1605833989399-52e8548a3dae?auto=format&fit=crop&w=1920&q=80', // 수원 예시 이미지
+  '부천시': 'https://images.unsplash.com/photo-1570198083995-1f6cc9709d07?auto=format&fit=crop&w=1920&q=80', // 부천 예시 이미지
+  // ... 필요한 만큼 지역 추가
+};
+
+const defaultBanner = 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=1920&q=80'; 
 
 const MainPage = () => {
-    const location = useLocation();
-    const currentRegion = location.state?.selectedRegion || '경기도';
+  const location = useLocation();
+  const currentRegion = location.state?.selectedRegion || '경기도';
+
+  // 2. 현재 지역에 맞는 배너 이미지 찾기 (없으면 기본 이미지 사용)
+  const currentBannerImage = bannerImages[currentRegion] || defaultBanner;
   const streetList = [
     { id: 1, title: '예술의 거리', location: '객사 에이리', img: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=400&q=80' },
     { id: 2, title: '낭만의 거리', location: '수변 상업동', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
@@ -66,13 +77,12 @@ const MainPage = () => {
       
       {/* 1. 상단 히어로 배너 (동적 텍스트 적용) */}
       <section 
-        className="w-full h-[400px] bg-cover bg-center flex justify-center items-center relative"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=1920&q=80')" }}
+        className="w-full h-[400px] bg-cover bg-center flex justify-center items-center relative transition-all duration-500"
+        style={{ backgroundImage: `url('${currentBannerImage}')` }} // 👈 여기가 핵심입니다!
       >
         <div className="absolute inset-0 bg-black/30"></div>
         <div className="relative z-10 text-center text-white drop-shadow-md">
-          {/* 🔥 전달받은 지역 이름이 이곳에 뜹니다! */}
-          <h1 className="font-griun text-[50px] md:text-[80px] mb-[15px] font-black">
+          <h1 className="font-['GriunFont'] text-[50px] md:text-[80px] mb-[15px] font-black">
             {currentRegion} 
           </h1>
           <p className="text-[18px] md:text-[24px] font-medium tracking-[2px]">전통과 현대가 공존하는 도시</p>
