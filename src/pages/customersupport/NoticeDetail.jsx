@@ -78,8 +78,8 @@ const NoticeDetail = () => {
                     <div className="border-t border-gray-300 mb-6"></div>
 
                     <div className="space-y-4">
-                        <Link to="/customersupport/notice"><p className="text-gray-500 mb-4">공지사항</p></Link>
-                        <Link to="/customersupport/faq"><p className="text-gray-900 font-medium">자주하는 질문</p></Link>
+                        <Link to="/customersupport/notice"><p className="text-gray-900 font-medium mb-4">공지사항</p></Link>
+                        <Link to="/customersupport/faq"><p className="text-gray-500">자주하는 질문</p></Link>
                     </div>
                 </div>
 

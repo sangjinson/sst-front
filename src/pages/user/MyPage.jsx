@@ -1,5 +1,6 @@
 import React from 'react';
 import '@assets/css/mypage.css';
+import { Link } from "react-router-dom";
 
 const MyPage = () => {
   // 찜 목록 임시 데이터 
@@ -45,8 +46,8 @@ const MyPage = () => {
         <div className="box-card">
           <h3>프로필 더보기</h3>
           <ul className="link-list">
-            <li><span>👤</span> 공지사항</li>
-            <li><span>🚫</span> 자주 하는 질문</li>
+            <Link to="/customersupport/notice"><li><span>👤</span> 공지사항</li></Link>
+            <Link to="/customersupport/Faq"><li><span>🚫</span> 자주 하는 질문</li></Link>
           </ul>
         </div>
       </aside>
