@@ -14,13 +14,13 @@ import MyPage from '@pages/user/MyPage';
 import Notice from "@pages/customersupport/Notice";
 import NoticeDetail from "@pages/customersupport/NoticeDetail";
 import Faq from "@pages/customersupport/Faq";
-import FaqDetail from "@pages/customersupport/FaqDetail";
 import AreaBaseTemplate from '@pages/area/AreaBaseTemplate';
 import AreaListTemplate from '@pages/area/AreaListTemplate';
 import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 
 import Community from '@pages/showcase/Community';
 import CommunityDetail from "@pages/showcase/CommunityDetail";
+import CommunityWrite from "@pages/showcase/CommunityWrite";
 
 const AppRoutes = () => {
   return (
@@ -44,6 +44,8 @@ const AppRoutes = () => {
             <Route index element={<Community />} /> 
             {/* 상세 보기 주소: /showcase/view/1 */}
             <Route path="view/:id" element={<CommunityDetail />} />
+            {/* 3. 뽐낼거리 글쓰기 페이지 */}
+            <Route path="write" element={<CommunityWrite />} />
           </Route>
         
 
@@ -52,7 +54,6 @@ const AppRoutes = () => {
           <Route path="notice" element={<Notice />} />
           <Route path="notice/:id" element={<NoticeDetail />} />
           <Route path="faq" element={<Faq />} />
-          <Route path="faq/:id" element={<FaqDetail />} />
         </Route>
 
         {/* 메인페이지 */}
