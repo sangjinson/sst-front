@@ -32,10 +32,11 @@ const Footer = () => {
                 <span className="font-bold">팩스 02-123-1234</span>
               </p>
             </div>
-            <div className="flex gap-6 text-gray-300">
-              <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">고객지원</Link>
-              <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">공지사항</Link>
-              <Link to="/customersupport/faq" className="text-white hover:text-sky-400! transition-colors duration-200">자주하는 질</Link>
+            <div className="gap-6 text-gray-300">
+              <span>고객지원</span>
+              <span className="mx-2">|</span>
+              <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200 mr-2.5">공지사항</Link>
+              <Link to="/customersupport/faq" className="text-white hover:text-sky-400! transition-colors duration-200">자주하는 질문</Link>
             </div>
           </div>
 
