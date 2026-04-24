@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import Footer from '@components/common/Footer';
-import Header from '@components/common/Header';
 import { getSleepDataByRegion } from './sleepDummyData';
 
 // 별점 컴포넌트
@@ -129,11 +127,10 @@ const List = () => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
-                  selectedCategory === cat
-                    ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
-                    : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${selectedCategory === cat
+                  ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
+                  }`}
               >
                 {cat}
               </button>
@@ -146,11 +143,10 @@ const List = () => {
               <button
                 key={opt.value}
                 onClick={() => setSortOption(opt.value)}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
-                  sortOption === opt.value
-                    ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
-                    : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${sortOption === opt.value
+                  ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
+                  }`}
               >
                 {opt.label}
               </button>
@@ -181,9 +177,8 @@ const List = () => {
                   />
                   {/* 카테고리 배지 */}
                   <span
-                    className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${
-                      categoryColor[item.category] || 'bg-gray-100 text-gray-600'
-                    }`}
+                    className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${categoryColor[item.category] || 'bg-gray-100 text-gray-600'
+                      }`}
                   >
                     {item.category}
                   </span>
@@ -234,11 +229,10 @@ const List = () => {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-9 h-9 rounded-lg text-sm font-medium transition ${
-                  currentPage === page
-                    ? 'bg-[#0F9B73] text-white'
-                    : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`w-9 h-9 rounded-lg text-sm font-medium transition ${currentPage === page
+                  ? 'bg-[#0F9B73] text-white'
+                  : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 {page}
               </button>
@@ -253,8 +247,6 @@ const List = () => {
           </div>
         )}
       </div>
-
-      <Footer />
     </div>
   );
 };

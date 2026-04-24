@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import Footer from '@components/common/Footer';
-import Header from '@components/common/Header';
 import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
 
 // ※ 프로젝트의 실제 AuthContext import로 교체하세요
@@ -34,9 +32,8 @@ const StarSelector = ({ value, onChange }) => (
       <span
         key={star}
         onClick={() => onChange(star)}
-        className={`text-2xl cursor-pointer transition-colors ${
-          star <= value ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
-        }`}
+        className={`text-2xl cursor-pointer transition-colors ${star <= value ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
+          }`}
       >
         ★
       </span>
@@ -136,7 +133,6 @@ const View = () => {
             </button>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -181,9 +177,8 @@ const View = () => {
           {/* 이름 오버레이 */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-5">
             <span
-              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-2 ${
-                categoryColor[item.category] || 'bg-gray-100 text-gray-600'
-              }`}
+              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-2 ${categoryColor[item.category] || 'bg-gray-100 text-gray-600'
+                }`}
             >
               {item.category}
             </span>
@@ -205,9 +200,8 @@ const View = () => {
             {/* 찜 버튼 */}
             <button
               onClick={() => setIsWished((prev) => !prev)}
-              className={`w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-sm transition shadow-sm ${
-                isWished ? "bg-red-500 text-white" : "bg-white/80 text-gray-400 hover:bg-white"
-              }`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-sm transition shadow-sm ${isWished ? "bg-red-500 text-white" : "bg-white/80 text-gray-400 hover:bg-white"
+                }`}
               title={isWished ? "찜 취소" : "찜하기"}
             >
               {isWished ? "♥" : "♡"}
@@ -404,8 +398,6 @@ const View = () => {
         )}
 
       </div>
-
-      <Footer />
     </div>
   );
 };
