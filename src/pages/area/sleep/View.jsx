@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import Footer from '@components/common/Footer';
-import Header from '@components/common/Header';
 import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
 
-// 별점 컴포넌트
+// ※ 프로젝트의 실제 AuthContext import로 교체하세요
+// import { useAuth } from '@context/AuthContext';
+
+// 별점 컴포넌트 (읽기용)
 const StarRating = ({ rating, size = 'md' }) => {
   const textSize = size === 'lg' ? 'text-xl' : 'text-sm';
   return (
@@ -24,6 +25,25 @@ const StarRating = ({ rating, size = 'md' }) => {
   );
 };
 
+// 별점 선택 컴포넌트 (등록용)
+const StarSelector = ({ value, onChange }) => (
+  <div className="flex items-center gap-1">
+    {[1, 2, 3, 4, 5].map((star) => (
+      <span
+        key={star}
+        onClick={() => onChange(star)}
+        className={`text-2xl cursor-pointer transition-colors ${star <= value ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
+          }`}
+      >
+        ★
+      </span>
+    ))}
+  </div>
+);
+
+// 한 번에 보여줄 리뷰 수
+const REVIEWS_PER_PAGE = 3;
+
 // 카테고리 배지 색상
 const categoryColor = {
   호텔: 'bg-blue-100 text-blue-700',
@@ -40,9 +60,27 @@ const View = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
 
+  // ※ 실제 프로젝트에서는 아래 주석을 해제하고 위의 임시 코드를 삭제하세요
+  // const { user } = useAuth();
+  // const isLoggedIn = !!user;
+
+  // ※ 임시 로그인 상태 (실제 AuthContext로 교체 필요)
+  const isLoggedIn = true;
+
   const [item, setItem] = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // 찜 상태
+  const [isWished, setIsWished] = useState(false);
+
+  // 리뷰 더보기 상태
+  const [showAllReviews, setShowAllReviews] = useState(false);
+
+  // 리뷰 등록 상태
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     if (!id) return;
@@ -50,14 +88,34 @@ const View = () => {
     // 숙소 단건 조회
     const data = getSleepDataById(id);
     setItem(data);
-
-    // 연관 숙소: 같은 지역에서 본인 제외 최대 4개
     if (data) {
+      setReviews(data.reviews || []);
+      // 연관 숙소: 같은 지역에서 본인 제외 최대 4개
       const all = getSleepDataByRegion(data.region);
       const related = all.filter((d) => d.id !== data.id).slice(0, 4);
       setRelatedItems(related);
     }
   }, [id]);
+
+  // 리뷰 등록 핸들러
+  const handleReviewSubmit = () => {
+    if (reviewRating === 0) {
+      alert('별점을 선택해주세요.');
+      return;
+    }
+    if (!reviewComment.trim()) {
+      alert('리뷰 내용을 입력해주세요.');
+      return;
+    }
+    const newReview = {
+      user: '나',  // ※ 실제에서는 user.name 등으로 교체
+      rating: reviewRating,
+      comment: reviewComment.trim(),
+    };
+    setReviews((prev) => [newReview, ...prev]);
+    setReviewRating(0);
+    setReviewComment('');
+  };
 
   // 데이터 없을 때
   if (!item) {
@@ -75,7 +133,6 @@ const View = () => {
             </button>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -120,14 +177,37 @@ const View = () => {
           {/* 이름 오버레이 */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-5">
             <span
-              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-2 ${
-                categoryColor[item.category] || 'bg-gray-100 text-gray-600'
-              }`}
+              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-2 ${categoryColor[item.category] || 'bg-gray-100 text-gray-600'
+                }`}
             >
               {item.category}
             </span>
             <h1 className="text-2xl md:text-3xl font-bold text-white">{item.name}</h1>
           </div>
+          {/* 공유 & 찜 버튼 */}
+          <div className="absolute top-4 right-4 flex gap-2">
+            {/* 공유 버튼 */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                alert("링크가 복사되었습니다.");
+              }}
+              className="w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full text-gray-700 hover:bg-white transition shadow-sm"
+              title="공유하기"
+            >
+              🔗
+            </button>
+            {/* 찜 버튼 */}
+            <button
+              onClick={() => setIsWished((prev) => !prev)}
+              className={`w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-sm transition shadow-sm ${isWished ? "bg-red-500 text-white" : "bg-white/80 text-gray-400 hover:bg-white"
+                }`}
+              title={isWished ? "찜 취소" : "찜하기"}
+            >
+              {isWished ? "♥" : "♡"}
+            </button>
+          </div>
+
           {/* 뒤로가기 버튼 */}
           <button
             onClick={() => navigate(-1)}
@@ -230,8 +310,44 @@ const View = () => {
             </div>
           </div>
 
+          {/* 리뷰 등록 폼 - 로그인 상태에서만 표시 */}
+          {isLoggedIn ? (
+            <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
+              <p className="text-sm font-semibold text-gray-700 mb-3">리뷰 작성</p>
+              <div className="mb-3">
+                <p className="text-xs text-gray-400 mb-1">별점 선택</p>
+                <StarSelector value={reviewRating} onChange={setReviewRating} />
+              </div>
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                placeholder="숙소에 대한 솔직한 리뷰를 남겨주세요."
+                rows={3}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none resize-none focus:border-[#0F9B73] transition-colors"
+              />
+              <button
+                onClick={handleReviewSubmit}
+                className="mt-2 w-full py-2.5 bg-[#0F9B73] text-white rounded-xl text-sm font-medium hover:bg-[#0d8a66] transition-colors"
+              >
+                리뷰 등록
+              </button>
+            </div>
+          ) : (
+            // 비로그인 상태: 로그인 유도 메시지
+            <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100 text-center">
+              <p className="text-sm text-gray-500 mb-2">리뷰를 등록하려면 로그인이 필요합니다.</p>
+              <button
+                onClick={() => navigate('/login')}
+                className="px-5 py-2 border border-[#0F9B73] text-[#0F9B73] rounded-lg text-sm font-medium hover:bg-[#0F9B73] hover:text-white transition-colors"
+              >
+                로그인하러 가기
+              </button>
+            </div>
+          )}
+
+          {/* 리뷰 목록 - 기본 3개 표시, 더보기 클릭 시 전체 표시 */}
           <div className="flex flex-col gap-3">
-            {item.reviews.map((review, idx) => (
+            {(showAllReviews ? reviews : reviews.slice(0, REVIEWS_PER_PAGE)).map((review, idx) => (
               <div key={idx} className="border border-gray-100 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-sm font-semibold text-gray-800">{review.user}</p>
@@ -242,9 +358,14 @@ const View = () => {
             ))}
           </div>
 
-          {/* 리뷰 더보기 버튼 */}
-          <button className="w-full mt-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition">
-            리뷰 더보기
+          {/* 리뷰 더보기 / 접기 버튼 */}
+          <button
+            onClick={() => setShowAllReviews((prev) => !prev)}
+            className="w-full mt-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition"
+          >
+            {showAllReviews
+              ? '접기 ▲'
+              : `리뷰 더보기 ▼`}
           </button>
         </div>
 
@@ -277,8 +398,6 @@ const View = () => {
         )}
 
       </div>
-
-      <Footer />
     </div>
   );
 };

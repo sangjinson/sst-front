@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import Footer from '@components/common/Footer';
-import Header from '@components/common/Header';
 import { getSleepDataByRegion } from './sleepDummyData';
 
 // 별점 컴포넌트
@@ -36,7 +34,7 @@ const List = () => {
   const [sleepList, setSleepList] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('전체');
-  const [sortOption, setSortOption] = useState('rating');
+  const [sortOption, setSortOption] = useState('latest');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
@@ -56,22 +54,12 @@ const List = () => {
       result = result.filter((item) => item.category === selectedCategory);
     }
 
-    if (sortOption === 'rating') {
+    if (sortOption === 'latest') {
+      // 최신순: id 내림차순 (id가 클수록 최근 등록)
+      result.sort((a, b) => b.id - a.id);
+    } else if (sortOption === 'popular') {
+      // 인기순: 평점 높은 순
       result.sort((a, b) => b.rating - a.rating);
-    } else if (sortOption === 'review') {
-      result.sort((a, b) => b.reviewCount - a.reviewCount);
-    } else if (sortOption === 'price_asc') {
-      result.sort((a, b) => {
-        const aPrice = parseInt(a.price.replace(/[^0-9]/g, ''));
-        const bPrice = parseInt(b.price.replace(/[^0-9]/g, ''));
-        return aPrice - bPrice;
-      });
-    } else if (sortOption === 'price_desc') {
-      result.sort((a, b) => {
-        const aPrice = parseInt(a.price.replace(/[^0-9]/g, ''));
-        const bPrice = parseInt(b.price.replace(/[^0-9]/g, ''));
-        return bPrice - aPrice;
-      });
     }
 
     setFiltered(result);
@@ -102,9 +90,6 @@ const List = () => {
         />
         <div className="absolute inset-0 bg-black/50" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
-          <p className="text-sm text-white/70 mb-2">
-            홈 &gt; {region} &gt; <span className="text-white font-semibold">잘거리</span>
-          </p>
           <h1 className="text-4xl md:text-5xl font-bold mb-3">{region}</h1>
           <p className="text-base md:text-lg text-white/80">
             {region}의 편안한 숙소를 찾아보세요
@@ -114,6 +99,26 @@ const List = () => {
 
       {/* 필터 & 정렬 영역 */}
       <div className="max-w-[1200px] mx-auto px-4 py-6">
+
+        {/* 브레드크럼 */}
+        <p className="text-sm text-gray-400 mb-4">
+          <span
+            className="cursor-pointer hover:text-[#0F9B73] transition-colors"
+            onClick={() => navigate('/')}
+          >
+            홈
+          </span>
+          {' > '}
+          <span
+            className="cursor-pointer hover:text-[#0F9B73] transition-colors"
+            onClick={() => navigate(`/${region}`)}
+          >
+            {region}
+          </span>
+          {' > '}
+          <span className="text-gray-700 font-medium">잘거리</span>
+        </p>
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
 
           {/* 카테고리 필터 탭 */}
@@ -122,28 +127,31 @@ const List = () => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
-                  selectedCategory === cat
-                    ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
-                    : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${selectedCategory === cat
+                  ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
+                  }`}
               >
                 {cat}
               </button>
             ))}
           </div>
 
-          {/* 정렬 셀렉트 */}
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white outline-none cursor-pointer"
-          >
-            <option value="rating">평점 높은 순</option>
-            <option value="review">리뷰 많은 순</option>
-            <option value="price_asc">가격 낮은 순</option>
-            <option value="price_desc">가격 높은 순</option>
-          </select>
+          {/* 정렬 버튼 */}
+          <div className="flex gap-2">
+            {[{ value: 'latest', label: '최신순' }, { value: 'popular', label: '인기순' }].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setSortOption(opt.value)}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${sortOption === opt.value
+                  ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
+                  }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 결과 수 */}
@@ -169,9 +177,8 @@ const List = () => {
                   />
                   {/* 카테고리 배지 */}
                   <span
-                    className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${
-                      categoryColor[item.category] || 'bg-gray-100 text-gray-600'
-                    }`}
+                    className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${categoryColor[item.category] || 'bg-gray-100 text-gray-600'
+                      }`}
                   >
                     {item.category}
                   </span>
@@ -222,11 +229,10 @@ const List = () => {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-9 h-9 rounded-lg text-sm font-medium transition ${
-                  currentPage === page
-                    ? 'bg-[#0F9B73] text-white'
-                    : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`w-9 h-9 rounded-lg text-sm font-medium transition ${currentPage === page
+                  ? 'bg-[#0F9B73] text-white'
+                  : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 {page}
               </button>
@@ -241,8 +247,6 @@ const List = () => {
           </div>
         )}
       </div>
-
-      <Footer />
     </div>
   );
 };
