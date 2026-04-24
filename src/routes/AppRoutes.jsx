@@ -19,6 +19,7 @@ import AreaListTemplate from '@pages/area/AreaListTemplate';
 import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 
 import Community from '@pages/showcase/Community';
+import CommunityDetail from "@pages/showcase/CommunityDetail";
 
 const AppRoutes = () => {
   return (
@@ -37,13 +38,13 @@ const AppRoutes = () => {
           <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
         </Route>
 
-      {/* 커뮤니티 (뽐낼거리) 추가 */}
-        <Route path="/showcase" element={<UserLayout />}>
-          {/* /showcase 접속 시 바로 목록 출력 (가장 깔끔한 주소) */}
-          <Route index element={<Community />} /> 
-          {/* 상세 보기 주소: /showcase/view/1 */}
-          {/*<Route path="view/:id" element={<CommunityDetail />} />*/}
-        </Route>
+        {/* 커뮤니티 (뽐낼거리) 추가 */}
+          <Route path="/showcase" element={<UserLayout />}>
+            {/* /showcase 접속 시 바로 목록 출력 */}
+            <Route index element={<Community />} /> 
+            {/* 상세 보기 주소: /showcase/view/1 */}
+            <Route path="view/:id" element={<CommunityDetail />} />
+          </Route>
         
 
         {/* 고객센터 */}
