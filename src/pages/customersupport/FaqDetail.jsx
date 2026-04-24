@@ -51,8 +51,8 @@ const faqData = [
     2. 언제 어디서든 확인: 
     PC에서 짜둔 일정을 여행 당일 스마트폰으로 확인하려면, 계정에 안전하게 저장되어 있어야 합니다.
 
-    카카오계정을 이용하시면 별도의 가입 절차 없이 3초 만에 간편하게 시작하실 수 있습니다. 지금 바로 
-    로그인하고 당신만의 경기도 여행 지도를 완성해 보세요!`
+    카카오계정을 이용하시면 별도의 가입 절차 없이 3초 만에 간편하게 시작하실 수 있습니다. 
+    지금 바로 로그인하고 당신만의 경기도 여행 지도를 완성해 보세요!`
   },
 ];
 
@@ -82,8 +82,8 @@ const FaqDetail = () => {
                     <div className="border-t border-gray-300 mb-6"></div>
 
                     <div className="space-y-4">
-                        <Link to="/customersupport/notice"><p className="text-gray-900 font-medium mb-4">공지사항</p></Link>
-                        <Link to="/customersupport/faq"><p className="text-gray-500">자주하는 질문</p></Link>
+                        <Link to="/customersupport/notice"><p className="text-gray-500 mb-4">공지사항</p></Link>
+                        <Link to="/customersupport/faq"><p className="text-gray-900 font-medium">자주하는 질문</p></Link>
                     </div>
                 </div>
 
