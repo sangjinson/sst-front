@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { getFoodDataByRegion } from "./foodData";
+import HeroBanner from "@components/common/HeroBanner";
 
 const ITEMS_PER_PAGE = 9;
 const categories = ["전체", "한식", "중식", "일식", "양식"];
@@ -61,13 +62,6 @@ export default function FoodList() {
         @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Pretendard:wght@300;400;500;600;700&display=swap');
         .food-page * { box-sizing: border-box; margin: 0; padding: 0; }
         .food-page { font-family: 'Pretendard', sans-serif; background: #f7f5f2; min-height: 100vh; }
-        .food-page .banner { position: relative; width: 100%; height: 250px; overflow: hidden; }
-        .food-page .banner-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.6s ease; }
-        .food-page .banner:hover .banner-bg { transform: scale(1.03); }
-        .food-page .banner-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.60) 60%, rgba(0,0,0,0.80) 100%); }
-        .food-page .banner-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 24px; }
-        .food-page .banner-title { font-family: 'Nanum Myeongjo', serif; font-size: clamp(2.6rem, 6vw, 4.2rem); font-weight: 800; color: #fff; letter-spacing: 0.08em; line-height: 1.1; margin-bottom: 14px; text-shadow: 0 2px 20px rgba(0,0,0,0.4); }
-        .food-page .banner-sub { font-size: clamp(0.85rem, 2vw, 1.05rem); font-weight: 300; color: rgba(255,255,255,0.88); letter-spacing: 0.04em; line-height: 1.7; text-shadow: 0 1px 8px rgba(0,0,0,0.5); }
         .food-page .content-wrap { width: 100%; max-width: 1920px; margin: 0 auto; padding: 0 20px; }
         @media (min-width: 1024px) { .food-page .content-wrap { padding: 0 50px; } }
         @media (min-width: 1280px) { .food-page .content-wrap { padding: 0 250px; } }
@@ -81,29 +75,10 @@ export default function FoodList() {
         .food-page .tab-btn { padding: 9px 22px; border-radius: 9999px; border: 1.5px solid #d9d0c4; background: #fff; font-size: 0.9rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s ease; font-family: 'Pretendard', sans-serif; }
         .food-page .tab-btn:hover { border-color: #c8860a; color: #c8860a; }
         .food-page .tab-btn.active { background: #c8860a; border-color: #c8860a; color: #fff; font-weight: 600; }
-
-        /* ✅ 정렬 버튼 그룹 */
         .food-page .sort-btn-group { display: flex; gap: 8px; }
-        .food-page .sort-btn {
-          padding: 9px 22px;
-          border-radius: 9999px;
-          border: 1.5px solid #d9d0c4;
-          background: #fff;
-          font-size: 0.9rem;
-          font-weight: 500;
-          color: #555;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          font-family: 'Pretendard', sans-serif;
-        }
+        .food-page .sort-btn { padding: 9px 22px; border-radius: 9999px; border: 1.5px solid #d9d0c4; background: #fff; font-size: 0.9rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s ease; font-family: 'Pretendard', sans-serif; }
         .food-page .sort-btn:hover { border-color: #0F9B73; color: #0F9B73; }
-        .food-page .sort-btn.active {
-          background: #0F9B73;
-          border-color: #0F9B73;
-          color: #fff;
-          font-weight: 600;
-        }
-
+        .food-page .sort-btn.active { background: #0F9B73; border-color: #0F9B73; color: #fff; font-weight: 600; }
         .food-page .result-count { font-size: 0.82rem; color: #999; padding-bottom: 8px; }
         .food-page .result-count strong { color: #333; }
         .food-page .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; text-align: center; color: #aaa; gap: 12px; }
@@ -134,7 +109,7 @@ export default function FoodList() {
         .food-page .tag { font-size: 0.72rem; color: #c8860a; background: #fef9ed; border: 1px solid #f0d88a; border-radius: 9999px; padding: 3px 10px; font-weight: 500; }
         .food-page .card-address { display: flex; align-items: center; gap: 5px; font-size: 0.76rem; color: #aaa; }
         .food-page .pin-icon { width: 12px; height: 12px; flex-shrink: 0; stroke: #c8860a; fill: none; stroke-width: 2; }
-        .food-page .pagination-bar { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 32px 0 60px; }
+        .food-page .pagination-bar { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 32px 0 60px; flex-wrap: wrap; }
         .food-page .page-btn { min-width: 38px; height: 38px; padding: 0 10px; border-radius: 8px; border: 1.5px solid #d9d0c4; background: #fff; font-size: 0.88rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s ease; font-family: 'Pretendard', sans-serif; display: flex; align-items: center; justify-content: center; }
         .food-page .page-btn:hover:not(:disabled) { border-color: #c8860a; color: #c8860a; }
         .food-page .page-btn.active { background: #c8860a; border-color: #c8860a; color: #fff; font-weight: 700; }
@@ -143,16 +118,15 @@ export default function FoodList() {
       `}</style>
 
       <div className="food-page">
-        <div className="banner">
-          <div className="banner-bg" style={{ backgroundImage: `url('${bannerImage}')` }} />
-          <div className="banner-overlay" />
-          <div className="banner-content">
-            <div className="banner-title">{selectedRegion || "경기도"}</div>
-            <div className="banner-sub">
-              {selectedRegion ? `${selectedRegion}의 대표 먹거리를 소개합니다` : "경기도 각 지역의 대표 먹거리를 만나보세요"}
-            </div>
-          </div>
-        </div>
+
+        {/* ✅ 기존 배너 → HeroBanner 컴포넌트로 교체 */}
+        <HeroBanner
+          bgImage={bannerImage}
+          title={selectedRegion || "경기도"}
+          subtitle={selectedRegion ? `${selectedRegion}의 대표 먹거리를 소개합니다` : "경기도 각 지역의 대표 먹거리를 만나보세요"}
+          height="320px"
+          className="rounded-b-[40px]"
+        />
 
         <div className="content-wrap">
           <div className="breadcrumb-row">
@@ -164,7 +138,6 @@ export default function FoodList() {
           </div>
 
           <div className="filter-sort-row">
-            {/* 카테고리 탭 */}
             <div className="category-tabs">
               {categories.map((cat) => (
                 <button
@@ -176,8 +149,6 @@ export default function FoodList() {
                 </button>
               ))}
             </div>
-
-            {/* ✅ 정렬 버튼 그룹 */}
             <div className="sort-btn-group">
               <button
                 className={`sort-btn${sortBy === "popular" ? " active" : ""}`}
