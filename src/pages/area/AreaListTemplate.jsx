@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import HeroBanner from '../../components/common/HeroBanner';
 
 
 const PlayList = lazy(() => import('./play/List'));

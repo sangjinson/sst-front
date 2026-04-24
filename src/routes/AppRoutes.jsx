@@ -14,11 +14,13 @@ import MyPage from '@pages/user/MyPage';
 import Notice from "@pages/customersupport/Notice";
 import NoticeDetail from "@pages/customersupport/NoticeDetail";
 import Faq from "@pages/customersupport/Faq";
-import FaqDetail from "@pages/customersupport/FaqDetail";
 import AreaBaseTemplate from '@pages/area/AreaBaseTemplate';
 import AreaListTemplate from '@pages/area/AreaListTemplate';
 import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 
+import Community from '@pages/showcase/Community';
+import CommunityDetail from "@pages/showcase/CommunityDetail";
+import CommunityWrite from "@pages/showcase/CommunityWrite";
 
 const AppRoutes = () => {
   return (
@@ -33,32 +35,36 @@ const AppRoutes = () => {
 
         {/* 마이페이지 */}
         <Route path="/user" element={<UserLayout />}>
-          {/* 수정전 */}
-          {/* <Route index element={<MainPage />} /> */}
           <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
         </Route>
+
+        {/* 커뮤니티 (뽐낼거리) 추가 */}
+          <Route path="/showcase" element={<UserLayout />}>
+            {/* /showcase 접속 시 바로 목록 출력 */}
+            <Route index element={<Community />} /> 
+            {/* 상세 보기 주소: /showcase/view/1 */}
+            <Route path="view/:id" element={<CommunityDetail />} />
+            {/* 3. 뽐낼거리 글쓰기 페이지 */}
+            <Route path="write" element={<CommunityWrite />} />
+          </Route>
+        
 
         {/* 고객센터 */}
         <Route path="/customersupport" element={<UserLayout />}>
           <Route path="notice" element={<Notice />} />
           <Route path="notice/:id" element={<NoticeDetail />} />
           <Route path="faq" element={<Faq />} />
-          <Route path="faq/:id" element={<FaqDetail />} />
         </Route>
 
         {/* 메인페이지 */}
         <Route path="/:region">
           <Route element={<UserLayout />}>
-            {/* 수정후 */}
             <Route index element={<MainPage />} />
           </Route>
         </Route>
 
         {/* 사거리 탬플릿 */}
         <Route path="/:region" element={<AreaBaseTemplate />}>
-          {/* 수정전 */}
-          {/* <Route path=":type/list" element={<AreaListTemplate />} /> */}
-          {/* <Route path=":type/view" element={<AreaViewTemplate />} /> */}
           <Route path=":type/list" element={<AreaListTemplate />} />
           <Route path=":type/view" element={<AreaViewTemplate />} />
         </Route>
