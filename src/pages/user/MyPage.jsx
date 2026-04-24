@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 
+// 🚀 공통 브레드크럼 컴포넌트 임포트! (경로 확인해주세요)
+import Breadcrumb from '@components/common/Breadcrumb';
+
 // ─────────────────────────────────────────
 // 더미 데이터
 // ─────────────────────────────────────────
@@ -77,7 +80,7 @@ const MemberInfo = ({ profile, onUpdate }) => {
         <div style={{ width: "clamp(160px, 20vw, 200px)", background: "#f9fafb", borderRadius: "14px", padding: "18px", display: "flex", flexDirection: "column", alignItems: "center", gap: "7px", border: "1px solid #e5e7eb", flexShrink: 0 }}>
           <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "#374151", marginBottom: "4px" }}>마이페이지</p>
           <div style={{ position: "relative" }}>
-            <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="프로필" style={{ width: "68px", height: "68px", borderRadius: "50%", objectFit: "cover", border: "3px solid #0F9B73" }} />
+            <img src="https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png" alt="프로필" style={{ width: "68px", height: "68px", borderRadius: "50%", objectFit: "cover", border: "3px solid #0F9B73" }} />
             <div style={{ position: "absolute", bottom: 0, right: 0, background: "#0F9B73", color: "#fff", borderRadius: "50%", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", cursor: "pointer" }}>✎</div>
           </div>
           <div style={{ fontWeight: 700, fontSize: "0.9rem" }}>{form.name} 📍</div>
@@ -379,9 +382,6 @@ const MyPage = () => {
           to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── 브레드크럼 ── */
-        .mp-breadcrumb { font-size: 0.78rem; color: #9ca3af; }
-
         /* ── 그리드: 뽐낼거리 ── */
         .showcase-grid {
           display: grid;
@@ -434,7 +434,7 @@ const MyPage = () => {
           <div className="mp-box">
             <h3>마이페이지</h3>
             <div className="mp-profile-center">
-              <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="프로필" className="mp-avatar" />
+              <img src="https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png" alt="프로필" className="mp-avatar" />
               <div className="mp-name">{profile.name} 🏅</div>
               <div className="mp-desc">안녕하세요! {profile.name}입니다.<br />리액트 참 좋네요! 잘 부탁드려요.</div>
             </div>
@@ -457,6 +457,16 @@ const MyPage = () => {
         {/* ── 메인 ── */}
         <section className="mp-main">
 
+          {/* 🚀 브레드크럼을 메인 섹션 최상단으로 이동! */}
+          <Breadcrumb 
+            paths={[
+              { label: '홈', to: '/' },
+              { label: '마이페이지', to: '/user/mypage' },
+              { label: sectionLabel }
+            ]} 
+            className="mb-0" // 기존 컴포넌트 내부 여백이 있어 0으로 설정
+          />
+
           {/* 카드 4개 고정 */}
           <div className="mp-card-row">
             {CARDS.map((card) => (
@@ -469,11 +479,6 @@ const MyPage = () => {
                 <div className="mp-circle">{card.icon}</div>
               </div>
             ))}
-          </div>
-
-          {/* 브레드크럼 */}
-          <div className="mp-breadcrumb">
-            홈 &gt; 마이페이지 &gt; {sectionLabel}
           </div>
 
           {/* 섹션 패널 */}
