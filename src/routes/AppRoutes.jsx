@@ -35,8 +35,6 @@ const AppRoutes = () => {
 
         {/* 마이페이지 */}
         <Route path="/user" element={<UserLayout />}>
-          {/* 수정전 */}
-          {/* <Route index element={<MainPage />} /> */}
           <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
         </Route>
 
@@ -61,16 +59,12 @@ const AppRoutes = () => {
         {/* 메인페이지 */}
         <Route path="/:region">
           <Route element={<UserLayout />}>
-            {/* 수정후 */}
             <Route index element={<MainPage />} />
           </Route>
         </Route>
 
         {/* 사거리 탬플릿 */}
         <Route path="/:region" element={<AreaBaseTemplate />}>
-          {/* 수정전 */}
-          {/* <Route path=":type/list" element={<AreaListTemplate />} /> */}
-          {/* <Route path=":type/view" element={<AreaViewTemplate />} /> */}
           <Route path=":type/list" element={<AreaListTemplate />} />
           <Route path=":type/view" element={<AreaViewTemplate />} />
         </Route>
