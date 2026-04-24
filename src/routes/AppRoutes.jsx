@@ -10,8 +10,6 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
-import SeeList from '@pages/area/see/List';
-
 import Notice from "@pages/customersupport/Notice";
 import NoticeDetail from "@pages/customersupport/NoticeDetail";
 import Faq from "@pages/customersupport/Faq";
@@ -27,16 +25,18 @@ const AppRoutes = () => {
       {/* 공개 접근 가능 페이지 */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      
-      {/* 볼거리 페이지 */}
-      <Route path="/see" element={<SeeList />} />
 
       {/* 일반 사용자 권한 (USER, ADMIN) */}
       <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
+
+        {/* 마이페이지 */}
         <Route path="/user" element={<UserLayout />}>
-          <Route index element={<MainPage />} />
+          {/* 수정전 */}
+          {/* <Route index element={<MainPage />} /> */}
           <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
         </Route>
+
+        {/* 고객센터 */}
         <Route path="/customersupport" element={<UserLayout />}>
           <Route path="notice" element={<Notice />} />
           <Route path="notice/:id" element={<NoticeDetail />} />
@@ -44,8 +44,19 @@ const AppRoutes = () => {
           <Route path="faq/:id" element={<FaqDetail />} />
         </Route>
 
-        {/* 놀거리 */}
-        <Route path="/area" element={<AreaBaseTemplate />}>
+        {/* 메인페이지 */}
+        <Route path="/:region">
+          <Route element={<UserLayout />}>
+            {/* 수정후 */}
+            <Route index element={<MainPage />} />
+          </Route>
+        </Route>
+
+        {/* 사거리 탬플릿 */}
+        <Route path="/:region" element={<AreaBaseTemplate />}>
+          {/* 수정전 */}
+          {/* <Route path=":type/list" element={<AreaListTemplate />} /> */}
+          {/* <Route path=":type/view" element={<AreaViewTemplate />} /> */}
           <Route path=":type/list" element={<AreaListTemplate />} />
           <Route path=":type/view" element={<AreaViewTemplate />} />
         </Route>
@@ -57,9 +68,7 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
         </Route>
-      </Route>
-
-      
+      </Route>        
 
     </Routes>
   );
