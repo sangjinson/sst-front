@@ -503,7 +503,7 @@ export default function FoodList() {
                   className="food-card"
                   key={item.id}
                   onClick={() =>
-                    navigate("/area/food/view", {
+                    navigate(`/${selectedRegion}/food/view`, {
                       state: { food: item, selectedRegion },
                     })
                   }
