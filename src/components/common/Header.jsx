@@ -29,7 +29,7 @@ const Header = () => {
     { name: '먹거리', path: `/${currentRegion}/food/list` },
     { name: '잘거리', path: `/${currentRegion}/sleep/list` },
     { name: '놀거리', path: `/${currentRegion}/play/list` },
-    { name: '뽐낼거리', path: '/showcase' },
+    { name: '뽐낼거리', path: `/${currentRegion}` },
     { name: '내거리', path: '/user/mypage' },
   ];
 
