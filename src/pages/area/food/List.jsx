@@ -40,8 +40,8 @@ export default function FoodList() {
     setCurrentPage(1);
   };
 
-  const handleSortChange = (e) => {
-    setSortBy(e.target.value);
+  const handleSortChange = (sort) => {
+    setSortBy(sort);
     setCurrentPage(1);
   };
 
@@ -49,7 +49,6 @@ export default function FoodList() {
     foodData[0]?.image ??
     "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=90";
 
-  // ✅ 카드 클릭 시 ?id= 쿼리로 이동
   const handleCardClick = (item) => {
     navigate(`/${selectedRegion}/food/view?id=${item.id}`, {
       state: { food: item, selectedRegion },
@@ -82,8 +81,29 @@ export default function FoodList() {
         .food-page .tab-btn { padding: 9px 22px; border-radius: 9999px; border: 1.5px solid #d9d0c4; background: #fff; font-size: 0.9rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s ease; font-family: 'Pretendard', sans-serif; }
         .food-page .tab-btn:hover { border-color: #c8860a; color: #c8860a; }
         .food-page .tab-btn.active { background: #c8860a; border-color: #c8860a; color: #fff; font-weight: 600; }
-        .food-page .sort-select { padding: 8px 14px; border: 1.5px solid #d9d0c4; border-radius: 8px; font-size: 0.85rem; font-family: 'Pretendard', sans-serif; color: #555; background: #fff; cursor: pointer; outline: none; }
-        .food-page .sort-select:focus { border-color: #c8860a; }
+
+        /* ✅ 정렬 버튼 그룹 */
+        .food-page .sort-btn-group { display: flex; gap: 8px; }
+        .food-page .sort-btn {
+          padding: 9px 22px;
+          border-radius: 9999px;
+          border: 1.5px solid #d9d0c4;
+          background: #fff;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #555;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-family: 'Pretendard', sans-serif;
+        }
+        .food-page .sort-btn:hover { border-color: #0F9B73; color: #0F9B73; }
+        .food-page .sort-btn.active {
+          background: #0F9B73;
+          border-color: #0F9B73;
+          color: #fff;
+          font-weight: 600;
+        }
+
         .food-page .result-count { font-size: 0.82rem; color: #999; padding-bottom: 8px; }
         .food-page .result-count strong { color: #333; }
         .food-page .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; text-align: center; color: #aaa; gap: 12px; }
@@ -144,6 +164,7 @@ export default function FoodList() {
           </div>
 
           <div className="filter-sort-row">
+            {/* 카테고리 탭 */}
             <div className="category-tabs">
               {categories.map((cat) => (
                 <button
@@ -155,10 +176,22 @@ export default function FoodList() {
                 </button>
               ))}
             </div>
-            <select className="sort-select" value={sortBy} onChange={handleSortChange}>
-              <option value="popular">인기순</option>
-              <option value="rating">별점순</option>
-            </select>
+
+            {/* ✅ 정렬 버튼 그룹 */}
+            <div className="sort-btn-group">
+              <button
+                className={`sort-btn${sortBy === "popular" ? " active" : ""}`}
+                onClick={() => handleSortChange("popular")}
+              >
+                인기순
+              </button>
+              <button
+                className={`sort-btn${sortBy === "rating" ? " active" : ""}`}
+                onClick={() => handleSortChange("rating")}
+              >
+                별점순
+              </button>
+            </div>
           </div>
 
           <div className="result-count">
