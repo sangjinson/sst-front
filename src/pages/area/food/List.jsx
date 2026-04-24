@@ -9,7 +9,7 @@ const categories = ["전체", "한식", "중식", "일식", "양식"];
 export default function FoodList() {
   const navigate = useNavigate();
 
-  // ✅ AreaBaseTemplate의 Outlet context에서 받음
+  // ✅ AreaBaseTemplate의 Outlet context에서 selectedRegion 수신
   const { selectedRegion } = useOutletContext();
 
   const foodData = getFoodDataByRegion(selectedRegion);

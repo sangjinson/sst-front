@@ -1,15 +1,15 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import Header from '@components/common/Header';
 import Footer from '@components/common/Footer';
 
 const AreaBaseTemplate = () => {
-  const location = useLocation();
+  const { region } = useParams();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Header />
       <main style={{ flex: 1, backgroundColor: '#f9f9f9' }}>
-        <Outlet context={{ selectedRegion: location.state?.selectedRegion ?? "" }} />
+        <Outlet context={{ selectedRegion: region ?? "" }} />
       </main>
       <Footer />
     </div>
