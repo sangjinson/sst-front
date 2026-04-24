@@ -133,7 +133,6 @@ const View = () => {
             </button>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
