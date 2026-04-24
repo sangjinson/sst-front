@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import InListCard from "@/components/card/inListCard";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Community = () => {
   const [activeCategory, setActiveCategory] = useState("전체");
@@ -69,9 +70,9 @@ const Community = () => {
       {/* 버튼 영역 */}
       <div className="flex justify-end gap-2 mb-8">
         <button className="px-4 py-1.5 bg-gray-800 text-white text-xs rounded-md hover:bg-gray-700 transition-colors">임시저장</button>
-        <button className="px-4 py-1.5 bg-gray-800 text-white text-xs rounded-md flex items-center gap-1 hover:bg-gray-700 transition-colors">
+         <Link to="/showcase/Write"><button className="px-4 py-1.5 bg-gray-800 text-white text-xs rounded-md flex items-center gap-1 hover:bg-gray-700 transition-colors">
           <span className="text-lg leading-none">+</span> 글쓰기
-        </button>
+        </button></Link>
       </div>
 
       {/* 필터 및 정렬 */}

@@ -81,8 +81,8 @@ const CommunityDetail = () => {
         {/* 오른쪽: 정보 및 본문 */}
         <div className="w-full md:w-[400px] ml-15">
           <div className="flex gap-2 mb-6 text-[10px]">
-            <button className="px-3 py-1 border border-gray-200 rounded flex items-center gap-1 hover:bg-gray-50">공유</button>
-            <button className="px-3 py-1 border border-gray-200 rounded flex items-center gap-1 hover:bg-gray-50">신고</button>
+            <button className="text-[14px] px-3 py-1 border border-gray-200 rounded flex items-center gap-1 hover:bg-gray-200">공유</button>
+            <button className="text-[14px] px-3 py-1 border border-gray-200 rounded flex items-center gap-1 hover:bg-gray-200">신고</button>
             {/* <button onClick={() => navigate(-1)} className="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 ml-auto font-bold">뒤로가기</button>*/}
           </div>
 
@@ -90,8 +90,8 @@ const CommunityDetail = () => {
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">👤</div>
             <div>
               {/* ✅ 클릭한 게시물의 작성자로 변경 */}
-              <h4 className="font-bold text-sm">{postDetail.author}</h4>
-              <p className="text-[10px] text-gray-400">작성일 {postDetail.date}</p>
+              <h4 className="font-bold text-xm">{postDetail.author}</h4>
+              <p className="text-[12px] text-gray-400">작성일 {postDetail.date}</p>
             </div>
           </div>
 

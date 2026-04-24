@@ -20,6 +20,7 @@ import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 
 import Community from '@pages/showcase/Community';
 import CommunityDetail from "@pages/showcase/CommunityDetail";
+import CommunityWrite from "@pages/showcase/CommunityWrite";
 
 const AppRoutes = () => {
   return (
@@ -45,6 +46,8 @@ const AppRoutes = () => {
             <Route index element={<Community />} /> 
             {/* 상세 보기 주소: /showcase/view/1 */}
             <Route path="view/:id" element={<CommunityDetail />} />
+            {/* 3. 뽐낼거리 글쓰기 페이지 */}
+            <Route path="write" element={<CommunityWrite />} />
           </Route>
         
 
