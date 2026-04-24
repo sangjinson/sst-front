@@ -87,8 +87,6 @@ const List = () => {
         bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
         title={region}
         subtitle={`${region}의 편안한 숙소를 찾아보세요`}
-        height="320px"
-        className="rounded-b-[40px]"
       />
 
       {/* 필터 & 정렬 영역 */}
