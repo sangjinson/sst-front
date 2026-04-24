@@ -1,5 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
 
 const PlayList = lazy(() => import('./play/List'));
 const FoodList = lazy(() => import('./food/List'));
@@ -8,6 +11,11 @@ const SleepList = lazy(() => import('./sleep/List'));
 
 
 function AreaListTemplate() {
+    const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   const { type } = useParams();
   const renderList = () => {
     switch (type) {
