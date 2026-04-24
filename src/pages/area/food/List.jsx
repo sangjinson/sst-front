@@ -1,134 +1,19 @@
+// src/pages/area/food/List.jsx
 import { useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { getFoodDataByRegion } from "./foodData";
 
 const ITEMS_PER_PAGE = 9;
-
-const foodData = [
-  {
-    id: 1,
-    name: "수원 왕갈비탕",
-    category: "한식",
-    rating: 4.8,
-    reviews: 324,
-    description: "60년 전통의 진한 사골육수로 우려낸 수원 대표 왕갈비탕. 두툼한 갈비살이 일품입니다.",
-    address: "경기도 수원시 팔달구 행궁로 45",
-    image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80",
-    tags: ["전통", "대표음식", "가족식사"],
-  },
-  {
-    id: 2,
-    name: "화성 통닭골목",
-    category: "한식",
-    rating: 4.7,
-    reviews: 512,
-    description: "수원 화성 인근 유명 통닭골목. 바삭한 튀김옷과 육즙 가득한 통닭이 유명합니다.",
-    address: "경기도 수원시 팔달구 정조로 777",
-    image: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&q=80",
-    tags: ["통닭", "명물거리", "야식"],
-  },
-  {
-    id: 3,
-    name: "행궁동 스시 오마카세",
-    category: "일식",
-    rating: 4.9,
-    reviews: 198,
-    description: "제철 해산물로 구성된 프리미엄 오마카세. 수원에서 즐기는 도심 속 미식 경험.",
-    address: "경기도 수원시 팔달구 행궁로 12",
-    image: "https://images.unsplash.com/photo-1553621042-f6e147245754?w=600&q=80",
-    tags: ["오마카세", "프리미엄", "데이트"],
-  },
-  {
-    id: 4,
-    name: "수원 짜장면 원조",
-    category: "중식",
-    rating: 4.5,
-    reviews: 276,
-    description: "50년 전통의 수타면 짜장면. 춘장의 깊은 맛과 쫄깃한 면발이 특징입니다.",
-    address: "경기도 수원시 영통구 영통로 88",
-    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80",
-    tags: ["중화요리", "전통", "점심"],
-  },
-  {
-    id: 5,
-    name: "인계동 파스타",
-    category: "양식",
-    rating: 4.6,
-    reviews: 145,
-    description: "이탈리아 정통 레시피로 만든 수제 파스타. 트러플 크림 파스타가 시그니처입니다.",
-    address: "경기도 수원시 팔달구 인계로 55",
-    image: "https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?w=600&q=80",
-    tags: ["파스타", "데이트", "이탈리안"],
-  },
-  {
-    id: 6,
-    name: "광교 육회비빔밥",
-    category: "한식",
-    rating: 4.7,
-    reviews: 389,
-    description: "신선한 한우 육회와 참기름 향이 어우러진 정통 육회비빔밥. 광교 맛집 1위.",
-    address: "경기도 수원시 영통구 광교로 145",
-    image: "https://images.unsplash.com/photo-1590301157890-4810ed352733?w=600&q=80",
-    tags: ["육회", "비빔밥", "한우"],
-  },
-  {
-    id: 7,
-    name: "매탄동 라멘집",
-    category: "일식",
-    rating: 4.4,
-    reviews: 231,
-    description: "12시간 우린 돈코츠 육수의 진한 라멘. 일본 현지 감성 그대로 재현한 수원 맛집.",
-    address: "경기도 수원시 영통구 매탄로 33",
-    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80",
-    tags: ["라멘", "돈코츠", "일식"],
-  },
-  {
-    id: 8,
-    name: "팔달문 갈비찜",
-    category: "한식",
-    rating: 4.8,
-    reviews: 467,
-    description: "간장 양념에 24시간 재운 특제 갈비찜. 부드러운 육질과 달콤한 양념이 일품.",
-    address: "경기도 수원시 팔달구 팔달로 200",
-    image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80",
-    tags: ["갈비찜", "전통", "명절음식"],
-  },
-  {
-    id: 9,
-    name: "영통 스테이크하우스",
-    category: "양식",
-    rating: 4.6,
-    reviews: 162,
-    description: "드라이에이징 한우 스테이크 전문점. 풍부한 마블링과 깊은 풍미가 특징.",
-    address: "경기도 수원시 영통구 영통로 99",
-    image: "https://images.unsplash.com/photo-1558030006-450675393462?w=600&q=80",
-    tags: ["스테이크", "한우", "특별한날"],
-  },
-  {
-    id: 10,
-    name: "수원 순대국밥",
-    category: "한식",
-    rating: 4.5,
-    reviews: 310,
-    description: "구수한 뼈 육수에 듬뿍 담긴 순대와 내장. 이른 아침부터 줄 서는 수원 명물 국밥집.",
-    address: "경기도 수원시 권선구 권선로 123",
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80",
-    tags: ["국밥", "해장", "전통"],
-  },
-  {
-    id: 11,
-    name: "광교 딤섬하우스",
-    category: "중식",
-    rating: 4.6,
-    reviews: 189,
-    description: "홍콩식 정통 딤섬을 광교 신도시에서. 하가우·소룡포·차슈바오가 특히 인기.",
-    address: "경기도 수원시 영통구 광교중앙로 100",
-    image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=600&q=80",
-    tags: ["딤섬", "중식", "브런치"],
-  },
-];
-
 const categories = ["전체", "한식", "중식", "일식", "양식"];
 
-export default function SuwonFoodPage() {
+export default function FoodList() {
+  const navigate = useNavigate();
+
+  // ✅ AreaBaseTemplate의 Outlet context에서 selectedRegion 수신
+  const { selectedRegion } = useOutletContext();
+
+  const foodData = getFoodDataByRegion(selectedRegion);
+
   const [activeCategory, setActiveCategory] = useState("전체");
   const [sortBy, setSortBy] = useState("popular");
   const [likedCards, setLikedCards] = useState([]);
@@ -163,16 +48,15 @@ export default function SuwonFoodPage() {
     setCurrentPage(1);
   };
 
+  const bannerImage =
+    foodData[0]?.image ??
+    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=90";
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Pretendard:wght@300;400;500;600;700&display=swap');
 
-        /* ============================================
-           ✅ 핵심 수정: * → .food-page *
-           전역 리셋 제거! food-page 내부만 스코프 적용
-           헤더/푸터의 Tailwind padding이 살아남음!
-        ============================================ */
         .food-page * {
           box-sizing: border-box;
           margin: 0;
@@ -185,7 +69,6 @@ export default function SuwonFoodPage() {
           min-height: 100vh;
         }
 
-        /* ── BANNER — 풀너비 ── */
         .food-page .banner {
           position: relative;
           width: 100%;
@@ -195,7 +78,6 @@ export default function SuwonFoodPage() {
         .food-page .banner-bg {
           position: absolute;
           inset: 0;
-          background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=90');
           background-size: cover;
           background-position: center;
           transition: transform 0.6s ease;
@@ -243,7 +125,6 @@ export default function SuwonFoodPage() {
           text-shadow: 0 1px 8px rgba(0,0,0,0.5);
         }
 
-        /* ── CONTENT WRAP — 헤더/푸터 동일 기준 ── */
         .food-page .content-wrap {
           width: 100%;
           max-width: 1920px;
@@ -257,7 +138,6 @@ export default function SuwonFoodPage() {
           .food-page .content-wrap { padding: 0 250px; }
         }
 
-        /* ── BREADCRUMB ── */
         .food-page .breadcrumb-row {
           display: flex;
           align-items: center;
@@ -271,6 +151,7 @@ export default function SuwonFoodPage() {
           color: #888;
           text-decoration: none;
           transition: color 0.2s;
+          cursor: pointer;
         }
         .food-page .breadcrumb-row a:hover { color: #333; }
         .food-page .breadcrumb-row .bc-active {
@@ -278,7 +159,6 @@ export default function SuwonFoodPage() {
           font-weight: 600;
         }
 
-        /* ── FILTER + SORT ROW ── */
         .food-page .filter-sort-row {
           display: flex;
           align-items: center;
@@ -327,7 +207,6 @@ export default function SuwonFoodPage() {
         }
         .food-page .sort-select:focus { border-color: #c8860a; }
 
-        /* ── RESULT COUNT ── */
         .food-page .result-count {
           font-size: 0.82rem;
           color: #999;
@@ -335,7 +214,28 @@ export default function SuwonFoodPage() {
         }
         .food-page .result-count strong { color: #333; }
 
-        /* ── CARD GRID ── */
+        .food-page .empty-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 80px 20px;
+          text-align: center;
+          color: #aaa;
+          gap: 12px;
+        }
+        .food-page .empty-state svg {
+          width: 48px;
+          height: 48px;
+          stroke: #d9d0c4;
+          fill: none;
+          stroke-width: 1.5;
+        }
+        .food-page .empty-state p {
+          font-size: 0.95rem;
+          color: #bbb;
+        }
+
         .food-page .card-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -489,7 +389,6 @@ export default function SuwonFoodPage() {
           stroke-width: 2;
         }
 
-        /* ── PAGINATION ── */
         .food-page .pagination-bar {
           display: flex;
           align-items: center;
@@ -541,33 +440,36 @@ export default function SuwonFoodPage() {
 
       <div className="food-page">
 
-        {/* BANNER — content-wrap 밖 → 풀너비 */}
         <div className="banner">
-          <div className="banner-bg" />
+          <div
+            className="banner-bg"
+            style={{ backgroundImage: `url('${bannerImage}')` }}
+          />
           <div className="banner-overlay" />
           <div className="banner-content">
-            <div className="banner-title">수원</div>
+            <div className="banner-title">
+              {selectedRegion || "경기도"}
+            </div>
             <div className="banner-sub">
-              정조의 효심과 화성의 기상이 깃든, 미래를 여는 수반 도시
+              {selectedRegion
+                ? `${selectedRegion}의 대표 먹거리를 소개합니다`
+                : "경기도 각 지역의 대표 먹거리를 만나보세요"}
             </div>
           </div>
         </div>
 
-        {/* CONTENT — 헤더/푸터 동일 padding 기준 */}
         <div className="content-wrap">
 
-          {/* BREADCRUMB */}
           <div className="breadcrumb-row">
-            <a href="#">홈</a>
+            <a onClick={() => navigate("/")}>홈</a>
             <span>&gt;</span>
-            <a href="#">경기도</a>
-            <span>&gt;</span>
-            <a href="#">수원시</a>
+            <a onClick={() => navigate("/user", { state: { selectedRegion } })}>
+              {selectedRegion || "경기도"}
+            </a>
             <span>&gt;</span>
             <span className="bc-active">먹거리</span>
           </div>
 
-          {/* FILTER + SORT */}
           <div className="filter-sort-row">
             <div className="category-tabs">
               {categories.map((cat) => (
@@ -590,56 +492,74 @@ export default function SuwonFoodPage() {
             </select>
           </div>
 
-          {/* RESULT COUNT */}
           <div className="result-count">
             총 <strong>{sortedData.length}개</strong>의 먹거리
           </div>
 
-          {/* CARD GRID */}
-          <div className="card-grid">
-            {currentItems.map((item) => (
-              <div className="food-card" key={item.id}>
-                <div className="card-img-wrap">
-                  <img src={item.image} alt={item.name} />
-                  <span className="card-category-badge">{item.category}</span>
-                  <button
-                    className={`like-btn${likedCards.includes(item.id) ? " liked" : ""}`}
-                    onClick={() => toggleLike(item.id)}
-                    aria-label="좋아요"
-                  >
-                    <svg className="heart-icon" viewBox="0 0 24 24">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                  </button>
+          {currentItems.length > 0 ? (
+            <div className="card-grid">
+              {currentItems.map((item) => (
+                <div
+                  className="food-card"
+                  key={item.id}
+                  onClick={() =>
+                    navigate("/area/food/view", {
+                      state: { food: item, selectedRegion },
+                    })
+                  }
+                >
+                  <div className="card-img-wrap">
+                    <img src={item.image} alt={item.name} />
+                    <span className="card-category-badge">{item.category}</span>
+                    <button
+                      className={`like-btn${likedCards.includes(item.id) ? " liked" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike(item.id);
+                      }}
+                      aria-label="좋아요"
+                    >
+                      <svg className="heart-icon" viewBox="0 0 24 24">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="card-body">
+                    <div className="card-name">{item.name}</div>
+                    <div className="card-rating-row">
+                      <svg className="star-icon" viewBox="0 0 24 24">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                      </svg>
+                      <span className="rating-num">{item.rating}</span>
+                      <span className="reviews-num">({item.reviews}개 리뷰)</span>
+                    </div>
+                    <p className="card-desc">{item.description}</p>
+                    <div className="card-tags">
+                      {item.tags.map((tag) => (
+                        <span className="tag" key={tag}>#{tag}</span>
+                      ))}
+                    </div>
+                    <div className="card-address">
+                      <svg className="pin-icon" viewBox="0 0 24 24">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      {item.address}
+                    </div>
+                  </div>
                 </div>
-                <div className="card-body">
-                  <div className="card-name">{item.name}</div>
-                  <div className="card-rating-row">
-                    <svg className="star-icon" viewBox="0 0 24 24">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                    <span className="rating-num">{item.rating}</span>
-                    <span className="reviews-num">({item.reviews}개 리뷰)</span>
-                  </div>
-                  <p className="card-desc">{item.description}</p>
-                  <div className="card-tags">
-                    {item.tags.map((tag) => (
-                      <span className="tag" key={tag}>#{tag}</span>
-                    ))}
-                  </div>
-                  <div className="card-address">
-                    <svg className="pin-icon" viewBox="0 0 24 24">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                      <circle cx="12" cy="10" r="3" />
-                    </svg>
-                    {item.address}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <p>해당 카테고리의 먹거리가 없습니다.</p>
+            </div>
+          )}
 
-          {/* PAGINATION */}
           {totalPages > 1 && (
             <div className="pagination-bar">
               <button
