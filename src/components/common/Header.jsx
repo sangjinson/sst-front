@@ -13,16 +13,6 @@ const Header = () => {
 
   const currentRegion = region || '수원시';
 
-  // 수정 전
-  // const navItems = [
-  //   { name: '볼거리', path: '/area/see/list' },
-  //   { name: '먹거리', path: '/area/food/list' },
-  //   { name: '잘거리', path: '/area/sleep/list' },
-  //   { name: '놀거리', path: '/area/play/list' },
-  //   { name: '뽐낼거리', path: '/user' },
-  //   { name: '내거리', path: '/user/mypage' },
-  // ];
-
   // 수정 후
   const navItems = [
     { name: '볼거리', path: `/${currentRegion}/see/list` },
@@ -42,9 +32,6 @@ const Header = () => {
 
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;
-    // 수정전
-    //alert(`'${searchKeyword}'(으)로 검색합니다.`);
-    // 수정후
     navigate(`/user/${searchKeyword}`);
     setIsSearchOpen(false);
   };
