@@ -4,33 +4,39 @@ import { useNavigate } from "react-router-dom";
 const CommunityWrite = () => {
   const navigate = useNavigate();
   
-  // 상태 관리
+  // 기본 상태 관리
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("볼거리");
   const [content, setContent] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
-  
-  // ✅ 태그 관련 상태
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
+
+  // ✅ 지역 및 장소 관련 상태
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [isRegionOpen, setIsRegionOpen] = useState(false); // 드롭다운 열림 상태
+  const [placeName, setPlaceName] = useState("");
+
+  const gyeonggiRegions = [
+    "수원시", "용인시", "성남시", "부천시", "화성시", "안산시", "남양주시", "안양시", "평택시", 
+    "시흥시", "파주시", "의정부시", "김포시", "광명시", "광주시", "군포시", "이천시", "오산시", 
+    "하남시", "양주시", "구리시", "안성시", "포천시", "의왕시", "양평군", "여주시", "동두천시", 
+    "가평군", "과천시", "연천군"
+  ];
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
 
-  // 이미지 핸들러
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
+      reader.onloadend = () => setImagePreview(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  // ✅ 태그 추가 핸들러 (엔터나 스페이스바 입력 시 추가)
   const handleTagKeyDown = (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -40,20 +46,15 @@ const CommunityWrite = () => {
         setTagInput("");
       }
     } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
-      // 입력창이 비어있을 때 백스페이스 누르면 마지막 태그 삭제
       setTags(tags.slice(0, -1));
     }
   };
 
-  const removeTag = (indexToRemove) => {
-    setTags(tags.filter((_, index) => index !== indexToRemove));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({ title, category, content, tags });
+    console.log({ category, selectedRegion, placeName, title, content, tags });
     alert("글이 등록되었습니다!");
-    navigate("/showcase"); // 목록 경로에 맞춰 수정하세요
+    navigate("/showcase");
   };
 
   return (
@@ -77,7 +78,7 @@ const CommunityWrite = () => {
                   type="button"
                   onClick={() => setCategory(cat)}
                   className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                    category === cat ? "bg-[#009277] text-white shadow-md" : "bg-gray-100 text-gray-500"
+                    category === cat ? "bg-[#009277] text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                   }`}
                 >
                   {cat}
@@ -86,7 +87,61 @@ const CommunityWrite = () => {
             </div>
           </div>
 
-          {/* 2. 제목 */}
+          {/* ✅ 2. 지역 및 장소 선택 (커스텀 드롭다운 적용) */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* 지역 선택 (커스텀) */}
+            <div className="relative">
+              <label className="block text-sm font-bold text-gray-700 mb-3">방문 지역</label>
+              <button
+                type="button"
+                onClick={() => setIsRegionOpen(!isRegionOpen)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white flex justify-between items-center focus:border-[#009277] transition-all"
+              >
+                <span className={selectedRegion ? "text-gray-900" : "text-gray-400"}>
+                  {selectedRegion || "지역 선택"}
+                </span>
+                <svg 
+                  className={`w-4 h-4 text-gray-400 transition-transform ${isRegionOpen ? "rotate-180" : ""}`} 
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* 아래로 내려오는 목록 */}
+              {isRegionOpen && (
+                <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                  {gyeonggiRegions.map((region) => (
+                    <div
+                      key={region}
+                      className="px-4 py-3 hover:bg-[#f0f9f7] hover:text-[#009277] cursor-pointer text-gray-700 text-sm transition-colors"
+                      onClick={() => {
+                        setSelectedRegion(region);
+                        setIsRegionOpen(false);
+                      }}
+                    >
+                      {region}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 구체적인 장소 (입력창) */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">구체적인 장소</label>
+              <input
+                type="text"
+                value={placeName}
+                onChange={(e) => setPlaceName(e.target.value)}
+                placeholder="예: 화성행궁, 두물머리"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg outline-none focus:border-[#009277] transition-colors"
+                required
+              />
+            </div>
+          </div>
+
+          {/* 3. 제목 */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-3">제목</label>
             <input
@@ -99,17 +154,17 @@ const CommunityWrite = () => {
             />
           </div>
 
-          {/* 3. 사진 등록 */}
+          {/* 4. 사진 등록 */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-3">사진 등록</label>
             <div className="flex flex-col items-center justify-center w-full">
               {imagePreview ? (
                 <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border">
                   <img src={imagePreview} alt="미리보기" className="w-full h-full object-cover" />
-                  <button onClick={() => setImagePreview(null)} className="absolute top-4 right-4 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center">✕</button>
+                  <button type="button" onClick={() => setImagePreview(null)} className="absolute top-4 right-4 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center">✕</button>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400">
                     <svg className="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                     <p className="text-sm font-semibold">클릭하여 사진 추가</p>
@@ -120,52 +175,43 @@ const CommunityWrite = () => {
             </div>
           </div>
 
-          {/* ✅ 4. 내용 입력 (에디터 툴바 스타일 적용) */}
+          {/* 5. 내용 입력 */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-3">내용</label>
             <div className="border border-gray-200 rounded-lg overflow-hidden">
-              {/* 심플 툴바 UI */}
-              <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex gap-4">
-                <button type="button" className="font-bold text-gray-600 hover:text-black">B</button>
-                <button type="button" className="italic text-gray-600 hover:text-black">I</button>
-                <button type="button" className="underline text-gray-600 hover:text-black">U</button>
-                <div className="w-[1px] h-4 bg-gray-300 my-auto"></div>
-                <button type="button" className="text-sm text-gray-600 hover:text-black">링크</button>
-                <button type="button" className="text-sm text-gray-600 hover:text-black">정렬</button>
+              <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex gap-4 text-gray-600 font-bold">
+                <button type="button">B</button><button type="button">I</button><button type="button">U</button>
               </div>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows="10"
                 placeholder="경기도 여행의 추억을 에디터에 담아보세요."
-                className="w-full px-4 py-4 outline-none resize-none text-gray-700 leading-relaxed"
+                className="w-full px-4 py-4 outline-none resize-none text-gray-700"
                 required
               />
             </div>
           </div>
 
-          {/* ✅ 5. 태그 작성 영역 */}
+          {/* 6. 태그 설정 */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-3">태그 설정</label>
-            <div className="w-full px-4 py-2 border border-gray-200 rounded-lg focus-within:border-[#009277] transition-colors flex flex-wrap gap-2 items-center">
-              {/* 생성된 태그들 */}
+            <div className="w-full px-4 py-2 border border-gray-200 rounded-lg focus-within:border-[#009277] flex flex-wrap gap-2 items-center">
               {tags.map((tag, index) => (
                 <span key={index} className="bg-[#f0f9f7] text-[#009277] px-3 py-1 rounded-md text-sm font-medium flex items-center gap-1 shadow-sm">
                   #{tag}
-                  <button type="button" onClick={() => removeTag(index)} className="hover:text-red-500 ml-1">×</button>
+                  <button type="button" onClick={() => setTags(tags.filter((_, i) => i !== index))} className="ml-1 hover:text-red-500">×</button>
                 </span>
               ))}
-              {/* 태그 입력창 */}
               <input
                 type="text"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagKeyDown}
-                placeholder={tags.length === 0 ? "태그 입력 후 엔터 (예: 경기도, 캠핑)" : ""}
+                placeholder={tags.length === 0 ? "태그 입력 후 엔터" : ""}
                 className="flex-1 outline-none py-1 min-w-[150px] text-sm"
               />
             </div>
-            <p className="text-[11px] text-gray-400 mt-2">* 태그를 입력하고 Enter 또는 스페이스바를 눌러주세요.</p>
           </div>
 
           {/* 버튼 그룹 */}
@@ -173,7 +219,6 @@ const CommunityWrite = () => {
             <button type="button" onClick={() => navigate(-1)} className="flex-1 py-4 bg-gray-100 text-gray-600 font-bold rounded-lg hover:bg-gray-200 transition-all">취소</button>
             <button type="submit" className="flex-[2] py-4 bg-[#009277] text-white font-bold rounded-lg hover:bg-[#007a63] shadow-lg transition-all">등록하기</button>
           </div>
-
         </form>
       </div>
     </div>
