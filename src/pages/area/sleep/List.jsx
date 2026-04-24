@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getSleepDataByRegion } from './sleepDummyData';
+import HeroBanner from '@components/common/HeroBanner';
 
 // 별점 컴포넌트
 const StarRating = ({ rating }) => (
@@ -82,20 +83,13 @@ const List = () => {
     <div className="min-h-screen bg-[#f8f6f0]">
 
       {/* 히어로 배너 */}
-      <div className="relative h-60 md:h-80 overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
-          alt="잘거리 배너"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">{region}</h1>
-          <p className="text-base md:text-lg text-white/80">
-            {region}의 편안한 숙소를 찾아보세요
-          </p>
-        </div>
-      </div>
+      <HeroBanner 
+        bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
+        title={region}
+        subtitle={`${region}의 편안한 숙소를 찾아보세요`}
+        height="320px"
+        className="rounded-b-[40px]"
+      />
 
       {/* 필터 & 정렬 영역 */}
       <div className="max-w-[1200px] mx-auto px-4 py-6">
