@@ -35,7 +35,7 @@ const Footer = () => {
             <div className="flex gap-6 text-gray-300">
               <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">고객지원</Link>
               <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">공지사항</Link>
-              <Link to="/customersupport/faq" className="text-white hover:text-sky-400! transition-colors duration-200">자주하는 질</Link>
+              <Link to="/customersupport/faq" className="text-white hover:text-sky-400! transition-colors duration-200">자주하는 질문</Link>
             </div>
           </div>
 
