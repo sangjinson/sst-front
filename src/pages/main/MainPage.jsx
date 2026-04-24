@@ -1,21 +1,21 @@
-import React, { useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useMemo, useEffect } from 'react'; // 🚀 useEffect 추가
+import { useLocation, useNavigate, useParams } from 'react-router-dom'; // 🚀 useLocation 추가
 
 // ----------------------------------------------------
-// 1. 배너 이미지 설정 영역 (여기에 이미지 주소를 넣으시면 됩니다!)
+// 1. 배너 이미지 설정 영역
 // ----------------------------------------------------
 const bannerImages = {
-  '수원시': 'https://images.unsplash.com/photo-1605833989399-52e8548a3dae?auto=format&fit=crop&w=1920&q=80', // 수원화성 느낌의 전통 건축물
-  '화성시': 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=1920&q=80', // 화성행궁 느낌의 고즈넉한 풍경
-  '부천시': 'https://images.unsplash.com/photo-1570198083995-1f6cc9709d07?auto=format&fit=crop&w=1920&q=80', // 부천 도심 야경/공원 느낌
-  '용인시': 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1920&q=80', // 놀이공원/자연 느낌의 이국적 풍경
-  '고양시': 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80', // 호수공원 느낌의 수변 풍경
+  '수원시': 'https://images.unsplash.com/photo-1605833989399-52e8548a3dae?auto=format&fit=crop&w=1920&q=80',
+  '화성시': 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=1920&q=80',
+  '부천시': 'https://images.unsplash.com/photo-1570198083995-1f6cc9709d07?auto=format&fit=crop&w=1920&q=80',
+  '용인시': 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1920&q=80',
+  '고양시': 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80',
 };
 
 const defaultBanner = 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=1920&q=80';
 
 // ----------------------------------------------------
-// 2. 지역별 통합 더미 데이터 (각 5개씩 존재)
+// 2. 지역별 통합 더미 데이터
 // ----------------------------------------------------
 const regionData = {
   '수원시': {
@@ -33,12 +33,19 @@ const regionData = {
       { id: 4, tag: '볼거리', title: '플라잉수원', desc: '열기구를 타고 하늘에서 내려다보는 수원의 파노라마', img: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&w=400&q=80' },
       { id: 5, tag: '볼거리', title: '광교호수공원', desc: '도심 속 거대한 호수와 환상적인 야경', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
     ],
-    activities: [
+    plays: [
+      { id: 1, tag: '놀거리', title: '화성어차 탑승', desc: '왕의 가마를 모티브로 한 관광열차 투어', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80' },
+      { id: 2, tag: '놀거리', title: '아쿠아플라넷 광교', desc: '도심 속에서 만나는 신비로운 바닷속 탐험', img: 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=400&q=80' },
+      { id: 3, tag: '놀거리', title: '연무대 국궁체험', desc: '조선시대 군사들이 무예를 연마하던 곳에서 활쏘기', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '놀거리', title: '수원시립미술관 관람', desc: '화성행궁 옆에서 즐기는 현대 미술의 향연', img: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '놀거리', title: '광교 앨리웨이 산책', desc: '호수공원 옆 트렌디한 문화 복합 공간 즐기기', img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=400&q=80' },
+    ],
+    sleeps: [
       { id: 1, tag: '잘거리', title: '행궁동 한옥스테이', desc: '고즈넉한 분위기에서 즐기는 특별한 하룻밤', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80' },
-      { id: 2, tag: '놀거리', title: '화성어차 탑승', desc: '왕의 가마를 모티브로 한 관광열차 투어', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80' },
-      { id: 3, tag: '놀거리', title: '아쿠아플라넷 광교', desc: '도심 속에서 만나는 신비로운 바닷속 탐험', img: 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, tag: '놀거리', title: '연무대 국궁체험', desc: '조선시대 군사들이 무예를 연마하던 곳에서 활쏘기', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, tag: '잘거리', title: '광교 비즈니스 호텔', desc: '깔끔하고 모던한 도심 속 호캉스', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
+      { id: 2, tag: '잘거리', title: '라마다 프라자 수원', desc: '수원 도심을 한눈에 내려다보는 특급 호텔', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
+      { id: 3, tag: '잘거리', title: '노보텔 앰배서더', desc: '수원역과 연결된 편리하고 모던한 숙소', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '잘거리', title: '코트야드 메리어트 수원', desc: '광교 호수공원 인근의 럭셔리한 호캉스', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '잘거리', title: '수원 호스텔', desc: '화성행궁 바로 앞, 배낭여행객을 위한 아늑한 공간', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
     ],
     foods: [
       { id: 1, tag: '먹거리', title: '수원왕갈비', desc: '수원을 대표하는 부드럽고 달콤한 양념갈비', img: 'https://images.unsplash.com/photo-1544025162-811114215b22?auto=format&fit=crop&w=400&q=80' },
@@ -63,12 +70,19 @@ const regionData = {
       { id: 4, tag: '볼거리', title: '융건릉', desc: '사도세자와 정조가 잠든 고즈넉한 세계문화유산', img: 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=400&q=80' },
       { id: 5, tag: '볼거리', title: '우리꽃식물원', desc: '우리 땅에서 자라는 아름다운 자생식물들의 보금자리', img: 'https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=400&q=80' },
     ],
-    activities: [
+    plays: [
       { id: 1, tag: '놀거리', title: '서해랑 해상케이블카', desc: '제부도 바다 위를 가로지르는 아찔한 비행', img: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&w=400&q=80' },
       { id: 2, tag: '놀거리', title: '전곡항 요트 체험', desc: '푸른 바다를 가르는 럭셔리한 해양 레저', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80' },
-      { id: 3, tag: '잘거리', title: '율암온천 숯가마', desc: '천연 온천수와 참숯가마에서 즐기는 힐링', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, tag: '놀거리', title: '동탄 루나쇼 관람', desc: '밤하늘을 수놓는 화려한 호수공원 분수쇼', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, tag: '잘거리', title: '롤링힐스 호텔', desc: '자연 속에 파묻혀 즐기는 프라이빗 호캉스', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
+      { id: 3, tag: '놀거리', title: '동탄 루나쇼 관람', desc: '밤하늘을 수놓는 화려한 호수공원 분수쇼', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '놀거리', title: '화성드림파크 야구', desc: '국내 최대 규모의 유소년 야구장 나들이', img: 'https://images.unsplash.com/photo-1508344928928-7165b67de128?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '놀거리', title: '바지락 캐기 갯벌체험', desc: '백미리 어촌체험마을에서 즐기는 진흙놀이', img: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=400&q=80' },
+    ],
+    sleeps: [
+      { id: 1, tag: '잘거리', title: '율암온천 숯가마', desc: '천연 온천수와 참숯가마에서 즐기는 힐링 숙박', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80' },
+      { id: 2, tag: '잘거리', title: '롤링힐스 호텔', desc: '자연 속에 파묻혀 즐기는 프라이빗 호캉스', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
+      { id: 3, tag: '잘거리', title: '신라스테이 동탄', desc: '동탄 중심가에서 누리는 모던하고 깔끔한 휴식', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '잘거리', title: '푸르미르 호텔', desc: '융건릉 인근에 위치한 고풍스러운 분위기의 호텔', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '잘거리', title: '제부도 글램핑장', desc: '바닷소리를 자장가 삼아 잠드는 감성 캠핑', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80' },
     ],
     foods: [
       { id: 1, tag: '먹거리', title: '궁평항 바지락칼국수', desc: '서해 바다의 시원함이 가득 담긴 국물', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80' },
@@ -93,12 +107,19 @@ const regionData = {
       { id: 4, tag: '볼거리', title: '부천호수식물원 수피아', desc: '상동호수공원 내 위치한 이국적인 온실 식물원', img: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=400&q=80' },
       { id: 5, tag: '볼거리', title: '부천천문과학관', desc: '별과 우주의 신비를 탐구하는 도심 속 천문대', img: 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?auto=format&fit=crop&w=400&q=80' },
     ],
-    activities: [
+    plays: [
       { id: 1, tag: '놀거리', title: '만화 드로잉 체험', desc: '만화박물관에서 직접 나만의 캐릭터 그려보기', img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=400&q=80' },
       { id: 2, tag: '놀거리', title: '상동호수공원 피크닉', desc: '넓은 잔디밭에서 즐기는 여유로운 오후', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
       { id: 3, tag: '놀거리', title: '플레이아쿠아리움 부천', desc: '해양 생물부터 정글 동물까지 만나는 실내 동물원', img: 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, tag: '잘거리', title: '부천 도심 레지던스', desc: '교통이 편리한 부천 도심에서의 편안한 숙박', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, tag: '놀거리', title: '별자리 관측', desc: '천문과학관 망원경으로 밤하늘 별 찾기', img: 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '놀거리', title: '별자리 관측', desc: '천문과학관 망원경으로 밤하늘 별 찾기', img: 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '놀거리', title: '웅진플레이도시 워터파크', desc: '사계절 내내 즐길 수 있는 실내 테마파크', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80' },
+    ],
+    sleeps: [
+      { id: 1, tag: '잘거리', title: '고려호텔', desc: '상동역 도보 1분 거리의 품격 있는 4성급 호텔', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
+      { id: 2, tag: '잘거리', title: '부천 도심 레지던스', desc: '내 집처럼 편안한 취사 가능한 레지던스 숙박', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80' },
+      { id: 3, tag: '잘거리', title: '폴라리스 호텔', desc: '쾌적한 객실과 훌륭한 조식을 자랑하는 숙소', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '잘거리', title: '상동 부띠끄 호텔', desc: '감각적인 인테리어와 스파 욕조가 있는 부띠끄', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '잘거리', title: '부천역 게스트하우스', desc: '가성비 넘치고 젊은 여행객들이 모이는 곳', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
     ],
     foods: [
       { id: 1, tag: '먹거리', title: '작동 홍두깨칼국수', desc: '진한 바지락 육수와 쫄깃한 수타면의 조화', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80' },
@@ -123,12 +144,19 @@ const regionData = {
       { id: 4, tag: '볼거리', title: '백남준아트센터', desc: '비디오 아트의 거장, 백남준의 예술 세계 탐구', img: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=400&q=80' },
       { id: 5, tag: '볼거리', title: '용인 농촌테마파크', desc: '자연 속에서 즐기는 농경문화 체험과 꽃 구경', img: 'https://images.unsplash.com/photo-1542314831-c6a4d14eff40?auto=format&fit=crop&w=400&q=80' },
     ],
-    activities: [
+    plays: [
       { id: 1, tag: '놀거리', title: '티익스프레스 탑승', desc: '아찔한 속도감을 자랑하는 우든 코스터', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
       { id: 2, tag: '놀거리', title: '민속촌 한복 체험', desc: '고운 한복을 입고 조선시대 저잣거리 걷기', img: 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=400&q=80' },
       { id: 3, tag: '놀거리', title: '짚라인 용인', desc: '자연휴양림 숲속을 가로지르는 짜릿한 비행', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, tag: '잘거리', title: '자연휴양림 숲속의 집', desc: '맑은 공기를 마시며 즐기는 산속 펜션 휴양', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, tag: '놀거리', title: '캐리비안베이', desc: '여름을 시원하게 날려버릴 짜릿한 워터파크', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '놀거리', title: '캐리비안베이', desc: '여름을 시원하게 날려버릴 짜릿한 워터파크', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '놀거리', title: '용인자연휴양림 산책', desc: '울창한 숲속 맑은 공기를 마시며 걷는 힐링 타임', img: 'https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=400&q=80' },
+    ],
+    sleeps: [
+      { id: 1, tag: '잘거리', title: '자연휴양림 숲속의 집', desc: '맑은 공기를 마시며 즐기는 산속 통나무집 펜션', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80' },
+      { id: 2, tag: '잘거리', title: '용인 센트럴 코업 호텔', desc: '용인대 입구에 위치한 깔끔하고 가성비 좋은 숙소', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
+      { id: 3, tag: '잘거리', title: '라마다 용인 호텔', desc: '에버랜드 방문객을 위한 최고의 접근성과 서비스', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '잘거리', title: '더숨포레스트 호텔', desc: '전곡항과 가까워 자연의 숨결을 느끼는 휴양 펜션', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '잘거리', title: '에버랜드 홈브리지', desc: '놀이동산 안에서 잠드는 마법 같은 통나무 캐빈', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
     ],
     foods: [
       { id: 1, tag: '먹거리', title: '백암순대', desc: '야채와 고기가 듬뿍 들어간 용인 백암면의 명물', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80' },
@@ -153,12 +181,19 @@ const regionData = {
       { id: 4, tag: '볼거리', title: '아쿠아플라넷 일산', desc: '바다 생물과 정글 동물이 공존하는 실내 테마파크', img: 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=400&q=80' },
       { id: 5, tag: '볼거리', title: '행주산성', desc: '권율 장군의 얼이 깃든 한강 조망의 역사적 명소', img: 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=400&q=80' },
     ],
-    activities: [
+    plays: [
       { id: 1, tag: '놀거리', title: '호수공원 자전거 라이딩', desc: '시원한 바람을 맞으며 즐기는 자전거 산책', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80' },
       { id: 2, tag: '놀거리', title: '자동차 시승 체험', desc: '모터스튜디오에서 최신 차량 직접 타보기', img: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=400&q=80' },
-      { id: 3, tag: '잘거리', title: '소노캄 고양', desc: '킨텍스 인근에 위치한 최고급 5성급 호텔', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, tag: '놀거리', title: '원마운트 스노우파크', desc: '365일 눈이 내리는 실내 겨울 테마파크', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, tag: '놀거리', title: '배다골 테마파크', desc: '아이들과 함께 즐기는 도심 속 미니 농장 체험', img: 'https://images.unsplash.com/photo-1542314831-c6a4d14eff40?auto=format&fit=crop&w=400&q=80' },
+      { id: 3, tag: '놀거리', title: '원마운트 스노우파크', desc: '365일 눈이 내리는 실내 겨울 테마파크', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '놀거리', title: '배다골 테마파크', desc: '아이들과 함께 즐기는 도심 속 미니 농장 체험', img: 'https://images.unsplash.com/photo-1542314831-c6a4d14eff40?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '놀거리', title: '킨텍스 전시 관람', desc: '볼거리가 끊이지 않는 대형 전시와 페어 즐기기', img: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=400&q=80' },
+    ],
+    sleeps: [
+      { id: 1, tag: '잘거리', title: '소노캄 고양', desc: '킨텍스 인근에 위치한 최고급 5성급 호텔', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
+      { id: 2, tag: '잘거리', title: '킨텍스 바이 케이트리', desc: '전시장 방문객에게 최적화된 모던 비즈니스 호텔', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=400&q=80' },
+      { id: 3, tag: '잘거리', title: '일산 레지던스', desc: '라페스타 근처에서 내 집처럼 머무는 공간', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80' },
+      { id: 4, tag: '잘거리', title: '스테이25 호텔', desc: '조용하고 아늑한 분위기의 일산 도심 속 쉼터', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80' },
+      { id: 5, tag: '잘거리', title: 'YMCA 고양국제청소년센터', desc: '가족 단위 여행객을 위한 넓고 쾌적한 숙박 시설', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
     ],
     foods: [
       { id: 1, tag: '먹거리', title: '행주산성 원조국수', desc: '자전거 라이더들의 성지, 세숫대야 크기의 잔치국수', img: 'https://images.unsplash.com/photo-1583182332473-b31c07318d1a?auto=format&fit=crop&w=400&q=80' },
@@ -171,45 +206,62 @@ const regionData = {
 };
 
 // ----------------------------------------------------
-// 3. 무작위로 n개의 요소를 뽑아주는 유틸리티 함수
+// 3. 무작위 추출 유틸리티
 // ----------------------------------------------------
 const getRandomItems = (arr, num) => {
   const shuffled = [...arr].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, num);
 };
 
-// ----------------------------------------------------
-// 4. 메인 페이지 컴포넌트
-// ----------------------------------------------------
 const MainPage = () => {
-  const location = useLocation();
+  const { region } = useParams();
   const navigate = useNavigate();
+  const { pathname } = useLocation(); // 🚀 현재 경로 가져오기
+
+  // 🚀 페이지 경로(pathname)가 바뀔 때마다 스크롤을 맨 위로 이동!
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   
-  // 현재 지역 가져오기 (기본값 수원시)
-  const currentRegion = location.state?.selectedRegion || '수원시';
-  
-  // 🚀 지역에 맞는 배너 이미지 적용!
+  const currentRegion = region || '수원시';
   const currentBannerImage = bannerImages[currentRegion] || defaultBanner;
   
-  // 현재 지역 데이터 꺼내오기
   const currentData = regionData[currentRegion] || regionData['수원시'];
-  const { streetList, attractions, activities, foods } = currentData;
+  const { attractions, plays, sleeps, foods } = currentData;
 
-  // 🚀 새로고침 시 5개의 데이터 중 랜덤으로 3개만 추출 (useMemo를 써서 화면 렌더링 최적화)
-  const randomStreetList = useMemo(() => getRandomItems(streetList, 4), [currentRegion]);
+  const topPicks = useMemo(() => {
+    const seeItem = getRandomItems(attractions, 1)[0];
+    const playItem = getRandomItems(plays, 1)[0];
+    const sleepItem = getRandomItems(sleeps, 1)[0];
+    const foodItem = getRandomItems(foods, 1)[0];
+
+    return [
+      { ...seeItem, type: 'see' },
+      { ...playItem, type: 'play' },
+      { ...sleepItem, type: 'sleep' },
+      { ...foodItem, type: 'food' },
+    ];
+  }, [currentRegion]);
+
   const randomAttractions = useMemo(() => getRandomItems(attractions, 3), [currentRegion]);
-  const randomActivities = useMemo(() => getRandomItems(activities, 3), [currentRegion]);
+  const randomPlays = useMemo(() => getRandomItems(plays, 3), [currentRegion]);
+  const randomSleeps = useMemo(() => getRandomItems(sleeps, 3), [currentRegion]);
   const randomFoods = useMemo(() => getRandomItems(foods, 3), [currentRegion]);
 
   const handleMoreClick = (pathType) => {
-    navigate(`/area/${pathType}/list`, { state: { selectedRegion: currentRegion } });
+    navigate(`/${currentRegion}/${pathType}/list`);
   };
 
-  // 카테고리 렌더링 함수
+  const handleCardClick = (pathType, item) => {
+    navigate(`/${currentRegion}/${pathType}/view`, { 
+      state: { selectedRegion: currentRegion, selectedItem: item } 
+    });
+  };
+
   const renderCategorySection = (title, dataList, pathType) => (
     <section className="mb-[60px]">
       <div className="flex justify-between items-end mb-[25px]">
-        <h3 className="text-[22px] font-bold flex items-center gap-2.5 text-gray-900">
+        <h3 className="text-[22px] font-bold flex items-center gap-2.5 text-gray-900 font-griun">
           <span className="inline-block w-1 h-5 bg-[#E26338] rounded-sm"></span>
           {title}
         </h3>
@@ -221,18 +273,14 @@ const MainPage = () => {
         </button>
       </div>
       
-      {/* 3열 카드 그리드 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[25px]">
         {dataList.map((item) => (
-          <div key={item.id} className="bg-white border border-[#eee] rounded-xl overflow-hidden cursor-pointer transition-shadow duration-200 hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] group">
-            
-            {/* 🚀 회색 박스 대신 실제 이미지가 들어갑니다! */}
-            <img 
-              src={item.img} 
-              alt={item.title} 
-              className="w-full h-[180px] object-cover block group-hover:scale-105 transition-transform duration-300" 
-            />
-            
+          <div 
+            key={item.id} 
+            onClick={() => handleCardClick(pathType, item)}
+            className="bg-white border border-[#eee] rounded-xl overflow-hidden cursor-pointer transition-shadow duration-200 hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] group"
+          >
+            <img src={item.img} alt={item.title} className="w-full h-[180px] object-cover block group-hover:scale-105 transition-transform duration-300" />
             <div className="p-5 relative bg-white">
               <span className="inline-block bg-[#FFF2E8] text-[#E26338] text-[11px] font-bold py-1 px-2.5 rounded mb-3">
                 {item.tag}
@@ -249,50 +297,52 @@ const MainPage = () => {
   return (
     <div className="w-full bg-white pb-[100px]">
       
-      {/* 상단 히어로 배너 */}
       <section 
         className="w-full h-[400px] bg-cover bg-center flex justify-center items-center relative transition-all duration-500"
         style={{ backgroundImage: `url('${currentBannerImage}')` }}
       >
         <div className="absolute inset-0 bg-black/30"></div>
         <div className="relative z-10 text-center text-white drop-shadow-md">
-          <h1 className="font-['GriunFont'] text-[50px] md:text-[80px] mb-[15px] font-black">
+          <h1 className="font-griun text-[50px] md:text-[80px] mb-[15px] font-black">
             {currentRegion} 
           </h1>
           <p className="text-[18px] md:text-[24px] font-medium tracking-[2px]">전통과 현대가 공존하는 도시</p>
         </div>
       </section>
 
-      {/* 중앙 콘텐츠 영역 */}
       <div className="max-w-[1200px] mx-auto px-5 py-10">
         <div className="text-[13px] text-gray-500 mb-[50px]">
-          홈 &gt; <strong className="text-gray-900">{currentRegion}</strong>
+          홈 &gt; <strong className="text-gray-900 font-griun">{currentRegion}</strong>
         </div>
 
-        {/* 숨어있는 거리 섹션 */}
         <section className="mb-[80px]">
           <div className="text-center mb-10 border-b-2 border-gray-800 pb-4">
-            <h2 className="text-[26px] font-bold text-gray-900">방방곳곳 숨어있는 거리를 찾다</h2>
+            <h2 className="text-[26px] font-bold text-gray-900 font-griun">방방곳곳 숨어있는 추천을 찾다</h2>
           </div>
           
-          {/* 거리 이미지 카드도 3열로 맞췄습니다 */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {/* 🚀 원본 리스트 대신 랜덤 리스트 맵핑 */}
-            {randomStreetList.map((street) => (
-              <div key={street.id} className="relative rounded-xl overflow-hidden aspect-[3/4] shadow-[0_4px_15px_rgba(0,0,0,0.1)] cursor-pointer hover:-translate-y-1.5 transition-transform duration-300">
-                <img src={street.img} alt={street.title} className="w-full h-full object-cover block" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            {topPicks.map((item) => (
+              <div 
+                key={`${item.type}-${item.id}`} 
+                onClick={() => handleCardClick(item.type, item)}
+                className="relative rounded-xl overflow-hidden aspect-[3/4] shadow-[0_4px_15px_rgba(0,0,0,0.1)] cursor-pointer hover:-translate-y-1.5 transition-transform duration-300"
+              >
+                <img src={item.img} alt={item.title} className="w-full h-full object-cover block" />
                 <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent pt-[30px] pb-5 px-5 text-white">
-                  <h4 className="text-[18px] font-bold mb-1">{street.title}</h4>
-                  <p className="text-[13px] text-gray-300">{street.location}</p>
+                  <span className="text-[11px] bg-primary text-white px-2 py-0.5 rounded-sm mb-2 inline-block font-bold">
+                    {item.tag}
+                  </span>
+                  <h4 className="text-[18px] font-bold mb-1">{item.title}</h4>
+                  <p className="text-[13px] text-gray-300 line-clamp-1">{item.desc}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* 카테고리별 추천 리스트 🚀 원본 리스트 대신 랜덤 리스트를 넘겨줍니다. */}
         {renderCategorySection("놓치지 말아야 할 '볼거리'", randomAttractions, "see")}
-        {renderCategorySection("편안한 '잘거리'와 신나는 '놀거리'", randomActivities, "play")}
+        {renderCategorySection("신나는 '놀거리'", randomPlays, "play")}
+        {renderCategorySection("편안한 '잘거리'", randomSleeps, "sleep")}
         {renderCategorySection("수원의 맛, '먹거리'", randomFoods, "food")}
 
       </div>
