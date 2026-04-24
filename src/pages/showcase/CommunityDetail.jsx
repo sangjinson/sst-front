@@ -101,7 +101,7 @@ const CommunityDetail = () => {
             </svg>
           </button>
 
-          <div className="mb-8">
+          <div className="mt-66">
             {/* ✅ 클릭한 게시물의 제목으로 변경 */}
             <h3 className="text-lg font-bold mb-3">✏️ {postDetail.title}</h3>
             <div className="flex flex-wrap gap-2">
