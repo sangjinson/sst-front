@@ -1,5 +1,5 @@
-import React, { useMemo, useEffect } from 'react'; // 🚀 useEffect 추가
-import { useLocation, useNavigate, useParams } from 'react-router-dom'; // 🚀 useLocation 추가
+import React, { useMemo, useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 // ----------------------------------------------------
 // 1. 배너 이미지 설정 영역
@@ -19,13 +19,6 @@ const defaultBanner = 'https://images.unsplash.com/photo-1517154421773-0529f29ea
 // ----------------------------------------------------
 const regionData = {
   '수원시': {
-    streetList: [
-      { id: 1, title: '행리단길', location: '신풍동 일대', img: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=400&q=80' },
-      { id: 2, title: '수원 통닭거리', location: '팔달로 일대', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
-      { id: 3, title: '나혜석거리', location: '인계동', img: 'https://images.unsplash.com/photo-1542314831-c6a4d14eff40?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, title: '지동시장 순대타운길', location: '지동', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, title: '공방거리', location: '팔달문 인근', img: 'https://images.unsplash.com/photo-1524850301259-7729d41d11d9?auto=format&fit=crop&w=400&q=80' },
-    ],
     attractions: [
       { id: 1, tag: '볼거리', title: '수원화성', desc: '유네스코 세계문화유산, 조선시대 성곽 건축의 꽃', img: 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=400&q=80' },
       { id: 2, tag: '볼거리', title: '화성행궁', desc: '정조대왕이 머물던 아름답고 웅장한 행궁', img: 'https://images.unsplash.com/photo-1582236528775-68b42fc06bf6?auto=format&fit=crop&w=400&q=80' },
@@ -56,13 +49,6 @@ const regionData = {
     ],
   },
   '화성시': {
-    streetList: [
-      { id: 1, title: '제부도 해안길', location: '서신면 제부리', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80' },
-      { id: 2, title: '동탄 센트럴파크 카페거리', location: '반송동', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80' },
-      { id: 3, title: '궁평항 해물거리', location: '서신면 궁평리', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, title: '향남 로데오거리', location: '향남읍', img: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, title: '융건릉 산책로', location: '안녕동', img: 'https://images.unsplash.com/photo-1542314831-c6a4d14eff40?auto=format&fit=crop&w=400&q=80' },
-    ],
     attractions: [
       { id: 1, tag: '볼거리', title: '제부도 모세의 기적', desc: '하루 두 번 바닷길이 열리는 신비의 섬', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80' },
       { id: 2, tag: '볼거리', title: '전곡항', desc: '이국적인 요트들이 정박해 있는 아름다운 항구', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80' },
@@ -93,13 +79,6 @@ const regionData = {
     ],
   },
   '부천시': {
-    streetList: [
-      { id: 1, title: '밤리단길 (밤가시마을)', location: '일산동구', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80' },
-      { id: 2, title: '부천역 로데오거리', location: '심곡동', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
-      { id: 3, title: '상동 카페거리', location: '상동', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, title: '신중동 먹자골목', location: '중동', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, title: '부천 만화의 거리', location: '상동', img: 'https://images.unsplash.com/photo-1524850301259-7729d41d11d9?auto=format&fit=crop&w=400&q=80' },
-    ],
     attractions: [
       { id: 1, tag: '볼거리', title: '한국만화박물관', desc: '한국 만화의 역사와 현재를 한눈에 볼 수 있는 곳', img: 'https://images.unsplash.com/photo-1582236528775-68b42fc06bf6?auto=format&fit=crop&w=400&q=80' },
       { id: 2, tag: '볼거리', title: '부천 자연생태공원', desc: '도심 속 산소탱크, 수목원과 식물원의 조화', img: 'https://images.unsplash.com/photo-1542314831-c6a4d14eff40?auto=format&fit=crop&w=400&q=80' },
@@ -130,13 +109,6 @@ const regionData = {
     ],
   },
   '용인시': {
-    streetList: [
-      { id: 1, title: '보정동 카페거리', location: '기흥구 보정동', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80' },
-      { id: 2, title: '에버랜드 로맨틱 에비뉴', location: '처인구 포곡읍', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
-      { id: 3, title: '용인 중앙시장 길', location: '처인구 김량장동', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, title: '기흥 호수공원 산책로', location: '기흥구', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, title: '역북동 대학로', location: '처인구 역북동', img: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=400&q=80' },
-    ],
     attractions: [
       { id: 1, tag: '볼거리', title: '에버랜드', desc: '국내 최대 규모의 짜릿한 테마파크와 사파리', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
       { id: 2, tag: '볼거리', title: '한국민속촌', desc: '조선시대로 타임슬립! 전통 문화 테마파크', img: 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?auto=format&fit=crop&w=400&q=80' },
@@ -167,13 +139,6 @@ const regionData = {
     ],
   },
   '고양시': {
-    streetList: [
-      { id: 1, title: '일산 라페스타', location: '일산동구 장항동', img: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=400&q=80' },
-      { id: 2, title: '밤리단길', location: '일산동구 정발산동', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80' },
-      { id: 3, title: '웨스턴돔', location: '일산동구 장항동', img: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80' },
-      { id: 4, title: '행주산성 먹거리촌', location: '덕양구 행주외동', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
-      { id: 5, title: '원당 종마목장 길', location: '덕양구 원당동', img: 'https://images.unsplash.com/photo-1542314831-c6a4d14eff40?auto=format&fit=crop&w=400&q=80' },
-    ],
     attractions: [
       { id: 1, tag: '볼거리', title: '일산 호수공원', desc: '아시아 최대 규모의 인공 호수와 아름다운 꽃 박람회', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80' },
       { id: 2, tag: '볼거리', title: '킨텍스 (KINTEX)', desc: '매주 다채로운 전시와 박람회가 열리는 대형 전시장', img: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=400&q=80' },
@@ -216,9 +181,9 @@ const getRandomItems = (arr, num) => {
 const MainPage = () => {
   const { region } = useParams();
   const navigate = useNavigate();
-  const { pathname } = useLocation(); // 🚀 현재 경로 가져오기
+  const { pathname } = useLocation();
 
-  // 🚀 페이지 경로(pathname)가 바뀔 때마다 스크롤을 맨 위로 이동!
+  // 페이지 경로가 바뀔 때마다 스크롤 맨 위로!
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
@@ -252,10 +217,9 @@ const MainPage = () => {
     navigate(`/${currentRegion}/${pathType}/list`);
   };
 
+  // 🚀 핵심 수정 부분: 카드를 클릭할 때 url 뒤에 ?id=${item.id} 를 붙여서 보냅니다!
   const handleCardClick = (pathType, item) => {
-    navigate(`/${currentRegion}/${pathType}/view`, { 
-      state: { selectedRegion: currentRegion, selectedItem: item } 
-    });
+    navigate(`/${currentRegion}/${pathType}/view?id=${item.id}`);
   };
 
   const renderCategorySection = (title, dataList, pathType) => (
@@ -311,10 +275,18 @@ const MainPage = () => {
       </section>
 
       <div className="max-w-[1200px] mx-auto px-5 py-10">
-        <div className="text-[13px] text-gray-500 mb-[50px]">
-          홈 &gt; <strong className="text-gray-900 font-griun">{currentRegion}</strong>
-        </div>
-
+          <p className="text-sm text-gray-400 mb-[50px]">
+            <span
+              className="cursor-pointer hover:text-[#0F9B73] transition-colors"
+              onClick={() => navigate('/')}
+            >
+              홈
+            </span>
+            {' > '}
+            <span className="text-gray-900 font-bold font-griun">
+              {currentRegion}
+            </span>
+          </p>
         <section className="mb-[80px]">
           <div className="text-center mb-10 border-b-2 border-gray-800 pb-4">
             <h2 className="text-[26px] font-bold text-gray-900 font-griun">방방곳곳 숨어있는 추천을 찾다</h2>
