@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 // ----------------------------------------------------
 // 1. 배너 이미지 설정 영역 (여기에 이미지 주소를 넣으시면 됩니다!)
@@ -182,11 +182,16 @@ const getRandomItems = (arr, num) => {
 // 4. 메인 페이지 컴포넌트
 // ----------------------------------------------------
 const MainPage = () => {
-  const location = useLocation();
+  // 수정전
+  //const location = useLocation();
+  const { region } = useParams();
   const navigate = useNavigate();
   
   // 현재 지역 가져오기 (기본값 수원시)
-  const currentRegion = location.state?.selectedRegion || '수원시';
+  // 수정전
+  //const currentRegion = location.state?.selectedRegion || '수원시';
+  // 수정후
+  const currentRegion = region || '수원시';
   
   // 🚀 지역에 맞는 배너 이미지 적용!
   const currentBannerImage = bannerImages[currentRegion] || defaultBanner;
@@ -202,7 +207,10 @@ const MainPage = () => {
   const randomFoods = useMemo(() => getRandomItems(foods, 3), [currentRegion]);
 
   const handleMoreClick = (pathType) => {
-    navigate(`/area/${pathType}/list`, { state: { selectedRegion: currentRegion } });
+    // 수정전
+    // navigate(`/area/${pathType}/list`, { state: { selectedRegion: currentRegion } });
+    // 수정후
+    navigate(`/${currentRegion}/${pathType}/list`);
   };
 
   // 카테고리 렌더링 함수

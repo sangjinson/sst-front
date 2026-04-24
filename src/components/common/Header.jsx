@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import '@assets/css/header.css';
 
 const Header = () => {
@@ -7,12 +7,29 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
 
+  // 🚀 수정: 현재 URL에서 지역 추출
+  const { region } = useParams();
+  const navigate = useNavigate();
+
+  const currentRegion = region || '수원시';
+
+  // 수정 전
+  // const navItems = [
+  //   { name: '볼거리', path: '/area/see/list' },
+  //   { name: '먹거리', path: '/area/food/list' },
+  //   { name: '잘거리', path: '/area/sleep/list' },
+  //   { name: '놀거리', path: '/area/play/list' },
+  //   { name: '뽐낼거리', path: '/user' },
+  //   { name: '내거리', path: '/user/mypage' },
+  // ];
+
+  // 수정 후
   const navItems = [
-    { name: '볼거리', path: '/area/see/list' },
-    { name: '먹거리', path: '/area/food/list' },
-    { name: '잘거리', path: '/area/sleep/list' },
-    { name: '놀거리', path: '/area/play/list' },
-    { name: '뽐낼거리', path: '/user' },
+    { name: '볼거리', path: `/${currentRegion}/see/list` },
+    { name: '먹거리', path: `/${currentRegion}/food/list` },
+    { name: '잘거리', path: `/${currentRegion}/sleep/list` },
+    { name: '놀거리', path: `/${currentRegion}/play/list` },
+    { name: '뽐낼거리', path: `/${currentRegion}` },
     { name: '내거리', path: '/user/mypage' },
   ];
 
@@ -25,7 +42,10 @@ const Header = () => {
 
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;
-    alert(`'${searchKeyword}'(으)로 검색합니다.`);
+    // 수정전
+    //alert(`'${searchKeyword}'(으)로 검색합니다.`);
+    // 수정후
+    navigate(`/user/${searchKeyword}`);
     setIsSearchOpen(false);
   };
 
