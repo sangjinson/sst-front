@@ -12,9 +12,7 @@ const Header = () => {
 
   const currentRegion = region || '수원시';
 
-  // 🚀 1. 헤더 전체 영역을 감지하기 위한 ref 생성
-  const headerRef = useRef(null);
-
+  // 수정 후
   const navItems = [
     { name: '볼거리', path: `/${currentRegion}/see/list` },
     { name: '먹거리', path: `/${currentRegion}/food/list` },
