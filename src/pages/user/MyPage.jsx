@@ -365,16 +365,11 @@ const MyPage = () => {
               <li className="text-xs text-gray-700 flex items-start gap-1.5"><span className="text-sm">✉️</span>{profile.email}</li>
             </ul>
           </div>
-
-          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-700 mb-3">프로필 더보기</h3>
-            <ul className="flex flex-col gap-1.5">
-              <Link to="/customersupport/notice" className="text-sm text-gray-700 flex items-center gap-2 py-1.5 hover:text-[#0F9B73] transition-colors">
-                <span>👤</span> 공지사항
-              </Link>
-              <Link to="/customersupport/faq" className="text-sm text-gray-700 flex items-center gap-2 py-1.5 hover:text-[#0F9B73] transition-colors">
-                <span>🚫</span> 자주 하는 질문
-              </Link>
+          <div className="mp-box">
+            <h3>프로필 더보기</h3>
+            <ul className="mp-link-list">
+              <Link to="/customersupport/notice"><li><span>👤</span> 공지사항</li></Link>
+              <Link to="/customersupport/faq"><li><span>❓</span> 자주 하는 질문</li></Link>
             </ul>
           </div>
         </aside>

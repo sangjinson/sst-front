@@ -177,21 +177,18 @@ const CommunityWrite = () => {
 
           {/* 5. 내용 입력 */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-3">내용</label>
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex gap-4 text-gray-600 font-bold">
-                <button type="button">B</button><button type="button">I</button><button type="button">U</button>
-              </div>
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows="10"
-                placeholder="경기도 여행의 추억을 에디터에 담아보세요."
-                className="w-full px-4 py-4 outline-none resize-none text-gray-700"
-                required
-              />
-            </div>
+          <label className="block text-sm font-bold text-gray-700 mb-3">내용</label>
+          <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm focus-within:border-blue-400 transition-colors">
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows="15" // 에셋이 빠진 만큼 높이를 조금 더 확보해도 좋습니다.
+              placeholder="경기도 여행의 추억을 담아보세요."
+              className="w-full px-4 py-4 outline-none resize-none text-gray-700 leading-relaxed"
+              required
+            />
           </div>
+        </div>
 
           {/* 6. 태그 설정 */}
           <div>
