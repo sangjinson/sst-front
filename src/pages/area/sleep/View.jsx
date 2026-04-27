@@ -141,18 +141,8 @@ const View = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f6f0]">
-      <div className="max-w-[900px] mx-auto px-4 py-4">
-
-        {/* 브레드크럼 */}
-        <Breadcrumb 
-          paths={[
-            { label: '홈', to: '/' },
-            { label: regionKor, to: `/${regionKor}` },
-            { label: '잘거리', to: `/${regionKor}/sleep/view` }
-          ]} 
-          className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
-        />
+    <div className="min-h-screen">
+      <div className="py-5">
 
         {/* 대표 이미지 */}
         <div className="relative rounded-2xl overflow-hidden mb-6 h-64 md:h-96">
