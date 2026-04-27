@@ -83,19 +83,19 @@ const MainPage = () => {
   };
 
   return (
-    <div className="w-full bg-white pb-[50px] md:pb-[100px]"> {/* 🚀 모바일 하단 여백 축소 */}
+    /* List처럼 min-h-screen 적용, 배경은 기존대로 유지 */
+    <div className="min-h-screen bg-white pb-[50px] md:pb-[100px]"> 
       
+      {/* 배너는 컨테이너 바깥에 두어 화면 전체(100%)를 꽉 채우게 합니다 */}
       <HeroBanner 
         bgImage={currentBannerImage} 
         title={currentRegion} 
         subtitle="전통과 현대가 공존하는 도시" 
-        // HeroBanner 컴포넌트 내부에서 반응형 타이포그래피(md:text-[80px] 등)가 작동합니다.
       />
 
-      {/* 🚀 모바일에서는 py-6, 태블릿 이상에서 py-10 */}
-      <div className="max-w-[1200px] mx-auto px-5 py-6 md:py-10">
+      {/* 컨테이너의 좌우 여백을 List 컴포넌트와 동일하게 px-4로 맞춤 */}
+      <div className="max-w-[1200px] mx-auto px-4 py-6 md:py-10">
         
-        {/* 🚀 모바일에서 브레드크럼 여백 살짝 줄이기 */}
         <Breadcrumb 
           paths={[
             { label: '홈', to: '/' },
@@ -105,14 +105,13 @@ const MainPage = () => {
         />
 
         {topPicks.length > 0 && (
-          <section className="mb-[50px] md:mb-[80px]"> {/* 🚀 모바일 섹션 간격 줄이기 */}
+          <section className="mb-[50px] md:mb-[80px]"> 
             <div className="text-center mb-8 md:mb-10 border-b-2 border-gray-800 pb-3 md:pb-4">
               <h2 className="text-[20px] md:text-[26px] font-bold text-gray-900 font-griun">
                 방방곳곳 숨어있는 추천을 찾다
               </h2>
             </div>
             
-            {/* 🚀 모바일 1개, 태블릿 2개, 데스크탑 4개 배치 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
               {topPicks.map((item) => (
                 <TopPickCard 
