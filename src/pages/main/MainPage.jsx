@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import TopPickCard from '@components/card/TopPickCard';
@@ -6,8 +6,67 @@ import HeroBanner from '@components/common/HeroBanner';
 import CategorySection from '@components/card/CategorySection';
 import Breadcrumb from '@components/common/Breadcrumb';
 
-// 🚀 JSON 파일을 import 합니다! (경로는 실제 파일 위치에 맞게 수정해주세요)
+// 🚀 JSON 파일을 import 합니다!
 import regionData from '@pages/main/regionData.json';
+
+// ----------------------------------------------------
+// 메인 페이지 전용 스켈레톤 UI 컴포넌트
+// ----------------------------------------------------
+const MainSkeletonLoader = () => {
+  return (
+    <div className="min-h-screen bg-white pb-[50px] md:pb-[100px] animate-pulse">
+      
+      {/* 1. 배너 스켈레톤 */}
+      <div className="w-full h-[300px] md:h-[400px] bg-gray-200"></div>
+
+      <div className="max-w-[1200px] mx-auto px-4 py-6 md:py-10">
+        
+        {/* 2. 브레드크럼 스켈레톤 */}
+        <div className="h-4 bg-gray-200 rounded w-32 mb-6 md:mb-[50px]"></div>
+
+        {/* 3. 상단 추천 섹션 스켈레톤 (방방곳곳 숨어있는 추천을 찾다) */}
+        <section className="mb-[50px] md:mb-[80px]">
+          <div className="flex justify-center mb-8 md:mb-10 border-b-2 border-gray-100 pb-3 md:pb-4">
+            <div className="h-8 md:h-10 bg-gray-300 rounded w-64 md:w-80"></div>
+          </div>
+          
+          {/* 4칸 그리드 (모바일 1, 태블릿 2, 데스크탑 4) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+            {[1, 2, 3, 4].map((item) => (
+              <div key={`top-${item}`} className="h-[280px] md:h-[320px] bg-gray-200 rounded-2xl"></div>
+            ))}
+          </div>
+        </section>
+
+        {/* 4. 카테고리 섹션 스켈레톤 (볼거리, 놀거리, 잘거리, 먹거리) */}
+        {[1, 2, 3, 4].map((section) => (
+          <div key={`section-${section}`} className="mb-[50px] md:mb-[80px]">
+            {/* 타이틀 및 '더보기' 버튼 영역 */}
+            <div className="flex justify-between items-end mb-4 border-b border-gray-100 pb-2">
+              <div className="h-6 md:h-8 bg-gray-300 rounded w-48"></div>
+              <div className="h-4 bg-gray-200 rounded w-16"></div>
+            </div>
+            {/* 3칸 그리드 (기본 CategorySection은 보통 3개를 보여줍니다) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+              {[1, 2, 3].map((card) => (
+                <div key={`card-${card}`} className="bg-white rounded-2xl overflow-hidden shadow-sm">
+                  <div className="h-48 bg-gray-200"></div>
+                  <div className="p-4">
+                    <div className="h-5 bg-gray-300 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+      </div>
+    </div>
+  );
+};
 
 // ----------------------------------------------------
 // 1. 배너 이미지 설정 영역
@@ -36,9 +95,23 @@ const MainPage = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  // 🚀 로딩 상태 관리 추가
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [pathname]);
+    
+    // 페이지나 지역이 바뀔 때마다 로딩 상태 초기화
+    setIsLoading(true);
+
+    // 🚀 눈으로 스켈레톤을 확인하기 위한 임시 0.5초 딜레이
+    // 실제 서버(API)를 붙이실 때는 이 부분을 지우고 API 응답 후 setIsLoading(false)를 하시면 됩니다.
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [pathname, region]);
   
   const currentRegion = region || '수원시';
   const currentBannerImage = bannerImages[currentRegion] || defaultBanner;
@@ -82,18 +155,21 @@ const MainPage = () => {
     });
   };
 
+  // 🚀 데이터 로딩 중이면 스켈레톤 UI를 먼저 렌더링
+  if (isLoading) {
+    return <MainSkeletonLoader />;
+  }
+
+  // 🚀 로딩이 끝나면 실제 화면 렌더링
   return (
-    /* List처럼 min-h-screen 적용, 배경은 기존대로 유지 */
     <div className="min-h-screen bg-white pb-[50px] md:pb-[100px]"> 
       
-      {/* 배너는 컨테이너 바깥에 두어 화면 전체(100%)를 꽉 채우게 합니다 */}
       <HeroBanner 
         bgImage={currentBannerImage} 
         title={currentRegion} 
         subtitle="전통과 현대가 공존하는 도시" 
       />
 
-      {/* 컨테이너의 좌우 여백을 List 컴포넌트와 동일하게 px-4로 맞춤 */}
       <div className="max-w-[1200px] mx-auto px-4 py-6 md:py-10">
         
         <Breadcrumb 
