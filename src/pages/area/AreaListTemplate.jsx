@@ -55,7 +55,7 @@ function AreaListTemplate() {
                 <HeroBanner 
                   bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
                   title={regionKor}
-                  subtitle={`${regionKor}의 거리에서 놀아보자`}
+                  subtitle={`${regionKor}의 편안한 숙소를 찾아보세요`}
                 />
                 <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10 max-w-[1200px]'>
                   {/* 브레드크럼 */}

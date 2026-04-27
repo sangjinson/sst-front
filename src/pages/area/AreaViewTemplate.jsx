@@ -37,7 +37,8 @@ const AreaViewTemplate = () => {
                     paths={[
                       { label: '홈', to: '/' },
                       { label: regionKor, to: `/${region}` },
-                      { label: '잘거리', to: `/${region}/sleep/list` }
+                      { label: '잘거리', to: `/${region}/sleep/list` },
+                      { label: '상제정보' , to: `/${region}/sleep/view` }
                     ]} 
                     className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
                   />
