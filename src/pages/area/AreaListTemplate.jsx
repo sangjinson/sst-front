@@ -1,10 +1,9 @@
 import { lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import HeroBanner from '../../components/common/HeroBanner';
-import { toKorRegion } from '@utils/regionMap';
 import Breadcrumb from '@components/common/Breadcrumb';
+import { toKorRegion } from '@utils/regionMap';
 
 const PlayList = lazy(() => import('./play/List'));
 const FoodList = lazy(() => import('./food/List'));
@@ -12,15 +11,13 @@ const SeeList = lazy(() => import('./see/List'));
 const SleepList = lazy(() => import('./sleep/List'));
 
 function AreaListTemplate() {
-    const { pathname } = useLocation();
+  
     const { region, type } = useParams(); {/* URL 파라메터 */}
-    const navigate = useNavigate(); // 
     const regionKor = toKorRegion(region); 
 
     useEffect(() => {
       window.scrollTo(0, 0);
-    }, [pathname]);
-
+    }, [type, region]);
    
     const renderList = () => {
       switch (type) {
@@ -59,7 +56,7 @@ function AreaListTemplate() {
                 <HeroBanner 
                   bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
                   title={regionKor}
-                  subtitle={`${regionKor}의 거리에서 놀아보자`}
+                  subtitle={`${regionKor}의 편안한 숙소를 찾아보세요`}
                 />
                 <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10 max-w-[1200px]'>
                   {/* 브레드크럼 */}

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getSleepDataByRegion } from './sleepDummyData';
-import HeroBanner from '@components/common/HeroBanner';
-import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
 import { GridCard, GridCardHeader, GridCardBody, GridCardFooter } from '@components/modules/GridCard';
+import { HeartButton } from '@components/card/AttractionCard';
 
 // 별점 컴포넌트
 const StarRating = ({ rating }) => (
@@ -33,7 +32,6 @@ const categoryColor = {
 const List = () => {
   const { region } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const regionKor = toKorRegion(region);
 
   const [sleepList, setSleepList] = useState([]);
@@ -42,6 +40,14 @@ const List = () => {
   const [sortOption, setSortOption] = useState('latest');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+
+  // 찜 상태 관리 (id 기반으로 관리)
+  const [likedItems, setLikedItems] = useState({});
+
+  const handleLike = (e, id) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    setLikedItems((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const categories = ['전체', '호텔', '리조트', '펜션', '모텔', '게스트하우스'];
 
@@ -150,6 +156,14 @@ const List = () => {
                       >
                       {item.category}
                       </span>
+
+                      {/* 찜 버튼 추가 */}
+                      <div className="absolute top-3 right-3 scale-75 origin-top-right">
+                        <HeartButton
+                          liked={!!likedItems[item.id]}
+                          onClick={(e) => handleLike(e, item.id)}
+                        />
+                      </div>
                   </div>
                 </GridCardHeader>
 
