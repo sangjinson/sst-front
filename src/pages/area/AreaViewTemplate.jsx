@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 
 //const PlayView = lazy(() => import('./play/View'));
 const FoodView = lazy(() => import('./food/View'));
-//const SeeView = lazy(() => import('./see/View'));
+const SeeView = lazy(() => import('./see/View'));
 const SleepView = lazy(() => import('./sleep/View'));
 
 const AreaViewTemplate = () => {
@@ -22,8 +22,8 @@ const AreaViewTemplate = () => {
         //   return <PlayView />;
         case 'food':
           return <FoodView />;
-        // case 'see':
-        //   return <SeeView />;
+        case 'see':
+          return <SeeView />;
         case 'sleep':
           return <SleepView />;
 

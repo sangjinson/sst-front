@@ -38,6 +38,53 @@ const dummyData = [
     image: 'https://picsum.photos/300/200?4',
     desc: '조선 실학 사상을 소개하는 박물관입니다.',
   },
+
+  // 🔥 추가 5개
+  {
+    title: '남한산성',
+    location: '경기도 광주시 남한산성면',
+    tag: '지역명소',
+    region: '광주',
+    hashtags: ['성곽', '유네스코'],
+    image: 'https://picsum.photos/300/200?5',
+    desc: '조선시대 군사적 요충지였던 역사 유적지입니다.',
+  },
+  {
+    title: '에버랜드',
+    location: '경기도 용인시 처인구 포곡읍',
+    tag: '공원',
+    region: '용인',
+    hashtags: ['놀이공원', '데이트'],
+    image: 'https://picsum.photos/300/200?6',
+    desc: '국내 최대 규모의 테마파크로 다양한 놀이기구를 즐길 수 있습니다.',
+  },
+  {
+    title: '파주 헤이리 예술마을',
+    location: '경기도 파주시 탄현면',
+    tag: '지역명소',
+    region: '파주',
+    hashtags: ['예술', '감성'],
+    image: 'https://picsum.photos/300/200?7',
+    desc: '예술과 문화가 공존하는 감성적인 공간입니다.',
+  },
+  {
+    title: '광명동굴',
+    location: '경기도 광명시 가학로',
+    tag: '지역명소',
+    region: '광명',
+    hashtags: ['동굴', '체험'],
+    image: 'https://picsum.photos/300/200?8',
+    desc: '폐광을 활용한 이색 관광지로 다양한 체험이 가능합니다.',
+  },
+  {
+    title: '일산 호수공원',
+    location: '경기도 고양시 일산동구',
+    tag: '공원',
+    region: '고양',
+    hashtags: ['산책', '데이트'],
+    image: 'https://picsum.photos/300/200?9',
+    desc: '넓은 호수와 산책로가 있는 도심 속 힐링 공간입니다.',
+  },
 ];
 
 const categories = ['전체','박물관','도서관','지역명소','공원'];
