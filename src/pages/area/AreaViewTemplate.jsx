@@ -25,8 +25,26 @@ const AreaViewTemplate = () => {
       //   return <PlayView />;
       case 'food':
         return <FoodView />;
-      case 'see':
-        return <SeeView />;
+       case 'see':
+        return (
+          <div className='bg-[#f8f6f0]'>
+
+            <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10 max-w-[1000px]'>
+
+              <Breadcrumb 
+                paths={[
+                  { label: '홈', to: '/' },
+                  { label: regionKor, to: `/${region}` },
+                  { label: '볼거리', to: `/${region}/see/list` },
+                  { label: '상세정보' }
+                ]} 
+                className="mb-6"
+              />
+
+              <SeeView />
+            </div>
+          </div>
+        );
       case 'sleep':
         return (
             <>

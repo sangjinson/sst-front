@@ -122,15 +122,6 @@ const handleCopyLink = async () => {
 
       <div className="max-w-[1000px] mx-auto px-4 py-12">
 
-        <Breadcrumb
-          paths={[
-            { label: '홈', to: '/' },
-            { label: `${region}시`, to: `/${region}` },
-            { label: '볼거리', to: `/${region}/see/list` },
-            { label: item.title },
-          ]}
-          className="mb-8"
-        />
 
         {/* 🔥 HERO (완전 개선) */}
         <div className="relative rounded-3xl overflow-hidden shadow-xl mb-14">

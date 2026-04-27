@@ -110,10 +110,16 @@ const SeeList = () => {
       </div>
 
       {/* 카드 */}
-      <div className="grid grid-cols-4 gap-5 mb-12
-              lg:grid-cols-3 
-              md:grid-cols-2 
-              sm:grid-cols-1">
+      <div className="flex justify-center">
+  <div className="
+    grid 
+    grid-cols-2 
+    md:grid-cols-3 
+    lg:grid-cols-3 
+    gap-5
+    max-w-[1050px]
+    w-full
+  ">
         {currentData.map((item) => (
           <AttractionCard
             key={item.id}
@@ -122,7 +128,7 @@ const SeeList = () => {
           />
         ))}
       </div>
-
+        </div>
       {/* 페이지네이션 */}
       <div className="flex justify-center mt-4 mb-10 items-center gap-2">
 
