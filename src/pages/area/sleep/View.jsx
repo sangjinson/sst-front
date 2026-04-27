@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
-import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
+import { ClipButton, HeartButton } from '@components/card/AttractionCard';
+import Swal from 'sweetalert2';
 
 // ※ 프로젝트의 실제 AuthContext import로 교체하세요
 // import { useAuth } from '@context/AuthContext';
@@ -34,8 +35,9 @@ const StarSelector = ({ value, onChange }) => (
       <span
         key={star}
         onClick={() => onChange(star)}
-        className={`text-2xl cursor-pointer transition-colors ${star <= value ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
-          }`}
+        className={`text-2xl cursor-pointer transition-colors ${
+          star <= value ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
+        }`}
       >
         ★
       </span>
@@ -58,7 +60,6 @@ const categoryColor = {
 const View = () => {
   const { region } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
   const regionKor = toKorRegion(region);
@@ -77,6 +78,9 @@ const View = () => {
   // 찜 상태
   const [isWished, setIsWished] = useState(false);
 
+  // 공유 상태
+  const [isShareOpen, setIsShareOpen] = useState(false);
+
   // 리뷰 더보기 상태
   const [showAllReviews, setShowAllReviews] = useState(false);
 
@@ -87,19 +91,46 @@ const View = () => {
 
   useEffect(() => {
     if (!id) return;
-
-    // 숙소 단건 조회
     const data = getSleepDataById(id);
     setItem(data);
     if (data) {
       setReviews(data.reviews || []);
-      // 연관 숙소: 같은 지역에서 본인 제외 최대 4개
       const all = getSleepDataByRegion(data.region);
       const related = all.filter((d) => d.id !== data.id).slice(0, 4);
       setRelatedItems(related);
     }
   }, [id]);
 
+  // 공유 핸들러
+  const handleShareClick = () => {
+    setIsShareOpen((prev) => !prev);
+    setCopied(false);
+  };
+
+  const handleCopyLink = async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+
+    // 기존 setCopied(true) 제거하고 Swal로 교체
+    Swal.fire({
+      icon: 'success',
+      title: '복사 완료!',
+      text: '링크가 클립보드에 복사되었습니다.',
+      timer: 1500,        // 1.5초 후 자동 닫힘
+      showConfirmButton: false,
+    });
+  };
   // 리뷰 등록 핸들러
   const handleReviewSubmit = () => {
     if (reviewRating === 0) {
@@ -111,7 +142,7 @@ const View = () => {
       return;
     }
     const newReview = {
-      user: '나',  // ※ 실제에서는 user.name 등으로 교체
+      user: '나', // ※ 실제에서는 user.name 등으로 교체
       rating: reviewRating,
       comment: reviewComment.trim(),
     };
@@ -154,36 +185,43 @@ const View = () => {
           {/* 이름 오버레이 */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-5">
             <span
-              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-2 ${categoryColor[item.category] || 'bg-gray-100 text-gray-600'
-                }`}
+              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-2 ${
+                categoryColor[item.category] || 'bg-gray-100 text-gray-600'
+              }`}
             >
               {item.category}
             </span>
             <h1 className="text-2xl md:text-3xl font-bold text-white">{item.name}</h1>
           </div>
+
           {/* 공유 & 찜 버튼 */}
           <div className="absolute top-4 right-4 flex gap-2">
-            {/* 공유 버튼 */}
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                alert("링크가 복사되었습니다.");
-              }}
-              className="w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full text-gray-700 hover:bg-white transition shadow-sm"
-              title="공유하기"
-            >
-              🔗
-            </button>
-            {/* 찜 버튼 */}
-            <button
+            <ClipButton onClick={handleShareClick} />
+            <HeartButton
+              liked={isWished}
               onClick={() => setIsWished((prev) => !prev)}
-              className={`w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-sm transition shadow-sm ${isWished ? "bg-red-500 text-white" : "bg-white/80 text-gray-400 hover:bg-white"
-                }`}
-              title={isWished ? "찜 취소" : "찜하기"}
-            >
-              {isWished ? "♥" : "♡"}
-            </button>
+            />
           </div>
+
+          {/* 공유 URL 팝업 */}
+          {isShareOpen && (
+            <div className="absolute top-[70px] right-4 w-[300px] max-w-[calc(100%-32px)] rounded-2xl bg-white/95 backdrop-blur-md p-3 shadow-xl z-10">
+              <p className="text-xs font-semibold text-gray-500 mb-2">페이지 링크</p>
+              <div className="flex gap-2">
+                <input
+                  value={window.location.href}
+                  readOnly
+                  className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 outline-none"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className="shrink-0 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-[#0F9B73] transition cursor-pointer"
+                >
+                  복사
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 뒤로가기 버튼 */}
           <button
@@ -202,7 +240,7 @@ const View = () => {
           </p>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 block mx-auto text-sm text-[#0F9B73] font-medium hover:underline center"
+            className="mt-2 block mx-auto text-sm text-[#0F9B73] font-medium hover:underline"
           >
             {isExpanded ? '접기 ▲' : '더보기 ▼'}
           </button>
@@ -249,10 +287,7 @@ const View = () => {
             <p className="text-xs text-gray-400 mb-2">편의시설</p>
             <div className="flex flex-wrap gap-2">
               {item.facilities.map((f) => (
-                <span
-                  key={f}
-                  className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
-                >
+                <span key={f} className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
                   {f}
                 </span>
               ))}
@@ -310,7 +345,6 @@ const View = () => {
               </button>
             </div>
           ) : (
-            // 비로그인 상태: 로그인 유도 메시지
             <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100 text-center">
               <p className="text-sm text-gray-500 mb-2">리뷰를 등록하려면 로그인이 필요합니다.</p>
               <button
@@ -340,9 +374,7 @@ const View = () => {
             onClick={() => setShowAllReviews((prev) => !prev)}
             className="w-full mt-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition"
           >
-            {showAllReviews
-              ? '접기 ▲'
-              : `리뷰 더보기 ▼`}
+            {showAllReviews ? '접기 ▲' : '리뷰 더보기 ▼'}
           </button>
         </div>
 
