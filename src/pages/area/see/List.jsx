@@ -11,7 +11,7 @@ const SeeList = () => {
 
   const navigate = useNavigate();
   const { selectedRegion } = useOutletContext() || {};
-  const region = (selectedRegion || '수원').replace(/시$/, '');
+  const region = (selectedRegion || '수원');
   const data = getSeeDataByRegion(region);
 
   const [activeCategory, setActiveCategory] = useState('전체');
@@ -46,25 +46,8 @@ const SeeList = () => {
 
   return (
     <div className="bg-[#f8f6f0] min-h-screen">
-
-      <HeroBanner
-        bgImage="https://picsum.photos/1200/400"
-        title={`${region}시`}
-        subtitle="정조의 효심과 화성의 기상이 깃든 도시"
-      />
-
       {/* CONTENT */}
       <div className="max-w-[1200px] mx-auto mt-10 px-4">
-
-        <Breadcrumb
-          paths={[
-            { label: '홈', to: '/' },
-            { label: `${region}시`, to: `/${region}` },
-            { label: '볼거리' },
-          ]}
-          className="mb-5"
-        />
-
         {/* 카테고리 + 정렬 */}
         <div className="flex justify-between items-center mb-5 flex-wrap gap-3">
 

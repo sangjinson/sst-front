@@ -117,45 +117,47 @@ export default function FoodList() {
         .food-page .page-arrow-icon { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
       `}</style>
 
-      <div className="food-page">
+      <div className="min-h-screen bg-[#f8f6f0]">
+        {/* 🚀 이전 페이지들과 동일한 패딩/마진/너비 적용 */}
+        <div className="max-w-[1200px] mx-auto px-4 py-6">
 
-        {/* ✅ 기존 배너 → HeroBanner 컴포넌트로 교체 */}
-        <HeroBanner
-          bgImage={bannerImage}
-          title={selectedRegion || "경기도"}
-          subtitle={selectedRegion ? `${selectedRegion}의 대표 먹거리를 소개합니다` : "경기도 각 지역의 대표 먹거리를 만나보세요"}
-        />
-
-        <div className="content-wrap">
-          <div className="breadcrumb-row">
-            <a onClick={() => navigate("/")}>홈</a>
-            <span>&gt;</span>
-            <a onClick={() => navigate(`/${selectedRegion}`)}>{selectedRegion || "경기도"}</a>
-            <span>&gt;</span>
-            <span className="bc-active">먹거리</span>
-          </div>
-
-          <div className="filter-sort-row">
-            <div className="category-tabs">
+          {/* 필터 및 정렬 영역 */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+            {/* 카테고리 탭 */}
+            <div className="flex flex-wrap gap-2">
               {categories.map((cat) => (
                 <button
                   key={cat}
-                  className={`tab-btn${activeCategory === cat ? " active" : ""}`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
+                    activeCategory === cat
+                      ? "bg-[#0F9B73] text-white border-[#0F9B73]"
+                      : "bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]"
+                  }`}
                   onClick={() => handleCategoryChange(cat)}
                 >
                   {cat}
                 </button>
               ))}
             </div>
-            <div className="sort-btn-group">
+
+            {/* 정렬 버튼 */}
+            <div className="flex gap-2">
               <button
-                className={`sort-btn${sortBy === "popular" ? " active" : ""}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
+                  sortBy === "popular"
+                    ? "bg-[#0F9B73] text-white border-[#0F9B73]"
+                    : "bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]"
+                }`}
                 onClick={() => handleSortChange("popular")}
               >
                 인기순
               </button>
               <button
-                className={`sort-btn${sortBy === "rating" ? " active" : ""}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
+                  sortBy === "rating"
+                    ? "bg-[#0F9B73] text-white border-[#0F9B73]"
+                    : "bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]"
+                }`}
                 onClick={() => handleSortChange("rating")}
               >
                 별점순
@@ -163,78 +165,136 @@ export default function FoodList() {
             </div>
           </div>
 
-          <div className="result-count">
-            총 <strong>{sortedData.length}개</strong>의 먹거리
-          </div>
+          {/* 결과 수 */}
+          <p className="text-sm text-gray-500 mb-5">
+            총 <span className="font-semibold text-gray-800">{sortedData.length}</span>개의 먹거리
+          </p>
 
+          {/* 카드 그리드 영역 */}
           {currentItems.length > 0 ? (
-            <div className="card-grid">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentItems.map((item) => (
-                <div className="food-card" key={item.id} onClick={() => handleCardClick(item)}>
-                  <div className="card-img-wrap">
-                    <img src={item.image} alt={item.name} />
-                    <span className="card-category-badge">{item.category}</span>
+                <div 
+                  key={item.id} 
+                  onClick={() => handleCardClick(item)}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                >
+                  {/* 썸네일 이미지 */}
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={item.image} 
+                      alt={item.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {/* 카테고리 배지 */}
+                    <span className="absolute top-3 left-3 px-2 py-1 bg-white/90 text-gray-700 rounded-full text-xs font-semibold shadow-sm">
+                      {item.category}
+                    </span>
+                    {/* 찜(좋아요) 버튼 */}
                     <button
-                      className={`like-btn${likedCards.includes(item.id) ? " liked" : ""}`}
+                      className="absolute bottom-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
                       onClick={(e) => { e.stopPropagation(); toggleLike(item.id); }}
                       aria-label="좋아요"
                     >
-                      <svg className="heart-icon" viewBox="0 0 24 24">
+                      <svg 
+                        className={`w-5 h-5 transition-colors ${likedCards.includes(item.id) ? "fill-red-500 stroke-red-500" : "fill-none stroke-gray-500"}`} 
+                        viewBox="0 0 24 24" 
+                        strokeWidth="2"
+                      >
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                       </svg>
                     </button>
                   </div>
-                  <div className="card-body">
-                    <div className="card-name">{item.name}</div>
-                    <div className="card-rating-row">
-                      <svg className="star-icon" viewBox="0 0 24 24">
+
+                  {/* 카드 텍스트 정보 */}
+                  <div className="p-4">
+                    <div className="font-bold text-gray-900 text-base mb-1 truncate group-hover:text-[#0F9B73] transition-colors">
+                      {item.name}
+                    </div>
+                    
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <svg className="w-4 h-4 fill-yellow-400" viewBox="0 0 24 24">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                       </svg>
-                      <span className="rating-num">{item.rating}</span>
-                      <span className="reviews-num">({item.reviews}개 리뷰)</span>
+                      <span className="text-sm font-semibold text-gray-700">{item.rating}</span>
+                      <span className="text-xs text-gray-400">({item.reviews}개 리뷰)</span>
                     </div>
-                    <p className="card-desc">{item.description}</p>
-                    <div className="card-tags">
+                    
+                    <p className="text-sm text-gray-500 line-clamp-2 mb-3">
+                      {item.description}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-1 mb-3">
                       {item.tags.map((tag) => (
-                        <span className="tag" key={tag}>#{tag}</span>
+                        <span className="text-[11px] text-[#0F9B73] bg-green-50 px-2 py-0.5 rounded-sm" key={tag}>
+                          #{tag}
+                        </span>
                       ))}
                     </div>
-                    <div className="card-address">
-                      <svg className="pin-icon" viewBox="0 0 24 24">
+                    
+                    <div className="flex items-center gap-1 text-xs text-gray-400 border-t pt-3">
+                      <svg className="w-3.5 h-3.5 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                         <circle cx="12" cy="10" r="3" />
                       </svg>
-                      {item.address}
+                      <span className="truncate">{item.address}</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="empty-state">
-              <svg viewBox="0 0 24 24">
+            /* 빈 데이터 상태 */
+            <div className="flex flex-col items-center justify-center py-24 text-gray-400">
+              <svg className="w-16 h-16 stroke-current fill-none mb-4" viewBox="0 0 24 24" strokeWidth="1">
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-              <p>해당 카테고리의 먹거리가 없습니다.</p>
+              <p className="text-lg font-medium text-gray-500">해당 카테고리의 먹거리가 없습니다.</p>
             </div>
           )}
 
+          {/* 페이지네이션 */}
           {totalPages > 1 && (
-            <div className="pagination-bar">
-              <button className="page-btn" onClick={() => setCurrentPage((p) => p - 1)} disabled={currentPage === 1} aria-label="이전 페이지">
-                <svg className="page-arrow-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <button 
+                className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center justify-center" 
+                onClick={() => setCurrentPage((p) => p - 1)} 
+                disabled={currentPage === 1} 
+                aria-label="이전 페이지"
+              >
+                <svg className="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
               </button>
+              
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button key={page} className={`page-btn${currentPage === page ? " active" : ""}`} onClick={() => setCurrentPage(page)}>
+                <button 
+                  key={page} 
+                  className={`w-9 h-9 rounded-lg text-sm font-medium transition ${
+                    currentPage === page
+                      ? "bg-[#0F9B73] text-white"
+                      : "border border-gray-300 text-gray-600 hover:bg-gray-100"
+                  }`} 
+                  onClick={() => setCurrentPage(page)}
+                >
                   {page}
                 </button>
               ))}
-              <button className="page-btn" onClick={() => setCurrentPage((p) => p + 1)} disabled={currentPage === totalPages} aria-label="다음 페이지">
-                <svg className="page-arrow-icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
+              
+              <button 
+                className="px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center justify-center" 
+                onClick={() => setCurrentPage((p) => p + 1)} 
+                disabled={currentPage === totalPages} 
+                aria-label="다음 페이지"
+              >
+                <svg className="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
               </button>
             </div>
           )}
+          
         </div>
       </div>
     </>
