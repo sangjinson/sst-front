@@ -16,6 +16,7 @@ const SeeDetail = () => {
   const [liked, setLiked] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
 // 상태 (컴포넌트 상단에 추가)
 const [rating, setRating] = useState(0);
@@ -105,7 +106,16 @@ const handleCopyLink = async () => {
 
   setCopied(true);
 };
-  
+
+  if (!item) {
+    return (
+      <div className="bg-[#f8f6f0] min-h-screen flex items-center justify-center">
+        <p className="text-lg text-gray-500">볼거리 정보를 찾을 수 없습니다.</p>
+      </div>
+    );
+  }
+
+  const sortedReviews = [...reviews].sort((a, b) => b.rating - a.rating);
 
   return (
     <div className="bg-[#f8f6f0] min-h-screen">
@@ -117,7 +127,7 @@ const handleCopyLink = async () => {
             { label: '홈', to: '/' },
             { label: `${region}시`, to: `/${region}` },
             { label: '볼거리', to: `/${region}/see/list` },
-            { label: item?.title || '상세보기' },
+            { label: item.title },
           ]}
           className="mb-8"
         />
@@ -126,15 +136,16 @@ const handleCopyLink = async () => {
         <div className="relative rounded-3xl overflow-hidden shadow-xl mb-14">
 
           <img
-            src="https://picsum.photos/1200/500"
+            src={item.image}
+            alt={item.title}
             className="w-full h-[420px] object-cover hover:scale-105 transition duration-500"
           />
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
           <div className="absolute bottom-0 left-0 p-8 text-white">
-            <p className="text-sm opacity-80 mb-1">경기도 수원시</p>
-            <h1 className="text-4xl font-bold">수원 화성</h1>
+            <p className="text-sm opacity-80 mb-1">{item.location}</p>
+            <h1 className="text-4xl font-bold">{item.title}</h1>
           </div>
 
           {/* 버튼 */}
@@ -175,38 +186,79 @@ const handleCopyLink = async () => {
         </div>
 
         {/* 🔥 설명 */}
-        <section className="mb-14">
+        <section className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
           <h2 className="text-lg font-bold mb-4">상세 설명</h2>
 
-          <p className="text-gray-600 leading-relaxed text-sm">
-            수원 화성은 조선 정조 시대에 건설된 성곽으로 유네스코 세계문화유산입니다.
-            군사적 기능과 상업적 기능을 동시에 갖춘 독특한 구조를 가지고 있습니다.
-            산책로와 야경이 특히 아름답습니다.
+          <p className={`text-gray-600 leading-relaxed text-sm ${isExpanded ? '' : 'line-clamp-2'}`}>
+            {item.desc}
           </p>
 
-          <button className="mt-3 text-emerald-600 text-sm hover:underline">
-            더보기 +
+          <button
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className="mt-3 text-emerald-600 text-sm hover:underline cursor-pointer"
+          >
+            {isExpanded ? '접기 ▲' : '더보기 ▼'}
           </button>
         </section>
 
         {/* 🔥 이용정보 (카드화) */}
-        <section className="mb-14">
+        <section className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
           <h2 className="text-lg font-bold mb-4">이용 정보</h2>
 
           <div className="grid grid-cols-2 gap-4">
 
             {[
-              { title: '주소', value: '경기도 수원시 장안구 연무동 190' },
-              { title: '이용시간', value: '09:00 - 18:00' },
-              { title: '전화번호', value: '031-290-3600' },
-              { title: '이용요금', value: '1,500원' },
-            ].map((item, i) => (
+              {
+                title: '주소',
+                value: item.location,
+                icon: (
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M12 21s-7-5.686-7-11a7 7 0 1 1 14 0c0 5.314-7 11-7 11z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                )
+              },
+              {
+                title: '이용시간',
+                value: '09:00 - 18:00',
+                icon: (
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                )
+              },
+              {
+                title: '전화번호',
+                value: '031-290-3600',
+                icon: (
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M22 16.92V21a1 1 0 0 1-1.09 1 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2 3.09 1 1 0 0 1 3 2h4.09a1 1 0 0 1 1 .75l.7 3a1 1 0 0 1-.27.95l-1.27 1.27a16 16 0 0 0 6 6l1.27-1.27a1 1 0 0 1 .95-.27l3 .7a1 1 0 0 1 .75 1z" />
+                  </svg>
+                )
+              },
+              {
+                title: '이용요금',
+                value: '현장 확인',
+                icon: (
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M12 1v22M17 5H9a4 4 0 0 0 0 8h6a4 4 0 0 1 0 8H6" />
+                  </svg>
+                )
+              },
+            ].map((info, i) => (
               <div
                 key={i}
-                className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition"
+                className="bg-gray-50 p-5 rounded-xl border border-gray-100 hover:shadow-md transition flex items-center gap-4"
               >
-                <p className="text-xs text-gray-400">{item.title}</p>
-                <p className="font-semibold text-sm mt-1">{item.value}</p>
+                <div className="text-gray-400 shrink-0">
+                  {info.icon}
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium text-gray-400 leading-none">{info.title}</p>
+                  <p className="font-semibold text-sm text-gray-800 mt-1.5 leading-snug">{info.value}</p>
+                </div>
               </div>
             ))}
 
@@ -214,7 +266,7 @@ const handleCopyLink = async () => {
         </section>
 
         {/* 🔥 지도 */}
-        <section className="mb-14">
+        <section className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
           <h2 className="text-lg font-bold mb-4">위치</h2>
 
           <div className="rounded-2xl overflow-hidden h-[260px] bg-gray-200 relative shadow-sm">
@@ -226,7 +278,7 @@ const handleCopyLink = async () => {
 
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
               <div className="bg-white px-3 py-1 rounded-full shadow text-sm">
-                수원화성
+                {item.title}
               </div>
               <div className="text-red-500 text-xl text-center">📍</div>
             </div>
@@ -234,7 +286,7 @@ const handleCopyLink = async () => {
           </div>
         </section>
 
-        <section className="mb-14">
+        <section className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
   <h2 className="text-lg font-bold mb-4">
     리뷰 <span className="text-emerald-600">({reviews.length})</span>
   </h2>
@@ -265,7 +317,7 @@ const handleCopyLink = async () => {
   </div>
 
   {/* 🔥 리뷰 입력 */}
-  <div className="bg-white p-4 rounded-xl shadow-sm mb-6">
+  <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
 
     <div className="flex items-center gap-3 mb-3">
 
@@ -316,65 +368,94 @@ const handleCopyLink = async () => {
   </div>
 
   {/* 🔥 리뷰 리스트 */}
-  <div className="space-y-3">
-    {reviews.map((r) => (
-      <div key={r.id} className="bg-white p-4 rounded-xl shadow-sm">
+      
+<div className="space-y-3">
+  {sortedReviews.map((r) => (
+    <div
+      key={r.id}
+      className="bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-md transition"
+    >
 
-        {/* 상단 */}
-        <div className="flex justify-between items-center">
+      {/* 🔥 상단: 닉네임 + 별점 */}
+      <div className="flex justify-between items-start">
 
-          <div className="flex items-center gap-2">
-            <span className="font-semibold">{r.name}</span>
-
-            <span className="text-yellow-400 text-sm">
-              {'★'.repeat(r.rating)}
-              {'☆'.repeat(5 - r.rating)}
-            </span>
-
-            <span className="text-sm text-gray-500">
-              {r.rating}.0
-            </span>
-
-            <span className="text-xs text-gray-400">
-              {r.date}
-            </span>
-          </div>
-
-          {/* 버튼 */}
-          <div className="flex gap-2 text-xs">
-
-            {r.isMine ? (
-              <>
-                <button className="text-gray-400 hover:text-black cursor-pointer">
-                  수정
-                </button>
-                <button
-                  onClick={() => handleDelete(r.id)}
-                  className="text-red-400 hover:text-red-600 cursor-pointer"
-                >
-                  삭제
-                </button>
-              </>
-            ) : (
-              <button className="text-gray-400 hover:text-black cursor-pointer">
-                신고
-              </button>
-            )}
-
-          </div>
+        <div className="text-base font-semibold text-gray-900">
+          {r.name}
         </div>
 
-        {/* 내용 */}
-        <p className="text-gray-600 text-sm mt-2">
-          {r.content}
-        </p>
+        {/* ⭐ 별점 + 점수 (크게) */}
+        <div className="flex items-center gap-1 text-yellow-500 text-base font-semibold">
+          <span>
+            {'★'.repeat(r.rating)}
+            {'☆'.repeat(5 - r.rating)}
+          </span>
+          <span className="text-gray-600 text-sm ml-1">
+            {r.rating}.0
+          </span>
+        </div>
+
       </div>
-    ))}
+
+      {/* 🔥 중단: 리뷰 내용 */}
+      <div className="text-sm text-gray-700 mt-1 leading-relaxed">
+        {r.content}
+      </div>
+
+      {/* 🔥 하단: 날짜 + 버튼 */}
+<div className="flex justify-end items-center gap-3 mt-auto text-xs">
+
+  {/* 날짜 */}
+  <span className="text-gray-400 whitespace-nowrap">
+    {r.date}
+  </span>
+
+        {/* 버튼 그룹 */}
+  <div className="flex items-center gap-1">
+
+    {r.isMine ? (
+      <>
+        {/* 수정 */}
+        <button className="p-1.5 rounded-md text-gray-400 hover:text-black hover:bg-gray-100 transition">
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+          </svg>
+        </button>
+
+        {/* 삭제 */}
+        <button
+          onClick={() => handleDelete(r.id)}
+          className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14H6L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4h6v2" />
+          </svg>
+        </button>
+      </>
+    ) : (
+      /* 신고 */
+      <button className="p-1.5 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition">
+        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M4 22V4" />
+          <path d="M4 4h10l-1 3 1 3H4" />
+        </svg>
+      </button>
+    )}
+
   </div>
+
+</div>
+
+    </div>
+  ))}
+</div>
 </section>
 
         {/* 🔥 추천 (카드 통일) */}
-        <section>
+        <section className="bg-white rounded-2xl p-5 mb-6 shadow-sm">
           <h2 className="text-lg font-bold mb-5">연관 추천 볼거리</h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -382,7 +463,7 @@ const handleCopyLink = async () => {
             {[1,2,3,4].map(i => (
               <div
                 key={i}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition cursor-pointer"
+                className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition cursor-pointer"
               >
                 <img
                   src={`https://picsum.photos/200/150?${i}`}

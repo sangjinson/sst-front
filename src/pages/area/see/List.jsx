@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AttractionCard from '../../../components/card/AttractionCard';
 import Breadcrumb from '../../../components/common/Breadcrumb';
+import HeroBanner from '../../../components/common/HeroBanner';
 import { getSeeDataByRegion } from './seeData';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 
@@ -46,18 +47,11 @@ const SeeList = () => {
   return (
     <div className="bg-[#f8f6f0] min-h-screen">
 
-      {/* HERO */}
-      <section
-        className="h-[320px] bg-cover bg-center relative"
-        style={{ backgroundImage: `url('https://picsum.photos/1200/400')` }}
-      >
-        <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-white">
-          <h1 className="text-5xl font-bold drop-shadow-lg">{region}</h1>
-          <p className="mt-3 text-lg drop-shadow">
-            정조의 효심과 화성의 기상이 깃든 도시
-          </p>
-        </div>
-      </section>
+      <HeroBanner
+        bgImage="https://picsum.photos/1200/400"
+        title={`${region}시`}
+        subtitle="정조의 효심과 화성의 기상이 깃든 도시"
+      />
 
       {/* CONTENT */}
       <div className="max-w-[1200px] mx-auto mt-10 px-4">
@@ -133,12 +127,12 @@ const SeeList = () => {
                 md:grid-cols-2 
                 sm:grid-cols-1">
           {currentData.map((item) => (
-          <AttractionCard
-            key={item.id}
-            item={item}
-            onClick={() => navigate(`/${region}/see/view?id=${item.id}`)}
-          />
-        ))}
+            <AttractionCard
+              key={item.id}
+              item={item}
+              onClick={() => navigate(`/${region}/see/view?id=${item.id}`)}
+            />
+          ))}
         </div>
 
         {/* 🔥 페이지네이션 */}

@@ -135,6 +135,98 @@ const seeData = {
   ]
 };
 
+const defaultSeeTemplates = [
+  {
+    title: '역사문화관',
+    tag: '박물관',
+    hashtags: ['역사', '전시', '문화'],
+    likes: 84,
+    date: '2024-05-08',
+    image: 'https://picsum.photos/id/1027/800/600',
+    desc: '지역의 역사와 문화를 한눈에 볼 수 있는 전시 공간'
+  },
+  {
+    title: '중앙도서관',
+    tag: '도서관',
+    hashtags: ['열람실', '공부', '조용'],
+    likes: 67,
+    date: '2024-05-07',
+    image: 'https://picsum.photos/id/1035/800/600',
+    desc: '책과 휴식을 함께 즐길 수 있는 지역 대표 도서관'
+  },
+  {
+    title: '시민공원',
+    tag: '공원',
+    hashtags: ['산책', '피크닉', '힐링'],
+    likes: 142,
+    date: '2024-05-06',
+    image: 'https://picsum.photos/id/1016/800/600',
+    desc: '가볍게 산책하고 쉬어가기 좋은 도심 속 공원'
+  },
+  {
+    title: '대표 명소거리',
+    tag: '지역명소',
+    hashtags: ['카페', '사진', '데이트'],
+    likes: 175,
+    date: '2024-05-05',
+    image: 'https://picsum.photos/id/1043/800/600',
+    desc: '지역 분위기를 느낄 수 있는 감성 거리'
+  },
+  {
+    title: '생태공원',
+    tag: '공원',
+    hashtags: ['자연', '산책', '가족'],
+    likes: 121,
+    date: '2024-05-04',
+    image: 'https://picsum.photos/id/1020/800/600',
+    desc: '자연과 함께 여유로운 시간을 보내기 좋은 공원'
+  },
+  {
+    title: '미술전시관',
+    tag: '박물관',
+    hashtags: ['예술', '전시', '실내'],
+    likes: 93,
+    date: '2024-05-03',
+    image: 'https://picsum.photos/id/1031/800/600',
+    desc: '다양한 전시와 작품을 만날 수 있는 문화 공간'
+  },
+  {
+    title: '문화광장',
+    tag: '지역명소',
+    hashtags: ['공연', '축제', '야경'],
+    likes: 156,
+    date: '2024-05-02',
+    image: 'https://picsum.photos/id/1011/800/600',
+    desc: '행사와 야경을 함께 즐길 수 있는 열린 공간'
+  },
+  {
+    title: '어린이도서관',
+    tag: '도서관',
+    hashtags: ['어린이', '독서', '체험'],
+    likes: 58,
+    date: '2024-05-01',
+    image: 'https://picsum.photos/id/1039/800/600',
+    desc: '아이와 함께 방문하기 좋은 아늑한 도서관'
+  },
+  {
+    title: '전망공원',
+    tag: '공원',
+    hashtags: ['전망', '노을', '사진'],
+    likes: 132,
+    date: '2024-04-30',
+    image: 'https://picsum.photos/id/1060/800/600',
+    desc: '도시 풍경과 노을을 감상하기 좋은 전망 명소'
+  }
+];
+
+const createDefaultSeeData = (region) =>
+  defaultSeeTemplates.map((item, index) => ({
+    ...item,
+    id: index + 1,
+    title: `${region} ${item.title}`,
+    location: `${region}시`
+  }));
+
 export const getSeeDataByRegion = (region) => {
-  return seeData[region] || [];
+  return seeData[region] || createDefaultSeeData(region || '수원');
 };
