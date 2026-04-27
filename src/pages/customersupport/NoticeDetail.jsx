@@ -86,12 +86,6 @@ const NoticeDetail = () => {
                 {/* 오른쪽 */}
                 <div className="flex-1">
 
-                    {/* breadcrumb */}
-                    <div className="text-sm mb-2">
-                        <span className="text-gray-400">홈 &gt; 고객지원 &gt; </span>
-                        <span className="font-semibold text-gray-700">공지사항</span>
-                    </div>
-
                     {/* 제목 */}
                     <h2 className="text-3xl font-semibold mb-10">
                         {notice.title}

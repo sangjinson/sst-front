@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation} from "react-router-dom";
 
 // 상세 페이지에 있던 데이터를 목록으로 가져왔습니다.
 const faqData = [
@@ -53,6 +53,9 @@ const Faq = () => {
   const [currentPage, setCurrentPage] = useState(1);
   // ✅ 어떤 항목이 열려있는지 관리하는 상태 (null이면 모두 닫힘)
   const [openId, setOpenId] = useState(null);
+  const location = useLocation();
+  const isNotice = location.pathname.includes("notice");
+  const isFaq = location.pathname.includes("faq");
 
   const totalPages = 1;
 
@@ -67,29 +70,60 @@ const Faq = () => {
 
   return (
     <div className="bg-[#f7f8fa] min-h-screen py-20">
+
+    <style>
+        {`.mp-box {
+          background: #fff;
+          border-radius: 16px;
+          padding: 18px;
+          border: 1px solid #e5e7eb;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }`}
+      </style>
+
+      {/* 전체 컨테이너 */}
       <div className="max-w-5xl mx-auto flex gap-20">
-        {/* 왼쪽 사이드 */}
-        <div className="w-56">
-          <h3 className="text-lg font-semibold mb-6">고객지원</h3>
-          <div className="border-t border-gray-300 mb-6"></div>
-          <div className="space-y-4">
-            <Link to="/customersupport/notice">
-              <p className="text-gray-500 mb-4">공지사항</p>
-            </Link>
-            <Link to="/customersupport/faq">
-              <p className="text-gray-900 font-medium">자주하는 질문</p>
-            </Link>
+
+        {/* 🔹 왼쪽 사이드 (카드형) */}
+        <aside className="w-full lg:w-60">
+          <div className="mp-box">
+            <h3 className="text-lg font-semibold mb-4">고객지원</h3>
+            <div className="border-t border-gray-200 mb-4"></div>
+            <ul className="space-y-3">
+
+            <li>
+              <Link
+                to="/customersupport/notice"
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                  ${
+                    isNotice
+                      ? "bg-blue-50 text-blue-600 font-semibold"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                  }`}>
+                <span>👤</span>
+                <span>공지사항</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/customersupport/faq"
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                  ${
+                    isFaq
+                      ? "bg-blue-50 text-blue-600 font-semibold"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                  }`}>
+                <span>❓</span>
+                <span>자주 하는 질문</span>
+              </Link>
+            </li>
+          </ul>
           </div>
-        </div>
+        </aside>
 
         {/* 오른쪽 콘텐츠 */}
         <div className="flex-1">
-          {/* breadcrumb */}
-          <div className="text-sm text-gray-400 mb-4">
-            홈 &gt; 고객지원 &gt;{" "}
-            <span className="font-semibold text-gray-600">자주하는 질문</span>
-          </div>
-
+      
           <h2 className="text-2xl font-semibold mb-10">자주하는 질문</h2>
 
           {/* ✅ 아코디언 테이블 스타일 */}

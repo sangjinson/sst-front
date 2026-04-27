@@ -449,7 +449,7 @@ const MyPage = () => {
             <h3>프로필 더보기</h3>
             <ul className="mp-link-list">
               <Link to="/customersupport/notice"><li><span>👤</span> 공지사항</li></Link>
-              <Link to="/customersupport/faq"><li><span>🚫</span> 자주 하는 질문</li></Link>
+              <Link to="/customersupport/faq"><li><span>❓</span> 자주 하는 질문</li></Link>
             </ul>
           </div>
         </aside>

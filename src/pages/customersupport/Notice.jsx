@@ -1,56 +1,86 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Notice = () => {
-  // 1. 페이지 관련 상태 관리
   const [currentPage, setCurrentPage] = useState(1);
-
-  // 테스트를 위해 전체 페이지를 3으로 설정 (데이터가 적어도 UI가 보이게 함)
-  // 실제 데이터가 들어오면 Math.ceil(noticeData.length / 10) 등으로 변경하세요.
   const totalPages = 3;
 
-  useEffect(()=>{
+  const location = useLocation();
+  const isNotice = location.pathname.includes("notice");
+  const isFaq = location.pathname.includes("faq");
+
+  useEffect(() => {
     window.scrollTo({
       top: 0,
     });
-  },[currentPage])
+  }, [currentPage]);
+
+
 
   return (
-    <div className="bg-[#f7f8fa] min-h-screen py-20">
+
+    <div className="bg-[#f7f8fa] min-h-screen py-10 lg:py-20 px-4">
+      
+      <style>
+        {`.mp-box {
+          background: #fff;
+          border-radius: 16px;
+          padding: 18px;
+          border: 1px solid #e5e7eb;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }`}
+      </style>
+      
       {/* 전체 컨테이너 */}
-      <div className="max-w-5xl mx-auto flex gap-20">
+      <div className="max-w-5xl mx-auto flex flex-col lg:flex-row gap-10 lg:gap-20">
 
-        {/* 왼쪽 사이드 */}
-        <div className="w-56">
-          <h3 className="text-lg font-semibold mb-6">고객지원</h3>
+        {/* 🔹 왼쪽 사이드 (카드형) */}
+        <aside className="w-full lg:w-60">
+          <div className="mp-box">
+            <h3 className="text-lg font-semibold mb-4">고객지원</h3>
+            <div className="border-t border-gray-200 mb-4"></div>
+            <ul className="space-y-3">
 
-          {/* 상단 라인 */}
-          <div className="border-t border-gray-300 mb-6"></div>
-
-          <div className="space-y-4">
-            <Link to="/customersupport/notice"><p className="text-gray-900 font-medium mb-4">공지사항</p></Link>
-            <Link to="/customersupport/Faq"><p className="text-gray-500">자주하는 질문</p></Link>
+            <li>
+              <Link
+                to="/customersupport/notice"
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                  ${
+                    isNotice
+                      ? "bg-blue-50 text-blue-600 font-semibold"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                  }`}>
+                <span>👤</span>
+                <span>공지사항</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/customersupport/faq"
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                  ${
+                    isFaq
+                      ? "bg-blue-50 text-blue-600 font-semibold"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                  }`}>
+                <span>❓</span>
+                <span>자주 하는 질문</span>
+              </Link>
+            </li>
+          </ul>
           </div>
-        </div>
+        </aside>
 
-        {/* 오른쪽 콘텐츠 */}
+        {/* 🔹 오른쪽 콘텐츠 (✔ 그대로 유지) */}
         <div className="flex-1">
-
-          {/* breadcrumb */}
-          <div className="text-sm text-gray-400 mb-4">
-            홈 &gt; 고객지원 &gt; 
-            <span className="font-semibold text-gray-600">
-                공지사항
-            </span>
-          </div>
 
           {/* 제목 */}
           <h2 className="text-2xl font-semibold mb-10">공지사항</h2>
 
           {/* 테이블 */}
-          <div className="bg-white rounded-md">
+          <div className="bg-white rounded-md overflow-x-auto">
 
-            <table className="w-full table-fixed">
+            <table className="w-full table-fixed min-w-[600px]">
               
               {/* 헤더 */}
               <thead className="bg-gray-200 text-gray-700">
@@ -67,7 +97,11 @@ const Notice = () => {
                 
                 <tr className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer">
                   <td className="py-5 px-6 text-center">3</td>
-                  <td className="py-5 px-6"><Link to="/customersupport/notice/3" className="hover:underline">운영 시간 변경 안내</Link></td>
+                  <td className="py-5 px-6">
+                    <Link to="/customersupport/notice/3" className="hover:underline">
+                      운영 시간 변경 안내
+                    </Link>
+                  </td>
                   <td className="py-5 px-6 text-gray-500 text-center">2026.02.25</td>
                   <td className="py-5 px-6">
                     <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium">
@@ -78,7 +112,11 @@ const Notice = () => {
 
                 <tr className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer">
                   <td className="py-5 px-6 text-center">2</td>
-                  <td className="py-5 px-6"><Link to="/customersupport/notice/2" className="hover:underline">시스템 점검 안내</Link></td>
+                  <td className="py-5 px-6">
+                    <Link to="/customersupport/notice/2" className="hover:underline">
+                      시스템 점검 안내
+                    </Link>
+                  </td>
                   <td className="py-5 px-6 text-gray-500 text-center">2026.03.30</td>
                   <td className="py-5 px-6">
                     <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium">
@@ -89,7 +127,11 @@ const Notice = () => {
 
                 <tr className="hover:bg-gray-50 cursor-pointer">
                   <td className="py-5 px-6 text-center">1</td>
-                  <td className="py-5 px-6"><Link to="/customersupport/notice/1" className="hover:underline">신규 서비스 오픈 안내</Link></td>
+                  <td className="py-5 px-6">
+                    <Link to="/customersupport/notice/1" className="hover:underline">
+                      신규 서비스 오픈 안내
+                    </Link>
+                  </td>
                   <td className="py-5 px-6 text-gray-500 text-center">2026.03.20</td>
                   <td className="py-5 px-6">
                     <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium">
@@ -102,47 +144,43 @@ const Notice = () => {
             </table>
           </div>
 
-          {/* 페이지네이션 (테일윈드 적용) */}
+          {/* 페이지네이션 */}
           {totalPages >= 1 && (
             <div className="flex items-center justify-center gap-1 mt-12">
-              {/* 이전 페이지 버튼 */}
+              
+              {/* 이전 */}
               <button
-                className="flex items-center justify-center w-10 h-10 border border-gray-200 bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="flex items-center justify-center w-10 h-10 border border-gray-200 bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-600 disabled:opacity-30"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                aria-label="이전 페이지"
               >
-                <svg className="w-5 h-5 fill-none stroke-current" viewBox="0 0 24 24">
-                  <polyline points="15 18 9 12 15 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                ‹
               </button>
 
-              {/* 숫자 버튼들 */}
+              {/* 숫자 */}
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`flex items-center justify-center w-10 h-10 border transition-all text-sm font-medium ${
+                  className={`flex items-center justify-center w-10 h-10 border text-sm ${
                     currentPage === page
                       ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-gray-700"
+                      : "bg-white text-gray-500 border-gray-200"
                   }`}
                 >
                   {page}
                 </button>
               ))}
 
-              {/* 다음 페이지 버튼 */}
+              {/* 다음 */}
               <button
-                className="flex items-center justify-center w-10 h-10 border border-gray-200 bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="flex items-center justify-center w-10 h-10 border border-gray-200 bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-600 disabled:opacity-30"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                aria-label="다음 페이지"
               >
-                <svg className="w-5 h-5 fill-none stroke-current" viewBox="0 0 24 24">
-                  <polyline points="9 18 15 12 9 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                ›
               </button>
+
             </div>
           )}
         </div>
