@@ -124,8 +124,9 @@ export default function FoodList() {
         {/* ✅ 기존 배너 → HeroBanner 컴포넌트로 교체 */}
         <HeroBanner
           bgImage={bannerImage}
-          title={selectedRegion || "경기도"}
-          subtitle={selectedRegion ? `${selectedRegion}의 대표 먹거리를 소개합니다` : "경기도 각 지역의 대표 먹거리를 만나보세요"}
+          title={selectedRegion}
+          subtitle={`${selectedRegion}의 대표 먹거리를 소개합니다`}
+          height="400px"
         />
         <div className="content-wrap">
           <div className="breadcrumb-row">
