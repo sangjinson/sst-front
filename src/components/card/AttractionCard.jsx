@@ -60,8 +60,7 @@ const AttractionCard = ({ item, onClick }) => {
         <img
           src={item.image}
           alt={item.title}
-          className="w-full h-[180px] object-cover"
-        />
+          className="w-full aspect-[4/3] object-cover" />
 
         {/* ❤️ 좋아요 버튼 */}
         <div className="absolute top-3 right-3">
