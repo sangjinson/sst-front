@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import InListCard from "@/components/card/inListCard";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import Breadcrumb from "@components/common/Breadcrumb";
 
 const Community = () => {
   const [activeCategory, setActiveCategory] = useState("전체");
@@ -9,16 +8,15 @@ const Community = () => {
   const navigate = useNavigate();
   const itemsPerPage = 8;
 
-  // [추가] 찜 상태 관리 함수
+  // 찜 상태 관리
   const [wishlistedPosts, setWishlistedPosts] = useState({});
-    const toggleWishlist = (postId) => {
+  const toggleWishlist = (postId) => {
     setWishlistedPosts((prev) => ({
-        ...prev,
-        [postId]: !prev[postId],
-        }));
-    };
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
 
-  // 1. 데이터에 category 속성 추가 (볼거리, 먹거리, 놀거리, 잘거리)
   const posts = [
     { id: 16, title: "서울 야경 명소 발견!", author: "서울시민", likes: 45, img: "https://picsum.photos/seed/16/400/533", category: "볼거리" },
     { id: 15, title: "제주도 숨은 카페 공유해요", author: "여행가J", likes: 88, img: "https://picsum.photos/seed/15/400/533", category: "먹거리" },
@@ -40,140 +38,152 @@ const Community = () => {
 
   const categories = ["전체", "#볼거리", "#먹거리", "#놀거리", "#잘거리"];
 
-  // 2. 카테고리 필터링 적용
+  // 카테고리 필터링
   const filteredPosts = posts.filter((post) => {
     if (activeCategory === "전체") return true;
-    // 버튼 텍스트의 '#'을 제거하고 데이터의 카테고리와 비교합니다.
     return post.category === activeCategory.replace("#", "");
   });
 
-  // 3. 필터링된 데이터를 기준으로 페이지네이션 계산
+  // 페이지네이션 계산
   const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
   const currentItems = filteredPosts.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  // 카테고리 변경 시 페이지를 1로 초기화하는 함수
   const handleCategoryChange = (cat) => {
     setActiveCategory(cat);
     setCurrentPage(1);
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      {/* 경로 안내 */}
-      <nav className="text-xs text-gray-500 mb-5">
-        홈 &gt; <span className="font-bold text-gray-800">뽐낼거리</span>
-      </nav>
+    <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 font-sans">
+      <Breadcrumb 
+        paths={[{ label: '홈', to: '/' }, { label: '뽐낼거리' }]} 
+        className="mb-4" 
+      />
 
-      {/* 버튼 영역 */}
-      <div className="flex justify-end gap-2 mb-8">
-        <button className="px-4 py-1.5 bg-gray-800 text-white text-xs rounded-md hover:bg-gray-700 transition-colors">임시저장</button>
-         <Link to="/showcase/Write"><button className="px-4 py-1.5 bg-gray-800 text-white text-xs rounded-md flex items-center gap-1 hover:bg-gray-700 transition-colors">
-          <span className="text-lg leading-none">+</span> 글쓰기
-        </button></Link>
+      {/* 글쓰기 버튼 영역 (반응형 여백 처리) */}
+      <div className="flex justify-end gap-2 mb-6 md:mb-8 mt-4 md:mt-10">
+         <Link to="/showcase/Write">
+            <button className="px-4 py-2 bg-gray-800 text-white text-xs md:text-sm rounded-lg flex items-center gap-1 hover:bg-emerald-600 transition-all shadow-sm active:scale-95">
+              <span className="text-lg leading-none">+</span> 글쓰기
+            </button>
+         </Link>
       </div>
 
-      {/* 필터 및 정렬 */}
-      <div className="flex justify-between items-center mb-10 border-b border-gray-100 pb-4">
-        <div className="flex gap-3">
+      {/* 필터 및 정렬 (모바일에서 스크롤 가능하도록 설정) */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-gray-100 pb-4 gap-4">
+        <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
-              className={`px-4 py-1 rounded-full text-xs transition-colors ${
-                activeCategory === cat ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              className={`px-4 py-1.5 rounded-full text-xs whitespace-nowrap transition-all ${
+                activeCategory === cat 
+                  ? "bg-emerald-600 text-white shadow-md font-bold" 
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
               }`}
             >
               {cat}
             </button>
           ))}
         </div>
-        <div className="flex gap-4 text-xs text-gray-400 font-bold">
-          <button className="text-gray-800 underline underline-offset-4">최신순</button>
+        <div className="flex gap-4 text-xs text-gray-400 font-bold self-end md:self-auto">
+          <button className="text-gray-800 underline underline-offset-4 decoration-2 decoration-emerald-500">최신순</button>
           <button className="hover:text-gray-600">인기순</button>
         </div>
       </div>
 
-      {/* 카드 그리드 (현재 페이지 데이터만 출력) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+      {/* 카드 그리드: 반응형 1 -> 2 -> 3 -> 4열로 최적화 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-16">
         {currentItems.length > 0 ? (
-            currentItems.map((post) => (
-            // 1. 카드 전체 클릭 시 상세페이지 이동 추가
+          currentItems.map((post) => (
             <div 
-                key={post.id} 
-                // 라우터의 부모(/showcase) + 자식(view) + id를 합친 경로
-                onClick={() => navigate(`/showcase/view/${post.id}`)} 
-                className="group cursor-pointer"
+              key={post.id} 
+              // ✅ 경로를 /showcase/view/${id}로 확실하게 지정
+              onClick={() => navigate(`/showcase/view/${post.id}`)} 
+              className="group cursor-pointer flex flex-col"
             >
-                {/* 1. 이미지 컨테이너 (찜 버튼 추가) */}
-                <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-sm mb-3">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-gray-100 bg-gray-100 shadow-sm mb-4">
                 <img
-                    src={post.img}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  src={post.img}
+                  alt={post.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
                 />
                 
-                {/* 2. 찜 버튼 (e.stopPropagation 추가하여 이동 방지) */}
+                {/* ✅ 리스트의 찜 버튼: 상세페이지와 동일하게 작동하도록 수정 */}
                 <button 
-                    onClick={(e) => {
-                    e.stopPropagation(); // 찜할 때 상세페이지로 이동하는 것을 막음
-                    toggleWishlist(post.id); // 기존에 만든 찜 함수 실행
-                    }}
-                    className="absolute top-3 right-3 w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-red-500 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation(); 
+                    toggleWishlist(post.id);
+                  }}
+                  className={`absolute top-4 right-4 w-9 h-9 backdrop-blur-md rounded-full flex items-center justify-center transition-all active:scale-75 shadow-lg ${
+                    wishlistedPosts[post.id] 
+                      ? "bg-white text-red-500" 
+                      : "bg-black/20 text-white hover:bg-white hover:text-red-500"
+                  }`}
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill={wishlistedPosts[post.id] ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
+                  </svg>
                 </button>
+                
+                {/* 이미지 위 카테고리 태그 표시 (옵션) */}
+                <div className="absolute bottom-3 left-3 px-2 py-1 bg-black/40 backdrop-blur-sm rounded text-[10px] text-white font-medium">
+                  {post.category}
                 </div>
+              </div>
 
-                {/* 3. 정보 영역 */}
-                <div className="flex justify-between items-start px-1">
-                <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-bold text-gray-800 mb-1">{post.author}</h4>
-                    <p className="text-xs text-gray-500 line-clamp-1">{post.title}</p>
+              <div className="px-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-5 h-5 bg-emerald-50 rounded-full flex items-center justify-center text-[10px]">👤</div>
+                  <h4 className="text-[13px] font-bold text-gray-800">{post.author}</h4>
                 </div>
-                </div>
+                <p className="text-[14px] text-gray-600 font-medium line-clamp-1 group-hover:text-emerald-600 transition-colors leading-tight">
+                  {post.title}
+                </p>
+              </div>
             </div>
-            ))
+          ))
         ) : (
-            <div className="col-span-full py-20 text-center text-gray-400">
-            해당 카테고리에 게시물이 없습니다.
-            </div>
+          <div className="col-span-full py-32 text-center">
+            <p className="text-gray-400 text-lg">해당 카테고리에 게시물이 없습니다.</p>
+          </div>
         )}
-        </div>
+      </div>
 
-      {/* 페이지네이션 UI (필터링된 결과가 있을 때만 표시) */}
+      {/* 페이지네이션 (반응형 최적화) */}
       {totalPages > 0 && (
-        <div className="flex justify-center items-center gap-1">
+        <div className="flex justify-center items-center gap-2 py-8">
           <button 
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
-            className="w-9 h-9 flex items-center justify-center border border-gray-200 text-gray-400 rounded hover:bg-gray-50 disabled:opacity-30"
+            className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 transition-all"
           >
             &lt;
           </button>
 
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`w-9 h-9 flex items-center justify-center rounded text-sm font-bold transition-all ${
-                currentPage === page 
-                  ? "bg-blue-600 text-white shadow-md" 
-                  : "border border-gray-200 text-gray-500 hover:border-gray-400 bg-white"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
+          <div className="flex gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`w-10 h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all ${
+                  currentPage === page 
+                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100 scale-110" 
+                    : "text-gray-500 hover:bg-gray-100"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
 
           <button 
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
-            className="w-9 h-9 flex items-center justify-center border border-gray-200 text-gray-400 rounded hover:bg-gray-50 disabled:opacity-30"
+            className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 transition-all"
           >
             &gt;
           </button>
