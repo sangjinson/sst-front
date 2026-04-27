@@ -225,7 +225,7 @@ const View = () => {
           </p>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 text-sm text-[#0F9B73] font-medium hover:underline"
+            className="mt-2 block mx-auto text-sm text-[#0F9B73] font-medium hover:underline center"
           >
             {isExpanded ? '접기 ▲' : '더보기 ▼'}
           </button>
