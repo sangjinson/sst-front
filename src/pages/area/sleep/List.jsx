@@ -84,28 +84,10 @@ const List = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f6f0]">
-
-      {/* 히어로 배너 */}
-      <HeroBanner 
-        bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
-        title={regionKor}
-        subtitle={`${regionKor}의 편안한 숙소를 찾아보세요`}
-      />
+    <div className="min-h-screen">
 
       {/* 필터 & 정렬 영역 */}
-      <div className="max-w-[1200px] mx-auto px-4 py-5">
-
-        {/* 브레드크럼 */}
-        <Breadcrumb 
-          paths={[
-            { label: '홈', to: '/' },
-            { label: regionKor, to: `/${region}` },
-            { label: '잘거리', to: `/${region}/sleep/list` }
-          ]} 
-          className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
-        />
-
+      <div className="py-5">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
 
           {/* 카테고리 필터 탭 */}
@@ -153,22 +135,22 @@ const List = () => {
               <GridCard key={item.id} onClick={() => goToDetail(item.id)} >
                 {/* 썸네일 */}
                 <GridCardHeader className="p-0">
-                <div className="relative h-48 overflow-hidden">
-                    <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                  <div className="relative h-48 overflow-hidden">
+                      <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
 
-                    {/* 카테고리 배지 */}
-                    <span
-                    className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${
-                        categoryColor[item.category] || "bg-gray-100 text-gray-600"
-                    }`}
-                    >
-                    {item.category}
-                    </span>
-                </div>
+                      {/* 카테고리 배지 */}
+                      <span
+                      className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${
+                          categoryColor[item.category] || "bg-gray-100 text-gray-600"
+                      }`}
+                      >
+                      {item.category}
+                      </span>
+                  </div>
                 </GridCardHeader>
 
                 {/* 카드 정보 */}
@@ -192,10 +174,6 @@ const List = () => {
                         <span className="truncate max-w-[150px]">
                         {item.address}
                         </span>
-                    </p>
-
-                    <p className="text-sm font-bold text-[#0F9B73] whitespace-nowrap">
-                        {item.price}
                     </p>
                 </GridCardFooter>
             </GridCard>
