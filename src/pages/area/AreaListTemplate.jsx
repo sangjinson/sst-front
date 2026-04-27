@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import HeroBanner from '../../components/common/HeroBanner';
 import { toKorRegion } from '@utils/regionMap';
 import Breadcrumb from '@components/common/Breadcrumb';
@@ -12,15 +11,12 @@ const SeeList = lazy(() => import('./see/List'));
 const SleepList = lazy(() => import('./sleep/List'));
 
 function AreaListTemplate() {
-    const { pathname } = useLocation();
     const { region, type } = useParams(); {/* URL 파라메터 */}
-    const navigate = useNavigate(); // 
     const regionKor = toKorRegion(region); 
 
     useEffect(() => {
       window.scrollTo(0, 0);
-    }, [pathname]);
-
+    }, [type, region]);
    
     const renderList = () => {
       switch (type) {
