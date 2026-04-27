@@ -67,7 +67,7 @@ function AreaListTemplate() {
             title={regionKor}
             subtitle={`${regionKor}${currentConfig.subtitleSuffix}`}
           />
-          <div className="container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10 max-w-[1200px]">
+          <div className="max-w-[1920px] mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px]">
             <Breadcrumb
               paths={[
                 { label: '홈', to: '/' },

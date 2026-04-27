@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams, useOutletContext } from 'react-router-dom'; // 🚀 useOutletContext 추가됨
+import { useNavigate, useOutletContext } from 'react-router-dom'; // 🚀 useOutletContext 추가됨
 import AttractionCard from '../../../components/card/AttractionCard';
 import { getSeeDataByRegion } from './seeData';
 
