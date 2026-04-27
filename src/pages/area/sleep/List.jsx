@@ -4,7 +4,7 @@ import { getSleepDataByRegion } from './sleepDummyData';
 import HeroBanner from '@components/common/HeroBanner';
 import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
-
+import { GridCard, GridCardHeader, GridCardBody, GridCardFooter } from '@components/modules/GridCard';
 
 // 별점 컴포넌트
 const StarRating = ({ rating }) => (
@@ -80,7 +80,7 @@ const List = () => {
 
   // 상세 페이지 이동
   const goToDetail = (id) => {
-    navigate(`/${regionKor}/sleep/view?id=${id}`);
+    navigate(`/${region}/sleep/view?id=${id}`);
   };
 
   return (
@@ -94,14 +94,14 @@ const List = () => {
       />
 
       {/* 필터 & 정렬 영역 */}
-      <div className="max-w-[1200px] mx-auto px-4 py-4">
+      <div className="max-w-[1200px] mx-auto px-4 py-5">
 
         {/* 브레드크럼 */}
         <Breadcrumb 
           paths={[
             { label: '홈', to: '/' },
-            { label: regionKor, to: `/${regionKor}` },
-            { label: '잘거리', to: `/${regionKor}/sleep/list` }
+            { label: regionKor, to: `/${region}` },
+            { label: '잘거리', to: `/${region}/sleep/list` }
           ]} 
           className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
         />
@@ -150,48 +150,55 @@ const List = () => {
         {paginated.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginated.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => goToDetail(item.id)}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group"
-              >
+              <GridCard key={item.id} onClick={() => goToDetail(item.id)} >
                 {/* 썸네일 */}
+                <GridCardHeader className="p-0">
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                    <img
                     src={item.image}
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {/* 카테고리 배지 */}
-                  <span
-                    className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${categoryColor[item.category] || 'bg-gray-100 text-gray-600'
-                      }`}
-                  >
+                    />
+
+                    {/* 카테고리 배지 */}
+                    <span
+                    className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${
+                        categoryColor[item.category] || "bg-gray-100 text-gray-600"
+                    }`}
+                    >
                     {item.category}
-                  </span>
+                    </span>
                 </div>
+                </GridCardHeader>
 
                 {/* 카드 정보 */}
-                <div className="p-4">
-                  <h3 className="font-bold text-gray-900 text-base mb-1 truncate group-hover:text-[#0F9B73] transition-colors">
-                    {item.name}
-                  </h3>
-                  <StarRating rating={item.rating} />
-                  <p className="text-xs text-gray-400 mt-0.5 mb-2">리뷰 {item.reviewCount}개</p>
-                  <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-                    {item.description}
-                  </p>
-                  <div className="flex items-center justify-between border-t pt-3">
+                <GridCardBody className="px-4 py-3">
+                    <h3 className="font-bold text-gray-900 text-base mb-1 truncate group-hover:text-[#0F9B73] transition-colors">
+                        {item.name}
+                    </h3>
+                    <StarRating rating={item.rating} icon="★" />
+                    <p className="text-xs text-gray-400 mt-0.5 mb-2">
+                        리뷰 {item.reviewCount}개
+                    </p>
+                    <p className="text-sm text-gray-500 line-clamp-2">
+                        {item.description}
+                    </p>
+                </GridCardBody>
+
+                {/* 푸터 */}
+                <GridCardFooter className="flex items-center justify-between">
                     <p className="text-xs text-gray-400 flex items-center gap-1">
-                      <span>📍</span>
-                      <span className="truncate max-w-[150px]">{item.address}</span>
+                        <span>📍</span>
+                        <span className="truncate max-w-[150px]">
+                        {item.address}
+                        </span>
                     </p>
-                    <p className="text-sm font-bold text-[#0F9B73] whitespace-nowrap ml-2">
-                      {item.price}
+
+                    <p className="text-sm font-bold text-[#0F9B73] whitespace-nowrap">
+                        {item.price}
                     </p>
-                  </div>
-                </div>
-              </div>
+                </GridCardFooter>
+            </GridCard>
             ))}
           </div>
         ) : (
