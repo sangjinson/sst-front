@@ -11,7 +11,7 @@ const PlayList = () => {
     return (
         <>
         <div>PlayLis</div>
-        <IconSVG name="park" className="text-blue-500 hover:text-red-500" />
+        <IconSVG name="park" className="text-blue-500 hover:text-red-500" strokeWidth={5} />
         <IconSVG name="huney" className="text-blue-500 hover:text-red-500" />
         </>
     )
