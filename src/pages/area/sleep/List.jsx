@@ -3,6 +3,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getSleepDataByRegion } from './sleepDummyData';
 import HeroBanner from '@components/common/HeroBanner';
 import Breadcrumb from '@components/common/Breadcrumb';
+import { toKorRegion } from '@utils/regionMap';
+
 
 // 별점 컴포넌트
 const StarRating = ({ rating }) => (
@@ -32,6 +34,7 @@ const List = () => {
   const { region } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const regionKor = toKorRegion(region);
 
   const [sleepList, setSleepList] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -44,9 +47,9 @@ const List = () => {
 
   // 지역 데이터 로드
   useEffect(() => {
-    const data = getSleepDataByRegion(region);
+    const data = getSleepDataByRegion(regionKor);
     setSleepList(data);
-  }, [region]);
+  }, [regionKor]);
 
   // 필터 & 정렬
   useEffect(() => {
@@ -77,7 +80,7 @@ const List = () => {
 
   // 상세 페이지 이동
   const goToDetail = (id) => {
-    navigate(`/${region}/sleep/view?id=${id}`);
+    navigate(`/${regionKor}/sleep/view?id=${id}`);
   };
 
   return (
@@ -86,24 +89,24 @@ const List = () => {
       {/* 히어로 배너 */}
       <HeroBanner 
         bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
-        title={region}
-        subtitle={`${region}의 편안한 숙소를 찾아보세요`}
+        title={regionKor}
+        subtitle={`${regionKor}의 편안한 숙소를 찾아보세요`}
       />
 
       {/* 필터 & 정렬 영역 */}
-      <div className="max-w-[1200px] mx-auto px-4 py-6">
+      <div className="max-w-[1200px] mx-auto px-4 py-4">
 
         {/* 브레드크럼 */}
         <Breadcrumb 
           paths={[
             { label: '홈', to: '/' },
-            { label: region, to: `/${region}` },
-            { label: '잘거리', to: `/${region}/sleep/list` }
+            { label: regionKor, to: `/${regionKor}` },
+            { label: '잘거리', to: `/${regionKor}/sleep/list` }
           ]} 
-          className="mb-5" // 🚀 여기서는 좁은 여백을 던져줍니다!
+          className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
         />
 
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
 
           {/* 카테고리 필터 탭 */}
           <div className="flex flex-wrap gap-2">
@@ -139,7 +142,7 @@ const List = () => {
         </div>
 
         {/* 결과 수 */}
-        <p className="text-sm text-gray-500 mb-5">
+        <p className="text-sm text-gray-500 mb-3">
           총 <span className="font-semibold text-gray-800">{filtered.length}</span>개의 숙소
         </p>
 
