@@ -12,7 +12,6 @@ import MyPage from '@pages/user/MyPage';
 
 
 import Notice from "@pages/customersupport/Notice";
-import NoticeDetail from "@pages/customersupport/NoticeDetail";
 import Faq from "@pages/customersupport/Faq";
 import AreaBaseTemplate from '@pages/area/AreaBaseTemplate';
 import AreaListTemplate from '@pages/area/AreaListTemplate';
@@ -52,7 +51,6 @@ const AppRoutes = () => {
         {/* 고객센터 */}
         <Route path="/customersupport" element={<UserLayout />}>
           <Route path="notice" element={<Notice />} />
-          <Route path="notice/:id" element={<NoticeDetail />} />
           <Route path="faq" element={<Faq />} />
         </Route>
 
