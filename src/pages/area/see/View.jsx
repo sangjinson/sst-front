@@ -1,416 +1,478 @@
-// src/pages/area/food/View.jsx
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getFoodDataByRegion } from "./foodData";
-import { toKorRegion } from "@utils/regionMap";
+import React, { useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
+import Breadcrumb from '../../../components/common/Breadcrumb';
+import { ClipButton, HeartButton } from '../../../components/card/AttractionCard';
+import { getSeeDataByRegion } from './seeData';
 
-const LIKE_KEY = "food_likes";
 
-function getLikes() {
-  try { return JSON.parse(localStorage.getItem(LIKE_KEY)) || []; }
-  catch { return []; }
-}
-function saveLikes(likes) {
-  localStorage.setItem(LIKE_KEY, JSON.stringify(likes));
-}
-function isLiked(food) {
-  return getLikes().some((item) => item.id === food.id && item.name === food.name);
-}
-function toggleLikeStorage(food) {
-  const likes = getLikes();
-  const exists = likes.some((item) => item.id === food.id && item.name === food.name);
-  if (exists) {
-    saveLikes(likes.filter((item) => !(item.id === food.id && item.name === food.name)));
-    return false;
-  } else {
-    saveLikes([...likes, food]);
-    return true;
-  }
-}
 
-const StarRating = ({ rating, size = "md" }) => {
-  const textSize = size === "lg" ? "text-xl" : "text-sm";
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <span key={star} className={`${textSize} ${star <= Math.round(rating) ? "text-yellow-400" : "text-gray-300"}`}>★</span>
-      ))}
-      <span className={`${size === "lg" ? "text-base" : "text-sm"} text-gray-500 ml-1`}>{rating.toFixed(1)}</span>
-    </div>
-  );
-};
-
-const StarPicker = ({ value, onChange }) => {
-  const [hovered, setHovered] = useState(0);
-  const labels = ["", "1점 - 별로예요", "2점 - 그저 그래요", "3점 - 보통이에요", "4점 - 좋아요", "5점 - 최고예요"];
-
-  return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <button
-          key={star}
-          type="button"
-          onClick={() => onChange(star)}
-          onMouseEnter={() => setHovered(star)}
-          onMouseLeave={() => setHovered(0)}
-          style={{
-            background: "none", border: "none", cursor: "pointer", padding: "0 2px",
-            fontSize: "28px",
-            color: star <= (hovered || value) ? "#f59e0b" : "#d1d5db",
-            transition: "color 0.15s ease, transform 0.1s ease",
-            transform: star <= (hovered || value) ? "scale(1.15)" : "scale(1)",
-          }}
-          aria-label={`${star}점`}
-        >★</button>
-      ))}
-      <span style={{ fontSize: "0.85rem", color: "#6b7280", marginLeft: "6px" }}>
-        {labels[hovered || value] || "별점을 선택해주세요"}
-      </span>
-    </div>
-  );
-};
-
-const categoryColor = {
-  한식: "bg-red-100 text-red-700",
-  중식: "bg-yellow-100 text-yellow-700",
-  일식: "bg-blue-100 text-blue-700",
-  양식: "bg-purple-100 text-purple-700",
-};
-
-const generateReviews = (foodName) => [
-  { user: "미식가" + foodName.slice(0, 1) + "123", rating: 5, comment: `${foodName} 진짜 맛있어요! 강력 추천합니다.` },
-  { user: "여행중인밥", rating: 4, comment: "분위기도 좋고 음식도 맛있었어요. 또 오고 싶네요." },
-  { user: "동네주민", rating: 5, comment: `${foodName} 단골입니다. 항상 맛이 일정하고 서비스도 좋아요.` },
-];
-
-export default function FoodView() {
-  const { region } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
+const SeeDetail = () => {
+  const { region: regionParam } = useParams();
   const [searchParams] = useSearchParams();
-  const id = searchParams.get("id");
+  const region = (regionParam || '수원').replace(/시$/, '');
+  const itemId = searchParams.get('id');
+  const item = getSeeDataByRegion(region).find((seeItem) => String(seeItem.id) === String(itemId));
 
-  const currentRegion = region || location.state?.selectedRegion || "";
-  const currentRegionKor = toKorRegion(currentRegion);
-
-  const [item, setItem] = useState(null);
-  const [relatedItems, setRelatedItems] = useState([]);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
   const [liked, setLiked] = useState(false);
-  const [selectedRating, setSelectedRating] = useState(0);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  useEffect(() => {
-    const allFoods = getFoodDataByRegion(currentRegionKor);
+// 상태 (컴포넌트 상단에 추가)
+const [rating, setRating] = useState(0);
+const [hover, setHover] = useState(0);
+const [content, setContent] = useState("");
 
-    let food = null;
+const [reviews, setReviews] = useState([
+  {
+    id: 1,
+    name: "5스틴",
+    rating: 5,
+    content: "분위기 최고 👍",
+    date: "2026-04-26",
+    isMine: false,
+  },
+  {
+    id: 2,
+    name: "여행가 영훈",
+    rating: 4,
+    content: "좋아요!",
+    date: "2026-04-25",
+    isMine: true,
+  },
+]);
 
-    if (id) {
-      food = allFoods.find((f) => String(f.id) === String(id));
-    }
+// 별점 텍스트
+const ratingText = {
+  1: "많이 아쉬워요",
+  2: "그냥 그래요",
+  3: "나름 괜찮아요",
+  4: "좋아요",
+  5: "최고예요",
+};
 
-    if (!food && location.state?.food) {
-      food = location.state.food;
-    }
+// 평균 평점 계산
+const ratingAvg =
+  reviews.length === 0
+    ? 0
+    : reviews.reduce((acc, cur) => acc + cur.rating, 0) /
+      reviews.length;
 
-    if (food) {
-      setItem(food);
-      setComments(generateReviews(food.name));
-      setLiked(isLiked(food));
+// 리뷰 등록
+const handleSubmit = () => {
+  if (!rating || !content) return;
 
-      const related = allFoods
-        .filter((f) => f.id !== food.id && f.category === food.category)
-        .slice(0, 4);
-      setRelatedItems(related);
-    }
+  const newReview = {
+    id: Date.now(),
+    name: "나",
+    rating,
+    content,
+    date: new Date().toISOString().slice(0, 10),
+    isMine: true,
+  };
 
-    window.scrollTo(0, 0);
-  }, [id, currentRegionKor, location.state]);
+  setReviews([newReview, ...reviews]);
+  setRating(0);
+  setContent("");
+};
+
+// 삭제
+const handleDelete = (id) => {
+  setReviews(reviews.filter((r) => r.id !== id));
+};
+
+const getCurrentUrl = () => window.location.href;
+
+const handleShareClick = () => {
+  setIsShareOpen((prev) => !prev);
+  setCopied(false);
+};
+
+const handleCopyLink = async () => {
+  const url = getCurrentUrl();
+
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch {
+    const textarea = document.createElement('textarea');
+    textarea.value = url;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  }
+
+  setCopied(true);
+};
 
   if (!item) {
     return (
-      <div className="min-h-screen bg-[#f8f6f0] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-5xl mb-4">🍽️</p>
-          <p className="text-lg text-gray-400">음식점 정보를 찾을 수 없습니다.</p>
-          <button onClick={() => navigate(-1)} className="mt-4 px-5 py-2 bg-[#c8860a] text-white rounded-lg text-sm">돌아가기</button>
-        </div>
+      <div className="bg-[#f8f6f0] min-h-screen flex items-center justify-center">
+        <p className="text-lg text-gray-500">볼거리 정보를 찾을 수 없습니다.</p>
       </div>
     );
   }
 
-  const handleLike = () => {
-    const result = toggleLikeStorage(item);
-    setLiked(result);
-  };
-
-  const handleShareClick = () => {
-    setIsShareOpen((prev) => !prev);
-    setCopied(false);
-  };
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-    } catch {
-      const textarea = document.createElement('textarea');
-      textarea.value = window.location.href;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-    }
-    setCopied(true);
-  };
-
-  const handleCommentSubmit = () => {
-    if (!newComment.trim()) return;
-    if (selectedRating === 0) {
-      alert("별점을 선택해주세요! (1점 ~ 5점)");
-      return;
-    }
-    setComments([...comments, { user: "방문자", rating: selectedRating, comment: newComment }]);
-    setNewComment("");
-    setSelectedRating(0);
-  };
+  const sortedReviews = [...reviews].sort((a, b) => b.rating - a.rating);
 
   return (
-    <>
-      <style>{`
-        .food-view-wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; font-family: 'Pretendard', sans-serif; }
-        .like-btn-wrap { position: absolute; top: 16px; right: 16px; z-index: 10; }
-        .like-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s ease; backdrop-filter: blur(4px); }
-        .like-btn:hover { transform: scale(1.1); }
-        .like-btn.liked { background: #fee2e2; }
-        .like-btn svg { width: 20px; height: 20px; fill: none; stroke: #aaa; stroke-width: 2; transition: all 0.2s; }
-        .like-btn.liked svg { fill: #ef4444; stroke: #ef4444; }
-        .review-input-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f1f1; display: flex; flex-direction: column; gap: 12px; }
-        .review-rating-label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 4px; }
-      `}</style>
+    <div className="bg-[#f8f6f0] min-h-screen">
 
-      <div className="min-h-screen bg-[#f8f6f0]">
-        <div className="food-view-wrap">
+      <div className="max-w-[1000px] mx-auto px-4 py-12">
 
-          {/* 브레드크럼 */}
-          <p className="text-sm text-gray-400 mb-4">
-            <span className="cursor-pointer hover:text-[#c8860a] transition-colors" onClick={() => navigate("/")}>홈</span>
-            {" > "}
-            <span className="cursor-pointer hover:text-[#c8860a] transition-colors" onClick={() => navigate(`/${currentRegion}`)}>{currentRegionKor}</span>
-            {" > "}
-            <span className="cursor-pointer hover:text-[#c8860a] transition-colors" onClick={() => navigate(-1)}>먹거리</span>
-            {" > "}
-            <span className="text-gray-700 font-medium">{item.name}</span>
-          </p>
 
-          {/* 히어로 이미지 */}
-          <div className="relative rounded-2xl overflow-hidden mb-6 h-64 md:h-96">
-            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-5">
-              <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-2 ${categoryColor[item.category] || "bg-gray-100 text-gray-600"}`}>
-                {item.category}
-              </span>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">{item.name}</h1>
-              <p className="text-white/80 text-sm mt-1">{currentRegionKor}</p>
-            </div>
-            <button onClick={() => navigate(-1)} className="absolute top-4 left-4 bg-white/80 backdrop-blur-sm text-gray-700 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-white transition">
-              ← 목록으로
-            </button>
-            <div className="like-btn-wrap">
-              <button className={`like-btn${liked ? " liked" : ""}`} onClick={handleLike} aria-label="좋아요">
-                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
-              </button>
-            </div>
+        {/* 🔥 HERO (완전 개선) */}
+        <div className="relative rounded-3xl overflow-hidden shadow-xl mb-14">
+
+          <img
+            src={item.image}
+            alt={item.title}
+            className="w-full h-[420px] object-cover hover:scale-105 transition duration-500"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+          <div className="absolute bottom-0 left-0 p-8 text-white">
+            <p className="text-sm opacity-80 mb-1">{item.location}</p>
+            <h1 className="text-4xl font-bold">{item.title}</h1>
           </div>
 
-          {/* 찜하기 + 공유하기 버튼 */}
-          <div className="flex items-center gap-2 mb-4 relative">
-            <button
-              onClick={handleLike}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition text-sm font-medium ${liked ? "bg-red-50 border-red-300 text-red-500" : "bg-white border-gray-300 text-gray-500 hover:border-red-300 hover:text-red-400"}`}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill={liked ? "#ef4444" : "none"} stroke={liked ? "#ef4444" : "currentColor"} strokeWidth="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-              {liked ? "찜 완료" : "찜하기"}
-            </button>
+          {/* 버튼 */}
+          <div className="absolute top-5 right-5 flex gap-3">
+            <ClipButton onClick={handleShareClick} />
+            <HeartButton liked={liked} onClick={() => setLiked(!liked)} />
 
-            {/* 공유하기 버튼 */}
-            <button
-              onClick={handleShareClick}
-              className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-500 hover:border-[#0F9B73] hover:text-[#0F9B73] transition text-sm font-medium"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="18" cy="5" r="3" />
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="19" r="3" />
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-              </svg>
-              공유하기
-            </button>
-
-            {/* 공유 드롭다운 */}
-            {isShareOpen && (
-              <div className="absolute top-12 left-24 w-[320px] rounded-2xl bg-white/95 backdrop-blur-md p-3 shadow-xl z-10 border border-gray-100">
-                <p className="text-xs font-semibold text-gray-500 mb-2">페이지 링크</p>
-                <div className="flex gap-2">
-                  <input
-                    value={window.location.href}
-                    readOnly
-                    className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 outline-none"
-                  />
-                  <button
-                    onClick={handleCopyLink}
-                    className="shrink-0 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-[#0F9B73] transition cursor-pointer"
-                  >
-                    복사
-                  </button>
-                </div>
-                {copied && (
-                  <p className="mt-2 text-xs font-semibold text-[#0F9B73]">링크가 복사되었습니다.</p>
-                )}
-              </div>
-            )}
-
-            {liked && <span className="text-xs text-gray-400">마이페이지 내 찜목록에서 확인할 수 있어요</span>}
           </div>
 
-          {/* 상세 설명 */}
-          <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-            <h2 className="text-lg font-bold text-gray-900 mb-3">상세 설명</h2>
-            <p className={`text-sm text-gray-600 leading-relaxed ${!isExpanded ? "line-clamp-3" : ""}`}>{item.description}</p>
-            <button onClick={() => setIsExpanded(!isExpanded)} className="mt-2 text-sm text-[#c8860a] font-medium hover:underline">
-              {isExpanded ? "접기 ▲" : "더보기 ▼"}
-            </button>
-          </div>
+          {isShareOpen && (
+            <div className="absolute top-[70px] right-5 w-[320px] max-w-[calc(100%-40px)] rounded-2xl bg-white/95 backdrop-blur-md p-3 shadow-xl">
+              <p className="text-xs font-semibold text-gray-500 mb-2">
+                페이지 링크
+              </p>
 
-          {/* 이용 정보 */}
-          <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">이용 정보</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3">
-                <span className="text-xl">📍</span>
-                <div><p className="text-xs text-gray-400 mb-0.5">주소</p><p className="text-sm text-gray-700">{item.address}</p></div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-xl">📞</span>
-                <div><p className="text-xs text-gray-400 mb-0.5">전화번호</p><p className="text-sm text-gray-700">031-000-0000</p></div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-xl">⏰</span>
-                <div><p className="text-xs text-gray-400 mb-0.5">영업시간</p><p className="text-sm text-gray-700">11:00 - 21:00</p></div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-xl">💰</span>
-                <div><p className="text-xs text-gray-400 mb-0.5">평균 가격대</p><p className="text-sm font-semibold text-[#c8860a]">10,000원 ~ 30,000원</p></div>
-              </div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <p className="text-xs text-gray-400 mb-2">태그</p>
-              <div className="flex flex-wrap gap-2">
-                {item.tags.map((tag) => (
-                  <span key={tag} className="px-3 py-1 bg-[#fef9ed] text-[#c8860a] border border-[#f0d88a] text-xs rounded-full">#{tag}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* 지도 */}
-          <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-            <h2 className="text-lg font-bold text-gray-900 mb-3">위치</h2>
-            <div className="w-full h-52 rounded-xl overflow-hidden bg-gray-100">
-              <iframe
-                title="지도" width="100%" height="100%" style={{ border: 0 }}
-                loading="lazy" allowFullScreen
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(item.address)}&z=15&output=embed`}
-              />
-            </div>
-            <p className="text-xs text-gray-400 mt-2">📍 {item.address}</p>
-          </div>
-
-          {/* 평점 & 리뷰 */}
-          <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">평점 & 리뷰</h2>
-              <div className="flex items-center gap-2">
-                <StarRating rating={item.rating} size="lg" />
-                <span className="text-sm text-gray-400">({item.reviews}개)</span>
-              </div>
-            </div>
-
-            {comments.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {comments.map((review, idx) => (
-                  <div key={idx} className="border border-gray-100 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-semibold text-gray-800">{review.user}</p>
-                      <StarRating rating={review.rating} />
-                    </div>
-                    <p className="text-sm text-gray-500">{review.comment}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-400 text-center py-6">아직 작성된 리뷰가 없어요. 첫 번째 리뷰를 남겨보세요! 🍽️</p>
-            )}
-
-            {/* 리뷰 작성 */}
-            <div className="review-input-section">
-              <div>
-                <p className="review-rating-label">별점 선택 <span style={{ color: "#ef4444" }}>*</span></p>
-                <StarPicker value={selectedRating} onChange={setSelectedRating} />
-              </div>
               <div className="flex gap-2">
                 <input
-                  className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#c8860a]"
-                  placeholder="따뜻한 리뷰를 남겨주세요."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleCommentSubmit()}
+                  value={getCurrentUrl()}
+                  readOnly
+                  className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 outline-none"
                 />
-                <button onClick={handleCommentSubmit} className="px-4 py-2 bg-[#c8860a] text-white rounded-xl text-sm font-medium hover:bg-[#b07509] transition">
-                  등록
+
+                <button
+                  onClick={handleCopyLink}
+                  className="shrink-0 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-600 transition cursor-pointer"
+                >
+                  복사
                 </button>
               </div>
-            </div>
-          </div>
 
-          {/* 연관 추천 음식점 */}
-          {relatedItems.length > 0 && (
-            <div className="bg-white rounded-2xl p-5 mb-6 shadow-sm">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">{currentRegionKor} 비슷한 음식점</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {relatedItems.map((rel) => (
-                  <div
-                    key={rel.id}
-                    onClick={() => navigate(`/${currentRegion}/food/view?id=${rel.id}`, {
-                      state: { food: rel, selectedRegion: currentRegion },
-                    })}
-                    className="cursor-pointer group"
-                  >
-                    <div className="h-28 rounded-xl overflow-hidden mb-2">
-                      <img src={rel.image} alt={rel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    </div>
-                    <p className="text-xs font-semibold text-gray-800 truncate group-hover:text-[#c8860a] transition-colors">{rel.name}</p>
-                    <p className="text-xs text-gray-400">{rel.category}</p>
-                  </div>
-                ))}
-              </div>
+              {copied && (
+                <p className="mt-2 text-xs font-semibold text-emerald-600">
+                  링크가 복사되었습니다.
+                </p>
+              )}
             </div>
           )}
-
-          {/* 목록으로 */}
-          <button onClick={() => navigate(-1)} className="w-full py-4 border border-gray-300 rounded-xl text-sm text-gray-600 font-semibold hover:bg-gray-50 transition">
-            목록으로 돌아가기
-          </button>
-
         </div>
+
+        {/* 🔥 설명 */}
+        <section className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+          <h2 className="text-lg font-bold mb-4">상세 설명</h2>
+
+          <p className={`text-gray-600 leading-relaxed text-sm ${isExpanded ? '' : 'line-clamp-2'}`}>
+            {item.desc}
+          </p>
+
+          <button
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className="mt-3 text-emerald-600 text-sm hover:underline cursor-pointer"
+          >
+            {isExpanded ? '접기 ▲' : '더보기 ▼'}
+          </button>
+        </section>
+
+        {/* 🔥 이용정보 (카드화) */}
+        <section className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+          <h2 className="text-lg font-bold mb-4">이용 정보</h2>
+
+          <div className="grid grid-cols-2 gap-4">
+
+            {[
+              {
+                title: '주소',
+                value: item.location,
+                icon: (
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M12 21s-7-5.686-7-11a7 7 0 1 1 14 0c0 5.314-7 11-7 11z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                )
+              },
+              {
+                title: '이용시간',
+                value: '09:00 - 18:00',
+                icon: (
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                )
+              },
+              {
+                title: '전화번호',
+                value: '031-290-3600',
+                icon: (
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M22 16.92V21a1 1 0 0 1-1.09 1 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2 3.09 1 1 0 0 1 3 2h4.09a1 1 0 0 1 1 .75l.7 3a1 1 0 0 1-.27.95l-1.27 1.27a16 16 0 0 0 6 6l1.27-1.27a1 1 0 0 1 .95-.27l3 .7a1 1 0 0 1 .75 1z" />
+                  </svg>
+                )
+              },
+              {
+                title: '이용요금',
+                value: '현장 확인',
+                icon: (
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M12 1v22M17 5H9a4 4 0 0 0 0 8h6a4 4 0 0 1 0 8H6" />
+                  </svg>
+                )
+              },
+            ].map((info, i) => (
+              <div
+                key={i}
+                className="bg-gray-50 p-5 rounded-xl border border-gray-100 hover:shadow-md transition flex items-center gap-4"
+              >
+                <div className="text-gray-400 shrink-0">
+                  {info.icon}
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium text-gray-400 leading-none">{info.title}</p>
+                  <p className="font-semibold text-sm text-gray-800 mt-1.5 leading-snug">{info.value}</p>
+                </div>
+              </div>
+            ))}
+
+          </div>
+        </section>
+
+        {/* 🔥 지도 */}
+        <section className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+          <h2 className="text-lg font-bold mb-4">위치</h2>
+
+          <div className="rounded-2xl overflow-hidden h-[260px] bg-gray-200 relative shadow-sm">
+
+            <img
+              src="https://picsum.photos/1000/300"
+              className="w-full h-full object-cover"
+            />
+
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <div className="bg-white px-3 py-1 rounded-full shadow text-sm">
+                {item.title}
+              </div>
+              <div className="text-red-500 text-xl text-center">📍</div>
+            </div>
+
+          </div>
+        </section>
+
+        <section className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+  <h2 className="text-lg font-bold mb-4">
+    리뷰 <span className="text-emerald-600">({reviews.length})</span>
+  </h2>
+
+  {/* 🔥 총 평점 */}
+  <div className="flex items-center gap-3 mb-6">
+    <div className="flex text-yellow-400">
+      {[1,2,3,4,5].map((star) => (
+        <svg
+          key={star}
+          viewBox="0 0 24 24"
+          className={`w-5 h-5 ${
+            star <= Math.round(ratingAvg)
+              ? 'fill-current'
+              : 'text-gray-300'
+          }`}
+        >
+          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+        </svg>
+      ))}
+    </div>
+
+    <span className="text-lg font-bold">
+      {ratingAvg.toFixed(1)}
+    </span>
+
+    
+  </div>
+
+  {/* 🔥 리뷰 입력 */}
+  <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
+
+    <div className="flex items-center gap-3 mb-3">
+
+      {/* 별점 */}
+      <div className="flex gap-1">
+        {[1,2,3,4,5].map((star) => (
+          <svg
+            key={star}
+            viewBox="0 0 24 24"
+            className={`w-6 h-6 cursor-pointer transition ${
+              (hover || rating) >= star
+                ? 'text-yellow-400 scale-110'
+                : 'text-gray-300'
+            }`}
+            fill="currentColor"
+            onClick={() => setRating(star)}
+            onMouseEnter={() => setHover(star)}
+            onMouseLeave={() => setHover(0)}
+          >
+            <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+          </svg>
+        ))}
       </div>
-    </>
+
+      {/* 점수 + 텍스트 */}
+      {rating > 0 && (
+        <span className="text-sm text-gray-600">
+          {rating}.0 · {ratingText[rating]}
+        </span>
+      )}
+    </div>
+
+    <textarea
+      value={content}
+      onChange={(e) => setContent(e.target.value)}
+      placeholder="리뷰를 남겨주세요"
+      className="w-full border rounded-lg p-3 text-sm resize-none"
+    />
+
+    <div className="flex justify-end mt-2">
+      <button
+        onClick={handleSubmit}
+        className="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-emerald-700 cursor-pointer"
+      >
+        등록
+      </button>
+    </div>
+  </div>
+
+  {/* 🔥 리뷰 리스트 */}
+      
+<div className="space-y-3">
+  {sortedReviews.map((r) => (
+    <div
+      key={r.id}
+      className="bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-md transition"
+    >
+
+      {/* 🔥 상단: 닉네임 + 별점 */}
+      <div className="flex justify-between items-start">
+
+        <div className="text-base font-semibold text-gray-900">
+          {r.name}
+        </div>
+
+        {/* ⭐ 별점 + 점수 (크게) */}
+        <div className="flex items-center gap-1 text-yellow-500 text-base font-semibold">
+          <span>
+            {'★'.repeat(r.rating)}
+            {'☆'.repeat(5 - r.rating)}
+          </span>
+          <span className="text-gray-600 text-sm ml-1">
+            {r.rating}.0
+          </span>
+        </div>
+
+      </div>
+
+      {/* 🔥 중단: 리뷰 내용 */}
+      <div className="text-sm text-gray-700 mt-1 leading-relaxed">
+        {r.content}
+      </div>
+
+      {/* 🔥 하단: 날짜 + 버튼 */}
+<div className="flex justify-end items-center gap-3 mt-auto text-xs">
+
+  {/* 날짜 */}
+  <span className="text-gray-400 whitespace-nowrap">
+    {r.date}
+  </span>
+
+        {/* 버튼 그룹 */}
+  <div className="flex items-center gap-1">
+
+    {r.isMine ? (
+      <>
+        {/* 수정 */}
+        <button className="p-1.5 rounded-md text-gray-400 hover:text-black hover:bg-gray-100 transition">
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+          </svg>
+        </button>
+
+        {/* 삭제 */}
+        <button
+          onClick={() => handleDelete(r.id)}
+          className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14H6L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4h6v2" />
+          </svg>
+        </button>
+      </>
+    ) : (
+      /* 신고 */
+      <button className="p-1.5 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition">
+        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M4 22V4" />
+          <path d="M4 4h10l-1 3 1 3H4" />
+        </svg>
+      </button>
+    )}
+
+  </div>
+
+</div>
+
+    </div>
+  ))}
+</div>
+</section>
+
+        {/* 🔥 추천 (카드 통일) */}
+        <section className="bg-white rounded-2xl p-5 mb-6 shadow-sm">
+          <h2 className="text-lg font-bold mb-5">연관 추천 볼거리</h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+            {[1,2,3,4].map(i => (
+              <div
+                key={i}
+                className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition cursor-pointer"
+              >
+                <img
+                  src={`https://picsum.photos/200/150?${i}`}
+                  className="w-full h-[120px] object-cover"
+                />
+
+                <div className="p-3 text-sm font-semibold text-center">
+                  추천 장소 {i}
+                </div>
+              </div>
+            ))}
+
+          </div>
+        </section>
+
+      </div>
+    </div>
   );
-}
+};
+
+export default SeeDetail;
