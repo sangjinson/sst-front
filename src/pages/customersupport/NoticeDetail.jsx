@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 
 const noticeData = [
   {
@@ -53,6 +53,11 @@ const noticeData = [
 ];
 
 const NoticeDetail = () => {
+
+    const location = useLocation();
+    const isNotice = location.pathname.includes("notice");
+    const isFaq = location.pathname.includes("faq");
+
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -70,42 +75,78 @@ const NoticeDetail = () => {
 
     return (
         <div className="bg-[#f7f8fa] min-h-screen py-20">
+
+        <style>
+        {`.mp-box {
+          background: #fff;
+          border-radius: 16px;
+          padding: 18px;
+          border: 1px solid #e5e7eb;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }`}
+        </style>
+
             <div className="max-w-5xl mx-auto flex gap-20">
+            {/* 🔹 왼쪽 사이드 (카드형) */}
+            <aside className="w-full lg:w-60">
+                <div className="mp-box">
+                <h3 className="text-lg font-semibold mb-4">고객지원</h3>
+                <div className="border-t border-gray-200 mb-4"></div>
+                <ul className="space-y-3">
+    
+                <li>
+                    <Link
+                    to="/customersupport/notice"
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                        ${
+                        isNotice
+                            ? "bg-blue-50 text-blue-600 font-semibold"
+                            : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                        }`}>
+                    <span>👤</span>
+                    <span>공지사항</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                    to="/customersupport/faq"
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                        ${
+                        isFaq
+                            ? "bg-blue-50 text-blue-600 font-semibold"
+                            : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                        }`}>
+                    <span>❓</span>
+                    <span>자주 하는 질문</span>
+                    </Link>
+                </li>
+                </ul>
+                </div>
+            </aside>
 
-                {/* 왼쪽 */}
-                <div className="w-56">
-                    <h3 className="text-lg font-semibold mb-6">고객지원</h3>
-                    <div className="border-t border-gray-300 mb-6"></div>
+            {/* 오른쪽 */}
+            <div className="flex-1">
 
-                    <div className="space-y-4">
-                        <Link to="/customersupport/notice"><p className="text-gray-900 font-medium mb-4">공지사항</p></Link>
-                        <Link to="/customersupport/faq"><p className="text-gray-500">자주하는 질문</p></Link>
-                    </div>
+                {/* 제목 */}
+                <h2 className="text-3xl font-semibold mb-10">
+                    {notice.title}
+                </h2>
+
+                {/* 내용 */}
+                <div className="bg-white rounded-lg shadow-sm p-8 border whitespace-pre-line text-gray-700">
+                    {notice.content}
                 </div>
 
-                {/* 오른쪽 */}
-                <div className="flex-1">
-
-                    {/* 제목 */}
-                    <h2 className="text-3xl font-semibold mb-10">
-                        {notice.title}
-                    </h2>
-
-                    {/* 내용 */}
-                    <div className="bg-white rounded-lg shadow-sm p-8 border whitespace-pre-line text-gray-700">
-                        {notice.content}
-                    </div>
-
-                    {/* 버튼 */}
-                    <div className="flex justify-center mt-12">
-                        <button
-                        onClick={() => navigate(-1)}
-                        className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                        >
-                        목록
-                        </button>
-                    </div>
+                {/* 버튼 */}
+                <div className="flex justify-center mt-12">
+                    <button
+                    onClick={() => navigate(-1)}
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                    >
+                    목록
+                    </button>
                 </div>
+            </div>
             </div>
         </div>
   );
