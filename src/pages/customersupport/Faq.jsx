@@ -75,14 +75,14 @@ const Faq = () => {
         {`.mp-box {
           background: #fff;
           border-radius: 16px;
-          padding: 18px;
+          padding: 30px;
           border: 1px solid #e5e7eb;
           box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }`}
       </style>
 
       {/* 전체 컨테이너 */}
-      <div className="max-w-5xl mx-auto flex gap-20">
+      <div className="max-w-7xl mx-auto flex gap-10">
 
         {/* 🔹 왼쪽 사이드 (카드형) */}
         <aside className="w-full lg:w-60">
@@ -123,7 +123,7 @@ const Faq = () => {
 
         {/* 오른쪽 콘텐츠 */}
         <div className="flex-1">
-      
+          <div className="mp-box">
           <h2 className="text-2xl font-semibold mb-10">자주하는 질문</h2>
 
           {/* ✅ 아코디언 테이블 스타일 */}
@@ -147,7 +147,7 @@ const Faq = () => {
                       onClick={() => toggleAccordion(faq.id)}
                     >
                       <td className="py-5 px-6 text-center text-gray-400">{faq.id}</td>
-                      <td className="py-5 px-6 font-mediu">
+                      <td className="py-5 px-6 font-medium">
                         <div className="flex items-center justify-between">
                           {faq.title}
                           <span className={`text-gray-400 transform transition-transform ${openId === faq.id ? "rotate-180" : ""}`}>
@@ -220,6 +220,7 @@ const Faq = () => {
               </button>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>
