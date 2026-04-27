@@ -1,9 +1,10 @@
 import { lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import HeroBanner from '../../components/common/HeroBanner';
-
+import { toKorRegion } from '@utils/regionMap';
+import Breadcrumb from '@components/common/Breadcrumb';
 
 const PlayList = lazy(() => import('./play/List'));
 const FoodList = lazy(() => import('./food/List'));
@@ -12,21 +13,69 @@ const SleepList = lazy(() => import('./sleep/List'));
 
 function AreaListTemplate() {
     const { pathname } = useLocation();
+    const { region, type } = useParams(); {/* URL 파라메터 */}
+    const navigate = useNavigate(); // 
+    const regionKor = toKorRegion(region); 
+
     useEffect(() => {
       window.scrollTo(0, 0);
     }, [pathname]);
 
-    const { type } = useParams();
+   
     const renderList = () => {
       switch (type) {
         case 'play':
-          return <PlayList />;
+          return (
+            <>
+              {/* 히어로 배너 */}
+              <HeroBanner 
+                bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
+                title={regionKor}
+                subtitle={`${regionKor}의 거리에서 놀아보자`}
+              />
+              <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10'>
+                {/* 브레드크럼 */}
+                <Breadcrumb 
+                  paths={[
+                    { label: '홈', to: '/' },
+                    { label: regionKor, to: `/${region}` },
+                    { label: '놀거리', to: `/${region}/play/list` }
+                  ]} 
+                  className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
+                />
+                <PlayList />
+              </div>
+            </>
+          );
         case 'food':
           return <FoodList />;
         case 'see':
           return <SeeList />;
         case 'sleep':
-          return <SleepList />;
+          return (
+            <>
+              <div className='bg-[#f8f6f0]'>
+                {/* 히어로 배너 */}
+                <HeroBanner 
+                  bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
+                  title={regionKor}
+                  subtitle={`${regionKor}의 거리에서 놀아보자`}
+                />
+                <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10 max-w-[1200px]'>
+                  {/* 브레드크럼 */}
+                  <Breadcrumb 
+                    paths={[
+                      { label: '홈', to: '/' },
+                      { label: regionKor, to: `/${region}` },
+                      { label: '잘거리', to: `/${region}/sleep/list` }
+                    ]} 
+                    className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
+                  />
+                  <SleepList />
+                </div>
+              </div>
+            </>
+          );
 
         default:
           return <div>Not Found</div>;
