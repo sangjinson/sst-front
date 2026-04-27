@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from '@components/common/Footer';
 import '@assets/css/landing.css';
+import { toEnRegion } from '@utils/regionMap';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -14,23 +15,11 @@ const LandingPage = () => {
   const currentCities = activeTab === '남부' ? citiesSouth : citiesNorth;
 
   // 🚀 핵심: 선택한 지역 이름을 state로 담아서 메인 페이지로 보냅니다!
-  // 수정전
-  // const goToMainPage = (regionName) => {
-  //   navigate('/user', { state: { selectedRegion: regionName } });
-  // };
-
-  // 수정후
+  
   const goToMainPage = (regionName) => {
-    navigate(`/${regionName}`);
+    navigate(`/${toEnRegion(regionName)}`);
   };
 
-  // 수정전
-  // const handleSearch = () => {
-  //   if (!searchKeyword.trim()) return;
-  //   goToMainPage(searchKeyword); // 검색어 기반으로 이동
-  // };
-
-  // 수정후
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;
     navigate(searchKeyword); // 검색어 기반으로 이동

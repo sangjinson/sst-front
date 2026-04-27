@@ -1,14 +1,59 @@
 import React, { useState } from 'react';
 
-const AttractionCard = ({ item }) => {
+export const ClipButton = ({ onClick }) => (
+  <button
+    onClick={onClick}
+    className="p-2.5 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/40 hover:text-emerald-300 active:scale-90 transition cursor-pointer border-none outline-none"
+    aria-label="링크 공유"
+  >
+    <svg
+      className="w-5 h-5 transition-all duration-200"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      viewBox="0 0 24 24"
+    >
+      <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 1 0-7.07-7.07L10 5" />
+      <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 1 0 7.07 7.07L14 19" />
+    </svg>
+  </button>
+);
+
+export const HeartButton = ({ liked, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`p-2.5 rounded-full bg-black/20 backdrop-blur-md hover:bg-black/40 active:scale-90 transition cursor-pointer border-none outline-none ${
+      liked ? 'text-red-500' : 'text-white hover:text-red-400'
+    }`}
+    aria-label="좋아요"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      className={`w-5 h-5 transition-all duration-200 ${
+        liked ? 'scale-110' : ''
+      }`}
+      fill={liked ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+    </svg>
+  </button>
+);
+
+const AttractionCard = ({ item, onClick }) => {
   const [liked, setLiked] = useState(false);
 
-  const handleLike = () => {
+  const handleLike = (event) => {
+    event.stopPropagation();
     setLiked(!liked);
   };
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:-translate-y-1 hover:shadow-xl transition">
+    <div
+      onClick={onClick}
+      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:-translate-y-1 hover:shadow-xl transition cursor-pointer"
+    >
 
       {/* 이미지 영역 */}
       <div className="relative">
@@ -19,29 +64,12 @@ const AttractionCard = ({ item }) => {
         />
 
         {/* ❤️ 좋아요 버튼 */}
-        <button
-          onClick={handleLike}
-          className="absolute top-3 right-3 p-2.5 rounded-full bg-black/20 backdrop-blur-md hover:bg-black/40 active:scale-90 transition cursor-pointer border-none outline-none"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className={`w-5 h-5 transition-all duration-200 ${
-              liked ? 'text-red-500 scale-110' : 'text-white'
-            }`}
-            fill={liked ? 'currentColor' : 'none'}
-            stroke="currentColor"
-            strokeWidth="1.8"
-          >
-            <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
-          </svg>
-        </button>
+        <div className="absolute top-3 right-3">
+          <HeartButton liked={liked} onClick={handleLike} />
+        </div>
 
-        {/* 🔥 지역 + 카테고리 */}
+        {/* 🔥 카테고리 */}
         <div className="absolute bottom-3 left-3 flex gap-2">
-          <span className="bg-white/95 backdrop-blur text-gray-800 text-xs px-3 py-1 rounded-full font-semibold shadow">
-            {item.region}
-          </span>
-
           <span className="bg-emerald-500 text-white text-xs px-3 py-1 rounded-full font-semibold shadow">
             {item.tag}
           </span>
