@@ -97,7 +97,7 @@ const CommunityDetail = () => {
       />
 
       {/* 헤더 섹션: 모바일 대응 mt 조정 */}
-      <div className="mb-8 mt-4 md:mt-12">
+      <div className="mb-8 mt-4 md:mt-7">
         <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-800 underline decoration-emerald-300 underline-offset-4">뽐낼거리</h2>
         <p className="text-gray-400 text-xs md:text-sm">경기도 여행의 순간을 공유하세요</p>
       </div>

@@ -63,17 +63,10 @@ const Community = () => {
         className="mb-4" 
       />
 
-      {/* 글쓰기 버튼 영역 (반응형 여백 처리) */}
-      <div className="flex justify-end gap-2 mb-6 md:mb-8 mt-4 md:mt-10">
-         <Link to="/showcase/Write">
-            <button className="px-4 py-2 bg-gray-800 text-white text-xs md:text-sm rounded-lg flex items-center gap-1 hover:bg-emerald-600 transition-all shadow-sm active:scale-95">
-              <span className="text-lg leading-none">+</span> 글쓰기
-            </button>
-         </Link>
-      </div>
-
-      {/* 필터 및 정렬 (모바일에서 스크롤 가능하도록 설정) */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-gray-100 pb-4 gap-4">
+      {/* 필터 및 글쓰기 버튼 통합 영역 */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-gray-100 pb-4 gap-4 mt-8">
+        
+        {/* 왼쪽: 카테고리 필터 (모바일 스크롤 유지) */}
         <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
           {categories.map((cat) => (
             <button
@@ -89,11 +82,24 @@ const Community = () => {
             </button>
           ))}
         </div>
-        <div className="flex gap-4 text-xs text-gray-400 font-bold self-end md:self-auto">
-          <button className="text-gray-800 underline underline-offset-4 decoration-2 decoration-emerald-500">최신순</button>
-          <button className="hover:text-gray-600">인기순</button>
+
+        {/* 오른쪽: 정렬 및 글쓰기 버튼 그룹 */}
+        <div className="flex items-center justify-between md:justify-end w-full md:w-auto gap-6">
+          {/* 최신순/인기순 */}
+          <div className="flex gap-4 text-xs text-gray-400 font-bold">
+            <button className="text-gray-800 underline underline-offset-4 decoration-2 decoration-emerald-500">최신순</button>
+            <button className="hover:text-gray-600 transition-colors">인기순</button>
+          </div>
+
+          {/* ✅ 글쓰기 버튼: 필터 라인 우측 끝에 배치 */}
+          <Link to="/showcase/Write">
+            <button className="px-4 py-2 bg-gray-800 text-white text-xs md:text-sm rounded-lg flex items-center gap-1 hover:bg-emerald-600 transition-all shadow-md active:scale-95 shrink-0">
+              <span className="text-lg leading-none">+</span> 글쓰기
+            </button>
+          </Link>
         </div>
       </div>
+      
 
       {/* 카드 그리드: 반응형 1 -> 2 -> 3 -> 4열로 최적화 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-16">
