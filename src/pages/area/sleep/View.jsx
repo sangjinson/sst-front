@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
 import { toKorRegion } from '@utils/regionMap';
 import { ClipButton, HeartButton } from '@components/card/AttractionCard';
+import Swal from 'sweetalert2';
 
 // ※ 프로젝트의 실제 AuthContext import로 교체하세요
 // import { useAuth } from '@context/AuthContext';
@@ -77,6 +78,9 @@ const View = () => {
   // 찜 상태
   const [isWished, setIsWished] = useState(false);
 
+  // 공유 상태
+  const [isShareOpen, setIsShareOpen] = useState(false);
+
   // 리뷰 더보기 상태
   const [showAllReviews, setShowAllReviews] = useState(false);
 
@@ -97,6 +101,36 @@ const View = () => {
     }
   }, [id]);
 
+  // 공유 핸들러
+  const handleShareClick = () => {
+    setIsShareOpen((prev) => !prev);
+    setCopied(false);
+  };
+
+  const handleCopyLink = async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+
+    // 기존 setCopied(true) 제거하고 Swal로 교체
+    Swal.fire({
+      icon: 'success',
+      title: '복사 완료!',
+      text: '링크가 클립보드에 복사되었습니다.',
+      timer: 1500,        // 1.5초 후 자동 닫힘
+      showConfirmButton: false,
+    });
+  };
   // 리뷰 등록 핸들러
   const handleReviewSubmit = () => {
     if (reviewRating === 0) {
@@ -162,17 +196,32 @@ const View = () => {
 
           {/* 공유 & 찜 버튼 */}
           <div className="absolute top-4 right-4 flex gap-2">
-            <ClipButton
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                alert('링크가 복사되었습니다.');
-              }}
-            />
+            <ClipButton onClick={handleShareClick} />
             <HeartButton
               liked={isWished}
               onClick={() => setIsWished((prev) => !prev)}
             />
           </div>
+
+          {/* 공유 URL 팝업 */}
+          {isShareOpen && (
+            <div className="absolute top-[70px] right-4 w-[300px] max-w-[calc(100%-32px)] rounded-2xl bg-white/95 backdrop-blur-md p-3 shadow-xl z-10">
+              <p className="text-xs font-semibold text-gray-500 mb-2">페이지 링크</p>
+              <div className="flex gap-2">
+                <input
+                  value={window.location.href}
+                  readOnly
+                  className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 outline-none"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className="shrink-0 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-[#0F9B73] transition cursor-pointer"
+                >
+                  복사
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 뒤로가기 버튼 */}
           <button
