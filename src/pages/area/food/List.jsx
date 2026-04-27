@@ -4,7 +4,6 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { getFoodDataByRegion } from "./foodData";
 import HeroBanner from "@components/common/HeroBanner";
 
-
 const ITEMS_PER_PAGE = 9;
 const categories = ["전체", "한식", "중식", "일식", "양식"];
 
@@ -23,8 +22,7 @@ export default function FoodList() {
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
-  
-  
+
   const filteredData =
     activeCategory === "전체"
       ? foodData
@@ -62,7 +60,7 @@ export default function FoodList() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Pretendard:wght@300;400;500;600;700&display=swap');
-        .food-page *:not(section, section *) { box-sizing: border-box; margin: 0; padding: 0; }
+        .food-page * { box-sizing: border-box; margin: 0; padding: 0; }
         .food-page { font-family: 'Pretendard', sans-serif; background: #f7f5f2; min-height: 100vh; }
         .food-page .content-wrap { width: 100%; max-width: 1920px; margin: 0 auto; padding: 0 20px; }
         @media (min-width: 1024px) { .food-page .content-wrap { padding: 0 50px; } }
@@ -121,21 +119,6 @@ export default function FoodList() {
 
       <div className="food-page">
 
-        {/* ✅ 기존 배너 → HeroBanner 컴포넌트로 교체 */}
-        <HeroBanner
-          bgImage={bannerImage}
-          title={selectedRegion}
-          subtitle={`${selectedRegion}의 대표 먹거리를 소개합니다`}
-          height="400px"
-        />
-        <div className="content-wrap">
-          <div className="breadcrumb-row">
-            <a onClick={() => navigate("/")}>홈</a>
-            <span>&gt;</span>
-            <a onClick={() => navigate(`/${selectedRegion}`)}>{selectedRegion || "경기도"}</a>
-            <span>&gt;</span>
-            <span className="bc-active">먹거리</span>
-          </div>
 
           <div className="filter-sort-row">
             <div className="category-tabs">
@@ -238,7 +221,6 @@ export default function FoodList() {
             </div>
           )}
         </div>
-      </div>
     </>
   );
 }

@@ -48,9 +48,32 @@ function AreaListTemplate() {
             </>
           );
         case 'food':
-          return <FoodList />;
+          return  (
+            <>
+              {/* 히어로 배너 */}
+              <HeroBanner 
+                bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
+                title={regionKor}
+                subtitle={`${regionKor}의 대표 먹거리를 소개합니다`}
+              />
+              <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10'>
+                {/* 브레드크럼 */}
+                  <Breadcrumb 
+                    paths={[
+                      { label: '홈', to: '/' },
+                      { label: regionKor, to: `/${region}` },
+                      { label: '먹거리', to: `/${region}/play/list` }
+                      ]} 
+                    className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
+                  />
+                <FoodList />
+              </div>
+            </>
+            );
+            
         case 'see':
-          return <SeeList />;
+          return<SeeList />;
+
         case 'sleep':
           return (
             <>
