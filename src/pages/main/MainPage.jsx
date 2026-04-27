@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import TopPickCard from '@components/card/TopPickCard';
@@ -6,9 +6,10 @@ import HeroBanner from '@components/common/HeroBanner';
 import CategorySection from '@components/card/CategorySection';
 import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
-
-// 🚀 JSON 파일을 import 합니다! (경로는 실제 파일 위치에 맞게 수정해주세요)
+import MainSkeleton from '@components/skeleton/MainSkeleton';
+// 🚀 JSON 파일을 import 합니다!
 import regionData from '@pages/main/regionData.json';
+
 
 // ----------------------------------------------------
 // 1. 배너 이미지 설정 영역
@@ -38,9 +39,23 @@ const MainPage = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  // 🚀 로딩 상태 관리 추가
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [pathname]);
+    
+    // 페이지나 지역이 바뀔 때마다 로딩 상태 초기화
+    setIsLoading(true);
+
+    // 🚀 눈으로 스켈레톤을 확인하기 위한 임시 0.5초 딜레이
+    // 실제 서버(API)를 붙이실 때는 이 부분을 지우고 API 응답 후 setIsLoading(false)를 하시면 됩니다.
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [pathname, region]);
   
   const currentRegion = regionKor || '수원시';
   const currentBannerImage = bannerImages[currentRegion] || defaultBanner;
@@ -75,29 +90,39 @@ const MainPage = () => {
   const randomFoods = useMemo(() => getRandomItems(foods, 3), [foods]);
 
   const handleMoreClick = (pathType) => {
-    navigate(`/${currentRegion}/${pathType}/list`);
+    navigate(`/${region}/${pathType}/list`);
   };
 
   const handleCardClick = (pathType, item) => {
-    navigate(`/${currentRegion}/${pathType}/view?id=${item.id}`, { 
-      state: { selectedRegion: currentRegion, selectedItem: item, food: item } 
+    navigate(`/${region}/${pathType}/view?id=${item.id}`, { 
+      state: { selectedRegion: region, selectedItem: item, food: item } 
     });
   };
 
+  // 🚀 데이터 로딩 중이면 스켈레톤 UI를 먼저 렌더링
+  if (isLoading) {
+    return <MainSkeleton />;
+  }
+
+  const categorySections = [
+    { title: "놓치지 말아야 할 '볼거리'", pathType: "see", dataList: randomAttractions },
+    { title: "신나는 '놀거리'", pathType: "play", dataList: randomPlays },
+    { title: "편안한 '잘거리'", pathType: "sleep", dataList: randomSleeps },
+    { title: `${currentRegion}의 맛, '먹거리'`, pathType: "food", dataList: randomFoods }, // 🚀 수원 대신 동적 지역명 적용!
+  ];
+
+  // 🚀 로딩이 끝나면 실제 화면 렌더링
   return (
-    <div className="w-full bg-white pb-[50px] md:pb-[100px]"> {/* 🚀 모바일 하단 여백 축소 */}
+    <div className="min-h-screen bg-white pb-[50px] md:pb-[100px]"> 
       
       <HeroBanner 
         bgImage={currentBannerImage} 
         title={currentRegion} 
         subtitle="전통과 현대가 공존하는 도시" 
-        // HeroBanner 컴포넌트 내부에서 반응형 타이포그래피(md:text-[80px] 등)가 작동합니다.
       />
 
-      {/* 🚀 모바일에서는 py-6, 태블릿 이상에서 py-10 */}
-      <div className="max-w-[1200px] mx-auto px-5 py-6 md:py-10">
+      <div className="max-w-[1200px] mx-auto px-4 py-6 md:py-10">
         
-        {/* 🚀 모바일에서 브레드크럼 여백 살짝 줄이기 */}
         <Breadcrumb 
           paths={[
             { label: '홈', to: '/' },
@@ -107,14 +132,13 @@ const MainPage = () => {
         />
 
         {topPicks.length > 0 && (
-          <section className="mb-[50px] md:mb-[80px]"> {/* 🚀 모바일 섹션 간격 줄이기 */}
+          <section className="mb-[50px] md:mb-[80px]"> 
             <div className="text-center mb-8 md:mb-10 border-b-2 border-gray-800 pb-3 md:pb-4">
               <h2 className="text-[20px] md:text-[26px] font-bold text-gray-900 font-griun">
                 방방곳곳 숨어있는 추천을 찾다
               </h2>
             </div>
             
-            {/* 🚀 모바일 1개, 태블릿 2개, 데스크탑 4개 배치 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
               {topPicks.map((item) => (
                 <TopPickCard 
@@ -127,34 +151,17 @@ const MainPage = () => {
           </section>
         )}
 
-        <CategorySection 
-          title="놓치지 말아야 할 '볼거리'" 
-          pathType="see" 
-          dataList={randomAttractions} 
-          onMoreClick={handleMoreClick} 
-          onCardClick={handleCardClick} 
-        />
-        <CategorySection 
-          title="신나는 '놀거리'" 
-          pathType="play" 
-          dataList={randomPlays} 
-          onMoreClick={handleMoreClick} 
-          onCardClick={handleCardClick} 
-        />
-        <CategorySection 
-          title="편안한 '잘거리'" 
-          pathType="sleep" 
-          dataList={randomSleeps} 
-          onMoreClick={handleMoreClick} 
-          onCardClick={handleCardClick} 
-        />
-        <CategorySection 
-          title="수원의 맛, '먹거리'" 
-          pathType="food" 
-          dataList={randomFoods} 
-          onMoreClick={handleMoreClick} 
-          onCardClick={handleCardClick} 
-        />
+        {/* 반복되던 4개의 카테고리 섹션을 map으로 깔끔하게 렌더링! */}
+        {categorySections.map((section) => (
+          <CategorySection 
+            key={section.pathType} 
+            title={section.title} 
+            pathType={section.pathType} 
+            dataList={section.dataList} 
+            onMoreClick={handleMoreClick} 
+            onCardClick={handleCardClick} 
+          />
+        ))}
 
       </div>
     </div>
