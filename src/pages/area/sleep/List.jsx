@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getSleepDataByRegion } from './sleepDummyData';
 import HeroBanner from '@components/common/HeroBanner';
+import Breadcrumb from '@components/common/Breadcrumb';
 
 // 별점 컴포넌트
 const StarRating = ({ rating }) => (
@@ -39,7 +40,7 @@ const List = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const categories = ['전체', '호텔', '리조트', '펜션', '게스트하우스', '모텔'];
+  const categories = ['전체', '호텔', '리조트', '펜션', '모텔', '게스트하우스'];
 
   // 지역 데이터 로드
   useEffect(() => {
@@ -93,23 +94,14 @@ const List = () => {
       <div className="max-w-[1200px] mx-auto px-4 py-6">
 
         {/* 브레드크럼 */}
-        <p className="text-sm text-gray-400 mb-4">
-          <span
-            className="cursor-pointer hover:text-[#0F9B73] transition-colors"
-            onClick={() => navigate('/')}
-          >
-            홈
-          </span>
-          {' > '}
-          <span
-            className="cursor-pointer hover:text-[#0F9B73] transition-colors"
-            onClick={() => navigate(`/${region}`)}
-          >
-            {region}
-          </span>
-          {' > '}
-          <span className="text-gray-700 font-medium">잘거리</span>
-        </p>
+        <Breadcrumb 
+          paths={[
+            { label: '홈', to: '/' },
+            { label: region, to: `/${region}` },
+            { label: '잘거리', to: `/${region}/sleep/list` }
+          ]} 
+          className="mb-5" // 🚀 여기서는 좁은 여백을 던져줍니다!
+        />
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
 

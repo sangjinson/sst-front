@@ -11,13 +11,13 @@ import React from 'react';
  */
 // 🚀 height(높이)와 추가 스타일(className)을 props로 받습니다.
 // 기본 높이를 400px로 설정해두면 메인 페이지에서는 따로 안 넘겨줘도 됩니다.
-const HeroBanner = ({ bgImage, title, subtitle, height = '400px', className = '' }) => {
+const HeroBanner = ({ bgImage, title, subtitle, className = '' }) => {
   return (
     <section 
-      className={`w-full bg-cover bg-center flex justify-center items-center relative transition-all duration-500 ${className}`}
+      className={`w-full bg-cover bg-center flex justify-center items-center relative transition-all duration-500 ${className} h-[200px] md:h-[300px]`}
       style={{ 
         backgroundImage: `url('${bgImage}')`,
-        height: height // 🚀 props로 받은 높이를 직접 적용합니다.
+        //height: height // 🚀 props로 받은 높이를 직접 적용합니다.
       }}
     >
       <div className="absolute inset-0 bg-black/30"></div>
