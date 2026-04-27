@@ -70,18 +70,18 @@ const StarPicker = ({ value, onChange }) => {
   );
 };
 
-const generateReviews = (foodName) => [
-  { user: "미식가" + foodName.slice(0, 1) + "123", rating: 5, comment: `${foodName} 진짜 맛있어요! 강력 추천합니다.` },
-  { user: "여행중인밥", rating: 4, comment: "분위기도 좋고 음식도 맛있었어요. 또 오고 싶네요." },
-  { user: "동네주민", rating: 5, comment: `${foodName} 단골입니다. 항상 맛이 일정하고 서비스도 좋아요.` },
-];
-
 const categoryColor = {
   한식: "bg-red-100 text-red-700",
   중식: "bg-yellow-100 text-yellow-700",
   일식: "bg-blue-100 text-blue-700",
   양식: "bg-purple-100 text-purple-700",
 };
+
+const generateReviews = (foodName) => [
+  { user: "미식가" + foodName.slice(0, 1) + "123", rating: 5, comment: `${foodName} 진짜 맛있어요! 강력 추천합니다.` },
+  { user: "여행중인밥", rating: 4, comment: "분위기도 좋고 음식도 맛있었어요. 또 오고 싶네요." },
+  { user: "동네주민", rating: 5, comment: `${foodName} 단골입니다. 항상 맛이 일정하고 서비스도 좋아요.` },
+];
 
 export default function FoodView() {
   const { region } = useParams();
@@ -90,7 +90,6 @@ export default function FoodView() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
 
-  // URL용 영어 region, 표시용 한글 regionKor
   const currentRegion = region || location.state?.selectedRegion || "";
   const currentRegionKor = toKorRegion(currentRegion);
 
@@ -101,9 +100,11 @@ export default function FoodView() {
   const [newComment, setNewComment] = useState("");
   const [liked, setLiked] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const allFoods = getFoodDataByRegion(currentRegionKor); // ✅ 한글로 데이터 로드
+    const allFoods = getFoodDataByRegion(currentRegionKor);
 
     let food = null;
 
@@ -144,6 +145,27 @@ export default function FoodView() {
   const handleLike = () => {
     const result = toggleLikeStorage(item);
     setLiked(result);
+  };
+
+  const handleShareClick = () => {
+    setIsShareOpen((prev) => !prev);
+    setCopied(false);
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = window.location.href;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    setCopied(true);
   };
 
   const handleCommentSubmit = () => {
@@ -205,8 +227,8 @@ export default function FoodView() {
             </div>
           </div>
 
-          {/* 찜하기 버튼 */}
-          <div className="flex items-center gap-2 mb-4">
+          {/* 찜하기 + 공유하기 버튼 */}
+          <div className="flex items-center gap-2 mb-4 relative">
             <button
               onClick={handleLike}
               className={`flex items-center gap-2 px-4 py-2 rounded-full border transition text-sm font-medium ${liked ? "bg-red-50 border-red-300 text-red-500" : "bg-white border-gray-300 text-gray-500 hover:border-red-300 hover:text-red-400"}`}
@@ -217,12 +239,9 @@ export default function FoodView() {
               {liked ? "찜 완료" : "찜하기"}
             </button>
 
-            {/* ✅ 공유하기 버튼 추가 */}
+            {/* 공유하기 버튼 */}
             <button
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                alert("링크가 복사되었습니다!");
-              }}
+              onClick={handleShareClick}
               className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-500 hover:border-[#0F9B73] hover:text-[#0F9B73] transition text-sm font-medium"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -235,6 +254,28 @@ export default function FoodView() {
               공유하기
             </button>
 
+            {/* 공유 드롭다운 */}
+            {isShareOpen && (
+              <div className="absolute top-12 left-24 w-[320px] rounded-2xl bg-white/95 backdrop-blur-md p-3 shadow-xl z-10 border border-gray-100">
+                <p className="text-xs font-semibold text-gray-500 mb-2">페이지 링크</p>
+                <div className="flex gap-2">
+                  <input
+                    value={window.location.href}
+                    readOnly
+                    className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 outline-none"
+                  />
+                  <button
+                    onClick={handleCopyLink}
+                    className="shrink-0 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-[#0F9B73] transition cursor-pointer"
+                  >
+                    복사
+                  </button>
+                </div>
+                {copied && (
+                  <p className="mt-2 text-xs font-semibold text-[#0F9B73]">링크가 복사되었습니다.</p>
+                )}
+              </div>
+            )}
 
             {liked && <span className="text-xs text-gray-400">마이페이지 내 찜목록에서 확인할 수 있어요</span>}
           </div>
@@ -372,4 +413,4 @@ export default function FoodView() {
       </div>
     </>
   );
-}
+} 
