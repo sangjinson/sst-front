@@ -1,9 +1,9 @@
 import { lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import HeroBanner from '../../components/common/HeroBanner';
-import NavText from '@modules/NavText';
+import Breadcrumb from '@components/common/Breadcrumb';
+import { toKorRegion } from '@utils/regionMap';
 
 const PlayList = lazy(() => import('./play/List'));
 const FoodList = lazy(() => import('./food/List'));
@@ -62,67 +62,68 @@ const ListSkeletonLoader = () => {
 };
 
 function AreaListTemplate() {
-  const { pathname } = useLocation();
-  const { region, type } = useParams(); {/* URL 파라메터 */}
-  const navigate = useNavigate(); 
+  
+    const { region, type } = useParams(); {/* URL 파라메터 */}
+    const regionKor = toKorRegion(region); 
 
-  {/* Navigation Text */}
-  const categoryMap = {
-    see: '볼거리',
-    food: '먹거리',
-    sleep: '숙박',
-    play: '놀거리',
-  };
-
-  const makeNavItems = ({ region, type }) => {
-    const key = type?.toLowerCase();
-    return [
-      { label: '홈', path: '/' },
-      { label: region, path: `/${region}` },
-      {
-        label: categoryMap[key] || type,
-        path: `/${region}/${type}`,
-      },
-    ];
-  };
-  {/* // Navigation Text  */}
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-
-  const renderList = () => {
-    switch (type) {
-      case 'play':
-        return (
-          <>
-            {/* 히어로 배너 */}
-            <HeroBanner 
-              bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
-              title={region}
-              subtitle={`${region}의 거리에서 놀아보자`}
-            />
-            <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10'>
-              <NavText
-                items={makeNavItems({ region, type })}
-                className="text-xs sm:text-sm md:text-base mb-6"
-                itemClassName="text-gray-500 hover:text-green-600"
-                activeClassName="text-black font-semibold"
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, [type, region]);
+   
+    const renderList = () => {
+      switch (type) {
+        case 'play':
+          return (
+            <>
+              {/* 히어로 배너 */}
+              <HeroBanner 
+                bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
+                title={regionKor}
+                subtitle={`${regionKor}의 거리에서 놀아보자`}
               />
-              <PlayList />
-            </div>
-          </>
-        );
-      case 'food':
-        return <FoodList />;
-      case 'see':
-        return <SeeList />;
-      case 'sleep':
-        return <SleepList />;
-      default:
-        return <div>Not Found</div>;
-    } // 🚀 누락되었던 switch문 닫는 괄호
-  }; // 🚀 누락되었던 renderList 함수 닫는 괄호
+              <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10'>
+                {/* 브레드크럼 */}
+                <Breadcrumb 
+                  paths={[
+                    { label: '홈', to: '/' },
+                    { label: regionKor, to: `/${region}` },
+                    { label: '놀거리', to: `/${region}/play/list` }
+                  ]} 
+                  className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
+                />
+                <PlayList />
+              </div>
+            </>
+          );
+        case 'food':
+          return <FoodList />;
+        case 'see':
+          return <SeeList />;
+        case 'sleep':
+          return (
+            <>
+              <div className='bg-[#f8f6f0]'>
+                {/* 히어로 배너 */}
+                <HeroBanner 
+                  bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
+                  title={regionKor}
+                  subtitle={`${regionKor}의 편안한 숙소를 찾아보세요`}
+                />
+                <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10 max-w-[1200px]'>
+                  {/* 브레드크럼 */}
+                  <Breadcrumb 
+                    paths={[
+                      { label: '홈', to: '/' },
+                      { label: regionKor, to: `/${region}` },
+                      { label: '잘거리', to: `/${region}/sleep/list` }
+                    ]} 
+                    className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
+                  />
+                  <SleepList />
+                </div>
+              </div>
+            </>
+          );
 
   return (
     // 기존 <div>Loading...</div> 대신 스켈레톤 UI 컴포넌트를 fallback으로 지정

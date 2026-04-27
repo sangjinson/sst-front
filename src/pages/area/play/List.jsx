@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getSleepDataByRegion } from './dummydata';
 import HeroBanner from '@components/common/HeroBanner';
 import StarRating from '@modules/StarRating';
+import { toKorRegion } from '@utils/regionMap';
 import {
   GridCard,
   GridCardHeader,
@@ -26,6 +27,7 @@ const PlayList = () => {
   const { region } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const regionKor = toKorRegion(region);
 
   const [sleepList, setSleepList] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -38,9 +40,9 @@ const PlayList = () => {
 
   // 지역 데이터 로드
   useEffect(() => {
-    const data = getSleepDataByRegion(region);
+    const data = getSleepDataByRegion(regionKor);
     setSleepList(data);
-  }, [region]);
+  }, [regionKor]);
 
   // 필터 & 정렬
   useEffect(() => {
