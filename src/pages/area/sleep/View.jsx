@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
+import Breadcrumb from '@components/common/Breadcrumb';
+import { toKorRegion } from '@utils/regionMap';
 
 // ※ 프로젝트의 실제 AuthContext import로 교체하세요
 // import { useAuth } from '@context/AuthContext';
@@ -59,6 +61,7 @@ const View = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
+  const regionKor = toKorRegion(region);
 
   // ※ 실제 프로젝트에서는 아래 주석을 해제하고 위의 임시 코드를 삭제하세요
   // const { user } = useAuth();
@@ -139,33 +142,17 @@ const View = () => {
 
   return (
     <div className="min-h-screen bg-[#f8f6f0]">
-      <div className="max-w-[900px] mx-auto px-4 py-6">
+      <div className="max-w-[900px] mx-auto px-4 py-4">
 
         {/* 브레드크럼 */}
-        <p className="text-sm text-gray-400 mb-4">
-          <span
-            className="cursor-pointer hover:text-[#0F9B73] transition-colors"
-            onClick={() => navigate('/')}
-          >
-            홈
-          </span>
-          {' > '}
-          <span
-            className="cursor-pointer hover:text-[#0F9B73] transition-colors"
-            onClick={() => navigate(`/${region}`)}
-          >
-            {region}
-          </span>
-          {' > '}
-          <span
-            className="cursor-pointer hover:text-[#0F9B73] transition-colors"
-            onClick={() => navigate(`/${region}/sleep/list`)}
-          >
-            잘거리
-          </span>
-          {' > '}
-          <span className="text-gray-700 font-medium">{item.name}</span>
-        </p>
+        <Breadcrumb 
+          paths={[
+            { label: '홈', to: '/' },
+            { label: regionKor, to: `/${regionKor}` },
+            { label: '잘거리', to: `/${regionKor}/sleep/view` }
+          ]} 
+          className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
+        />
 
         {/* 대표 이미지 */}
         <div className="relative rounded-2xl overflow-hidden mb-6 h-64 md:h-96">
@@ -225,7 +212,7 @@ const View = () => {
           </p>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 text-sm text-[#0F9B73] font-medium hover:underline"
+            className="mt-2 block mx-auto text-sm text-[#0F9B73] font-medium hover:underline center"
           >
             {isExpanded ? '접기 ▲' : '더보기 ▼'}
           </button>

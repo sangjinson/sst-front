@@ -5,6 +5,7 @@ import TopPickCard from '@components/card/TopPickCard';
 import HeroBanner from '@components/common/HeroBanner';
 import CategorySection from '@components/card/CategorySection';
 import Breadcrumb from '@components/common/Breadcrumb';
+import { toKorRegion } from '@utils/regionMap';
 
 // 🚀 JSON 파일을 import 합니다!
 import regionData from '@pages/main/regionData.json';
@@ -92,6 +93,7 @@ const getRandomItems = (arr, num) => {
 
 const MainPage = () => {
   const { region } = useParams();
+  const regionKor = toKorRegion(region);
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -113,7 +115,7 @@ const MainPage = () => {
     return () => clearTimeout(timer);
   }, [pathname, region]);
   
-  const currentRegion = region || '수원시';
+  const currentRegion = regionKor || '수원시';
   const currentBannerImage = bannerImages[currentRegion] || defaultBanner;
   
   const currentData = regionData[currentRegion] || regionData['수원시'];
