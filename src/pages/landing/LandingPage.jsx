@@ -36,11 +36,14 @@ const LandingPage = () => {
       <div className="page-wrapper min-h-screen bg-[#f8f6f0] ">
         <header className="container-fluid flex flex-col pb-[5vw]">
           <div className="container">
-            {/* 로그인 */}
+            
+            {/* 로그인 버튼 → /login으로 이동 */}
             <div className="flex justify-end p-5 md:py-[30px]">
-              <button className="bg-[#0F9B73] text-white border-none py-3 px-9 rounded font-bold cursor-pointer">
-                로그인
-              </button>
+              <Link to="/login">
+                <button className="bg-[#0F9B73] text-white border-none py-3 px-9 rounded font-bold cursor-pointer">
+                  로그인
+                </button>
+              </Link>
             </div>
 
             {/* 로고 */}
