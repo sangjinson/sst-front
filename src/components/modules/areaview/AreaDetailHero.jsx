@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipButton, HeartButton } from '@components/modules/AreaActionButtons';
-import Swal from 'sweetalert2';
 import { getBadgeColor } from '@components/modules/arealist/areaListUtils';
 
 /**
@@ -45,35 +44,6 @@ const AreaDetailHero = ({
 }) => {
   const badgeColor = getBadgeColor(categories, category);
   const navigate = useNavigate();
-  const [isShareOpen, setIsShareOpen] = useState(false);
-
-  const handleShareClick = () => {
-    setIsShareOpen((prev) => !prev);
-  };
-
-  const handleCopyLink = async () => {
-    const url = window.location.href;
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      const textarea = document.createElement('textarea');
-      textarea.value = url;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-    }
-    Swal.fire({
-      icon: 'success',
-      title: '복사 완료!',
-      text: '링크가 클립보드에 복사되었습니다.',
-      timer: 1500,
-      showConfirmButton: false,
-    });
-    setIsShareOpen(false);
-  };
 
   return (
     <div className="relative rounded-2xl overflow-hidden mb-6 h-64 md:h-96">
@@ -93,29 +63,9 @@ const AreaDetailHero = ({
 
       {/* 공유 & 찜 버튼 */}
       <div className="absolute top-4 right-4 flex gap-2">
-        <ClipButton onClick={handleShareClick} />
+        <ClipButton />
         <HeartButton liked={isWished} onClick={onWish} />
       </div>
-
-      {/* 공유 URL 팝업 */}
-      {isShareOpen && (
-        <div className="absolute top-[70px] right-4 w-[300px] max-w-[calc(100%-32px)] rounded-2xl bg-white/95 backdrop-blur-md p-3 shadow-xl z-10">
-          <p className="text-xs font-semibold text-gray-500 mb-2">페이지 링크</p>
-          <div className="flex gap-2">
-            <input
-              value={window.location.href}
-              readOnly
-              className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 outline-none"
-            />
-            <button
-              onClick={handleCopyLink}
-              className="shrink-0 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-[#0F9B73] transition cursor-pointer"
-            >
-              복사
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 뒤로가기 버튼 */}
       <button

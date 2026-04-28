@@ -10,12 +10,14 @@ import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import MyPage from '@pages/user/MyPage';
 
-
 import Notice from "@pages/customersupport/Notice";
 import Faq from "@pages/customersupport/Faq";
 import AreaBaseTemplate from '@pages/area/AreaBaseTemplate';
 import AreaListTemplate from '@pages/area/AreaListTemplate';
 import AreaViewTemplate from '@pages/area/AreaViewTemplate';
+
+import AIPlanPage from '@pages/aiplan/AIPlanPage';
+import AIPlanResultPage from '@pages/aiplan/AIPlanResultPage';
 
 import Community from '@pages/showcase/Community';
 import CommunityDetail from "@pages/showcase/CommunityDetail";
@@ -59,6 +61,12 @@ const AppRoutes = () => {
         <Route path="/customersupport" element={<UserLayout />}>
           <Route path="notice" element={<Notice />} />
           <Route path="faq" element={<Faq />} />
+        </Route>
+
+        {/* 내거리(일정) */}
+        <Route path="/plan" element={<UserLayout />}>
+          <Route index element={<AIPlanPage />} />
+          <Route path="result" element={<AIPlanResultPage />} />
         </Route>
 
         {/* 메인페이지 */}

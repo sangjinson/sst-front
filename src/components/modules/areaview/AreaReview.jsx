@@ -100,9 +100,21 @@ const AreaReview = ({
             onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
             onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'"
           >
-            <input type="radio" name="report" value="기타" style="accent-color:#f97316; width:16px; height:16px;" />
+            <input type="radio" name="report" value="기타" id="report-etc"
+              style="accent-color:#f97316; width:16px; height:16px;"
+              onclick="document.getElementById('etc-input-wrap').style.display='block'"
+            />
             기타
           </label>
+          <div id="etc-input-wrap" style="display:none; margin-top:4px;">
+            <textarea
+              id="etc-input"
+              placeholder="기타 신고 내용을 입력해주세요."
+              style="width:100%; border:1.5px solid #e5e7eb; border-radius:10px; padding:10px 12px; font-size:13px; color:#374151; resize:none; outline:none; height:80px; box-sizing:border-box;"
+              onfocus="this.style.borderColor='#f97316'"
+              onblur="this.style.borderColor='#e5e7eb'"
+            ></textarea>
+          </div>
         </div>
       `,
       showCancelButton: true,
@@ -115,6 +127,14 @@ const AreaReview = ({
         if (!selected) {
           Swal.showValidationMessage('신고 사유를 선택해주세요.');
           return false;
+        }
+        if (selected.value === '기타') {
+          const etcText = document.getElementById('etc-input')?.value?.trim();
+          if (!etcText) {
+            Swal.showValidationMessage('기타 신고 내용을 입력해주세요.');
+            return false;
+          }
+          return `기타: ${etcText}`;
         }
         return selected.value;
       },
@@ -181,8 +201,6 @@ const AreaReview = ({
       <div className="flex flex-col gap-3">
         {(showAllReviews ? reviews : reviews.slice(0, REVIEWS_PER_PAGE)).map((review) => (
           <div key={review.id} className="border border-gray-100 rounded-xl p-4">
-
-            {/* 수정 모드 */}
             {editingId === review.id ? (
               <div>
                 <div className="mb-2">
@@ -216,10 +234,8 @@ const AreaReview = ({
                   <p className="text-sm font-semibold text-gray-800">{review.user}</p>
                   <div className="flex items-center gap-1">
                     <StarRating rating={review.rating} />
-
                     {review.isMine ? (
                       <>
-                        {/* 수정 버튼 */}
                         <button
                           onClick={() => handleEditStart(review)}
                           className="p-1.5 rounded-md text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition"
@@ -230,7 +246,6 @@ const AreaReview = ({
                             <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
                           </svg>
                         </button>
-                        {/* 삭제 버튼 */}
                         <button
                           onClick={() => handleDelete(review.id)}
                           className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
@@ -245,7 +260,6 @@ const AreaReview = ({
                         </button>
                       </>
                     ) : (
-                      /* 신고 버튼 */
                       <button
                         onClick={handleReport}
                         className="p-1.5 rounded-md text-orange-400 hover:text-orange-600 hover:bg-orange-50 transition"
