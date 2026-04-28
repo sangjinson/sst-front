@@ -1,5 +1,5 @@
 import React from 'react';
-import { GridCard, GridCardHeader, GridCardBody, GridCardFooter } from '@components/modules/GridCard';
+import { GridCard, GridCardHeader, GridCardBody, GridCardFooter } from '@components/modules/gridcard';
 import StarRating from '@components/modules/StarRating';
 import { BADGE_COLORS } from '@components/modules/arealist/areaListUtils';
 import { HeartButton } from '@components/modules/AreaActionButtons';
