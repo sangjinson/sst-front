@@ -7,7 +7,7 @@ import React from 'react';
  * 사용 예시:
  *
  * // 1. import
- * import { ClipButton, HeartButton } from '@components/modules/areaview/AreaActionButtons';
+ * import { ClipButton, HeartButton } from '@components/modules/AreaActionButtons';
  *
  * // 2. JSX에서 사용
  * <ClipButton onClick={handleShareClick} />

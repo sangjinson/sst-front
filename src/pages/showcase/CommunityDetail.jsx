@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
+import { ClipButton, HeartButton } from '@components/modules/AreaActionButtons';
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -56,16 +57,23 @@ const CommunityDetail = () => {
 
   // --- 기능 함수들 ---
 
-  const handleShare = async () => {
+  // ✅ 1. 정의되지 않아 에러를 유발했던 함수 구현
+  const handleShareClick = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: postDetail.title, url: window.location.href });
+        await navigator.share({ 
+          title: postDetail.title, 
+          url: window.location.href 
+        });
       } else {
         await navigator.clipboard.writeText(window.location.href);
         alert("링크가 복사되었습니다!");
       }
-    } catch (err) { console.log(err); }
+    } catch (err) {
+      console.error("공유 실패:", err);
+    }
   };
+  
 
   const handleReport = () => {
     if (window.confirm("이 게시물을 신고하시겠습니까?")) alert("신고 접수 완료");
@@ -96,13 +104,13 @@ const CommunityDetail = () => {
         className="mb-4"
       />
 
-      {/* 헤더 섹션: 모바일 대응 mt 조정 */}
+      {/* 헤더 섹션 */}
       <div className="mb-8 mt-4 md:mt-7">
         <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-800 underline decoration-emerald-300 underline-offset-4">뽐낼거리</h2>
         <p className="text-gray-400 text-xs md:text-sm">경기도 여행의 순간을 공유하세요</p>
       </div>
 
-      {/* 메인 컨텐츠: flex-col(모바일) -> flex-row(PC) */}
+      {/* 메인 컨텐츠 */}
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 mb-16">
         
         {/* 왼쪽: 이미지 영역 */}
@@ -119,16 +127,19 @@ const CommunityDetail = () => {
         {/* 오른쪽: 상세 정보 영역 */}
         <div className="w-full lg:w-[400px] flex flex-col justify-between py-2">
           <div>
-            {/* 공유/신고 버튼 */}
-            <div className="flex gap-2 mb-8 mt-4 lg:mt-0">
-              <button onClick={handleShare} className="text-xs md:text-sm px-4 py-2 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors">🔗 공유</button>
-              <button onClick={handleReport} className="text-xs md:text-sm px-4 py-2 border border-gray-200 rounded-full hover:text-red-500 transition-colors">🚩 신고</button>
+            {/* ✅ 공유/신고 버튼: ClipButton 활용 */}
+            <div className="flex items-center gap-2 mb-8 mt-4 lg:mt-0">
+              <ClipButton onClick={handleShareClick} />
+              <button 
+                onClick={handleReport}
+                className="text-xs md:text-sm px-4 py-1.5 border border-gray-200 rounded-full hover:text-red-500 transition-colors bg-white/80">🚩 신고
+              </button>
             </div>
 
-            {/* ✅ 반응형 핵심 컨테이너: 모바일은 가로(row) 배치로 양 끝 정렬, PC(lg)는 세로(col) 배치 */}
+            {/* 작성자 정보 및 찜 버튼 컨테이너 */}
             <div className="flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-3 mb-8">
               
-              {/* 작성자 정보 (프로필 이미지 + 이름/날짜) */}
+              {/* 작성자 정보 */}
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-xl shrink-0 border border-emerald-100 shadow-sm">😊</div>
                 <div>
@@ -137,17 +148,13 @@ const CommunityDetail = () => {
                 </div>
               </div>
 
-              {/* ✅ 찜 버튼: 모바일에서는 오른쪽 맨 끝, PC(lg)에서는 작성자 정보 아래로 내려감 */}
-              <button 
-                onClick={() => setIsLiked(!isLiked)}
-                className={`w-11 h-11 md:w-12 md:h-12 border rounded-full flex items-center justify-center transition-all active:scale-90 shrink-0 lg:mt-10 ${
-                  isLiked ? "border-red-500 text-red-500 bg-red-50" : "border-gray-200 text-gray-300 hover:text-red-500 hover:border-red-500"
-                }`}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill={isLiked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </button>
+              {/* ✅ 찜 버튼: 공통 HeartButton으로 교체 및 크기 조정 */}
+              <div className="lg:mt-10 scale-125 md:scale-150 origin-right lg:origin-left">
+                <HeartButton 
+                  liked={isLiked} 
+                  onClick={() => setIsLiked(!isLiked)} 
+                />
+              </div>
             </div>
           </div>
 
@@ -193,7 +200,6 @@ const CommunityDetail = () => {
                   </div>
                 </div>
                 
-                {/* 댓글 액션 버튼: 모바일에서도 상시 노출 */}
                 <div className="flex gap-3 text-xs md:text-sm font-semibold pt-1">
                   {editingId === comment.id ? (
                     <>
