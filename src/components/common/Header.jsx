@@ -30,6 +30,7 @@ const Header = () => {
     { name: '놀거리', path: `/${currentRegion}/play/list` },
     { name: '뽐낼거리', path: `/showcase` },
     { name: '내거리', path: '/user/mypage' },
+    { name: '내거리(일정)', path: '/plan' },
   ];
 
   const toggleMenu = () => {
@@ -76,38 +77,38 @@ const Header = () => {
   return (
     <header ref={headerRef} className="w-full bg-white border-b border-gray-200 sticky top-0 z-[1000] relative">
       
-      <div className="container mx-auto flex justify-between items-center py-2">
+      <div className="container mx-auto flex justify-between items-end pt-7 pb-4">
         
         {/* 로고 */}
-        <div className="header-logo text-black no-underline fs-up-6 my-5">
+        <div className="header-logo text-black no-underline fs-up-6">
           <Link to="/" onClick={closeMenu}>거리에섯</Link>
         </div>
         
         {/* 데스크톱 네비게이션 */}
-        <nav className="hidden md:flex gap-[30px]">
+        <nav className="hidden md:flex gap-4 lg:gap-[30px] mb-2">
           {navItems.map((item) => (
-            <Link key={item.name} to={item.path} className="text-black text-lg font-medium hover:text-primary transition-colors">
+            <Link key={item.name} to={item.path} className="text-black fs-up-3 font-medium hover:text-primary transition-colors">
               {item.name}
             </Link>
           ))}
         </nav>
 
         {/* 우측 버튼 영역 */}
-        <div className="flex items-center gap-4 md:gap-5">
-          <button onClick={toggleSearch} className="text-xl cursor-pointer bg-transparent border-none">
+        <div className="flex items-center gap-4 md:gap-5 mb-2">
+          <button onClick={toggleSearch} className="fs-up-3 cursor-pointer bg-transparent border-none">
             🔍
           </button>
           
           {/* 로그인 버튼 → /login으로 이동 */}
           <Link to="/login">
-            <button className="bg-primary text-white py-2 px-4 md:px-6 rounded text-sm font-bold border-none cursor-pointer whitespace-nowrap">
+            <button className="bg-primary text-white py-2 px-4 md:px-6 rounded fs-up-1 font-bold border-none cursor-pointer whitespace-nowrap">
               로그인
             </button>
           </Link>
           
           {/* 모바일 햄버거 버튼 */}
-          <button 
-            className="block md:hidden text-[26px] text-gray-800 bg-transparent border-none cursor-pointer w-8 h-8 flex items-center justify-center" 
+          <button
+            className="block md:hidden w-9 h-9 flex items-center justify-center fs-up-3 text-gray-800 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition"
             onClick={toggleMenu}
           >
             {isMenuOpen ? '✖' : '☰'}

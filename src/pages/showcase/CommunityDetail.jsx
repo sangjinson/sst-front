@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
+import { ClipButton } from '@components/modules/AreaActionButtons';
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -56,16 +57,16 @@ const CommunityDetail = () => {
 
   // --- 기능 함수들 ---
 
-  const handleShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: postDetail.title, url: window.location.href });
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        alert("링크가 복사되었습니다!");
-      }
-    } catch (err) { console.log(err); }
-  };
+  // const handleShare = async () => {
+  //   try {
+  //     if (navigator.share) {
+  //       await navigator.share({ title: postDetail.title, url: window.location.href });
+  //     } else {
+  //       await navigator.clipboard.writeText(window.location.href);
+  //       alert("링크가 복사되었습니다!");
+  //     }
+  //   } catch (err) { console.log(err); }
+  // };
 
   const handleReport = () => {
     if (window.confirm("이 게시물을 신고하시겠습니까?")) alert("신고 접수 완료");
@@ -121,7 +122,7 @@ const CommunityDetail = () => {
           <div>
             {/* 공유/신고 버튼 */}
             <div className="flex gap-2 mb-8 mt-4 lg:mt-0">
-              <button onClick={handleShare} className="text-xs md:text-sm px-4 py-2 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors">🔗 공유</button>
+              <ClipButton />
               <button onClick={handleReport} className="text-xs md:text-sm px-4 py-2 border border-gray-200 rounded-full hover:text-red-500 transition-colors">🚩 신고</button>
             </div>
 
