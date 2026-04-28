@@ -31,7 +31,7 @@ export const ClipButton = ({ onClick }) => (
   >
     <svg
       viewBox="0 0 24 24"
-      className="w-5 h-5 transition-all duration-200 stroke-gray-500" 
+      className="w-5 h-5 transition-all duration-200 fill-none stroke-gray-500"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"
