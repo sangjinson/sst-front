@@ -76,24 +76,24 @@ const Header = () => {
   return (
     <header ref={headerRef} className="w-full bg-white border-b border-gray-200 sticky top-0 z-[1000] relative">
       
-      <div className="container mx-auto flex justify-between items-center py-2">
+      <div className="container mx-auto flex justify-between items-end pt-7 pb-4">
         
         {/* 로고 */}
-        <div className="header-logo text-black no-underline fs-up-6 my-5">
+        <div className="header-logo text-black no-underline fs-up-6">
           <Link to="/" onClick={closeMenu}>거리에섯</Link>
         </div>
         
         {/* 데스크톱 네비게이션 */}
-        <nav className="hidden md:flex gap-[30px]">
+        <nav className="hidden md:flex gap-[30px] mb-2">
           {navItems.map((item) => (
-            <Link key={item.name} to={item.path} className="text-black text-lg font-medium hover:text-primary transition-colors">
+            <Link key={item.name} to={item.path} className="text-black fs-up-3 font-medium hover:text-primary transition-colors">
               {item.name}
             </Link>
           ))}
         </nav>
 
         {/* 우측 버튼 영역 */}
-        <div className="flex items-center gap-4 md:gap-5">
+        <div className="flex items-center gap-4 md:gap-5 mb-2">
           <button onClick={toggleSearch} className="text-xl cursor-pointer bg-transparent border-none">
             🔍
           </button>
