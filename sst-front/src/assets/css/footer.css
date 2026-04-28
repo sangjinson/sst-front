@@ -1,0 +1,74 @@
+/* src/assets/css/footer.css */
+
+.footer-wrapper {
+  background-color: #2B4A48;
+  color: #e0e0e0;
+  padding: 40px 250px 20px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.footer-container {
+  max-width: 1920px;
+  margin: 0 auto; /* 중앙 정렬 */
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px; /* bottomBar와의 간격 */
+}
+
+.footer-left {
+  flex: 1;
+}
+
+.footer-logo {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-family: 'GriunFont', sans-serif; /* 폰트 적용 */
+  font-weight: 900;
+  font-style: normal;
+}
+
+.footer-description {
+  margin-bottom: 30px;
+  color: white;
+}
+
+.footer-info {
+  margin-bottom: 20px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+  cursor: pointer;
+}
+
+.footer-links span:hover {
+  color: white; /* 마우스 오버 시 살짝 밝아지게 추가 */
+}
+
+.footer-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer-team-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  line-height: 1.8;
+}
+
+.footer-bottom-bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 20px;
+  font-size: 11px;
+  color: #a0a0a0;
+  max-width: 1920px;
+  margin: 0 auto; /* 중앙 정렬 */
+  display: flex;
+  justify-content: center; /* 텍스트가 가운데 오도록 조정 (필요에 따라 flex-start로 변경 가능) */
+}

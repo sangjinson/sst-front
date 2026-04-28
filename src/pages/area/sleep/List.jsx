@@ -69,7 +69,7 @@ const List = () => {
 
         {/* 카드 그리드 */}
         {paginated.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginated.map((item) => (
               <AreaListCard
                 key={item.id}
