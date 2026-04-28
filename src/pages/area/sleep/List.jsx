@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getSleepDataByRegion } from './sleepDummyData';
 import { toKorRegion } from '@utils/regionMap';
 import { AreaListCard, AreaFilterBar, AreaPagination, sortData } from '@components/modules/arealist';
+// [원복 방법] 아래 줄 삭제, WishlistHeartButton 제거, likedItems/handleLike 복구
+import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
 
 // 페이지당 카드 수
 const ITEMS_PER_PAGE = 6;
@@ -18,13 +20,12 @@ const List = () => {
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [sortOption, setSortOption]             = useState('reviews');
   const [currentPage, setCurrentPage]           = useState(1);
-  const [likedItems, setLikedItems]             = useState({});
-
-  // 찜 토글
-  const handleLike = (e, id) => {
-    e.stopPropagation();
-    setLikedItems((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  // [원복 방법] 아래 두 블록(likedItems, handleLike) 주석 해제 + WishlistHeartButton import/renderHeart 제거
+  // const [likedItems, setLikedItems] = useState({});
+  // const handleLike = (e, id) => {
+  //   e.stopPropagation();
+  //   setLikedItems((prev) => ({ ...prev, [id]: !prev[id] }));
+  // };
 
   // 필터 & 정렬 (useMemo)
   const filtered = useMemo(() => {
@@ -77,9 +78,11 @@ const List = () => {
                   ...item,
                   categoryIndex: CATEGORIES.filter(c => c !== '전체').indexOf(item.category),
                 }}
-                liked={!!likedItems[item.id]}
-                onLike={(e) => handleLike(e, item.id)}
                 onClick={() => goToDetail(item.id)}
+                // [원복 방법] renderHeart 제거 후 liked={!!likedItems[item.id]} onLike={(e) => handleLike(e, item.id)} 복구
+                renderHeart={() => (
+                  <WishlistHeartButton item={item} itemType="sleep" region={region} />
+                )}
               />
             ))}
           </div>
