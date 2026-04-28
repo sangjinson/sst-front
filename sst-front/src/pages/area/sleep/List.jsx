@@ -1,9 +1,7 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getSleepDataByRegion } from './sleepDummyData';
-import { toKorRegion } from '@utils/regionMap';
-import { GridCard, GridCardHeader, GridCardBody, GridCardFooter } from '@components/modules/GridCard';
-import { HeartButton } from '@components/card/AttractionCard';
+import HeroBanner from '@components/common/HeroBanner';
 
 // 별점 컴포넌트
 const StarRating = ({ rating }) => (
@@ -32,26 +30,25 @@ const categoryColor = {
 const List = () => {
   const { region } = useParams();
   const navigate = useNavigate();
-  const regionKor = toKorRegion(region);
+  const location = useLocation();
 
+  const [sleepList, setSleepList] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [sortOption, setSortOption] = useState('latest');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // 찜 상태 관리 (id 기반으로 관리)
-  const [likedItems, setLikedItems] = useState({});
+  const categories = ['전체', '호텔', '리조트', '펜션', '게스트하우스', '모텔'];
 
-  const handleLike = (e, id) => {
-    e.stopPropagation(); // 카드 클릭 이벤트 방지
-    setLikedItems((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  // 지역 데이터 로드
+  useEffect(() => {
+    const data = getSleepDataByRegion(region);
+    setSleepList(data);
+  }, [region]);
 
-  const categories = ['전체', '호텔', '리조트', '펜션', '모텔', '게스트하우스'];
-
-  // 필터 & 정렬 - useMemo로 처리 (데이터 로드 포함)
-  const filtered = useMemo(() => {
-    const sleepList = getSleepDataByRegion(regionKor);
+  // 필터 & 정렬
+  useEffect(() => {
     let result = [...sleepList];
 
     if (selectedCategory !== '전체') {
@@ -66,8 +63,9 @@ const List = () => {
       result.sort((a, b) => b.rating - a.rating);
     }
 
-    return result;
-  }, [selectedCategory, sortOption, regionKor]);
+    setFiltered(result);
+    setCurrentPage(1);
+  }, [selectedCategory, sortOption, sleepList]);
 
   // 페이지네이션
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -82,26 +80,49 @@ const List = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#f8f6f0]">
+
+      {/* 히어로 배너 */}
+      <HeroBanner 
+        bgImage="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80"
+        title={region}
+        subtitle={`${region}의 편안한 숙소를 찾아보세요`}
+      />
 
       {/* 필터 & 정렬 영역 */}
-      <div className="py-5">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <div className="max-w-[1200px] mx-auto px-4 py-6">
+
+        {/* 브레드크럼 */}
+        <p className="text-sm text-gray-400 mb-4">
+          <span
+            className="cursor-pointer hover:text-[#0F9B73] transition-colors"
+            onClick={() => navigate('/')}
+          >
+            홈
+          </span>
+          {' > '}
+          <span
+            className="cursor-pointer hover:text-[#0F9B73] transition-colors"
+            onClick={() => navigate(`/${region}`)}
+          >
+            {region}
+          </span>
+          {' > '}
+          <span className="text-gray-700 font-medium">잘거리</span>
+        </p>
+
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
 
           {/* 카테고리 필터 탭 */}
           <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => {
-                  setSelectedCategory(cat);
-                  setCurrentPage(1); // 카테고리 변경 시 페이지 초기화
-                }}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
-                  selectedCategory === cat
-                    ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
-                    : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
-                }`}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${selectedCategory === cat
+                  ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
+                  }`}
               >
                 {cat}
               </button>
@@ -113,15 +134,11 @@ const List = () => {
             {[{ value: 'latest', label: '최신순' }, { value: 'popular', label: '인기순' }].map((opt) => (
               <button
                 key={opt.value}
-                onClick={() => {
-                  setSortOption(opt.value);
-                  setCurrentPage(1); // 정렬 변경 시 페이지 초기화
-                }}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
-                  sortOption === opt.value
-                    ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
-                    : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
-                }`}
+                onClick={() => setSortOption(opt.value)}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${sortOption === opt.value
+                  ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
+                  }`}
               >
                 {opt.label}
               </button>
@@ -130,7 +147,7 @@ const List = () => {
         </div>
 
         {/* 결과 수 */}
-        <p className="text-sm text-gray-500 mb-3">
+        <p className="text-sm text-gray-500 mb-5">
           총 <span className="font-semibold text-gray-800">{filtered.length}</span>개의 숙소
         </p>
 
@@ -138,55 +155,48 @@ const List = () => {
         {paginated.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginated.map((item) => (
-              <GridCard key={item.id} onClick={() => goToDetail(item.id)}>
+              <div
+                key={item.id}
+                onClick={() => goToDetail(item.id)}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group"
+              >
                 {/* 썸네일 */}
-                <GridCardHeader className="p-0">
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    {/* 카테고리 배지 */}
-                    <span
-                      className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${
-                        categoryColor[item.category] || 'bg-gray-100 text-gray-600'
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  {/* 카테고리 배지 */}
+                  <span
+                    className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold ${categoryColor[item.category] || 'bg-gray-100 text-gray-600'
                       }`}
-                    >
-                      {item.category}
-                    </span>
-                    {/* 찜 버튼 */}
-                    <div className="absolute top-3 right-3 scale-75 origin-top-right">
-                      <HeartButton
-                        liked={!!likedItems[item.id]}
-                        onClick={(e) => handleLike(e, item.id)}
-                      />
-                    </div>
-                  </div>
-                </GridCardHeader>
+                  >
+                    {item.category}
+                  </span>
+                </div>
 
                 {/* 카드 정보 */}
-                <GridCardBody className="px-4 py-3">
+                <div className="p-4">
                   <h3 className="font-bold text-gray-900 text-base mb-1 truncate group-hover:text-[#0F9B73] transition-colors">
                     {item.name}
                   </h3>
                   <StarRating rating={item.rating} />
-                  <p className="text-xs text-gray-400 mt-0.5 mb-2">
-                    리뷰 {item.reviewCount}개
-                  </p>
-                  <p className="text-sm text-gray-500 line-clamp-2">
+                  <p className="text-xs text-gray-400 mt-0.5 mb-2">리뷰 {item.reviewCount}개</p>
+                  <p className="text-sm text-gray-500 line-clamp-2 mb-3">
                     {item.description}
                   </p>
-                </GridCardBody>
-
-                {/* 푸터 */}
-                <GridCardFooter className="flex items-center justify-between">
-                  <p className="text-xs text-gray-400 flex items-center gap-1">
-                    <span>📍</span>
-                    <span className="truncate max-w-[150px]">{item.address}</span>
-                  </p>
-                </GridCardFooter>
-              </GridCard>
+                  <div className="flex items-center justify-between border-t pt-3">
+                    <p className="text-xs text-gray-400 flex items-center gap-1">
+                      <span>📍</span>
+                      <span className="truncate max-w-[150px]">{item.address}</span>
+                    </p>
+                    <p className="text-sm font-bold text-[#0F9B73] whitespace-nowrap ml-2">
+                      {item.price}
+                    </p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         ) : (
@@ -211,11 +221,10 @@ const List = () => {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-9 h-9 rounded-lg text-sm font-medium transition ${
-                  currentPage === page
-                    ? 'bg-[#0F9B73] text-white'
-                    : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`w-9 h-9 rounded-lg text-sm font-medium transition ${currentPage === page
+                  ? 'bg-[#0F9B73] text-white'
+                  : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 {page}
               </button>

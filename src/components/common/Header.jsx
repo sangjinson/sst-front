@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // 🚀 useEffect, useRef 추가
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import '@assets/css/header.css';
 
@@ -10,11 +10,19 @@ const Header = () => {
   const { region } = useParams();
   const navigate = useNavigate();
 
-  const currentRegion = region || '수원시';
+  // 🚀 1. URL에 지역 정보(region)가 있을 때마다 브라우저에 저장해둡니다.
+  useEffect(() => {
+    if (region) {
+      localStorage.setItem('lastVisitedRegion', region);
+    }
+  }, [region]);
 
-  // 🚀 1. 헤더 전체 영역을 감지하기 위한 ref 생성
+  // 🚀 2. 현재 지역을 결정합니다. (URL 파라미터 우선 -> 없으면 저장된 값 -> 없으면 기본값)
+  const currentRegion = region || localStorage.getItem('lastVisitedRegion') || '수원시';
+
   const headerRef = useRef(null);
 
+  // 🚀 3. 이제 currentRegion이 항상 유지되므로 링크가 깨지지 않습니다.
   const navItems = [
     { name: '볼거리', path: `/${currentRegion}/see/list` },
     { name: '먹거리', path: `/${currentRegion}/food/list` },
@@ -26,14 +34,14 @@ const Header = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-    setIsSearchOpen(false); // 메뉴 열 때 검색창 닫기
+    setIsSearchOpen(false); 
   };
   
   const closeMenu = () => setIsMenuOpen(false);
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
-    setIsMenuOpen(false); // 검색창 열 때 메뉴 닫기
+    setIsMenuOpen(false); 
   };
 
   const handleSearch = () => {
@@ -50,27 +58,22 @@ const Header = () => {
     setSearchKeyword(tag.replace('#', '').trim());
   };
 
-  // 🚀 2. 바깥 클릭 감지 로직 (useEffect)
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // 클릭한 요소(event.target)가 headerRef(헤더) 안에 없으면 닫기!
       if (headerRef.current && !headerRef.current.contains(event.target)) {
         setIsSearchOpen(false);
         setIsMenuOpen(false);
       }
     };
 
-    // 마우스 클릭 이벤트 리스너 등록
     document.addEventListener('mousedown', handleClickOutside);
     
-    // 컴포넌트가 언마운트될 때 리스너 정리 (메모리 누수 방지)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
   return (
-    /* 🚀 3. header 태그에 ref를 달아주고, 모바일을 위해 relative를 추가합니다. */
     <header ref={headerRef} className="w-full bg-white border-b border-gray-200 sticky top-0 z-[1000] relative">
       
       <div className="max-w-[1920px] mx-auto flex justify-between items-center py-5 px-5 lg:px-[50px] xl:px-[250px]">
@@ -95,9 +98,12 @@ const Header = () => {
             🔍
           </button>
           
-          <button className="bg-primary text-white py-2 px-4 md:px-6 rounded text-sm font-bold border-none cursor-pointer whitespace-nowrap">
-            로그인
-          </button>
+          {/* 로그인 버튼 → /login으로 이동 */}
+          <Link to="/login">
+            <button className="bg-primary text-white py-2 px-4 md:px-6 rounded text-sm font-bold border-none cursor-pointer whitespace-nowrap">
+              로그인
+            </button>
+          </Link>
           
           {/* 모바일 햄버거 버튼 */}
           <button 
@@ -142,7 +148,6 @@ const Header = () => {
       )}
 
       {/* --- 모바일 전용 드롭다운 메뉴 --- */}
-      {/* 🚀 모바일 메뉴도 화면을 밀어내지 않고 absolute로 덮이게 처리했습니다. */}
       {isMenuOpen && (
         <nav className="absolute top-full left-0 w-full bg-white shadow-lg border-t border-gray-100 flex flex-col md:hidden z-[998]">
           {navItems.map((item) => (
