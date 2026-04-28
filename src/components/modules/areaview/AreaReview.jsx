@@ -1,38 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StarRating from '@components/modules/StarRating';
+import Swal from 'sweetalert2';
 
-/**
- * AreaReview - 뷰 페이지 공통 평점 & 리뷰 섹션
- *
- * ────────────────────────────────────────────────
- * 사용 예시:
- *
- * // 1. import
- * import AreaReview from '@components/modules/areaview/AreaReview';
- *
- * // 2. JSX에서 사용
- * <AreaReview
- *   rating={item.rating}
- *   reviewCount={item.reviewCount}
- *   reviews={item.reviews}
- *   isLoggedIn={isLoggedIn}
- *   placeholder="숙소에 대한 솔직한 리뷰를 남겨주세요."
- * />
- * ────────────────────────────────────────────────
- *
- * props:
- * - rating       : 평점 (숫자)
- * - reviewCount  : 리뷰 수 (숫자)
- * - reviews      : 초기 리뷰 배열 [{ user, rating, comment }]
- * - isLoggedIn   : 로그인 여부 (boolean)
- * - placeholder  : 리뷰 입력창 placeholder (기본: '리뷰를 남겨주세요.')
- */
-
-// 한 번에 보여줄 리뷰 수
 const REVIEWS_PER_PAGE = 3;
 
-// 별점 선택 컴포넌트 (등록용)
 const StarSelector = ({ value, onChange }) => (
   <div className="flex items-center gap-1">
     {[1, 2, 3, 4, 5].map((star) => (
@@ -65,23 +37,16 @@ const AreaReview = ({
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
 
-  // 수정 상태
   const [editingId, setEditingId] = useState(null);
   const [editRating, setEditRating] = useState(0);
   const [editComment, setEditComment] = useState('');
 
   const handleReviewSubmit = () => {
-    if (reviewRating === 0) {
-      alert('별점을 선택해주세요.');
-      return;
-    }
-    if (!reviewComment.trim()) {
-      alert('리뷰 내용을 입력해주세요.');
-      return;
-    }
+    if (reviewRating === 0) { alert('별점을 선택해주세요.'); return; }
+    if (!reviewComment.trim()) { alert('리뷰 내용을 입력해주세요.'); return; }
     const newReview = {
       id: Date.now(),
-      user: '나', // ※ 실제에서는 user.name 등으로 교체
+      user: '나',
       rating: reviewRating,
       comment: reviewComment.trim(),
       isMine: true,
@@ -91,14 +56,12 @@ const AreaReview = ({
     setReviewComment('');
   };
 
-  // 수정 시작
   const handleEditStart = (review) => {
     setEditingId(review.id);
     setEditRating(review.rating);
     setEditComment(review.comment);
   };
 
-  // 수정 저장
   const handleEditSave = (id) => {
     if (editRating === 0) { alert('별점을 선택해주세요.'); return; }
     if (!editComment.trim()) { alert('리뷰 내용을 입력해주세요.'); return; }
@@ -108,17 +71,70 @@ const AreaReview = ({
     setEditingId(null);
   };
 
-  // 삭제
   const handleDelete = (id) => {
     if (window.confirm('리뷰를 삭제하시겠습니까?')) {
       setReviews((prev) => prev.filter((r) => r.id !== id));
     }
   };
 
+  const handleReport = async () => {
+    const result = await Swal.fire({
+      title: '신고 사유를 선택해주세요',
+      html: `
+        <div style="display:flex; flex-direction:column; gap:10px; text-align:left; margin-top:8px;">
+          <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827; transition:all 0.2s;"
+            onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
+            onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'"
+          >
+            <input type="radio" name="report" value="부적절한 댓글로 인한 신고" style="accent-color:#f97316; width:16px; height:16px;" />
+            부적절한 댓글로 인한 신고
+          </label>
+          <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827; transition:all 0.2s;"
+            onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
+            onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'"
+          >
+            <input type="radio" name="report" value="불법 광고 및 홍보 인한 신고" style="accent-color:#f97316; width:16px; height:16px;" />
+            불법 광고 및 홍보 인한 신고
+          </label>
+          <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827; transition:all 0.2s;"
+            onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
+            onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'"
+          >
+            <input type="radio" name="report" value="기타" style="accent-color:#f97316; width:16px; height:16px;" />
+            기타
+          </label>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: '신고하기',
+      cancelButtonText: '취소',
+      confirmButtonColor: '#f97316',
+      cancelButtonColor: '#9ca3af',
+      preConfirm: () => {
+        const selected = document.querySelector('input[name="report"]:checked');
+        if (!selected) {
+          Swal.showValidationMessage('신고 사유를 선택해주세요.');
+          return false;
+        }
+        return selected.value;
+      },
+    });
+
+    if (result.isConfirmed) {
+      await Swal.fire({
+        icon: 'success',
+        title: '신고 완료',
+        text: '신고가 정상적으로 완료되었습니다.',
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
 
-      {/* 헤더: 평점 & 리뷰수 */}
+      {/* 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-900">평점 & 리뷰</h2>
         <div className="flex items-center gap-2">
@@ -127,7 +143,7 @@ const AreaReview = ({
         </div>
       </div>
 
-      {/* 리뷰 등록 폼 - 로그인 상태에서만 표시 */}
+      {/* 리뷰 등록 폼 */}
       {isLoggedIn ? (
         <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
           <p className="text-sm font-semibold text-gray-700 mb-3">리뷰 작성</p>
@@ -196,7 +212,6 @@ const AreaReview = ({
               </div>
             ) : (
               <>
-                {/* 일반 모드 */}
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-sm font-semibold text-gray-800">{review.user}</p>
                   <div className="flex items-center gap-1">
@@ -232,19 +247,19 @@ const AreaReview = ({
                     ) : (
                       /* 신고 버튼 */
                       <button
-                        onClick={() => alert('신고가 접수되었습니다.')}
+                        onClick={handleReport}
                         className="p-1.5 rounded-md text-orange-400 hover:text-orange-600 hover:bg-orange-50 transition"
                         title="신고하기"
                       >
                         <svg viewBox="0 0 64 64" className="w-4 h-4">
-                          <rect x="30" y="2"  width="4" height="7" rx="2" fill="currentColor"/>
-                          <rect x="30" y="2"  width="4" height="7" rx="2" fill="currentColor" transform="rotate(45 32 32)"/>
-                          <rect x="30" y="2"  width="4" height="7" rx="2" fill="currentColor" transform="rotate(90 32 32)"/>
-                          <rect x="30" y="2"  width="4" height="7" rx="2" fill="currentColor" transform="rotate(135 32 32)"/>
-                          <rect x="30" y="2"  width="4" height="7" rx="2" fill="currentColor" transform="rotate(-45 32 32)"/>
+                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor"/>
+                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(45 32 32)"/>
+                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(90 32 32)"/>
+                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(135 32 32)"/>
+                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(-45 32 32)"/>
                           <path d="M12 34 A20 20 0 0 1 52 34 Z" fill="currentColor"/>
                           <rect x="10" y="34" width="44" height="11" rx="5" fill="currentColor"/>
-                          <rect x="8"  y="45" width="48" height="10" rx="5" fill="#2d2d4e"/>
+                          <rect x="8" y="45" width="48" height="10" rx="5" fill="#2d2d4e"/>
                         </svg>
                       </button>
                     )}
@@ -257,7 +272,7 @@ const AreaReview = ({
         ))}
       </div>
 
-      {/* 더보기 / 접기 버튼 */}
+      {/* 더보기 / 접기 */}
       <button
         onClick={() => setShowAllReviews((prev) => !prev)}
         className="w-full mt-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition"
