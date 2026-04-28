@@ -77,10 +77,10 @@ const Header = () => {
   return (
     <header ref={headerRef} className="w-full bg-white border-b border-gray-200 sticky top-0 z-[1000] relative">
       
-      <div className="max-w-[1920px] mx-auto flex justify-between items-center py-5 px-5 lg:px-[50px] xl:px-[250px]">
+      <div className="container mx-auto flex justify-between items-center py-2">
         
         {/* 로고 */}
-        <div className="header-logo text-black no-underline text-[28px] my-5">
+        <div className="header-logo text-black no-underline fs-up-6 my-5">
           <Link to="/" onClick={closeMenu}>거리에섯</Link>
         </div>
         

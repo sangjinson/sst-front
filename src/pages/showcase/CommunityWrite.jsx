@@ -71,13 +71,15 @@ const CommunityWrite = () => {
           {/* 1. 카테고리 */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-3">카테고리</label>
-            <div className="flex gap-3">
+            {/* flex-wrap을 추가하여 화면이 아주 작아질 경우 다음 줄로 넘어가게 하거나, 
+                overflow-x-auto를 사용해 가로 스크롤이 생기게 할 수 있습니다. */}
+            <div className="flex flex-wrap gap-3">
               {["볼거리", "먹거리", "놀거리", "잘거리"].map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setCategory(cat)}
-                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap min-w-[70px] ${
                     category === cat ? "bg-[#009277] text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                   }`}
                 >
