@@ -56,11 +56,11 @@ export const ClipButton = () => {
       {/* 공유 버튼 */}
       <button
         onClick={() => setIsShareOpen((prev) => !prev)}
-        className="p-2.5 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/40 hover:text-emerald-300 active:scale-90 transition cursor-pointer border-none outline-none"
+        className="group/link w-9 h-9 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md hover:bg-white hover:scale-105 active:scale-90 transition-all duration-200 cursor-pointer border-none outline-none"
         aria-label="링크 공유"
       >
         <svg
-          className="w-5 h-5 transition-all duration-200"
+          className="w-5 h-5 text-gray-500 transition-all duration-200 group-hover/link:text-[#0F9B73] group-hover/link:scale-110"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.8"
