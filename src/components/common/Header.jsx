@@ -30,6 +30,7 @@ const Header = () => {
     { name: '놀거리', path: `/${currentRegion}/play/list` },
     { name: '뽐낼거리', path: `/showcase` },
     { name: '내거리', path: '/user/mypage' },
+    { name: '내거리(일정)', path: '/user' },
   ];
 
   const toggleMenu = () => {

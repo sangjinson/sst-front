@@ -69,18 +69,9 @@ const AreaListCard = ({ item, liked, onLike, onClick }) => {
           <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-semibold ${badgeColor}`}>
             {category}
           </span>
-          <button
-            className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
-            onClick={onLike}
-          >
-            <svg
-              className={`w-5 h-5 transition-colors ${liked ? 'fill-red-500 stroke-red-500' : 'fill-none stroke-gray-500'}`}
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-            >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
-          </button>
+          <div className="absolute top-2 right-2">
+            <HeartButton liked={liked} onClick={onLike} />
+          </div>
         </div>
       </GridCardHeader>
 
