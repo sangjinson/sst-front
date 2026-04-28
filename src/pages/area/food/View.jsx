@@ -119,7 +119,7 @@ export default function FoodView() {
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => navigate(`/${currentRegion}/food/list`)}
-            className="flex-1 py-3 border border-[#0F9B73] bg-[#0F9B73] rounded-xl text-sm text-white font-medium hover:bg-[#0d8a66] transition"
+            className="flex-1 py-3 border border-[#E8956D] bg-[#E8956D] rounded-xl text-sm text-white font-medium hover:bg-[#f07e48] transition"
           >
             ← 목록으로
           </button>
