@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import Breadcrumb from '../../../components/common/Breadcrumb';
-import { ClipButton, HeartButton } from '../../../components/card/AttractionCard';
+import Breadcrumb from '@components/common/Breadcrumb';
+import { ClipButton, HeartButton } from '@components/card/AttractionCard';
 import { getSeeDataByRegion } from './seeData';
-
+import { toKorRegion } from '@utils/regionMap';
 
 
 const SeeDetail = () => {
@@ -11,7 +11,8 @@ const SeeDetail = () => {
   const [searchParams] = useSearchParams();
   const region = (regionParam || '수원').replace(/시$/, '');
   const itemId = searchParams.get('id');
-  const item = getSeeDataByRegion(region).find((seeItem) => String(seeItem.id) === String(itemId));
+  const regionKor = toKorRegion(regionParam);
+  const item = getSeeDataByRegion(regionKor).find((seeItem) => String(seeItem.id) === String(itemId));
 
   const [liked, setLiked] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -121,8 +122,6 @@ const handleCopyLink = async () => {
     <div className="bg-[#f8f6f0] min-h-screen">
 
       <div className="max-w-[1000px] mx-auto px-4 py-12">
-
-
         {/* 🔥 HERO (완전 개선) */}
         <div className="relative rounded-3xl overflow-hidden shadow-xl mb-14">
 

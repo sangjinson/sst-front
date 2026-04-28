@@ -183,17 +183,6 @@ export default function FoodView() {
       <div className="min-h-screen bg-[#f8f6f0]">
         <div className="food-view-wrap">
 
-          {/* 브레드크럼 */}
-          <p className="text-sm text-gray-400 mb-4">
-            <span className="cursor-pointer hover:text-[#c8860a] transition-colors" onClick={() => navigate("/")}>홈</span>
-            {" > "}
-            <span className="cursor-pointer hover:text-[#c8860a] transition-colors" onClick={() => navigate(`/${currentRegion}`)}>{currentRegion}</span>
-            {" > "}
-            <span className="cursor-pointer hover:text-[#c8860a] transition-colors" onClick={() => navigate(-1)}>먹거리</span>
-            {" > "}
-            <span className="text-gray-700 font-medium">{item.name}</span>
-          </p>
-
           {/* 히어로 이미지 */}
           <div className="relative rounded-2xl overflow-hidden mb-6 h-64 md:h-96">
             <img src={item.image} alt={item.name} className="w-full h-full object-cover" />

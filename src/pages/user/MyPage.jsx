@@ -35,35 +35,41 @@ function getFoodLikes() {
 }
 
 // ─────────────────────────────────────────
-// 페이지네이션
+// 페이지네이션 (Tailwind 적용)
 // ─────────────────────────────────────────
 const Pagination = ({ page, totalPages, onPageChange }) => (
-  <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "28px", flexWrap: "wrap" }}>
-    <button onClick={() => onPageChange(Math.max(1, page - 1))} style={pageBtnStyle(false)}>&lt;</button>
+  <div className="flex justify-center gap-2 mt-7 flex-wrap">
+    <button 
+      onClick={() => onPageChange(Math.max(1, page - 1))} 
+      className="w-[34px] h-[34px] rounded-full border border-gray-200 bg-white text-gray-700 text-sm hover:bg-gray-50 transition-colors flex items-center justify-center"
+    >
+      &lt;
+    </button>
     {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-      <button key={p} onClick={() => onPageChange(p)} style={pageBtnStyle(p === page)}>{p}</button>
+      <button 
+        key={p} 
+        onClick={() => onPageChange(p)} 
+        className={`w-[34px] h-[34px] rounded-full text-sm transition-colors flex items-center justify-center ${
+          p === page 
+            ? 'bg-[#0F9B73] text-white font-bold border-none' 
+            : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+        }`}
+      >
+        {p}
+      </button>
     ))}
-    <button onClick={() => onPageChange(Math.min(totalPages, page + 1))} style={pageBtnStyle(false)}>&gt;</button>
+    <button 
+      onClick={() => onPageChange(Math.min(totalPages, page + 1))} 
+      className="w-[34px] h-[34px] rounded-full border border-gray-200 bg-white text-gray-700 text-sm hover:bg-gray-50 transition-colors flex items-center justify-center"
+    >
+      &gt;
+    </button>
   </div>
 );
-const pageBtnStyle = (active) => ({
-  width: "34px", height: "34px", borderRadius: "50%",
-  border: active ? "none" : "1px solid #e5e7eb",
-  background: active ? "#0F9B73" : "#fff",
-  color: active ? "#fff" : "#374151",
-  cursor: "pointer", fontWeight: active ? 700 : 400, fontSize: "0.85rem",
-});
 
 // ─────────────────────────────────────────
-// 섹션: 회원정보
+// 섹션: 회원정보 (프로필 카드 제거됨)
 // ─────────────────────────────────────────
-const labelStyle = { fontSize: "0.75rem", color: "#9ca3af", display: "block", marginBottom: "4px" };
-const inputStyle = {
-  width: "100%", padding: "10px 12px", border: "1px solid #e5e7eb",
-  borderRadius: "8px", fontSize: "0.88rem", outline: "none",
-  boxSizing: "border-box", fontFamily: "inherit",
-};
-
 const MemberInfo = ({ profile, onUpdate }) => {
   const [form, setForm] = useState({ ...profile, password: "", passwordConfirm: "", address: "", detailAddress: "" });
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -72,41 +78,96 @@ const MemberInfo = ({ profile, onUpdate }) => {
     onUpdate({ name: form.name, phone: form.phone, email: form.email, location: form.location });
     alert("회원정보가 수정되었습니다.");
   };
+
   return (
-    <div style={{ padding: "clamp(16px, 3vw, 28px)" }}>
-      <h2 style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.3rem)", fontWeight: 700, marginBottom: "20px" }}>회원 정보</h2>
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-        {/* 프로필 미리보기 */}
-        <div style={{ width: "clamp(160px, 20vw, 200px)", background: "#f9fafb", borderRadius: "14px", padding: "18px", display: "flex", flexDirection: "column", alignItems: "center", gap: "7px", border: "1px solid #e5e7eb", flexShrink: 0 }}>
-          <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "#374151", marginBottom: "4px" }}>마이페이지</p>
-          <div style={{ position: "relative" }}>
-            <img src="https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png" alt="프로필" style={{ width: "68px", height: "68px", borderRadius: "50%", objectFit: "cover", border: "3px solid #0F9B73" }} />
-            <div style={{ position: "absolute", bottom: 0, right: 0, background: "#0F9B73", color: "#fff", borderRadius: "50%", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", cursor: "pointer" }}>✎</div>
+    <div className="p-4 md:p-7">
+      <h2 className="text-lg md:text-xl font-bold mb-5 text-gray-900">회원 정보 수정</h2>
+      
+      {/* 🚀 프로필 카드를 지우고 폼 영역이 전체를 차지하도록 수정 */}
+      <div className="bg-white rounded-2xl p-5 md:p-7 border border-gray-200 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            ["name", "이름", "text"],
+            ["phone", "연락처", "text"],
+            ["password", "비밀번호", "password"],
+            ["passwordConfirm", "비밀번호 확인", "password"]
+          ].map(([n, l, t]) => (
+            <div key={n}>
+              <label className="block text-xs text-gray-400 mb-1.5">{l}</label>
+              <input 
+                name={n} 
+                type={t} 
+                value={form[n]} 
+                onChange={handleChange} 
+                placeholder="필수입력 입니다." 
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#0F9B73] focus:ring-1 focus:ring-[#0F9B73] transition-colors"
+              />
+            </div>
+          ))}
+          
+          <div className="sm:col-span-2">
+            <label className="block text-xs text-gray-400 mb-1.5">이메일</label>
+            <input 
+              name="email" 
+              value={form.email} 
+              onChange={handleChange} 
+              placeholder="필수입력 입니다." 
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#0F9B73] focus:ring-1 focus:ring-[#0F9B73] transition-colors"
+            />
           </div>
-          <div style={{ fontWeight: 700, fontSize: "0.9rem" }}>{form.name} 📍</div>
-          <div style={{ fontSize: "0.72rem", color: "#6b7280", textAlign: "center", lineHeight: 1.5 }}>안녕하세요! {form.name}입니다.<br />리액트 참 좋네요!</div>
-          <div style={{ width: "100%", marginTop: "6px", display: "flex", flexDirection: "column", gap: "4px" }}>
-            {[["♦", form.location, false], ["♦", "가입일: 2026-04-10", false], ["♦", form.phone, true], ["♦", form.email, true]].map(([icon, text, green], i) => (
-              <div key={i} style={{ fontSize: "0.72rem", color: green ? "#0F9B73" : "#6b7280", display: "flex", gap: "4px" }}><span>{icon}</span><span style={{ wordBreak: "break-all" }}>{text}</span></div>
-            ))}
+
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">우편번호</label>
+            <input 
+              placeholder="필수입력 입니다." 
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#0F9B73] focus:ring-1 focus:ring-[#0F9B73] transition-colors"
+            />
+          </div>
+          <div className="flex items-end">
+            <button className="w-full py-2.5 bg-[#0F9B73] hover:bg-[#0d8a66] text-white rounded-lg font-bold text-sm transition-colors">
+              주소검색
+            </button>
+          </div>
+
+          <div className="sm:col-span-2">
+            <label className="block text-xs text-gray-400 mb-1.5">주소</label>
+            <input 
+              name="address" 
+              value={form.address} 
+              onChange={handleChange} 
+              placeholder="주소검색을 클릭하세요." 
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#0F9B73] focus:ring-1 focus:ring-[#0F9B73] transition-colors"
+            />
+          </div>
+
+          <div className="sm:col-span-2">
+            <label className="block text-xs text-gray-400 mb-1.5">상세주소</label>
+            <input 
+              name="detailAddress" 
+              value={form.detailAddress} 
+              onChange={handleChange} 
+              placeholder="필수입력 입니다." 
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#0F9B73] focus:ring-1 focus:ring-[#0F9B73] transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">거주지</label>
+            <input 
+              name="location" 
+              value={form.location} 
+              onChange={handleChange} 
+              placeholder="예) 경기도 수원시" 
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#0F9B73] focus:ring-1 focus:ring-[#0F9B73] transition-colors"
+            />
           </div>
         </div>
-        {/* 수정 폼 */}
-        <div style={{ flex: 1, minWidth: "240px", background: "#fff", borderRadius: "14px", padding: "clamp(16px, 3vw, 22px)", border: "1px solid #e5e7eb" }}>
-          <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: "16px" }}>정보수정</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "10px" }}>
-            {[["name","이름","text"],["phone","연락처","text"],["password","비밀번호","password"],["passwordConfirm","비밀번호 확인","password"]].map(([n,l,t]) => (
-              <div key={n}><label style={labelStyle}>{l}</label><input name={n} type={t} value={form[n]} onChange={handleChange} placeholder="필수입력 입니다." style={inputStyle} /></div>
-            ))}
-            <div style={{ gridColumn: "1/-1" }}><label style={labelStyle}>이메일</label><input name="email" value={form.email} onChange={handleChange} placeholder="필수입력 입니다." style={inputStyle} /></div>
-            <div><label style={labelStyle}>우편번호</label><input placeholder="필수입력 입니다." style={inputStyle} /></div>
-            <div style={{ display: "flex", alignItems: "flex-end" }}><button style={{ width: "100%", padding: "10px", background: "#0F9B73", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 700, cursor: "pointer" }}>주소검색</button></div>
-            <div style={{ gridColumn: "1/-1" }}><label style={labelStyle}>주소</label><input name="address" value={form.address} onChange={handleChange} placeholder="주소검색을 클릭하세요." style={inputStyle} /></div>
-            <div style={{ gridColumn: "1/-1" }}><label style={labelStyle}>상세주소</label><input name="detailAddress" value={form.detailAddress} onChange={handleChange} placeholder="필수입력 입니다." style={inputStyle} /></div>
-            <div><label style={labelStyle}>거주지</label><input name="location" value={form.location} onChange={handleChange} placeholder="예) 경기도 수원시" style={inputStyle} /></div>
-          </div>
-          <button onClick={handleSave} style={{ marginTop: "16px", width: "100%", padding: "11px", background: "#0F9B73", color: "#fff", border: "none", borderRadius: "10px", fontWeight: 700, fontSize: "0.95rem", cursor: "pointer" }}>Save</button>
-        </div>
+        <button 
+          onClick={handleSave} 
+          className="mt-6 w-full py-3 bg-[#0F9B73] hover:bg-[#0d8a66] text-white rounded-xl font-bold transition-colors"
+        >
+          저장하기
+        </button>
       </div>
     </div>
   );
@@ -118,18 +179,20 @@ const MemberInfo = ({ profile, onUpdate }) => {
 const MyShowcase = () => {
   const [page, setPage] = useState(1);
   return (
-    <div style={{ padding: "clamp(16px, 3vw, 28px)" }}>
-      <h2 style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.3rem)", fontWeight: 700, marginBottom: "18px" }}>내 뽐낼 거리</h2>
-      <div className="showcase-grid">
+    <div className="p-4 md:p-7">
+      <h2 className="text-lg md:text-xl font-bold mb-5 text-gray-900">내 뽐낼 거리</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
         {DUMMY_POSTS.map((post) => (
-          <div key={post.id} style={{ background: "#fff", borderRadius: "14px", overflow: "hidden", border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", cursor: "pointer" }}>
-            <img src={post.image} alt={post.title} style={{ width: "100%", height: "160px", objectFit: "cover" }} />
-            <div style={{ padding: "12px 14px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>{post.author}</span>
-                <span style={{ fontSize: "0.8rem", color: "#6b7280" }}><span style={{ color: "#ef4444" }}>♥</span> {post.likes}</span>
+          <div key={post.id} className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <img src={post.image} alt={post.title} className="w-full h-40 object-cover" />
+            <div className="p-3 md:p-4">
+              <div className="flex justify-between items-center mb-1.5">
+                <span className="text-sm font-semibold">{post.author}</span>
+                <span className="text-xs text-gray-500">
+                  <span className="text-red-500 mr-1">♥</span>{post.likes}
+                </span>
               </div>
-              <p style={{ fontSize: "0.8rem", color: "#6b7280" }}>{post.desc}</p>
+              <p className="text-xs text-gray-500 line-clamp-2">{post.desc}</p>
             </div>
           </div>
         ))}
@@ -145,14 +208,14 @@ const MyShowcase = () => {
 const MySchedule = () => {
   const [page, setPage] = useState(1);
   return (
-    <div style={{ padding: "clamp(16px, 3vw, 28px)" }}>
-      <h2 style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.3rem)", fontWeight: 700, marginBottom: "18px" }}>내 일정 관리</h2>
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "400px" }}>
+    <div className="p-4 md:p-7">
+      <h2 className="text-lg md:text-xl font-bold mb-5 text-gray-900">내 일정 관리</h2>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[400px] border-collapse">
           <thead>
-            <tr style={{ borderBottom: "2px solid #f3f4f6" }}>
+            <tr className="border-b-2 border-gray-100">
               {["번호", "제목", "여행 날짜", "상태"].map((h) => (
-                <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "0.82rem", color: "#9ca3af", fontWeight: 600, whiteSpace: "nowrap" }}>{h}</th>
+                <th key={h} className="py-3 px-4 text-left text-xs font-semibold text-gray-400 whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
@@ -160,12 +223,19 @@ const MySchedule = () => {
             {DUMMY_SCHEDULES.map((s) => {
               const sc = STATUS_COLOR[s.status] || { bg: "#f3f4f6", color: "#374151" };
               return (
-                <tr key={s.id} style={{ borderBottom: "1px solid #f9fafb" }}>
-                  <td style={{ padding: "16px 14px", fontSize: "0.88rem", color: "#6b7280" }}>{s.id}</td>
-                  <td style={{ padding: "16px 14px", fontSize: "0.88rem", fontWeight: 500 }}>{s.title}</td>
-                  <td style={{ padding: "16px 14px", fontSize: "0.82rem", color: "#6b7280", lineHeight: 1.8, whiteSpace: "nowrap" }}>{s.startDate}<br />~<br />{s.endDate}</td>
-                  <td style={{ padding: "16px 14px" }}>
-                    <span style={{ background: sc.bg, color: sc.color, padding: "4px 12px", borderRadius: "9999px", fontSize: "0.78rem", fontWeight: 600, whiteSpace: "nowrap" }}>{s.status}</span>
+                <tr key={s.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                  <td className="py-4 px-4 text-sm text-gray-500">{s.id}</td>
+                  <td className="py-4 px-4 text-sm font-medium text-gray-900">{s.title}</td>
+                  <td className="py-4 px-4 text-xs text-gray-500 leading-relaxed whitespace-nowrap">
+                    {s.startDate} <br />~<br /> {s.endDate}
+                  </td>
+                  <td className="py-4 px-4">
+                    <span 
+                      className="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"
+                      style={{ backgroundColor: sc.bg, color: sc.color }}
+                    >
+                      {s.status}
+                    </span>
                   </td>
                 </tr>
               );
@@ -198,35 +268,37 @@ const MyWishlist = () => {
   };
 
   return (
-    <div style={{ padding: "clamp(16px, 3vw, 28px)" }}>
-      <h2 style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.3rem)", fontWeight: 700, marginBottom: "18px" }}>내 찜 목록</h2>
+    <div className="p-4 md:p-7">
+      <h2 className="text-lg md:text-xl font-bold mb-5 text-gray-900">내 찜 목록</h2>
       {likes.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "#9ca3af" }}>
-          <div style={{ fontSize: "3rem", marginBottom: "12px" }}>💔</div>
-          <p style={{ fontSize: "0.9rem" }}>아직 찜한 목록이 없습니다.</p>
+        <div className="text-center py-16 text-gray-400">
+          <div className="text-5xl mb-3">💔</div>
+          <p className="text-sm">아직 찜한 목록이 없습니다.</p>
         </div>
       ) : (
         <>
-          <div className="wishlist-grid">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {currentItems.map((item, idx) => (
               <div
                 key={idx}
-                style={{ background: "#fff", borderRadius: "12px", overflow: "hidden", border: "1px solid #e5e7eb", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.05)", position: "relative" }}
+                className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative group"
                 onClick={() => navigate(`/${item.address?.split(' ')[1] || "수원시"}/food/view?id=${item.id}`, { state: { food: item } })}
               >
-                <img src={item.image} alt={item.name} style={{ width: "100%", height: "120px", objectFit: "cover" }} />
-                <div style={{ padding: "10px 12px 28px" }}>
-                  <div style={{ fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.name}</div>
-                  <div style={{ fontSize: "0.72rem", color: "#6b7280", marginTop: "2px" }}>{item.category}</div>
+                <img src={item.image} alt={item.name} className="w-full h-32 md:h-40 object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="p-3 pb-8">
+                  <div className="text-sm font-semibold truncate text-gray-900">{item.name}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{item.category}</div>
                 </div>
-                <div style={{ position: "absolute", bottom: "8px", left: "10px", background: "rgba(0,0,0,0.45)", color: "#fff", fontSize: "0.65rem", padding: "2px 7px", borderRadius: "9999px" }}>
+                <div className="absolute bottom-2 left-3 bg-black/45 text-white text-[10px] px-2 py-0.5 rounded-full">
                   {item.address?.split(' ').slice(0, 2).join(' ')}
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); handleRemove(item); }}
-                  style={{ position: "absolute", bottom: "6px", right: "8px", background: "none", border: "none", cursor: "pointer", fontSize: "16px" }}
+                  className="absolute bottom-1.5 right-2 text-lg hover:scale-110 transition-transform"
                   title="찜 해제"
-                >❤️</button>
+                >
+                  ❤️
+                </button>
               </div>
             ))}
           </div>
@@ -241,7 +313,7 @@ const MyWishlist = () => {
 // 카드 정의
 // ─────────────────────────────────────────
 const CARDS = [
-  { key: "member",   label: "회원정보",    icon: "👤" },
+  { key: "member",   label: "회원정보",   icon: "👤" },
   { key: "showcase", label: "내 뽐낼거리", icon: "🖼️" },
   { key: "schedule", label: "내 일정관리", icon: "📅" },
   { key: "wishlist", label: "내 찜목록",   icon: "❤️" },
@@ -272,223 +344,88 @@ const MyPage = () => {
   const sectionLabel = CARDS.find((c) => c.key === activeSection)?.label || "";
 
   return (
-    <>
-      <style>{`
-        *, *::before, *::after { box-sizing: border-box; }
-
-        .mp-wrap {
-          display: flex;
-          gap: 24px;
-          padding: clamp(16px, 3vw, 30px) clamp(16px, 4vw, 40px);
-          max-width: 1400px;
-          margin: 0 auto;
-          font-family: 'Pretendard', sans-serif;
-          min-height: 100vh;
-          background: #f9fafb;
-        }
-
-        /* ── 사이드바 ── */
-        .mp-sidebar {
-          width: 220px;
-          flex-shrink: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
-        .mp-box {
-          background: #fff;
-          border-radius: 16px;
-          padding: 18px;
-          border: 1px solid #e5e7eb;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        .mp-box h3 { font-size: 0.9rem; font-weight: 700; color: #374151; margin: 0 0 14px 0; }
-        .mp-profile-center { display: flex; flex-direction: column; align-items: center; gap: 7px; margin-bottom: 14px; }
-        .mp-avatar { width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 3px solid #0F9B73; }
-        .mp-name { font-weight: 700; font-size: 0.95rem; color: #111; }
-        .mp-desc { font-size: 0.75rem; color: #6b7280; text-align: center; line-height: 1.5; }
-        .mp-info-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; }
-        .mp-info-list li { font-size: 0.78rem; color: #374151; display: flex; align-items: flex-start; gap: 6px; }
-        .mp-link-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
-        .mp-link-list a { text-decoration: none; color: inherit; }
-        .mp-link-list li { font-size: 0.82rem; color: #374151; display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; transition: color 0.2s; }
-        .mp-link-list li:hover { color: #0F9B73; }
-
-        /* ── 메인 ── */
-        .mp-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
-
-        /* ── 카드 4개 행 ── */
-        .mp-card-row {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-        }
-
-        /* ── 상단 카드 ── */
-        .mp-stat-card {
-          background: #fff;
-          border: 1.5px solid #e5e7eb;
-          border-radius: 16px;
-          padding: 18px 14px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 12px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        .mp-stat-card:hover {
-          border-color: #0F9B73;
-          box-shadow: 0 4px 14px rgba(15,155,115,0.12);
-          transform: translateY(-2px);
-        }
-        .mp-stat-card.active {
-          border-color: #0F9B73;
-          background: #f0fdf9;
-          box-shadow: 0 4px 14px rgba(15,155,115,0.15);
-        }
-        .mp-stat-card .card-label {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #374151;
-          align-self: flex-start;
-        }
-        .mp-stat-card.active .card-label { color: #0F9B73; }
-        .mp-circle {
-          width: 58px;
-          height: 58px;
-          border-radius: 50%;
-          border: 3px solid #3b82f6;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.4rem;
-          transition: border-color 0.2s;
-        }
-        .mp-stat-card.active .mp-circle { border-color: #0F9B73; }
-
-        /* ── 섹션 패널 ── */
-        .mp-section-panel {
-          background: #fff;
-          border-radius: 16px;
-          border: 1px solid #e5e7eb;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-          min-height: 300px;
-          animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(6px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ── 그리드: 뽐낼거리 ── */
-        .showcase-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-        }
-
-        /* ── 그리드: 찜목록 ── */
-        .wishlist-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-        }
-
-        /* ════════════════════════
-           반응형 breakpoints
-        ════════════════════════ */
-
-        /* 태블릿 이하 (≤1024px): 사이드바 숨김, 카드 2열 */
-        @media (max-width: 1024px) {
-          .mp-sidebar { display: none; }
-          .mp-card-row { grid-template-columns: repeat(2, 1fr); }
-          .wishlist-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        /* 소형 태블릿 (≤768px): 카드 2열 유지, 그리드 축소 */
-        @media (max-width: 768px) {
-          .mp-wrap { padding: 16px; gap: 0; }
-          .mp-card-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-          .showcase-grid { grid-template-columns: repeat(2, 1fr); }
-          .wishlist-grid { grid-template-columns: repeat(2, 1fr); }
-          .mp-circle { width: 48px; height: 48px; font-size: 1.2rem; }
-        }
-
-        /* 모바일 (≤480px): 카드 2열, 그리드 1열 */
-        @media (max-width: 480px) {
-          .mp-card-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-          .mp-stat-card { padding: 14px 10px; gap: 8px; }
-          .mp-stat-card .card-label { font-size: 0.78rem; }
-          .mp-circle { width: 42px; height: 42px; font-size: 1rem; }
-          .showcase-grid { grid-template-columns: 1fr; }
-          .wishlist-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-      `}</style>
-
-      <div className="mp-wrap">
+    <div className="min-h-screen bg-gray-50 font-sans">
+      <div className="max-w-[1400px] mx-auto px-4 py-6 md:px-10 lg:py-10 flex flex-col lg:flex-row gap-6">
 
         {/* ── 사이드바 (1024px 이상만 표시) ── */}
-        <aside className="mp-sidebar">
-          <div className="mp-box">
-            <h3>마이페이지</h3>
-            <div className="mp-profile-center">
-              <img src="https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png" alt="프로필" className="mp-avatar" />
-              <div className="mp-name">{profile.name} 🏅</div>
-              <div className="mp-desc">안녕하세요! {profile.name}입니다.<br />리액트 참 좋네요! 잘 부탁드려요.</div>
+        <aside className="hidden lg:flex flex-col gap-4 w-[220px] shrink-0">
+          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-700 mb-4">마이페이지</h3>
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <img src="https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png" alt="프로필" className="w-16 h-16 rounded-full object-cover border-[3px] border-[#0F9B73]" />
+              <div className="font-bold text-gray-900">{profile.name} 🏅</div>
+              <div className="text-xs text-gray-500 text-center leading-relaxed">
+                안녕하세요! {profile.name}입니다.<br />리액트 참 좋네요! 잘 부탁드려요.
+              </div>
             </div>
-            <ul className="mp-info-list">
-              <li><span>🗺️</span>{profile.location} 거주</li>
-              <li><span>📅</span>가입일: 2026-04-10</li>
-              <li><span>📞</span>{profile.phone}</li>
-              <li><span>✉️</span>{profile.email}</li>
+            <ul className="flex flex-col gap-2">
+              <li className="text-xs text-gray-700 flex items-start gap-1.5"><span className="text-sm">🗺️</span>{profile.location} 거주</li>
+              <li className="text-xs text-gray-700 flex items-start gap-1.5"><span className="text-sm">📅</span>가입일: 2026-04-10</li>
+              <li className="text-xs text-gray-700 flex items-start gap-1.5"><span className="text-sm">📞</span>{profile.phone}</li>
+              <li className="text-xs text-gray-700 flex items-start gap-1.5"><span className="text-sm">✉️</span>{profile.email}</li>
             </ul>
           </div>
           <div className="mp-box">
             <h3>프로필 더보기</h3>
             <ul className="mp-link-list">
               <Link to="/customersupport/notice"><li><span>👤</span> 공지사항</li></Link>
-              <Link to="/customersupport/faq"><li><span>🚫</span> 자주 하는 질문</li></Link>
+              <Link to="/customersupport/faq"><li><span>❓</span> 자주 하는 질문</li></Link>
             </ul>
           </div>
         </aside>
 
         {/* ── 메인 ── */}
-        <section className="mp-main">
-
-          {/* 🚀 브레드크럼을 메인 섹션 최상단으로 이동! */}
+        <section className="flex-1 min-w-0 flex flex-col gap-4">
+          
           <Breadcrumb 
             paths={[
               { label: '홈', to: '/' },
               { label: '마이페이지', to: '/user/mypage' },
               { label: sectionLabel }
             ]} 
-            className="mb-0" // 기존 컴포넌트 내부 여백이 있어 0으로 설정
+            className="mb-0" 
           />
 
           {/* 카드 4개 고정 */}
-          <div className="mp-card-row">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {CARDS.map((card) => (
               <div
                 key={card.key}
-                className={`mp-stat-card${activeSection === card.key ? " active" : ""}`}
                 onClick={() => setActiveSection(card.key)}
+                className={`bg-white border-[1.5px] rounded-2xl p-4 md:p-5 flex flex-col items-center gap-3 cursor-pointer transition-all hover:-translate-y-1 ${
+                  activeSection === card.key 
+                    ? "border-[#0F9B73] bg-[#f0fdf9] shadow-md" 
+                    : "border-gray-200 shadow-sm hover:border-[#0F9B73]"
+                }`}
               >
-                <span className="card-label">{card.label}</span>
-                <div className="mp-circle">{card.icon}</div>
+                <span className={`text-sm md:text-sm font-bold self-start ${activeSection === card.key ? "text-[#0F9B73]" : "text-gray-700"}`}>
+                  {card.label}
+                </span>
+                <div className={`w-12 h-12 md:w-[58px] md:h-[58px] rounded-full border-[3px] flex items-center justify-center text-xl md:text-2xl transition-colors ${
+                  activeSection === card.key ? "border-[#0F9B73]" : "border-blue-500"
+                }`}>
+                  {card.icon}
+                </div>
               </div>
             ))}
           </div>
 
           {/* 섹션 패널 */}
-          <div className="mp-section-panel" key={activeSection}>
+          <div key={activeSection} className="bg-white rounded-2xl border border-gray-200 shadow-sm min-h-[300px] animate-[fadeIn_0.3s_ease-in-out]">
             {renderSection()}
           </div>
 
         </section>
       </div>
-    </>
+
+      {/* Tailwind에 없는 커스텀 페이드인 애니메이션만 짧게 주입 */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(5px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
   );
 };
 
