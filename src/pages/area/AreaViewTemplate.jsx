@@ -46,7 +46,7 @@ const AreaViewTemplate = () => {
       ) : (
         /* 🚀 맵핑된 데이터를 활용한 단일 레이아웃 구조 (모든 View에 공통 적용) */
         <div className="bg-[#f8f6f0] min-h-screen">
-          <div className="container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10 max-w-[900px]">
+          <div className="container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-6 max-w-[900px]">
             {/* 브레드크럼 */}
             <Breadcrumb 
               paths={[
@@ -57,7 +57,7 @@ const AreaViewTemplate = () => {
                 // 💡 참고: 추후 View 컴포넌트 내부에서 게시물 데이터를 불러온 뒤,
                 // '상세정보' 대신 'item.name(예: 수원 왕갈비)'을 라벨로 넘겨주면 훨씬 좋습니다!
               ]} 
-              className="mb-6"
+              className="mb-10"
             />
             {/* 동적으로 상세 컴포넌트 렌더링 */}
             <currentConfig.Component />
