@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+//import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipButton, HeartButton } from '@components/modules/AreaActionButtons';
+// [원복 방법] HeartButton 다시 추가, WishlistHeartButton 제거
+import { ClipButton } from '@components/modules/AreaActionButtons';
 import { getBadgeColor } from '@components/modules/arealist/areaListUtils';
 
 /**
@@ -34,13 +35,18 @@ import { getBadgeColor } from '@components/modules/arealist/areaListUtils';
  * - isWished   : 찜 상태 (boolean)
  * - onWish     : 찜 토글 핸들러
  */
+// [원복 방법]
+// 1. props를 아래처럼 되돌린다:
+//    isWished, onWish 복구 / renderHeart 제거
+// 2. JSX에서 renderHeart() 호출 부분을 아래로 되돌린다:
+//    <HeartButton liked={isWished} onClick={onWish} />
+// 3. import에 HeartButton 다시 추가한다
 const AreaDetailHero = ({
   image,
   name,
   category,
   categories = [],
-  isWished,
-  onWish,
+  renderHeart,
 }) => {
   const badgeColor = getBadgeColor(categories, category);
   const navigate = useNavigate();
@@ -64,7 +70,8 @@ const AreaDetailHero = ({
       {/* 공유 & 찜 버튼 */}
       <div className="absolute top-4 right-4 flex gap-2">
         <ClipButton />
-        <HeartButton liked={isWished} onClick={onWish} />
+        {/* [원복 방법] 아래 줄을 <HeartButton liked={isWished} onClick={onWish} /> 로 교체 */}
+        {renderHeart && renderHeart()}
       </div>
 
       {/* 뒤로가기 버튼 */}

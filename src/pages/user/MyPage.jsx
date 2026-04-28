@@ -1,9 +1,13 @@
 // src/pages/user/MyPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+// [원복 방법] 주석 해제하면 원래대로 돌아옴
+//import { useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 
 // 🚀 공통 브레드크럼 컴포넌트 임포트! (경로 확인해주세요)
 import Breadcrumb from '@components/common/Breadcrumb';
+// [원복 방법] 아래 import 줄 삭제 후, getFoodLikes 주석 해제하면 원래대로 돌아옴
+import { getWishlist, STORAGE_KEY } from '@hooks/useWishlist';
 
 // ─────────────────────────────────────────
 // 더미 데이터
@@ -29,10 +33,11 @@ const STATUS_COLOR = {
 
 const ITEMS_PER_PAGE = 8;
 
-function getFoodLikes() {
-  try { return JSON.parse(localStorage.getItem("food_likes")) || []; }
-  catch { return []; }
-}
+// TODO: getWishlist() 훅으로 대체됨
+// function getFoodLikes() {
+//   try { return JSON.parse(localStorage.getItem("food_likes")) || []; }
+//   catch { return []; }
+// }
 
 // ─────────────────────────────────────────
 // 페이지네이션 (Tailwind 적용)
@@ -253,17 +258,27 @@ const MySchedule = () => {
 // ─────────────────────────────────────────
 const MyWishlist = () => {
   const navigate = useNavigate();
-  const [likes, setLikes] = useState([]);
+  // [원복 방법] useState([]) 로 되돌리고, 아래 useEffect 주석 해제
+  // const [likes, setLikes] = useState([]);
+  // useEffect(() => { setLikes(getFoodLikes()); }, []);
+  const [likes, setLikes] = useState(() => getWishlist());
   const [page, setPage] = useState(1);
-
-  useEffect(() => { setLikes(getFoodLikes()); }, []);
 
   const totalPages = Math.ceil(likes.length / ITEMS_PER_PAGE) || 1;
   const currentItems = likes.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
+  // [원복 방법] 아래 주석 해제 후 새 handleRemove 삭제
+  // const handleRemove = (item) => {
+  //   const updated = likes.filter((f) => !(f.id === item.id && f.name === item.name));
+  //   localStorage.setItem("food_likes", JSON.stringify(updated));
+  //   setLikes(updated);
+  // };
   const handleRemove = (item) => {
-    const updated = likes.filter((f) => !(f.id === item.id && f.name === item.name));
-    localStorage.setItem("food_likes", JSON.stringify(updated));
+    const updated = likes.filter(
+      (w) => !(String(w.id) === String(item.id) && w.type === item.type)
+    );
+    // TODO: API 연동 시 → DELETE /api/wishlist/:id 로 교체, localStorage 줄 제거
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     setLikes(updated);
   };
 
@@ -282,7 +297,9 @@ const MyWishlist = () => {
               <div
                 key={idx}
                 className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative group"
-                onClick={() => navigate(`/${item.address?.split(' ')[1] || "수원시"}/food/view?id=${item.id}`, { state: { food: item } })}
+                // [원복 방법] 아래 주석 해제, 새 onClick 삭제
+                // onClick={() => navigate(`/${item.address?.split(' ')[1] || "수원시"}/food/view?id=${item.id}`, { state: { food: item } })}
+                onClick={() => navigate(`/${item.region}/${item.type}/view?id=${item.id}`)}
               >
                 <img src={item.image} alt={item.name} className="w-full h-32 md:h-40 object-cover group-hover:scale-105 transition-transform duration-300" />
                 <div className="p-3 pb-8">
