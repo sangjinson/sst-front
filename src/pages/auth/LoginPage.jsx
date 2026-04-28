@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [memberId, setMemberId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = () => {
-    if (!email.trim() || !password.trim()) {
-      alert('이메일과 비밀번호를 입력해주세요.');
+    if (!memberId.trim() || !password.trim()) {
+      alert('아이디와 비밀번호를 입력해주세요.');
       return;
     }
     alert('로그인 기능은 준비 중입니다.');
@@ -19,34 +19,37 @@ export default function LoginPage() {
   return (
     <>
       <style>{`
-            @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
-            .login-wrap { font-family: 'Pretendard', sans-serif; }
-            `}</style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
+        .login-wrap { font-family: 'Pretendard', sans-serif; }
+      `}</style>
 
       <div className="login-wrap min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="w-full max-w-[500px] bg-white rounded-2xl shadow-sm p-10">
 
-          {/* 로고 - 클릭하면 랜딩페이지로 */}
+          {/* 로고 */}
           <div className="text-center mb-10">
             <Link to="/">
-            <h1 className="font-griun text-5xl font-black text-gray-900 cursor-pointer hover:opacity-80 transition">
+              <h1
+                className="font-griun text-5xl text-gray-900 cursor-pointer hover:opacity-80 transition"
+                style={{ fontWeight: 'normal' }}
+              >
                 거리에섯
-            </h1>
+              </h1>
             </Link>
           </div>
 
-          {/* 이메일 */}
+          {/* 아이디 */}
           <div className="mb-6 border-b border-gray-300 flex items-center pb-3">
             <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="아이디"
+              value={memberId}
+              onChange={(e) => setMemberId(e.target.value)}
               className="flex-1 outline-none text-base text-gray-700 placeholder-gray-400 bg-transparent"
             />
             <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-              <polyline points="22,6 12,13 2,6" />
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
           </div>
 

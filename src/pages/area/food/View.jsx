@@ -67,6 +67,8 @@ export default function FoodView() {
   }
 
   return (
+    <div className='container'>
+      <div>
     <div className="min-h-screen">
       <div className="py-5">
 
@@ -135,6 +137,8 @@ export default function FoodView() {
         </div>
 
       </div>
+    </div>
+    </div>
     </div>
   );
 }
