@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipButton, HeartButton } from '@components/card/AttractionCard';
+import { ClipButton, HeartButton } from '@components/modules/AreaActionButtons';
 import Swal from 'sweetalert2';
 import { getBadgeColor } from '@components/modules/arealist/areaListUtils';
 
