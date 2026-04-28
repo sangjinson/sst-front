@@ -113,7 +113,7 @@ const MainPage = () => {
 
   // 🚀 로딩이 끝나면 실제 화면 렌더링
   return (
-    <div className="min-h-screen bg-white pb-[50px] md:pb-[100px]"> 
+    <div className="min-h-screen bg-white"> 
       
       <HeroBanner 
         bgImage={currentBannerImage} 
