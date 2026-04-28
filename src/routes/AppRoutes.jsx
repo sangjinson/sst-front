@@ -21,6 +21,9 @@ import Community from '@pages/showcase/Community';
 import CommunityDetail from "@pages/showcase/CommunityDetail";
 import CommunityWrite from "@pages/showcase/CommunityWrite";
 
+import LoginPage from '@pages/auth/LoginPage';
+import SignupPage from '@pages/auth/SignupPage';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -29,12 +32,16 @@ const AppRoutes = () => {
       <Route path="/unauthorized" element={<Unauthorized />} />
       
 
+      {/* 로그인/회원가입 - 여기에 추가 */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login/signup" element={<SignupPage />} />
+
       {/* 일반 사용자 권한 (USER, ADMIN) */}
       <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
 
         {/* 마이페이지 */}
         <Route path="/user" element={<UserLayout />}>
-          <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
+        <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
         </Route>
 
         {/* 커뮤니티 (뽐낼거리) 추가 */}
@@ -75,6 +82,8 @@ const AppRoutes = () => {
           <Route index element={<AdminDashboard />} />
         </Route>
       </Route>        
+
+
 
     </Routes>
   );
