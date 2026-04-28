@@ -52,62 +52,65 @@ const SeeList = () => {
 
   return (
     <>
-      {/* 카테고리 + 정렬 */}
-      <div className="flex justify-between items-center mb-5 flex-wrap gap-3">
+      {/* 🔥 카테고리 + 정렬 (카드와 width 맞춤) */}
+      <div className="flex justify-center">
+        <div className="flex justify-between items-center mb-4 flex-wrap gap-2 max-w-[1050px] w-full">
 
-        {/* 카테고리 */}
-        <div className="flex gap-2 flex-wrap">
-          {categories.map((item) => (
+          {/* 카테고리 */}
+          <div className="flex gap-2 flex-wrap">
+            {categories.map((item) => (
+              <button
+                key={item}
+                onClick={() => setActiveCategory(item)}
+                className={`
+                  px-4 py-2 rounded-full text-sm cursor-pointer
+                  border border-gray-200 transition
+                  ${
+                    activeCategory === item
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-black'
+                  }
+                `}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+
+          {/* 정렬 */}
+          <div className="flex bg-gray-100 rounded-full p-1">
             <button
-              key={item}
-              onClick={() => setActiveCategory(item)}
+              onClick={() => setSort('latest')}
               className={`
-                px-4 py-2 rounded-full text-sm cursor-pointer
-                border border-gray-200 transition
+                px-4 py-1.5 text-sm rounded-full transition cursor-pointer
                 ${
-                  activeCategory === item
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-black'
+                  sort === 'latest'
+                    ? 'bg-gray-900 text-white shadow-sm'
+                    : 'text-gray-400 hover:text-black'
                 }
               `}
             >
-              {item}
+              최신순
             </button>
-          ))}
+
+            <button
+              onClick={() => setSort('popular')}
+              className={`
+                px-4 py-1.5 text-sm rounded-full transition cursor-pointer
+                ${
+                  sort === 'popular'
+                    ? 'bg-gray-900 text-white shadow-sm'
+                    : 'text-gray-400 hover:text-black'
+                }
+              `}
+            >
+              인기순
+            </button>
+          </div>
+
         </div>
-
-        {/* 정렬 */}
-        <div className="flex bg-gray-100 rounded-full p-1">
-          <button
-            onClick={() => setSort('latest')}
-            className={`
-              px-4 py-1.5 text-sm rounded-full transition cursor-pointer
-              ${
-                sort === 'latest'
-                  ? 'bg-gray-900 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-black'
-              }
-            `}
-          >
-            최신순
-          </button>
-
-          <button
-            onClick={() => setSort('popular')}
-            className={`
-              px-4 py-1.5 text-sm rounded-full transition cursor-pointer
-              ${
-                sort === 'popular'
-                  ? 'bg-gray-900 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-black'
-              }
-            `}
-          >
-            인기순
-          </button>
-        </div>
-
       </div>
+
 
       {/* 카드 */}
       <div className="flex justify-center">

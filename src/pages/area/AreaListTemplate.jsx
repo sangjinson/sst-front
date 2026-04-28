@@ -57,14 +57,17 @@ function AreaListTemplate() {
               />
               <div className='container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-10'>
                 {/* 브레드크럼 */}
-                <Breadcrumb 
-                  paths={[
-                    { label: '홈', to: '/' },
-                    { label: regionKor, to: `/${region}` },
-                    { label: '볼거리', to: `/${region}/see/list` }
-                  ]} 
-                  className="mb-6" // 🚀 여기서는 좁은 여백을 던져줍니다!
-                />
+                <div className="flex justify-center">
+  <div className="max-w-[1050px] w-full mb-6">
+    <Breadcrumb 
+      paths={[
+        { label: '홈', to: '/' },
+        { label: regionKor, to: `/${region}` },
+        { label: '볼거리', to: `/${region}/see/list` }
+      ]}
+    />
+  </div>
+</div>
                 <SeeList />
               </div>
             </>
