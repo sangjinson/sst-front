@@ -122,7 +122,7 @@ const Notice = () => {
                       {notice.date}
                     </span>
 
-                    <span className={`text-gray-300 text-xs md:text-sm transform transition-transform pt-1 ${
+                    <span className={`text-gray-300 text-xs md:text-em transform transition-transform pt-1 ${
                       openId === notice.id ? "rotate-180" : ""
                     }`}>
                       ▼
