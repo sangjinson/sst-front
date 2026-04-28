@@ -113,55 +113,57 @@ const MainPage = () => {
 
   // 🚀 로딩이 끝나면 실제 화면 렌더링
   return (
-    <div className="min-h-screen bg-white pb-[50px] md:pb-[100px]"> 
+    <div className="min-h-screen bg-white"> 
       
       <HeroBanner 
         bgImage={currentBannerImage} 
         title={currentRegion} 
         subtitle="전통과 현대가 공존하는 도시" 
       />
-
-      <div className="max-w-[1200px] mx-auto px-4 py-6 md:py-10">
-        
-        <Breadcrumb 
-          paths={[
-            { label: '홈', to: '/' },
-            { label: currentRegion }
-          ]} 
-          className="mb-6 md:mb-[50px]" 
-        />
-
-        {topPicks.length > 0 && (
-          <section className="mb-[50px] md:mb-[80px]"> 
-            <div className="text-center mb-8 md:mb-10 border-b-2 border-gray-800 pb-3 md:pb-4">
-              <h2 className="text-[20px] md:text-[26px] font-bold text-gray-900">
-                방방곳곳 숨어있는 추천을 찾다
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-              {topPicks.map((item) => (
-                <TopPickCard 
-                  key={`${item.type}-${item.id}`} 
-                  item={item} 
-                  onClick={() => handleCardClick(item.type, item)} 
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 반복되던 4개의 카테고리 섹션을 map으로 깔끔하게 렌더링! */}
-        {categorySections.map((section) => (
-          <CategorySection 
-            key={section.pathType} 
-            title={section.title} 
-            pathType={section.pathType} 
-            dataList={section.dataList} 
-            onMoreClick={handleMoreClick} 
-            onCardClick={handleCardClick} 
+      <div className='container'>
+        <div className="mx-auto px-4 py-6 md:py-10">
+          
+          <Breadcrumb 
+            paths={[
+              { label: '홈', to: '/' },
+              { label: currentRegion }
+            ]} 
+            className="mb-2 sm:mb-6" 
           />
-        ))}
+          {/* Section 1 : 방방곳곳 숨어있는 추천을 찾다  */}
+          {topPicks.length > 0 && (
+            <section className="mb-[6vw]"> 
+              <div className="text-center mb-8 md:mb-10 border-b-2 border-gray-800 pb-3 md:pb-4">
+                <h2 className="fs-up-6 font-bold text-gray-900">
+                  방방곳곳 숨어있는 추천을 찾다
+                </h2>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+                {topPicks.map((item) => (
+                  <TopPickCard 
+                    key={`${item.type}-${item.id}`} 
+                    item={item} 
+                    onClick={() => handleCardClick(item.type, item)} 
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* 반복되던 4개의 카테고리 섹션을 map으로 깔끔하게 렌더링! */}
+          {categorySections.map((section) => (
+            <CategorySection 
+              key={section.pathType} 
+              title={section.title} 
+              pathType={section.pathType} 
+              dataList={section.dataList} 
+              onMoreClick={handleMoreClick} 
+              onCardClick={handleCardClick} 
+            />
+          ))}
+
+        </div>
 
       </div>
     </div>

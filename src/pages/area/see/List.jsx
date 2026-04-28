@@ -1,155 +1,103 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom'; // 🚀 useOutletContext 추가됨
-import AttractionCard from '../../../components/card/AttractionCard';
+import React, { useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getSeeDataByRegion } from './seeData';
+import { toKorRegion } from '@utils/regionMap';
+import { AreaFilterBar, AreaListCard, AreaPagination, sortData } from '@components/modules/arealist';
 
-const categories = ['전체', '박물관', '도서관', '지역명소', '공원'];
+const ITEMS_PER_PAGE = 6;
+const CATEGORIES = ['전체', '박물관', '도서관', '지역명소', '공원'];
 
-const SeeList = () => {
+const List = () => {
+  const { region } = useParams();
   const navigate = useNavigate();
-  const { selectedRegion } = useOutletContext() || {};
-  const region = selectedRegion || '수원';
-  const data = getSeeDataByRegion(region);
+  const regionKor = toKorRegion(region || '수원');
+  const regionName = regionKor.replace(/[시군]$/, '');
 
-  const [activeCategory, setActiveCategory] = useState('전체');
-  const [sort, setSort] = useState('latest');
-  const [activePage, setActivePage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [sortOption, setSortOption] = useState('reviews');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [likedItems, setLikedItems] = useState({});
 
-  const itemsPerPage = 9;
+  const handleLike = (e, id) => {
+    e.stopPropagation();
+    setLikedItems((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
-  // ✅ 필터 + 정렬
-  const filteredData = useMemo(() => {
-    const categoryData =
-      activeCategory === '전체'
-        ? data
-        : data.filter((item) => item.tag === activeCategory);
+  const filtered = useMemo(() => {
+    const data = getSeeDataByRegion(regionName).map((item) => ({
+      ...item,
+      category: item.tag,
+      description: item.desc,
+      address: item.location,
+      reviewCount: item.likes ?? 0,
+      rating: item.rating ?? 0,
+    }));
 
-    return [...categoryData].sort((a, b) => {
-      if (sort === 'popular') {
-        return b.likes - a.likes;
-      }
-      return new Date(b.date) - new Date(a.date);
-    });
-  }, [activeCategory, data, sort]);
+    let result = [...data];
 
-  // ✅ 페이지 계산
-  const totalPages = Math.max(1, Math.ceil(filteredData.length / itemsPerPage));
+    if (selectedCategory !== '전체') {
+      result = result.filter((item) => item.tag === selectedCategory);
+    }
 
-  const currentData = filteredData.slice(
-    (activePage - 1) * itemsPerPage,
-    activePage * itemsPerPage
+    return sortData(result, sortOption);
+  }, [regionName, selectedCategory, sortOption]);
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
   );
 
-  // ✅ 카테고리 / 정렬 / 지역이 바뀌면 페이지 초기화
-  useEffect(() => {
-    setActivePage(1);
-  }, [activeCategory, sort, region]); // 🚀 regionName -> region 으로 수정됨
+  const goToDetail = (id) => {
+    navigate(`/${region}/see/view?id=${id}`);
+  };
 
   return (
-    <div className="bg-[#f8f6f0] min-h-screen pb-10">
-      {/* CONTENT */}
-      <div className="max-w-[1200px] mx-auto mt-10 px-4">
-        
-        {/* 카테고리 + 정렬 영역 */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div className="min-h-screen bg-[#f8f6f0]">
+      <div className="py-2">
 
-          {/* 카테고리 */}
-          <div className="flex gap-2 flex-wrap">
-            {categories.map((item) => (
-              <button
-                key={item}
-                onClick={() => setActiveCategory(item)}
-                className={`px-4 py-2 rounded-full text-sm cursor-pointer border border-gray-200 transition ${
-                  activeCategory === item
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-black'
-                }`}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
+        <AreaFilterBar
+          categories={CATEGORIES}
+          selectedCategory={selectedCategory}
+          onCategoryChange={(cat) => { setSelectedCategory(cat); setCurrentPage(1); }}
+          selectedSort={sortOption}
+          onSortChange={(sort) => { setSortOption(sort); setCurrentPage(1); }}
+          totalCount={filtered.length}
+          countLabel="볼거리"
+        />
 
-          {/* 정렬 (🚀 중간에 꼬여있던 잘못된 코드 블록 완전 삭제 후 정상 복구됨) */}
-          <div className="flex bg-gray-100 rounded-full p-1">
-            <button
-              onClick={() => setSort('latest')}
-              className={`px-4 py-1.5 text-sm rounded-full transition cursor-pointer ${
-                sort === 'latest'
-                  ? 'bg-gray-900 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-black'
-              }`}
-            >
-              최신순
-            </button>
-            <button
-              onClick={() => setSort('popular')}
-              className={`px-4 py-1.5 text-sm rounded-full transition cursor-pointer ${
-                sort === 'popular'
-                  ? 'bg-gray-900 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-black'
-              }`}
-            >
-              인기순
-            </button>
-          </div>
-          
-        </div>
-
-        {/* 카드 그리드 영역 */}
-        <div className="flex justify-center">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 max-w-[1050px] w-full">
-            {currentData.map((item) => (
-              <AttractionCard
+        {paginated.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginated.map((item) => (
+              <AreaListCard
                 key={item.id}
-                item={item}
-                onClick={() => navigate(`/${region}/see/view?id=${item.id}`)}
+                item={{
+                  ...item,
+                  categoryIndex: CATEGORIES.filter((c) => c !== '전체').indexOf(item.tag),
+                }}
+                liked={!!likedItems[item.id]}
+                onLike={(e) => handleLike(e, item.id)}
+                onClick={() => goToDetail(item.id)}
               />
             ))}
           </div>
-        </div>
-
-        {/* 페이지네이션 */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-10 items-center gap-2">
-            {/* 이전 버튼 */}
-            <button
-              onClick={() => setActivePage((prev) => (prev > 1 ? prev - 1 : prev))}
-              disabled={activePage === 1}
-              className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm"
-            >
-              ←
-            </button>
-
-            {/* 페이지 숫자 */}
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map((n) => (
-              <button
-                key={n}
-                onClick={() => setActivePage(n)}
-                className={`w-9 h-9 rounded-lg text-sm transition cursor-pointer flex items-center justify-center ${
-                  activePage === n
-                    ? 'bg-gray-900 text-white shadow-sm'
-                    : 'bg-white border border-gray-200 hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-
-            {/* 다음 버튼 */}
-            <button
-              onClick={() => setActivePage((prev) => (prev < totalPages ? prev + 1 : prev))}
-              disabled={activePage === totalPages}
-              className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm"
-            >
-              →
-            </button>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 text-gray-400">
+            <span className="text-5xl mb-4">👀</span>
+            <p className="text-lg font-medium">해당 카테고리의 볼거리가 없습니다</p>
+            <p className="text-sm mt-1">다른 카테고리를 선택해보세요</p>
           </div>
         )}
 
+        <AreaPagination
+          currentPage={currentPage}
+          totalPages={totalPages || 1}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
+
       </div>
-    </div> // 🚀 닫는 태그 수정 완료 (</> -> </div>)
+    </div>
   );
 };
 
-export default SeeList;
+export default List;

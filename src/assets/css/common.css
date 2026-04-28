@@ -80,44 +80,89 @@ html, body{
   .container-3xl, .container-2xl, .container-xl, .container-lg, .container-md, .container-sm, .container { max-width: var(--tw-device-max-width-3xl); }
 }
 
-.fs-1 {
-  font-size: 0.75em;
+.fs-1 { font-size: 0.75em; }
+.fs-2 { font-size: 0.85em; }
+.fs-3 { font-size: 0.95em; }
+.fs-4 { font-size: 1.05em; }
+.fs-5 { font-size: 1.2em; }
+.fs-6 { font-size: 1.4em; }
+.fs-7 { font-size: 1.6em; }
+.fs-8 { font-size: 1.9em; }
+.fs-9 { font-size: 2.3em; }
+.fs-10 { font-size: 2.8em; }
+
+@media (min-width: 576px) {
+  .fs-sm-1 { font-size: 0.75em; }
+  .fs-sm-2 { font-size: 0.85em; }
+  .fs-sm-3 { font-size: 0.95em; }
+  .fs-sm-4 { font-size: 1.05em; }
+  .fs-sm-5 { font-size: 1.2em; }
+  .fs-sm-6 { font-size: 1.4em; }
+  .fs-sm-7 { font-size: 1.6em; }
+  .fs-sm-8 { font-size: 1.9em; }
+  .fs-sm-9 { font-size: 2.3em; }
+  .fs-sm-10 { font-size: 2.8em; }
 }
 
-.fs-2 {
-  font-size: 0.85em;
+@media (min-width: 768px) {
+  .fs-md-1 { font-size: 0.75em; }
+  .fs-md-2 { font-size: 0.85em; }
+  .fs-md-3 { font-size: 0.95em; }
+  .fs-md-4 { font-size: 1.05em; }
+  .fs-md-5 { font-size: 1.2em; }
+  .fs-md-6 { font-size: 1.4em; }
+  .fs-md-7 { font-size: 1.6em; }
+  .fs-md-8 { font-size: 1.9em; }
+  .fs-md-9 { font-size: 2.3em; }
+  .fs-md-10 { font-size: 2.8em; }
 }
-
-.fs-3 {
-  font-size: 0.95em;
+@media (min-width: 992px) {
+  .fs-lg-1 { font-size: 0.75em; }
+  .fs-lg-2 { font-size: 0.85em; }
+  .fs-lg-3 { font-size: 0.95em; }
+  .fs-lg-4 { font-size: 1.05em; }
+  .fs-lg-5 { font-size: 1.2em; }
+  .fs-lg-6 { font-size: 1.4em; }
+  .fs-lg-7 { font-size: 1.6em; }
+  .fs-lg-8 { font-size: 1.9em; }
+  .fs-lg-9 { font-size: 2.3em; }
+  .fs-lg-10 { font-size: 2.8em; }
 }
-
-.fs-4 {
-  font-size: 1.05em;
+@media (min-width: 1200px) {
+  .fs-xl-1 { font-size: 0.75em; }
+  .fs-xl-2 { font-size: 0.85em; }
+  .fs-xl-3 { font-size: 0.95em; }
+  .fs-xl-4 { font-size: 1.05em; }
+  .fs-xl-5 { font-size: 1.2em; }
+  .fs-xl-6 { font-size: 1.4em; }
+  .fs-xl-7 { font-size: 1.6em; }
+  .fs-xl-8 { font-size: 1.9em; }
+  .fs-xl-9 { font-size: 2.3em; }
+  .fs-xl-10 { font-size: 2.8em; }
 }
-
-.fs-5 {
-  font-size: 1.2em;
+@media (min-width: 1400px) {
+  .fs-2xl-1 { font-size: 0.75em; }
+  .fs-2xl-2 { font-size: 0.85em; }
+  .fs-2xl-3 { font-size: 0.95em; }
+  .fs-2xl-4 { font-size: 1.05em; }
+  .fs-2xl-5 { font-size: 1.2em; }
+  .fs-2xl-6 { font-size: 1.4em; }
+  .fs-2xl-7 { font-size: 1.6em; }
+  .fs-2xl-8 { font-size: 1.9em; }
+  .fs-2xl-9 { font-size: 2.3em; }
+  .fs-2xl-10 { font-size: 2.8em; }
 }
-
-.fs-6 {
-  font-size: 1.4em;
-}
-
-.fs-7 {
-  font-size: 1.6em;
-}
-
-.fs-8 {
-  font-size: 1.9em;
-}
-
-.fs-9 {
-  font-size: 2.3em;
-}
-
-.fs-10 {
-  font-size: 2.8em;
+@media (min-width: 1900px) {
+  .fs-3xl-1 { font-size: 0.75em; }
+  .fs-3xl-2 { font-size: 0.85em; }
+  .fs-3xl-3 { font-size: 0.95em; }
+  .fs-3xl-4 { font-size: 1.05em; }
+  .fs-3xl-5 { font-size: 1.2em; }
+  .fs-3xl-6 { font-size: 1.4em; }
+  .fs-3xl-7 { font-size: 1.6em; }
+  .fs-3xl-8 { font-size: 1.9em; }
+  .fs-3xl-9 { font-size: 2.3em; }
+  .fs-3xl-10 { font-size: 2.8em; }
 }
 
 .fs-up-1 {

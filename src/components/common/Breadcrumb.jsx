@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 /*
 // 사용법
@@ -19,28 +20,32 @@ const Breadcrumb = ({ paths, className = '' }) => {
 
   return (
     /* 🚀 고정되어 있던 mb-[50px]를 지우고, 밖에서 받아온 className을 합쳐줍니다! */
-    <p className={`text-sm text-gray-400 flex items-center flex-wrap gap-1.5 ${className}`}>
-      {paths.map((path, index) => {
-        const isLast = index === paths.length - 1;
+    <div className="w-full flex justify-center md:justify-end">
+      <p className={`fs-up-2 text-gray-400 flex flex-wrap items-center gap-1.5 ${className}`}>
+        {paths.map((path, index) => {
+          const isLast = index === paths.length - 1;
 
-        return (
-          <React.Fragment key={index}>
-            <span
-              onClick={() => !isLast && path.to && navigate(path.to)}
-              className={`${
-                isLast
-                  ? 'text-gray-900 font-bold cursor-default'
-                  : 'cursor-pointer hover:text-[#0F9B73] transition-colors'
-              }`}
-            >
-              {path.label}
-            </span>
-            
-            {!isLast && <span>{' > '}</span>}
-          </React.Fragment>
-        );
-      })}
-    </p>
+          return (
+            <React.Fragment key={index}>
+              {path.to && !isLast ? (
+                <Link
+                  to={path.to}
+                  className="cursor-pointer hover:text-[#0F9B73] transition-colors"
+                >
+                  {path.label}
+                </Link>
+              ) : (
+                <span className="text-gray-900 font-bold cursor-default">
+                  {path.label}
+                </span>
+              )}
+
+              {!isLast && <span>{' > '}</span>}
+            </React.Fragment>
+          );
+        })}
+      </p>
+    </div>
   );
 };
 
