@@ -21,13 +21,18 @@ import Community from '@pages/showcase/Community';
 import CommunityDetail from "@pages/showcase/CommunityDetail";
 import CommunityWrite from "@pages/showcase/CommunityWrite";
 
+import SearchPage from '@pages/search/SearchPage';
+
 const AppRoutes = () => {
   return (
     <Routes>
       {/* 공개 접근 가능 페이지 */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      
+
+      <Route element={<UserLayout />}>
+        <Route path="/search/:keyword" element={<SearchPage />} />
+      </Route>
 
       {/* 일반 사용자 권한 (USER, ADMIN) */}
       <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>

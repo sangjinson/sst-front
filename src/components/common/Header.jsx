@@ -46,7 +46,7 @@ const Header = () => {
 
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;
-    navigate(`/user/${searchKeyword}`);
+    navigate(`/search/${searchKeyword}`);
     setIsSearchOpen(false);
   };
 
