@@ -31,7 +31,7 @@ table {
   --tw-device-max-width-lg: 960px;
   --tw-device-max-width-xl: 1140px;
   --tw-device-max-width-2xl: 1320px;
-  --tw-device-max-width-3xl: 1860px;
+  --tw-device-max-width-3xl: 1420px;
 }
 html, body{
     font-size: var(--tw-default-font-size);
