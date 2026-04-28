@@ -29,7 +29,7 @@ const Breadcrumb = ({ paths, className = '' }) => {
               onClick={() => !isLast && path.to && navigate(path.to)}
               className={`${
                 isLast
-                  ? 'text-gray-900 font-bold font-griun cursor-default'
+                  ? 'text-gray-900 font-bold cursor-default'
                   : 'cursor-pointer hover:text-[#0F9B73] transition-colors'
               }`}
             >

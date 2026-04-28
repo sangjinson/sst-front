@@ -134,7 +134,7 @@ const MainPage = () => {
         {topPicks.length > 0 && (
           <section className="mb-[50px] md:mb-[80px]"> 
             <div className="text-center mb-8 md:mb-10 border-b-2 border-gray-800 pb-3 md:pb-4">
-              <h2 className="text-[20px] md:text-[26px] font-bold text-gray-900 font-griun">
+              <h2 className="text-[20px] md:text-[26px] font-bold text-gray-900">
                 방방곳곳 숨어있는 추천을 찾다
               </h2>
             </div>

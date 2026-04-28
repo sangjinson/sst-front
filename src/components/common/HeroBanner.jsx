@@ -22,7 +22,7 @@ const HeroBanner = ({ bgImage, title, subtitle, className = '' }) => {
     >
       <div className="absolute inset-0 bg-black/30"></div>
       <div className="relative z-10 text-center text-white drop-shadow-md">
-        <h1 className="font-griun text-[50px] md:text-[80px] mb-[15px] font-black">
+        <h1 className="text-[50px] md:text-[80px] mb-[15px] font-black">
           {title} 
         </h1>
         {subtitle && (
