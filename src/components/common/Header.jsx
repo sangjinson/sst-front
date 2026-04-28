@@ -98,9 +98,12 @@ const Header = () => {
             🔍
           </button>
           
-          <button className="bg-primary text-white py-2 px-4 md:px-6 rounded text-sm font-bold border-none cursor-pointer whitespace-nowrap">
-            로그인
-          </button>
+          {/* 로그인 버튼 → /login으로 이동 */}
+          <Link to="/login">
+            <button className="bg-primary text-white py-2 px-4 md:px-6 rounded text-sm font-bold border-none cursor-pointer whitespace-nowrap">
+              로그인
+            </button>
+          </Link>
           
           {/* 모바일 햄버거 버튼 */}
           <button 

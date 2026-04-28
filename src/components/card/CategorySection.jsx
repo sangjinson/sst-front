@@ -5,7 +5,7 @@ const CategorySection = ({ title, pathType, dataList, onMoreClick, onCardClick }
   return (
     <section className="mb-[60px]">
       <div className="flex justify-between items-end mb-[25px]">
-        <h3 className="text-[22px] font-bold flex items-center gap-2.5 text-gray-900 font-griun">
+        <h3 className="text-[22px] font-bold flex items-center gap-2.5 text-gray-900">
           <span className="inline-block w-1 h-5 bg-[#E26338] rounded-sm"></span>
           {title}
         </h3>

@@ -26,8 +26,12 @@ const Notice = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [openId, setOpenId] = useState(null);
   const location = useLocation();
+  
   const isNotice = location.pathname.includes("notice");
   const isFaq = location.pathname.includes("faq");
+
+  // .mp-box CSS를 대체하는 Tailwind 공통 클래스
+  const containerStyle = "bg-white rounded-2xl p-5 md:p-[30px] border border-gray-200 shadow-[0_1px_4px_rgba(0,0,0,0.04)]";
 
   const totalPages = 1;
 
@@ -41,25 +45,13 @@ const Notice = () => {
 
   return (
     <div className="bg-[#f7f8fa] min-h-screen py-10 md:py-20 font-sans">
-      <style>
-        {`.mp-box {
-          background: #fff;
-          border-radius: 16px;
-          padding: 20px;
-          border: 1px solid #e5e7eb;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        @media (min-width: 768px) {
-          .mp-box { padding: 30px; }
-        }`}
-      </style>
-
+      
       {/* 전체 컨테이너 */}
       <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-6 lg:gap-10">
         
-        {/* 🔹 왼쪽 사이드바 (모바일 탭 메뉴 전환) */}
+        {/* 🔹 왼쪽 사이드바 (기존 .mp-box 제거 후 containerStyle 적용) */}
         <aside className="w-full lg:w-60 shrink-0">
-          <div className="mp-box">
+          <div className={containerStyle}>
             <h3 className="hidden lg:block text-lg font-semibold mb-4 text-gray-800">고객지원</h3>
             <div className="hidden lg:block border-t border-gray-200 mb-4"></div>
             <ul className="flex lg:flex-col gap-2">
@@ -92,12 +84,12 @@ const Notice = () => {
           </div>
         </aside>
 
-        {/* 🔹 오른쪽 콘텐츠 영역 */}
+        {/* 🔹 오른쪽 콘텐츠 영역 (기존 .mp-box 제거 후 containerStyle 적용) */}
         <div className="flex-1">
-          <div className="mp-box">
+          <div className={containerStyle}>
             <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-10 text-gray-800">공지사항</h2>
 
-            {/* ✅ 반응형 리스트 레이아웃 (Table 탈피) */}
+            {/* ✅ 반응형 리스트 레이아웃 */}
             <div className="border-t border-gray-200">
               {noticeData.map((notice) => (
                 <div key={notice.id} className="border-b border-gray-100 last:border-none">
@@ -107,30 +99,30 @@ const Notice = () => {
                       openId === notice.id ? "bg-gray-50" : ""
                     }`}
                     onClick={() => toggleAccordion(notice.id)}>
-                    {/* ✅ 1. 번호 표시: 모바일/PC 모두 보이도록 설정 */}
+                    
+                    {/* 번호 표시 */}
                     <span className="text-gray-400 text-sm md:text-base w-8 text-center pt-0.5 shrink-0">
                       {notice.id}
                     </span>
 
-                    {/* 2. 제목 및 모바일 날짜 영역 */}
+                    {/* 제목 및 모바일 날짜 영역 */}
                     <div className="flex-1">
                       <p className={`text-sm md:text-[16px] leading-snug ${
                         openId === notice.id ? "font-bold text-blue-600" : "text-gray-800"
                       }`}>
                         {notice.title}
                       </p>
-                      {/* 모바일 전용 날짜 (Lg 미만에서만 노출) */}
                       <span className="block mt-1 text-[11px] text-gray-400 font-normal lg:hidden">
                         {notice.date}
                       </span>
                     </div>
 
-                    {/* ✅ 3. PC 전용 날짜 (Lg 이상에서만 노출) */}
+                    {/* PC 전용 날짜 */}
                     <span className="hidden lg:block text-sm text-gray-400 w-24 text-right shrink-0">
                       {notice.date}
                     </span>
 
-                    <span className={`text-gray-300 text-xs md:text-sm transform transition-transform pt-1 ${
+                    <span className={`text-gray-300 text-xs md:text-em transform transition-transform pt-1 ${
                       openId === notice.id ? "rotate-180" : ""
                     }`}>
                       ▼
@@ -152,7 +144,7 @@ const Notice = () => {
               ))}
             </div>
 
-            {/* 🔹 페이지네이션 (반응형 최적화) */}
+            {/* 🔹 페이지네이션 */}
             {totalPages >= 1 && (
               <div className="flex items-center justify-center gap-1 mt-10 md:mt-14">
                 <button
