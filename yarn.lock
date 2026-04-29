@@ -1385,6 +1385,11 @@ punycode@^2.1.0:
   resolved "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz"
   integrity sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==
 
+react-daum-postcode@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-daum-postcode/-/react-daum-postcode-4.0.0.tgz#834183cbcb77343b9be5b6fe8ffc90a2635c9936"
+  integrity sha512-2CGR8Aa/5637IKaplJXv5m9S/qQWWYBr30FhQ9mK9nXiisVbTvrpU9D4U1mgr8YYCKw2RgcK8daN+F+PJhW+ig==
+
 react-dom@^19.2.5:
   version "19.2.5"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-19.2.5.tgz"
