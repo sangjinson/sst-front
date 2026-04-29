@@ -23,6 +23,7 @@ import Community from '@pages/showcase/Community';
 import CommunityDetail from "@pages/showcase/CommunityDetail";
 import CommunityWrite from "@pages/showcase/CommunityWrite";
 
+import SearchPage from '@pages/search/SearchPage';
 import LoginPage from '@pages/auth/LoginPage';
 import SignupPage from '@pages/auth/SignupPage';
 
@@ -32,7 +33,10 @@ const AppRoutes = () => {
       {/* 공개 접근 가능 페이지 */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      
+
+      <Route element={<UserLayout />}>
+        <Route path="/search/:keyword" element={<SearchPage />} />
+      </Route>
 
       {/* 로그인/회원가입 - 여기에 추가 */}
       <Route path="/login" element={<LoginPage />} />
