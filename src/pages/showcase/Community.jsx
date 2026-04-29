@@ -57,7 +57,7 @@ const Community = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="w-full max-w-[1400px] mx-auto px-6 py-6 md:py-10 font-sans">
       <Breadcrumb 
         paths={[{ label: '홈', to: '/' }, { label: '뽐낼거리' }]} 
         className="mb-4" 
