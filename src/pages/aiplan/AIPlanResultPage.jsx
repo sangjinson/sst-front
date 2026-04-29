@@ -11,6 +11,10 @@ import {
   getDetailPath,
 } from '@components/modules/airesult';
 import AIResultMapView from '@components/modules/airesult/AIResultMapView';
+import { ClipButton } from '@components/modules/ActionButtons';
+import { getFoodDataByRegion } from '@pages/area/food/foodData';
+import { getSeeDataByRegion } from '@pages/area/see/seeData';
+import { getSleepDataByRegion } from '@pages/area/sleep/sleepDummyData';
 import '@assets/css/common.css';
 
 const AIPlanResultPage = () => {

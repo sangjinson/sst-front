@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { ClipButton } from '@components/modules/AreaActionButtons';
+import { ClipButton } from '@components/modules/ActionButtons';
 
 const CommunityDetail = () => {
   const { id } = useParams();
