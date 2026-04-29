@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getSeeDataByRegion } from './seeData';
 import { toKorRegion } from '@utils/regionMap';
-import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import {
   AreaDescription,
   AreaDetailHero,
@@ -10,7 +10,7 @@ import {
   AreaMap,
   AreaRelated,
   AreaReview,
-} from '@components/modules/areaview';
+} from '@components/modules/area/areaview';
 
 // 카테고리 목록 (List.jsx와 동일)
 const CATEGORIES = ['전체', '박물관', '도서관', '지역명소', '공원'];

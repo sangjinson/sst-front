@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
-import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import {
   AreaDetailHero,
   AreaDescription,
@@ -9,7 +9,7 @@ import {
   AreaMap,
   AreaReview,
   AreaRelated,
-} from '@components/modules/areaview';
+} from '@components/modules/area/areaview';
 
 // ※ 프로젝트의 실제 AuthContext import로 교체하세요
 // import { useAuth } from '@context/AuthContext';

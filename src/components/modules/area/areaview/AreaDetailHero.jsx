@@ -1,8 +1,8 @@
 //import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // [원복 방법] HeartButton 다시 추가, WishlistHeartButton 제거
-import { ClipButton } from '@components/modules/AreaActionButtons';
-import { getBadgeColor } from '@components/modules/arealist/areaListUtils';
+import { ClipButton } from '@components/modules/ActionButtons';
+import { getBadgeColor } from '@components/modules/area/arealist/areaListUtils';
 
 /**
  * AreaDetailHero - 뷰 페이지 공통 대표 이미지 섹션

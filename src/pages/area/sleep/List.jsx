@@ -2,8 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSleepDataByRegion } from './sleepDummyData';
 import { toKorRegion } from '@utils/regionMap';
-import { AreaListCard, AreaFilterBar, AreaPagination, sortData } from '@components/modules/arealist';
-import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
+import { AreaListCard, AreaFilterBar, AreaPagination, sortData } from '@components/modules/area/arealist';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
 
 // 페이지당 카드 수
 const ITEMS_PER_PAGE = 6;

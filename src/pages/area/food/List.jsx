@@ -3,8 +3,8 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getFoodDataByRegion } from './foodData';
 import { toKorRegion } from '@utils/regionMap';
-import { AreaListCard, AreaFilterBar, AreaPagination, sortData } from '@components/modules/arealist';
-import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
+import { AreaListCard, AreaFilterBar, AreaPagination, sortData } from '@components/modules/area/arealist';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
 
 const ITEMS_PER_PAGE = 9;
 const CATEGORIES = ['전체', '한식', '중식', '일식', '양식'];

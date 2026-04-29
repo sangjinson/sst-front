@@ -1,8 +1,8 @@
 import React from 'react';
 import { GridCard, GridCardHeader, GridCardBody, GridCardFooter } from '@components/modules/gridcard';
 import StarRating from '@components/modules/StarRating';
-import { BADGE_COLORS } from '@components/modules/arealist/areaListUtils';
-import { HeartButton } from '@components/modules/AreaActionButtons';
+import { BADGE_COLORS } from '@components/modules/area/arealist/areaListUtils';
+import { HeartButton } from '@components/modules/ActionButtons';
 
 /**
  * AreaListCard - 볼거리/먹거리/잘거리/놀거리 공통 리스트 카드

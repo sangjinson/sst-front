@@ -2,8 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSeeDataByRegion } from './seeData';
 import { toKorRegion } from '@utils/regionMap';
-import { AreaFilterBar, AreaListCard, AreaPagination, sortData } from '@components/modules/arealist';
-import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
+import { AreaFilterBar, AreaListCard, AreaPagination, sortData } from '@components/modules/area/arealist';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
 
 // 페이지당 표시할 아이템 개수
 const ITEMS_PER_PAGE = 6;

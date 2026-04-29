@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getFoodDataByRegion } from './foodData';
 import { toKorRegion } from '@utils/regionMap';
-import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
 
 import {
   AreaDetailHero,
@@ -12,7 +12,7 @@ import {
   AreaMap,
   AreaReview,
   AreaRelated,
-} from '@components/modules/areaview';
+} from '@components/modules/area/areaview';
 
 const CATEGORIES = ['전체', '한식', '중식', '일식', '양식'];
 
