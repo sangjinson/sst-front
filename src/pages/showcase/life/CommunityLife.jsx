@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 
-const Community = () => {
+const CommunityLife = () => {
   const [activeCategory, setActiveCategory] = useState("전체");
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ const Community = () => {
           </div>
 
           {/* ✅ 글쓰기 버튼: 필터 라인 우측 끝에 배치 */}
-          <Link to="/showcase/Write">
+          <Link to="/showcase/life/write">
             <button className="px-4 py-2 bg-gray-800 text-white text-xs md:text-sm rounded-lg flex items-center gap-1 hover:bg-emerald-600 transition-all shadow-md active:scale-95 shrink-0">
               <span className="text-lg leading-none">+</span> 글쓰기
             </button>
@@ -108,7 +108,7 @@ const Community = () => {
             <div 
               key={post.id} 
               // ✅ 경로를 /showcase/view/${id}로 확실하게 지정
-              onClick={() => navigate(`/showcase/view/${post.id}`)} 
+              onClick={() => navigate(`/showcase/life/view/${post.id}`)} 
               className="group cursor-pointer flex flex-col"
             >
               <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-gray-100 bg-gray-100 shadow-sm mb-4">
@@ -199,4 +199,4 @@ const Community = () => {
   );
 };
 
-export default Community;
+export default CommunityLife;

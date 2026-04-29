@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import { ClipButton } from '@components/modules/ActionButtons';
 
-const CommunityDetail = () => {
+const CommunityHotplaceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -228,4 +228,4 @@ const CommunityDetail = () => {
   );
 };
 
-export default CommunityDetail;
+export default CommunityHotplaceDetail;

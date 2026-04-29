@@ -4,14 +4,14 @@ import TextInput from "@modules/form/TextInput";
 import SelectInput from "@modules/form/SelectInput";
 
 
-const CommunityWrite = () => {
+const CommunityHotplaceWrite = () => {
   const navigate = useNavigate();
   
   // 기본 상태 관리
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("볼거리");
   const [content, setContent] = useState("");
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
 
@@ -32,12 +32,16 @@ const CommunityWrite = () => {
   }, []);
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+  const files = Array.from(e.target.files);
+
+    files.forEach((file) => {
       const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result);
+      reader.onloadend = () => {
+        setImagePreviews((prev) => [...prev, reader.result]);
+      };
       reader.readAsDataURL(file);
-    }
+    });
+    e.target.value = "";
   };
 
   const handleTagKeyDown = (e) => {
@@ -76,8 +80,7 @@ const CommunityWrite = () => {
               <div className="relative">
                 <label
                   id="region-label"
-                  className="block fs-down-2 font-bold text-gray-700 mb-3"
-                >
+                  className="block fs-down-2 font-bold text-gray-700 mb-3">
                   방문 지역
                 </label>
 
@@ -87,8 +90,7 @@ const CommunityWrite = () => {
                   aria-haspopup="listbox"
                   aria-expanded={isRegionOpen}
                   onClick={() => setIsRegionOpen(!isRegionOpen)}
-                  className="w-full h-[3rem] px-[1rem] text-[1rem] border border-gray-200 rounded-lg bg-white flex justify-between items-center focus:border-[#009277] transition-all"
-                >
+                  className="w-full h-[3rem] px-[1rem] text-[1rem] border border-gray-200 rounded-lg bg-white flex justify-between items-center focus:border-[#009277] transition-all">
                   <span className={selectedRegion ? "text-gray-900" : "text-gray-400"}>
                     {selectedRegion || "지역 선택"}
                   </span>
@@ -96,8 +98,7 @@ const CommunityWrite = () => {
                     className={`w-4 h-4 text-gray-400 transition-transform ${isRegionOpen ? "rotate-180" : ""}`}
                     fill="none"
                     stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                    viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -107,8 +108,7 @@ const CommunityWrite = () => {
                   <div
                     role="listbox"
                     aria-labelledby="region-label"
-                    className="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto"
-                  >
+                    className="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                     {gyeonggiRegions.map((region) => (
                       <div
                         key={region}
@@ -118,8 +118,7 @@ const CommunityWrite = () => {
                         onClick={() => {
                           setSelectedRegion(region);
                           setIsRegionOpen(false);
-                        }}
-                      >
+                        }}>
                         {region}
                       </div>
                     ))}
@@ -131,8 +130,7 @@ const CommunityWrite = () => {
               <div>
                 <label
                   htmlFor="placeName"
-                  className="block fs-down-2 font-bold text-gray-700 mb-3"
-                >
+                  className="block fs-down-2 font-bold text-gray-700 mb-3">
                   구체적인 장소
                 </label>
 
@@ -150,8 +148,7 @@ const CommunityWrite = () => {
             <div>
               <label
                 htmlFor="title"
-                className="block fs-down-2 font-bold text-gray-700 mb-3"
-              >
+                className="block fs-down-2 font-bold text-gray-700 mb-3">
                 제목
               </label>
 
@@ -168,20 +165,30 @@ const CommunityWrite = () => {
             <div>
               <label className="block fs-down-2 font-bold text-gray-700 mb-3">사진 등록</label>
               <div className="flex flex-col items-center justify-center w-full">
-                {imagePreview ? (
-                  <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border">
-                    <img src={imagePreview} alt="미리보기" className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => setImagePreview(null)} className="absolute top-4 right-4 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center">✕</button>
+                {imagePreviews.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full mb-4">
+                    {imagePreviews.map((preview, index) => (
+                      <div key={index} className="relative aspect-[4/3] rounded-lg overflow-hidden border">
+                        <img src={preview} alt={`미리보기 ${index + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setImagePreviews(imagePreviews.filter((_, i) => i !== index))}
+                          className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400">
-                      <svg className="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-                      <p className="text-em font-semibold">클릭하여 사진 추가</p>
-                    </div>
-                    <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" />
-                  </label>
                 )}
+
+                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400">
+                    <svg className="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                    <p className="text-em font-semibold">클릭하여 사진 추가</p>
+                  </div>
+                  <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" multiple />
+                </label>
               </div>
             </div>
 
@@ -204,8 +211,7 @@ const CommunityWrite = () => {
             <div>
               <label
                 htmlFor="tagInput"
-                className="block text-em font-bold text-gray-700 mb-3"
-              >
+                className="block text-em font-bold text-gray-700 mb-3">
                 태그 설정
               </label>
 
@@ -234,15 +240,13 @@ const CommunityWrite = () => {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="px-5 py-2.5 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200 transition-all"
-              >
+                className="px-5 py-2.5 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200 transition-all">
                 취소
               </button>
 
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-[#009277] text-white font-semibold rounded-lg hover:bg-[#007a63] shadow-md transition-all"
-              >
+                className="px-6 py-2.5 bg-[#009277] text-white font-semibold rounded-lg hover:bg-[#007a63] shadow-md transition-all">
                 등록하기
               </button>
             </div>
@@ -253,4 +257,4 @@ const CommunityWrite = () => {
   );
 };
 
-export default CommunityWrite;
+export default CommunityHotplaceWrite;

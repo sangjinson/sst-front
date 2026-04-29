@@ -29,7 +29,7 @@ const Header = () => {
       name: '뽐낼거리', 
       path: `/showcase`,
       subMenu: [ // 하위 메뉴 추가
-        { name: '핫플거리', path: '/showcase/hot' },
+        { name: '핫플거리', path: '/showcase/hotplace' },
         { name: '인생거리', path: '/showcase/life' },
       ]
     },
