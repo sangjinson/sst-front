@@ -1,35 +1,55 @@
 // src/context/AuthContext.jsx
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import api from '@api/axios';
 
-export const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  // 🚀 포인트 1: 초기값을 localStorage에서 읽어옵니다.
+  // 이렇게 하면 새로고침 직후에도 'isLogin' 값만큼은 즉시 살아납니다.
+  const [user, setUser] = useState(() => {
+    const savedLogin = localStorage.getItem('isLogin');
+    return savedLogin === 'true' ? { role: 'USER' } : null; 
+  });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 🚧 [수정됨] 프론트엔드 UI 개발을 위해 무조건 로그인된 것으로 강제 설정
-    const checkToken = () => {
-      // 로컬 스토리지 검사를 잠시 무시하고 강제로 유저 정보를 세팅합니다.
-      setUser({ id: 1, name: '홍길동', role: 'USER' });
-      setLoading(false);
+    const verifyUser = async () => {
+      try {
+        // 🚀 포인트 2: 새로고침 시 백엔드에 쿠키가 유효한지 물어봅니다. (/auth/me 또는 /auth/refresh)
+        const response = await api.get('/auth/me'); 
+        setUser(response.data); // 서버에 저장된 실제 유저 정보로 업데이트
+        localStorage.setItem('isLogin', 'true');
+      } catch (error) {
+        // 토큰이 만료되었거나 없다면 로그아웃 처리
+        setUser(null);
+        localStorage.removeItem('isLogin');
+      } finally {
+        setLoading(false);
+      }
     };
-    
-    setTimeout(checkToken, 300);
+
+    verifyUser();
   }, []);
 
-  const login = (userData, token) => {
-    localStorage.setItem('accessToken', token);
+  const login = (userData) => {
+    localStorage.setItem('isLogin', 'true');
     setUser(userData);
   };
 
-  const logout = () => {
-    localStorage.removeItem('accessToken');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } finally {
+      localStorage.removeItem('isLogin');
+      setUser(null);
+      window.location.href = '/';
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
