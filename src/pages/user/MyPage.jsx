@@ -19,9 +19,6 @@ const STATUS_COLOR = {
 
 const ITEMS_PER_PAGE = 8;
 
-// ─────────────────────────────────────────
-// 여행 상태 계산
-// ─────────────────────────────────────────
 const getTripStatus = (startDate, endDate) => {
   const now = new Date();
   const start = new Date(startDate);
@@ -31,9 +28,6 @@ const getTripStatus = (startDate, endDate) => {
   return '여행중';
 };
 
-// ─────────────────────────────────────────
-// 페이지네이션
-// ─────────────────────────────────────────
 const Pagination = ({ page, totalPages, onPageChange }) => (
   <div className="flex justify-center gap-2 mt-7 flex-wrap">
     <button
@@ -64,9 +58,6 @@ const Pagination = ({ page, totalPages, onPageChange }) => (
   </div>
 );
 
-// ─────────────────────────────────────────
-// 섹션: 회원정보
-// ─────────────────────────────────────────
 const MemberInfo = ({ profile, onUpdate }) => {
   const [form, setForm] = useState({ ...profile, password: "", passwordConfirm: "", address: "", detailAddress: "" });
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -152,9 +143,6 @@ const MemberInfo = ({ profile, onUpdate }) => {
   );
 };
 
-// ─────────────────────────────────────────
-// 섹션: 내 뽐낼거리
-// ─────────────────────────────────────────
 const MyShowcase = () => {
   const [page, setPage] = useState(1);
   return (
@@ -180,14 +168,13 @@ const MyShowcase = () => {
 };
 
 // ─────────────────────────────────────────
-// 섹션: 내 일정관리 ✅ localStorage 연동
+// 섹션: 내 일정관리
 // ─────────────────────────────────────────
 const MySchedule = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [schedules, setSchedules] = useState([]);
 
-  // localStorage에서 저장된 일정 불러오기
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem('savedTrips') || '[]');
     setSchedules(saved);
@@ -196,11 +183,28 @@ const MySchedule = () => {
   const totalPages = Math.ceil(schedules.length / ITEMS_PER_PAGE) || 1;
   const currentItems = schedules.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  const handleDelete = (id) => {
+  const handleDelete = (e, id) => {
+    e.stopPropagation(); // ✅ 행 클릭 이벤트 버블링 방지
     if (!window.confirm('일정을 삭제하시겠습니까?')) return;
     const updated = schedules.filter(s => s.id !== id);
     localStorage.setItem('savedTrips', JSON.stringify(updated));
     setSchedules(updated);
+  };
+
+  //  행 클릭 시 결과페이지로 이동 - 저장된 일정 데이터 그대로 전달
+  const handleRowClick = (s) => {
+    navigate('/plan/result', {
+      state: {
+        region: s.region,
+        period: s.period,
+        themes: s.themes || [],
+        startDate: s.startDate,
+        endDate: s.endDate,
+        schedule: s.schedule, // 저장된 일정 그대로 복원
+        savedId: s.id,     // 기존 id 전달
+        savedName: s.name,
+      }
+    });
   };
 
   return (
@@ -215,7 +219,7 @@ const MySchedule = () => {
             onClick={() => navigate('/plan')}
             className="px-5 py-2.5 bg-[#0F9B73] text-white rounded-xl text-sm font-medium hover:bg-[#0d8a66] transition"
           >
-            AI 일정 만들러 가기
+            일정 만들러 가기
           </button>
         </div>
       ) : (
@@ -234,9 +238,15 @@ const MySchedule = () => {
                   const status = getTripStatus(s.startDate, s.endDate);
                   const sc = STATUS_COLOR[status] || { bg: '#f3f4f6', color: '#374151' };
                   return (
-                    <tr key={s.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                    <tr
+                      key={s.id}
+                      onClick={() => handleRowClick(s)}  // ✅ 행 클릭 시 결과페이지 이동
+                      className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer"
+                    >
                       <td className="py-4 px-4 text-sm text-gray-500">{(page - 1) * ITEMS_PER_PAGE + idx + 1}</td>
-                      <td className="py-4 px-4 text-sm font-medium text-gray-900">{s.name}</td>
+                      <td className="py-4 px-4 text-sm font-medium text-gray-900 hover:text-[#0F9B73] transition-colors">
+                        {s.name}
+                      </td>
                       <td className="py-4 px-4 text-sm text-gray-500">{s.region}</td>
                       <td className="py-4 px-4 text-xs text-gray-500 whitespace-nowrap">
                         {s.startDate} ~ {s.endDate}
@@ -251,7 +261,7 @@ const MySchedule = () => {
                       </td>
                       <td className="py-4 px-4">
                         <button
-                          onClick={() => handleDelete(s.id)}
+                          onClick={(e) => handleDelete(e, s.id)}  // ✅ e 전달
                           className="px-3 py-1 bg-red-50 text-red-500 rounded-lg text-xs font-medium hover:bg-red-100 transition"
                         >
                           삭제
@@ -272,9 +282,6 @@ const MySchedule = () => {
   );
 };
 
-// ─────────────────────────────────────────
-// 섹션: 내 찜목록
-// ─────────────────────────────────────────
 const MyWishlist = () => {
   const navigate = useNavigate();
   const [likes, setLikes] = useState(() => getWishlist());
@@ -335,9 +342,6 @@ const MyWishlist = () => {
   );
 };
 
-// ─────────────────────────────────────────
-// 카드 정의
-// ─────────────────────────────────────────
 const CARDS = [
   { key: 'member',   label: '회원정보',    icon: '👤' },
   { key: 'showcase', label: '내 뽐낼거리', icon: '🖼️' },
@@ -345,17 +349,9 @@ const CARDS = [
   { key: 'wishlist', label: '내 찜목록',   icon: '❤️' },
 ];
 
-// ─────────────────────────────────────────
-// MyPage
-// ─────────────────────────────────────────
 const MyPage = () => {
   const location = useLocation();
-
-  // ✅ navigate로 전달된 tab state 자동 이동
-  const [activeSection, setActiveSection] = useState(
-    location.state?.tab || 'member'
-  );
-
+  const [activeSection, setActiveSection] = useState(location.state?.tab || 'member');
   const [profile, setProfile] = useState({
     name: '홍길동',
     phone: '010-5882-1253',
@@ -379,7 +375,6 @@ const MyPage = () => {
     <div className="min-h-screen bg-gray-50 font-sans">
       <div className="max-w-[1400px] mx-auto px-4 py-6 md:px-10 lg:py-10 flex flex-col lg:flex-row gap-6">
 
-        {/* 사이드바 */}
         <aside className="hidden lg:flex flex-col gap-4 w-[220px] shrink-0">
           <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
             <h3 className="text-sm font-bold text-gray-700 mb-4">마이페이지</h3>
@@ -414,7 +409,6 @@ const MyPage = () => {
           </div>
         </aside>
 
-        {/* 메인 */}
         <section className="flex-1 min-w-0 flex flex-col gap-4">
           <Breadcrumb
             paths={[
@@ -425,7 +419,6 @@ const MyPage = () => {
             className="mb-0"
           />
 
-          {/* 카드 4개 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {CARDS.map((card) => (
               <div
@@ -449,7 +442,6 @@ const MyPage = () => {
             ))}
           </div>
 
-          {/* 섹션 패널 */}
           <div key={activeSection} className="bg-white rounded-2xl border border-gray-200 shadow-sm min-h-[300px] animate-[fadeIn_0.3s_ease-in-out]">
             {renderSection()}
           </div>
@@ -466,4 +458,4 @@ const MyPage = () => {
   );
 };
 
-export default MyPage;
+export default MyPage;  
