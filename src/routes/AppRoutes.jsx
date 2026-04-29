@@ -26,9 +26,32 @@ import CommunityWrite from "@pages/showcase/CommunityWrite";
 import LoginPage from '@pages/auth/LoginPage';
 import SignupPage from '@pages/auth/SignupPage';
 
+import AdminHome from '@pages/user/Home';
+import MemberList from '@pages/admin/MemberList';
+import AreaPostList from '@pages/admin/AreaPostList';
+import ReportList from '@pages/admin/ReportList';
+import ReportDetail from '@pages/admin/ReportDetail';
+import ShowcaseList from '@pages/admin/ShowcaseList';
+
 const AppRoutes = () => {
   return (
     <Routes>
+
+      {/* 관리자 임시 경로!! */}
+      <Route path="/admin1" element={<AdminLayout />}>
+        <Route index element={<AdminHome />} />
+        <Route path="members" element={<MemberList />} />
+        <Route path="area/:type" element={<AreaPostList />} />
+        <Route path="report" element={<ReportList />} />
+        <Route path="report/:id" element={<ReportDetail />} />
+        <Route path="showcase" element={<ShowcaseList />} />
+      </Route>
+
+      {/* 관리자 임시 경로!! */}
+      <Route path="/admin1" element={<AdminLayout />}>
+        <Route index element={<AdminHome />} />
+      </Route>
+
       {/* 공개 접근 가능 페이지 */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
