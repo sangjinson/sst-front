@@ -1,21 +1,6 @@
 import React from 'react';
 import { SEARCH_CATEGORIES } from './aiResultUtils';
 
-/**
- * AIResultSearchPanel - 장소 검색 패널
- *
- * 사용 예시:
- * <AIResultSearchPanel
- *   searchKeyword={searchKeyword}
- *   searchCategory={searchCategory}
- *   searchResults={searchResults}
- *   currentDayItems={currentDayItems}
- *   onKeywordChange={(kw) => setSearchKeyword(kw)}
- *   onCategoryChange={(cat) => setSearchCategory(cat)}
- *   onAddPlace={handleAddPlace}
- *   onClose={() => setShowSearch(false)}
- * />
- */
 const AIResultSearchPanel = ({
   searchKeyword,
   searchCategory,
@@ -55,16 +40,16 @@ const AIResultSearchPanel = ({
         </div>
       </div>
 
-      {/* 카테고리 필터 */}
+      {/* ✅ 카테고리 필터 - 초록색 통일 */}
       <div className="flex gap-2 mb-3 flex-wrap">
         {SEARCH_CATEGORIES.map(cat => (
           <button
             key={cat}
             onClick={() => onCategoryChange(cat)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition ${
+            className={`px-4 py-1.5 rounded-full text-xs font-medium border transition ${
               searchCategory === cat
-                ? 'bg-[#E8956D] text-white border-[#E8956D]'
-                : 'bg-white text-gray-600 border-gray-300 hover:border-[#E8956D] hover:text-[#E8956D]'
+                ? 'bg-[#0F9B73] text-white border-[#0F9B73]'
+                : 'bg-white text-gray-600 border-gray-300 hover:border-[#0F9B73] hover:text-[#0F9B73]'
             }`}
           >
             {cat}
