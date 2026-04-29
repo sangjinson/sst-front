@@ -1,3 +1,4 @@
+// 역할: 상단에 1,2,3단계 진행상태 표시
 import React from 'react';
 
 /**
@@ -14,7 +15,7 @@ const AIPlanStepIndicator = ({ current }) => {
 
   return (
     <div className="flex items-center justify-center mb-8">
-      {steps.map((label, i) => (
+      {steps.map((label, i) =>  (
         <React.Fragment key={i}>
           <div className="flex flex-col items-center">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition ${
