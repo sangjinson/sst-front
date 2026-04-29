@@ -134,13 +134,11 @@ const CommunityHotplace = () => {
           return (
             <article
               key={post.id}
-              className="mb-5 md:mb-6 break-inside-avoid overflow-hidden rounded-xl border border-[#eee] bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_28px_rgba(0,0,0,0.09)] group"
-            >
+              className="mb-5 md:mb-6 break-inside-avoid overflow-hidden rounded-xl border border-[#eee] bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_28px_rgba(0,0,0,0.09)] group">
               <button
                 type="button"
                 onClick={() => navigate(`/showcase/hotplace/view/${post.id}`)}
-                className="block w-full text-left"
-              >
+                className="block w-full text-left">
                 <div className="p-4 bg-white">
                   <h4 className="fs-up-3 font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-1">
                     {post.title}
@@ -163,9 +161,11 @@ const CommunityHotplace = () => {
 
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <span className="block text-xs text-gray-400 mb-0.5">작성자</span>
-                    <strong className="block text-sm text-gray-900 truncate">{post.author}</strong>
-                  </div>
+                  <span className="fs-up-2 text-gray-500 shrink-0">작성자</span>
+                  <strong className="fs-up-3 text-[#E8956D] truncate pl-4">
+                    {post.author}
+                  </strong>
+                </div>
 
                   <button
                     type="button"
@@ -175,8 +175,7 @@ const CommunityHotplace = () => {
                         ? "border-red-200 bg-red-50 text-red-500"
                         : "border-gray-200 bg-white text-gray-500 hover:border-red-200 hover:text-red-500"
                     }`}
-                    aria-label={`${post.title} 좋아요`}
-                  >
+                    aria-label={`${post.title} 좋아요`}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4"
