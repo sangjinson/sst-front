@@ -10,25 +10,29 @@ const Header = () => {
   const { region } = useParams();
   const navigate = useNavigate();
 
-  // 🚀 1. URL에 지역 정보(region)가 있을 때마다 브라우저에 저장해둡니다.
   useEffect(() => {
     if (region) {
       localStorage.setItem('lastVisitedRegion', region);
     }
   }, [region]);
 
-  // 🚀 2. 현재 지역을 결정합니다. (URL 파라미터 우선 -> 없으면 저장된 값 -> 없으면 기본값)
   const currentRegion = region || localStorage.getItem('lastVisitedRegion') || '수원시';
 
   const headerRef = useRef(null);
 
-  // 🚀 3. 이제 currentRegion이 항상 유지되므로 링크가 깨지지 않습니다.
   const navItems = [
     { name: '볼거리', path: `/${currentRegion}/see/list` },
     { name: '먹거리', path: `/${currentRegion}/food/list` },
     { name: '잘거리', path: `/${currentRegion}/sleep/list` },
     { name: '놀거리', path: `/${currentRegion}/play/list` },
-    { name: '뽐낼거리', path: `/showcase` },
+    { 
+      name: '뽐낼거리', 
+      path: `/showcase`,
+      subMenu: [ // 하위 메뉴 추가
+        { name: '핫플거리', path: '/showcase/hot' },
+        { name: '인생거리', path: '/showcase/life' },
+      ]
+    },
     { name: '내거리', path: '/user/mypage' },
     { name: '내거리(일정)', path: '/plan' },
   ];
@@ -76,8 +80,7 @@ const Header = () => {
 
   return (
     <header ref={headerRef} className="w-full bg-white border-b border-gray-200 sticky top-0 z-[1000] relative">
-      
-      <div className="container mx-auto flex justify-between items-end pt-7 pb-4">
+      <div className="container mx-auto flex justify-between items-end pt-7 pb-4 px-4">
         
         {/* 로고 */}
         <div className="header-logo text-black no-underline fs-up-6">
@@ -87,9 +90,35 @@ const Header = () => {
         {/* 데스크톱 네비게이션 */}
         <nav className="hidden md:flex gap-4 lg:gap-[30px] mb-2">
           {navItems.map((item) => (
-            <Link key={item.name} to={item.path} className="text-black fs-up-3 font-medium hover:text-primary transition-colors">
-              {item.name}
-            </Link>
+            <div key={item.name} className="relative group">
+              <Link 
+                to={item.path} 
+                className="text-black fs-up-3 font-medium hover:text-primary transition-colors block py-1"
+              >
+                {item.name}
+              </Link>
+
+              {/* 🚀 뽐낼거리 하위 메뉴 드롭다운 */}
+              {item.subMenu && (
+                <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out z-[1001]">
+                  {/* 메뉴와 드롭다운 사이 마우스 이탈 방지를 위한 투명 레이어 */}
+                  <div className="absolute -top-2 left-0 w-full h-2"></div>
+                  
+                  <div className="w-32 bg-white border border-gray-100 shadow-xl rounded-md py-1">
+                    {item.subMenu.map((sub) => (
+                      <Link
+                        key={sub.name}
+                        to={sub.path}
+                        onClick={closeMenu}
+                        className="block px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors whitespace-nowrap text-center"
+                      >
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           ))}
         </nav>
 
@@ -99,14 +128,12 @@ const Header = () => {
             🔍
           </button>
           
-          {/* 로그인 버튼 → /login으로 이동 */}
           <Link to="/login">
             <button className="bg-primary text-white py-2 px-4 md:px-6 rounded fs-up-1 font-bold border-none cursor-pointer whitespace-nowrap">
               로그인
             </button>
           </Link>
           
-          {/* 모바일 햄버거 버튼 */}
           <button
             className="block md:hidden w-9 h-9 flex items-center justify-center fs-up-3 text-gray-800 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition"
             onClick={toggleMenu}
@@ -118,9 +145,8 @@ const Header = () => {
 
       {/* --- 확장 검색창 오버레이 --- */}
       {isSearchOpen && (
-        <div className="absolute top-full left-0 w-full bg-white/98 shadow-[0_10px_30px_rgba(0,0,0,0.1)] pt-[50px] pb-[40px] px-5 flex justify-center z-[999] border-t border-gray-100 animate-slidedown">
+        <div className="absolute top-full left-0 w-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.1)] pt-[50px] pb-[40px] px-5 flex justify-center z-[999] border-t border-gray-100 animate-slidedown">
           <div className="w-full max-w-[800px] flex flex-col">
-            
             <div className="flex items-center border-b-2 border-gray-800 pb-[15px] mb-[15px]">
               <input 
                 type="text" 
@@ -135,7 +161,6 @@ const Header = () => {
                 🔍
               </button>
             </div>
-            
             <div className="flex flex-wrap gap-2.5 md:gap-5 px-2.5 text-[13px] md:text-[14px] text-gray-500">
               {['#마술의 거리', '#낭만의 거리', '#숲속의 거리', '#필수 관광명소'].map(tag => (
                 <span key={tag} onClick={() => handleTagClick(tag)} className="cursor-pointer hover:text-primary hover:underline transition-colors">
@@ -143,7 +168,6 @@ const Header = () => {
                 </span>
               ))}
             </div>
-
           </div>
         </div>
       )}
@@ -152,14 +176,21 @@ const Header = () => {
       {isMenuOpen && (
         <nav className="absolute top-full left-0 w-full bg-white shadow-lg border-t border-gray-100 flex flex-col md:hidden z-[998]">
           {navItems.map((item) => (
-            <Link 
-              key={item.name} 
-              to={item.path} 
-              onClick={closeMenu} 
-              className="text-gray-800 text-[16px] py-[15px] px-5 border-b border-gray-50 hover:bg-gray-50 no-underline"
-            >
-              {item.name}
-            </Link>
+            <React.Fragment key={item.name}>
+              <Link 
+                to={item.path} 
+                onClick={closeMenu} 
+                className="text-gray-800 text-[16px] py-[15px] px-5 border-b border-gray-50 hover:bg-gray-50 no-underline font-bold"
+              >
+                {item.name}
+              </Link>
+              {/* 모바일에서도 하위 메뉴를 보여주고 싶다면 여기에 추가 로직을 넣을 수 있어 */}
+              {item.subMenu && item.subMenu.map(sub => (
+                <Link key={sub.name} to={sub.path} onClick={closeMenu} className="text-gray-500 text-[14px] py-[10px] px-8 border-b border-gray-50 hover:bg-gray-50 no-underline">
+                  - {sub.name}
+                </Link>
+              ))}
+            </React.Fragment>
           ))}
         </nav>
       )}
