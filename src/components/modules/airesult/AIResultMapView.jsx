@@ -1,18 +1,9 @@
-import React, { useState } from 'react';
-
-const TYPE_LABEL = {
-  see:   '볼거리',
-  food:  '먹거리',
-  sleep: '잘거리',
-};
-
-const TYPE_COLOR = {
-  see:   'bg-blue-100 text-blue-700',
-  food:  'bg-orange-100 text-orange-700',
-  sleep: 'bg-green-100 text-green-700',
-};
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { TYPE_LABEL, TYPE_COLOR, getDetailPath } from './aiResultUtils';
 
 const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, onSelectItem }) => {
+  const navigate = useNavigate();
   const currentDayItems = schedule[activeDay] || [];
 
   const handlePrev = () => {
@@ -25,11 +16,18 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     if (idx < currentDayItems.length - 1) onSelectItem(currentDayItems[idx + 1]);
   };
 
+  const handleGoDetail = () => {
+    if (!selectedItem) return;
+    navigate(getDetailPath(selectedItem, selectedRegion));
+  };
+
+  const currentIdx = currentDayItems.findIndex(i => i.id === selectedItem?.id);
+
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col min-w-0">
 
       {/* 지도 */}
-      <div className="w-full flex-1 bg-gray-100 relative" style={{ minHeight: '480px' }}>
+      <div className="w-full flex-1 bg-gray-100 relative" style={{ minHeight: '400px' }}>
         <iframe
           title="지도"
           width="100%"
@@ -56,18 +54,22 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
 
       {/* 미니 상세 카드 */}
       {selectedItem ? (
-        <div className="border-t border-gray-100 bg-white px-4 py-3 flex items-center gap-3">
+        <div className="border-t border-gray-100 bg-white px-3 py-3 flex items-center gap-3">
+
           {/* 이전 버튼 */}
           <button
             onClick={handlePrev}
-            disabled={currentDayItems.findIndex(i => i.id === selectedItem.id) === 0}
-            className="text-gray-400 hover:text-gray-600 text-2xl shrink-0 disabled:opacity-30"
+            disabled={currentIdx === 0}
+            className="text-gray-400 hover:text-gray-600 text-2xl shrink-0 disabled:opacity-30 transition"
           >
             ‹
           </button>
 
-          {/* 이미지 */}
-          <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0">
+          {/* 이미지 - 클릭 시 상세페이지 이동 */}
+          <div
+            onClick={handleGoDetail}
+            className="w-16 h-16 rounded-xl overflow-hidden shrink-0 cursor-pointer hover:opacity-80 transition"
+          >
             <img
               src={selectedItem.image}
               alt={selectedItem.name}
@@ -75,15 +77,19 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
             />
           </div>
 
-          {/* 정보 */}
-          <div className="flex-1 min-w-0">
+          {/* 정보 - 클릭 시 상세페이지 이동 */}
+          <div
+            onClick={handleGoDetail}
+            className="flex-1 min-w-0 cursor-pointer"
+          >
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs text-gray-400">{selectedItem.time}</span>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${TYPE_COLOR[selectedItem.type]}`}>
                 {TYPE_LABEL[selectedItem.type]}
               </span>
             </div>
-            <p className="text-sm font-bold text-gray-900 truncate">{selectedItem.name}</p>
+            <p className="text-sm font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
+              {selectedItem.name}
+            </p>
             <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1 truncate">
               <svg viewBox="0 0 24 24" className="w-3 h-3 fill-none stroke-current shrink-0" strokeWidth="2">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -101,8 +107,8 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           {/* 다음 버튼 */}
           <button
             onClick={handleNext}
-            disabled={currentDayItems.findIndex(i => i.id === selectedItem.id) === currentDayItems.length - 1}
-            className="text-gray-400 hover:text-gray-600 text-2xl shrink-0 disabled:opacity-30"
+            disabled={currentIdx === currentDayItems.length - 1}
+            className="text-gray-400 hover:text-gray-600 text-2xl shrink-0 disabled:opacity-30 transition"
           >
             ›
           </button>
