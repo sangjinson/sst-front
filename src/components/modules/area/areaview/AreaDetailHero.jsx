@@ -1,8 +1,8 @@
 //import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // [원복 방법] HeartButton 다시 추가, WishlistHeartButton 제거
-import { ClipButton } from '@components/modules/AreaActionButtons';
-import { getBadgeColor } from '@components/modules/arealist/areaListUtils';
+import { ClipButton } from '@components/modules/ActionButtons';
+import { getBadgeColor } from '@components/modules/area/arealist/areaListUtils';
 
 /**
  * AreaDetailHero - 뷰 페이지 공통 대표 이미지 섹션
@@ -21,9 +21,10 @@ import { getBadgeColor } from '@components/modules/arealist/areaListUtils';
  *   image={item.image}
  *   name={item.name}
  *   category={item.category}
- *   categories={['전체', '호텔', '리조트', '펜션', '모텔', '게스트하우스']}
- *   isWished={isWished}
- *   onWish={() => setIsWished((prev) => !prev)}
+ *   categories={[선언된 카테고리]}
+ *   renderHeart={() => (
+      <WishlistHeartButton item={item} itemType="해당타입" region={region} />
+     )}
  * />
  * ────────────────────────────────────────────────
  *
@@ -35,12 +36,7 @@ import { getBadgeColor } from '@components/modules/arealist/areaListUtils';
  * - isWished   : 찜 상태 (boolean)
  * - onWish     : 찜 토글 핸들러
  */
-// [원복 방법]
-// 1. props를 아래처럼 되돌린다:
-//    isWished, onWish 복구 / renderHeart 제거
-// 2. JSX에서 renderHeart() 호출 부분을 아래로 되돌린다:
-//    <HeartButton liked={isWished} onClick={onWish} />
-// 3. import에 HeartButton 다시 추가한다
+
 const AreaDetailHero = ({
   image,
   name,
@@ -70,7 +66,6 @@ const AreaDetailHero = ({
       {/* 공유 & 찜 버튼 */}
       <div className="absolute top-4 right-4 flex gap-2">
         <ClipButton />
-        {/* [원복 방법] 아래 줄을 <HeartButton liked={isWished} onClick={onWish} /> 로 교체 */}
         {renderHeart && renderHeart()}
       </div>
 

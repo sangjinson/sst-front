@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Breadcrumb from '@components/common/Breadcrumb';
-import { ClipButton } from '@components/modules/AreaActionButtons';
+import { ClipButton } from '@components/modules/ActionButtons';
 import { getFoodDataByRegion } from '@pages/area/food/foodData';
 import { getSeeDataByRegion } from '@pages/area/see/seeData';
 import { getSleepDataByRegion } from '@pages/area/sleep/sleepDummyData';
