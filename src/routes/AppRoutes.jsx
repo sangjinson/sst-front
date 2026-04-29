@@ -86,6 +86,7 @@ const AppRoutes = () => {
           <Route path="hotplace" element={<CommunityHotplace />} />
           <Route path="hotplace/view/:id" element={<CommunityHotplaceDetail />} />
           <Route path="hotplace/write" element={<CommunityHotplaceWrite />} />
+          <Route path="hotplace/write/:id" element={<CommunityHotplaceWrite />} />
 
           {/* 인생거리 */}
           <Route path="life" element={<CommunityLife />} />

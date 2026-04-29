@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import TextInput from "@modules/form/TextInput";
 import SelectInput from "@modules/form/SelectInput";
-
+import { hotplacePosts, gyeonggiRegions } from "./communityHotplaceData";
 
 const CommunityHotplaceWrite = () => {
   const navigate = useNavigate();
-  
+  const { id } = useParams();
+
+  // 수정 모드 여부
+  const isEditMode = !!id;
+
+  // 수정할 게시글 데이터 찾기
+  const currentPost = hotplacePosts.find((post) => post.id === Number(id));
+
   // 기본 상태 관리
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("볼거리");
@@ -20,19 +27,36 @@ const CommunityHotplaceWrite = () => {
   const [isRegionOpen, setIsRegionOpen] = useState(false); // 드롭다운 열림 상태
   const [placeName, setPlaceName] = useState("");
 
-  const gyeonggiRegions = [
-    "수원시", "용인시", "성남시", "부천시", "화성시", "안산시", "남양주시", "안양시", "평택시", 
-    "시흥시", "파주시", "의정부시", "김포시", "광명시", "광주시", "군포시", "이천시", "오산시", 
-    "하남시", "양주시", "구리시", "안성시", "포천시", "의왕시", "양평군", "여주시", "동두천시", 
-    "가평군", "과천시", "연천군"
-  ];
-
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
 
+  // 수정 모드일 때 기존 게시글 데이터를 입력창에 넣기
+  useEffect(() => {
+    if (!isEditMode || !currentPost) return;
+
+    setTitle(currentPost.title);
+    setContent(currentPost.description);
+    setPlaceName(currentPost.place);
+    setTags(currentPost.hashtags || []);
+    setImagePreviews(currentPost.images || [currentPost.img]);
+
+    // 현재 더미데이터에 region 값이 없어서 임시로 빈 값 유지
+    // 나중에 데이터에 region: "수원시" 같은 값을 추가하면 자동으로 들어감
+    setSelectedRegion(currentPost.region || "");
+  }, [isEditMode, currentPost]);
+
+  // 수정 모드인데 게시글이 없을 때
+  if (isEditMode && !currentPost) {
+    return (
+      <div className="py-20 text-center font-bold text-gray-500">
+        수정할 게시글이 존재하지 않습니다.
+      </div>
+    );
+  }
+
   const handleImageChange = (e) => {
-  const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files);
 
     files.forEach((file) => {
       const reader = new FileReader();
@@ -59,9 +83,25 @@ const CommunityHotplaceWrite = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({ category, selectedRegion, placeName, title, content, tags });
-    alert("글이 등록되었습니다!");
-    navigate("/showcase");
+
+    console.log({
+      id: currentPost?.id,
+      category,
+      selectedRegion,
+      placeName,
+      title,
+      content,
+      tags,
+      imagePreviews,
+    });
+
+    if (isEditMode) {
+      alert("글이 수정되었습니다!");
+      navigate(`/showcase/hotplace/view/${id}`);
+    } else {
+      alert("글이 등록되었습니다!");
+      navigate("/showcase/hotplace");
+    }
   };
 
   return (
@@ -69,8 +109,14 @@ const CommunityHotplaceWrite = () => {
       <div className="container py-20">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="border-b px-8 py-6">
-            <h2 className="fs-down-4 font-bold text-gray-800">뽐낼거리 작성하기</h2>
-            <p className="fs-down-1 text-gray-400 mt-1">나만의 경기도 여행 순간을 기록해 보세요.</p>
+            <h2 className="fs-down-4 font-bold text-gray-800">
+              {isEditMode ? "핫플거리 수정하기" : "핫플거리 작성하기"}
+            </h2>
+            <p className="fs-down-1 text-gray-400 mt-1">
+              {isEditMode
+                ? "작성한 경기도 여행 순간을 수정해보세요."
+                : "나만의 경기도 여행 순간을 기록해 보세요."}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
@@ -247,7 +293,7 @@ const CommunityHotplaceWrite = () => {
               <button
                 type="submit"
                 className="px-6 py-2.5 bg-[#009277] text-white font-semibold rounded-lg hover:bg-[#007a63] shadow-md transition-all">
-                등록하기
+                {isEditMode ? "수정하기" : "등록하기"}
               </button>
             </div>
           </form>
