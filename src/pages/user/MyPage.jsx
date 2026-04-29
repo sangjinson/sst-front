@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '@components/common/Breadcrumb';
 
-// 🚀 분리한 컴포넌트들을 불러옵니다. (경로가 맞는지 확인해 주세요)
+// 분리한 컴포넌트들을 불러옵니다.
 import Sidebar from '@components/mypage/Sidebar';
 import MemberInfo from '@components/mypage/MemberInfo';
 import MyShowcase from '@components/mypage/MyShowcase';
@@ -94,41 +94,48 @@ const MyPage = () => {
       <AnimationStyles />
       
       <div className="min-h-screen bg-gray-50 font-paperlogy">
-        <div className="max-w-[1400px] mx-auto px-4 py-6 md:px-10 lg:py-10 flex flex-col lg:flex-row gap-6">
+        {/* 🚀 전체 영역을 세로(flex-col)로만 정렬하도록 수정 */}
+        <div className="max-w-[1400px] mx-auto px-4 py-6 md:px-10 lg:py-10 flex flex-col gap-4 md:gap-6">
 
-          {/* 좌측 사이드바 컴포넌트 */}
-          <Sidebar profile={profile} />
+          {/* 🚀 브레드크럼을 가장 상단으로 분리하여 배치 */}
+          <Breadcrumb 
+            paths={[
+              { label: '홈', to: '/' },
+              { label: '마이페이지', to: '/user/mypage' },
+              { label: sectionLabel }
+            ]} 
+            className="mb-0" 
+          />
 
-          {/* 우측 메인 콘텐츠 */}
-          <section className="flex-1 min-w-0 flex flex-col gap-4">
+          {/* 🚀 사이드바와 메인 콘텐츠를 묶어주는 가로 정렬 컨테이너 추가 */}
+          <div className="flex flex-col lg:flex-row gap-6">
             
-            <Breadcrumb 
-              paths={[
-                { label: '홈', to: '/' },
-                { label: '마이페이지', to: '/user/mypage' },
-                { label: sectionLabel }
-              ]} 
-              className="mb-0" 
-            />
+            {/* 좌측 사이드바 컴포넌트 */}
+            <Sidebar profile={profile} />
 
-            {/* 4개의 탭 버튼 영역 */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {CARDS.map((card) => (
-                <TabCard 
-                  key={card.key} 
-                  card={card} 
-                  isActive={activeSection === card.key} 
-                  onClick={() => setActiveSection(card.key)} 
-                />
-              ))}
-            </div>
+            {/* 우측 메인 콘텐츠 */}
+            <section className="flex-1 min-w-0 flex flex-col gap-4">
+              
+              {/* 4개의 탭 버튼 영역 */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                {CARDS.map((card) => (
+                  <TabCard 
+                    key={card.key} 
+                    card={card} 
+                    isActive={activeSection === card.key} 
+                    onClick={() => setActiveSection(card.key)} 
+                  />
+                ))}
+              </div>
 
-            {/* 선택된 탭 렌더링 영역 */}
-            <div key={activeSection} className="bg-white rounded-2xl border border-gray-200 shadow-sm min-h-[300px] animate-fade-in">
-              {renderContent[activeSection]}
-            </div>
+              {/* 선택된 탭 렌더링 영역 */}
+              <div key={activeSection} className="bg-white rounded-2xl border border-gray-200 shadow-sm min-h-[300px] animate-fade-in">
+                {renderContent[activeSection]}
+              </div>
 
-          </section>
+            </section>
+          </div>
+
         </div>
       </div>
     </>
