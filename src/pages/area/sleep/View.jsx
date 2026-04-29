@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
+// [원복 방법] useWishlist 복구, WishlistHeartButton import 제거
+import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
 import {
   AreaDetailHero,
   AreaDescription,
@@ -28,9 +30,10 @@ const View = () => {
 
   const isLoggedIn = true; // ※ 실제 AuthContext로 교체 필요
 
-  const [item, setItem]               = useState(null);
+  const [item, setItem]                = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
-  const [isWished, setIsWished]       = useState(false);
+  // [원복 방법] 아래 줄 복구: const { isWished, toggleWish } = useWishlist(id, 'sleep');
+
 
   useEffect(() => {
     if (!id) return;
@@ -65,13 +68,15 @@ const View = () => {
     <div>
 
       {/* 대표 이미지 + 공유/찜/뒤로가기 */}
+      {/* [원복 방법] renderHeart 제거 후 isWished, onWish props 복구 */}
       <AreaDetailHero
         image={item.image}
         name={item.name}
         category={item.category}
         categories={CATEGORIES}
-        isWished={isWished}
-        onWish={() => setIsWished((prev) => !prev)}
+        renderHeart={() => (
+          <WishlistHeartButton item={item} itemType="sleep" region={region} />
+        )}
       />
 
       {/* 상세 설명 */}

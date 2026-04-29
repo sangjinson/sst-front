@@ -1,6 +1,8 @@
 // src/pages/user/MyPage.jsx
 import React, { useState, useEffect } from 'react'; // 🚀 useEffect 추가
 import Breadcrumb from '@components/common/Breadcrumb';
+// [원복 방법] 아래 import 줄 삭제 후, getFoodLikes 주석 해제하면 원래대로 돌아옴
+import { getWishlist, STORAGE_KEY } from '@hooks/useWishlist';
 
 import Sidebar from '@components/mypage/Sidebar';
 import MemberInfo from '@components/mypage/MemberInfo';

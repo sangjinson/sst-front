@@ -28,9 +28,9 @@ const Footer = () => {
             <div className="text-gray-300 leading-[2] space-y-1">
               <p className="m-0">(54888) 전북특별자치도 전주시 덕진구 기린대로 499</p>
               <p className="m-0">
-                <span className="font-bold">대표전화 010-8728-4276</span>
+                <span className="font-semibold">대표전화 010-8728-4276</span>
                 <span className="mx-2">|</span>
-                <span className="font-bold">팩스 02-123-1234</span>
+                <span className="font-semibold">팩스 02-123-1234</span>
               </p>
             </div>
 
@@ -38,6 +38,7 @@ const Footer = () => {
               숨겨진 경기도의 매력을 발견하세요.<br />
               나만의 완벽한 여행 일정을 AI와 함께 쉽게 계획할 수 있습니다.
             </div>
+
 
           </div>
 
@@ -56,7 +57,22 @@ const Footer = () => {
               <li>손상진 thstkdwls13@naver.com</li>
               <li>한상인 blueunycon@gmail.com</li>
             </ul>
+
+            <div className="text-gray-300 border-t border-white/20 pt-3 md:border-t-0 md:pt-0 font-bold">
+              <ul className="flex items-center text-gray-300 border-t border-white/20 pt-3 md:border-t-0 md:pt-0 font-bold list-none">
+                <li>
+                  <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">공지사항</Link>
+                </li>
+                {/* 구분선 (li로 감싸거나 요소 사이에 배치) */}
+                <li className="mx-2.5 text-white/30" aria-hidden="true">|</li>
+                <li>
+                  <Link to="/customersupport/faq" className="text-white hover:text-sky-400! transition-colors duration-200">자주하는 질문</Link>
+                </li>
+              </ul>
+            </div>
           </div>
+          
+            
         </div>
 
         {/* 3. 하단 섹션: 카피라이트 */}
