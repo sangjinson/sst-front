@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+// [원복 방법] 아래 줄 삭제, WishlistHeartButton 컴포넌트 전체 삭제
+import { useWishlist } from '@hooks/useWishlist';
 
 /**
  * AreaActionButtons - 뷰 페이지 공통 공유/찜 버튼 컴포넌트
@@ -56,11 +58,11 @@ export const ClipButton = () => {
       {/* 공유 버튼 */}
       <button
         onClick={() => setIsShareOpen((prev) => !prev)}
-        className="p-2.5 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/40 hover:text-emerald-300 active:scale-90 transition cursor-pointer border-none outline-none"
+        className="group/link w-9 h-9 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md hover:bg-white hover:scale-105 active:scale-90 transition-all duration-200 cursor-pointer border-none outline-none"
         aria-label="링크 공유"
       >
         <svg
-          className="w-5 h-5 transition-all duration-200"
+          className="w-5 h-5 text-gray-500 transition-all duration-200 group-hover/link:text-[#0F9B73] group-hover/link:scale-110"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.8"
@@ -94,19 +96,49 @@ export const ClipButton = () => {
   );
 };
 
-// 찜(하트) 버튼
+// 리스트 페이지용 - 찜 로직 내장 (원복: 이 컴포넌트 전체 삭제 + import 삭제)
+export const WishlistHeartButton = ({ item, itemType, region }) => {
+  const { isWished, toggleWish } = useWishlist(item?.id, itemType);
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    toggleWish({
+      id: item.id,
+      name: item.name,
+      image: item.image,
+      category: item.category,
+      address: item.address,
+      type: itemType,
+      region,
+    });
+  };
+
+  return <HeartButton liked={isWished} onClick={handleClick} />;
+};
+
+// 찜(하트) 버튼 - 순수 UI (liked, onClick을 외부에서 주입)
 export const HeartButton = ({ liked, onClick }) => (
   <button
     onClick={onClick}
-    className="w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors border-none outline-none cursor-pointer"
+    className={`group/heart w-9 h-9 flex items-center justify-center rounded-full backdrop-blur-md transition-all duration-200 cursor-pointer border-none outline-none
+      ${liked ? 'bg-white shadow-md' : 'bg-white/80 hover:bg-white'}
+      hover:scale-105 active:scale-90`}
     aria-label="좋아요"
   >
     <svg
       viewBox="0 0 24 24"
-      className={`w-5 h-5 transition-colors ${liked ? 'fill-red-500 stroke-red-500' : 'fill-none stroke-gray-500'}`}
-      strokeWidth="2"
+      className={`w-5 h-5 transition-all duration-200 ${
+        liked
+          ? 'scale-110 text-rose-500 fill-rose-500'
+          : 'text-gray-500 group-hover/heart:text-rose-400 group-hover/heart:scale-110'
+      }`}
+      fill={liked ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
     </svg>
   </button>
 );
