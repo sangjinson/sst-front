@@ -3,7 +3,8 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { getFoodDataByRegion } from './foodData';
 import { toKorRegion } from '@utils/regionMap';
-import { AreaListCard, AreaFilterBar, AreaPagination, sortData } from '@components/modules/arealist';
+import { AreaListCard, AreaFilterBar, AreaPagination, sortData } from '@components/modules/area/arealist';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
 
 const ITEMS_PER_PAGE = 9;
 const CATEGORIES = ['전체', '한식', '중식', '일식', '양식'];
@@ -16,12 +17,6 @@ export default function FoodList() {
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [sortOption, setSortOption]             = useState('reviews');
   const [currentPage, setCurrentPage]           = useState(1);
-  const [likedItems, setLikedItems]             = useState({});
-
-  const handleLike = (e, id) => {
-    e.stopPropagation();
-    setLikedItems((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
 
   const filtered = useMemo(() => {
     const data = getFoodDataByRegion(regionKor);
@@ -61,9 +56,10 @@ export default function FoodList() {
                   ...item,
                   categoryIndex: CATEGORIES.filter(c => c !== '전체').indexOf(item.category),
                 }}
-                liked={!!likedItems[item.id]}
-                onLike={(e) => handleLike(e, item.id)}
                 onClick={() => navigate(`/${selectedRegion}/food/view?id=${item.id}`)}
+                renderHeart={() => (
+                  <WishlistHeartButton item={item} itemType="food" region={regionKor} />
+                )}
               />
             ))}
           </div>

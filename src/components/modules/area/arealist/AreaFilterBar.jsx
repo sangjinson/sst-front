@@ -1,5 +1,5 @@
 import React from 'react';
-import { AREA_SORT_OPTIONS } from '@components/modules/arealist/areaListUtils';
+import { AREA_SORT_OPTIONS } from '@components/modules/area/arealist/areaListUtils';
 
 /**
  * AreaFilterBar - 볼거리/먹거리/잘거리/놀거리 공통 필터/정렬 바

@@ -1,28 +1,60 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-// [원복 방법] 아래 줄 삭제, WishlistHeartButton 컴포넌트 전체 삭제
 import { useWishlist } from '@hooks/useWishlist';
 
 /**
- * AreaActionButtons - 뷰 페이지 공통 공유/찜 버튼 컴포넌트
+ * AreaActionButtons - 공통 공유/찜 버튼 컴포넌트
  *
  * ────────────────────────────────────────────────
- * 사용 예시:
+ * [ClipButton] 공유 버튼 - props 없음, 어디서든 사용 가능
  *
- * // 1. import
- * import { ClipButton, HeartButton } from '@components/modules/AreaActionButtons';
- *
- * // 2. JSX에서 사용
+ * import { ClipButton } from '@components/modules/AreaActionButtons';
  * <ClipButton />
- * <HeartButton liked={isWished} onClick={() => setIsWished((prev) => !prev)} />
  * ────────────────────────────────────────────────
  *
- * ClipButton props:
- * - 없음 (공유 팝업 + 복사 로직 내장)
+ * ────────────────────────────────────────────────
+ * [HeartButton] 찜 버튼 - 마이페이지 찜목록 연동 불필요한 곳에서 사용
+ * (예: 커뮤니티 상세, 단순 UI 토글이 필요한 곳)
  *
- * HeartButton props:
+ * import { HeartButton } from '@components/modules/AreaActionButtons';
+ *
+ * const [liked, setLiked] = useState(false);
+ * <HeartButton liked={liked} onClick={() => setLiked(prev => !prev)} />
+ *
+ * props:
  * - liked   : 찜 상태 (boolean)
  * - onClick : 클릭 핸들러
+ * ────────────────────────────────────────────────
+ *
+ * ────────────────────────────────────────────────
+ * [WishlistHeartButton] 찜 버튼 - 마이페이지 찜목록 연동이 필요한 곳에서 사용
+ * (예: 볼거리/먹거리/잘거리 리스트·뷰 페이지)
+ * - 찜 상태가 localStorage에 저장되어 마이페이지 찜목록과 연동됨
+ * - 마이페이지에서 클릭 시 /{region}/{itemType}/view?id= 로 이동
+ *
+ * import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
+ *
+ * // 뷰 페이지에서 사용 예시 (renderHeart prop으로 전달)
+ * <AreaDetailHero
+ *   ...
+ *   renderHeart={() => (
+ *     <WishlistHeartButton item={item} itemType="see" region={region} />
+ *   )}
+ * />
+ *
+ * // 리스트 페이지에서 사용 예시 (AreaListCard의 renderHeart prop으로 전달)
+ * <AreaListCard
+ *   ...
+ *   renderHeart={() => (
+ *     <WishlistHeartButton item={item} itemType="food" region={region} />
+ *   )}
+ * />
+ *
+ * props:
+ * - item     : 장소 데이터 객체 { id, name|title, image, category|tag, address|location }
+ * - itemType : 카테고리 타입 ('see' | 'food' | 'sleep')
+ * - region   : URL 지역 파라미터 (영문, 예: 'suwon')
+ * ────────────────────────────────────────────────
  */
 
 // 공유(링크 복사) 버튼 - 팝업 및 복사 로직 내장
@@ -104,10 +136,10 @@ export const WishlistHeartButton = ({ item, itemType, region }) => {
     e.stopPropagation();
     toggleWish({
       id: item.id,
-      name: item.name,
+      name: item.name || item.title,
       image: item.image,
-      category: item.category,
-      address: item.address,
+      category: item.category || item.tag,
+      address: item.address || item.location,
       type: itemType,
       region,
     });
