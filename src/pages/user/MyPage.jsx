@@ -1,9 +1,8 @@
 // src/pages/user/MyPage.jsx
-import React, { useState, useEffect } from 'react'; // 🚀 useEffect 추가
+import React, { useState, useEffect } from 'react';
 import Breadcrumb from '@components/common/Breadcrumb';
-// [원복 방법] 아래 import 줄 삭제 후, getFoodLikes 주석 해제하면 원래대로 돌아옴
-import { getWishlist, STORAGE_KEY } from '@hooks/useWishlist';
 
+// 🚀 분리한 컴포넌트들을 불러옵니다. (경로가 맞는지 확인해 주세요)
 import Sidebar from '@components/mypage/Sidebar';
 import MemberInfo from '@components/mypage/MemberInfo';
 import MyShowcase from '@components/mypage/MyShowcase';
@@ -28,6 +27,14 @@ const AnimationStyles = () => (
     }
     .animate-icon-pulse {
       animation: iconPulse 2s infinite;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-in-out;
     }
   `}</style>
 );
@@ -68,7 +75,7 @@ const MyPage = () => {
     location: "경기도 성남시",
   });
 
-  // 🚀 컴포넌트가 처음 렌더링될 때 무조건 스크롤을 맨 위(0, 0)로 올립니다!
+  // 컴포넌트 마운트 시 스크롤 상단 이동
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -89,8 +96,10 @@ const MyPage = () => {
       <div className="min-h-screen bg-gray-50 font-paperlogy">
         <div className="max-w-[1400px] mx-auto px-4 py-6 md:px-10 lg:py-10 flex flex-col lg:flex-row gap-6">
 
+          {/* 좌측 사이드바 컴포넌트 */}
           <Sidebar profile={profile} />
 
+          {/* 우측 메인 콘텐츠 */}
           <section className="flex-1 min-w-0 flex flex-col gap-4">
             
             <Breadcrumb 
@@ -102,6 +111,7 @@ const MyPage = () => {
               className="mb-0" 
             />
 
+            {/* 4개의 탭 버튼 영역 */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               {CARDS.map((card) => (
                 <TabCard 
@@ -113,7 +123,8 @@ const MyPage = () => {
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm min-h-[300px] animate-[slideDown_0.3s_ease-out_forwards]">
+            {/* 선택된 탭 렌더링 영역 */}
+            <div key={activeSection} className="bg-white rounded-2xl border border-gray-200 shadow-sm min-h-[300px] animate-fade-in">
               {renderContent[activeSection]}
             </div>
 
