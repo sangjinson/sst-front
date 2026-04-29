@@ -1,233 +1,132 @@
-import React, { useState } from 'react';
-import AttractionCard from '@components/card/AttractionCard';
+import React, { useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getSeeDataByRegion } from './seeData';
+import { toKorRegion } from '@utils/regionMap';
+import { AreaFilterBar, AreaListCard, AreaPagination, sortData } from '@components/modules/area/arealist';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
 
-const dummyData = [
-  {
-    title: '수원화성',
-    location: '경기도 수원시 장안구 영화동 190',
-    tag: '지역명소',
-    region: '수원',
-    hashtags: ['유적지', '역사탐방'],
-    image: 'https://picsum.photos/300/200?1',
-    desc: '유네스코 세계문화유산으로 지정된 조선시대 성곽입니다.',
-  },
-  {
-    title: '국립현대미술관 과천',
-    location: '경기도 과천시 광명로 313',
-    tag: '박물관',
-    region: '과천',
-    hashtags: ['전시', '현대미술'],
-    image: 'https://picsum.photos/300/200?2',
-    desc: '다양한 현대미술 작품을 감상할 수 있는 공간입니다.',
-  },
-  {
-    title: '가평 아침고요수목원',
-    location: '경기도 가평군 상면 수목원로 432',
-    tag: '지역명소',
-    region: '가평',
-    hashtags: ['힐링', '자연'],
-    image: 'https://picsum.photos/300/200?3',
-    desc: '자연과 함께 힐링할 수 있는 아름다운 수목원입니다.',
-  },
-  {
-    title: '실학박물관',
-    location: '경기도 남양주시 조안면 다산로747번길 16',
-    tag: '박물관',
-    region: '남양주',
-    hashtags: ['역사', '교육'],
-    image: 'https://picsum.photos/300/200?4',
-    desc: '조선 실학 사상을 소개하는 박물관입니다.',
-  },
+// 페이지당 표시할 아이템 개수
+const ITEMS_PER_PAGE = 6;
+// 카테고리 목록 (전체 + 세부 카테고리)
+const CATEGORIES = ['전체', '박물관', '도서관', '지역명소', '공원'];
 
-  // 🔥 추가 5개
-  {
-    title: '남한산성',
-    location: '경기도 광주시 남한산성면',
-    tag: '지역명소',
-    region: '광주',
-    hashtags: ['성곽', '유네스코'],
-    image: 'https://picsum.photos/300/200?5',
-    desc: '조선시대 군사적 요충지였던 역사 유적지입니다.',
-  },
-  {
-    title: '에버랜드',
-    location: '경기도 용인시 처인구 포곡읍',
-    tag: '공원',
-    region: '용인',
-    hashtags: ['놀이공원', '데이트'],
-    image: 'https://picsum.photos/300/200?6',
-    desc: '국내 최대 규모의 테마파크로 다양한 놀이기구를 즐길 수 있습니다.',
-  },
-  {
-    title: '파주 헤이리 예술마을',
-    location: '경기도 파주시 탄현면',
-    tag: '지역명소',
-    region: '파주',
-    hashtags: ['예술', '감성'],
-    image: 'https://picsum.photos/300/200?7',
-    desc: '예술과 문화가 공존하는 감성적인 공간입니다.',
-  },
-  {
-    title: '광명동굴',
-    location: '경기도 광명시 가학로',
-    tag: '지역명소',
-    region: '광명',
-    hashtags: ['동굴', '체험'],
-    image: 'https://picsum.photos/300/200?8',
-    desc: '폐광을 활용한 이색 관광지로 다양한 체험이 가능합니다.',
-  },
-  {
-    title: '일산 호수공원',
-    location: '경기도 고양시 일산동구',
-    tag: '공원',
-    region: '고양',
-    hashtags: ['산책', '데이트'],
-    image: 'https://picsum.photos/300/200?9',
-    desc: '넓은 호수와 산책로가 있는 도심 속 힐링 공간입니다.',
-  },
-];
+/**
+ * 볼거리 목록 페이지 컴포넌트
+ * - 지역별 볼거리 목록을 필터링, 정렬, 페이지네이션하여 표시
+ * - 카테고리별 필터링 및 좋아요 기능 지원
+ */
+const List = () => {
+  // URL 파라미터에서 region 정보 가져오기
+  const { region } = useParams();
+  const navigate = useNavigate();
+  
+  // region을 한글 지역명으로 변환 (예: 'suwon' -> '수원')
+  const regionKor = toKorRegion(region || '수원');
+  // '시', '군' 접미사 제거하여 지역명만 추출
+  const regionName = regionKor.replace(/[시군]$/, '');
 
-const categories = ['전체','박물관','도서관','지역명소','공원'];
+  // 선택된 카테고리 상태 (기본값: '전체')
+  const [selectedCategory, setSelectedCategory] = useState('전체');
+  // 정렬 옵션 상태 (기본값: 리뷰순)
+  const [sortOption, setSortOption] = useState('reviews');
+  // 현재 페이지 번호 상태 (기본값: 1)
+  const [currentPage, setCurrentPage] = useState(1);
 
-const SeeList = () => {
-  const [activeCategory, setActiveCategory] = useState('전체');
-  const [sort, setSort] = useState('latest');
-  const [activePage, setActivePage] = useState(1); // 🔥 추가
+  // 필터링 및 정렬된 데이터 계산 (useMemo로 최적화)
+  const filtered = useMemo(() => {
+    // 해당 지역의 볼거리 데이터 가져오기
+    const data = getSeeDataByRegion(regionName).map((item) => ({
+      ...item,
+      title : item.title,
+      category: item.tag,           // 태그를 카테고리로 매핑
+      description: item.desc,       // 설명 매핑
+      address: item.location,       // 위치 정보를 주소로 매핑
+      reviewCount: item.likes ?? 0, // 좋아요 수를 리뷰수로 매핑 (기본값: 0)
+      rating: item.rating ?? 0,     // 평점 매핑 (기본값: 0)
+    }));
+
+    let result = [...data];
+
+    // '전체'가 아닌 경우 카테고리 필터링 적용
+    if (selectedCategory !== '전체') {
+      result = result.filter((item) => item.tag === selectedCategory);
+    }
+
+    // 정렬 옵션에 따라 데이터 정렬
+    return sortData(result, sortOption);
+  }, [regionName, selectedCategory, sortOption]);
+
+  // 전체 페이지 수 계산
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  
+  // 현재 페이지에 해당하는 데이터만 추출 (페이지네이션)
+  const paginated = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  /**
+   * 상세 페이지로 이동하는 함수
+   * @param {string|number} id - 아이템 ID
+   */
+  const goToDetail = (id) => {
+    navigate(`/${region}/see/view?id=${id}`);
+  };
 
   return (
-    <div className="bg-[#f8f6f0] min-h-screen">
+    <div className="min-h-screen bg-[#f8f6f0]">
+      <div className="py-2">
 
-      {/* HERO */}
-      <section
-        className="h-[320px] bg-cover bg-center relative"
-        style={{ backgroundImage: `url('/src/assets/images/hero.png')` }}
-      >
-        <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-white">
-          <h1 className="text-5xl font-bold drop-shadow-lg">수원</h1>
-          <p className="mt-3 text-lg drop-shadow">
-            정조의 효심과 화성의 기상이 깃든 도시
-          </p>
-        </div>
-      </section>
+        {/* 필터 및 정렬 바 */}
+        <AreaFilterBar
+          categories={CATEGORIES}
+          selectedCategory={selectedCategory}
+          // 카테고리 변경 시 첫 페이지로 리셋
+          onCategoryChange={(cat) => { setSelectedCategory(cat); setCurrentPage(1); }}
+          selectedSort={sortOption}
+          // 정렬 변경 시 첫 페이지로 리셋
+          onSortChange={(sort) => { setSortOption(sort); setCurrentPage(1); }}
+          totalCount={filtered.length}
+          countLabel="볼거리"
+        />
 
-      {/* CONTENT */}
-      <div className="max-w-[1200px] mx-auto mt-10 px-4">
-
-        {/* breadcrumb */}
-        <div className="text-sm mb-5 flex items-center gap-2">
-          <span className="text-gray-400 hover:text-gray-600 cursor-pointer">홈</span>
-          <span className="text-gray-300">&gt;</span>
-          <span className="text-gray-400 hover:text-gray-600 cursor-pointer">수원시</span>
-          <span className="text-gray-300">&gt;</span>
-          <span className="text-gray-900 font-semibold">볼거리</span>
-        </div>
-
-        {/* 카테고리 + 정렬 */}
-        <div className="flex justify-between items-center mb-5 flex-wrap gap-3">
-
-          {/* 카테고리 */}
-          <div className="flex gap-2 flex-wrap">
-            {categories.map((item) => (
-              <button
-                key={item}
-                onClick={() => setActiveCategory(item)}
-                className={`
-                  px-4 py-2 rounded-full text-sm cursor-pointer
-                  border border-gray-200 transition
-                  ${
-                    activeCategory === item
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-black'
-                  }
-                `}
-              >
-                {item}
-              </button>
+        {/* 데이터가 있는 경우 그리드 형태로 카드 표시 */}
+        {paginated.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginated.map((item) => (
+              <AreaListCard
+                key={item.id}
+                item={{
+                  ...item,
+                  // 카테고리 인덱스 계산 (전체 제외)
+                  categoryIndex: CATEGORIES.filter((c) => c !== '전체').indexOf(item.tag),
+                }}
+                onClick={() => goToDetail(item.id)}
+                renderHeart={() => (
+                  <WishlistHeartButton item={item} itemType="see" region={region} />
+                )}
+              />
             ))}
           </div>
-
-          {/* 정렬 */}
-          <div className="flex bg-gray-100 rounded-full p-1">
-            <button
-              onClick={() => setSort('latest')}
-              className={`
-                px-4 py-1.5 text-sm rounded-full transition cursor-pointer
-                ${
-                  sort === 'latest'
-                    ? 'bg-gray-900 text-white shadow-sm'
-                    : 'text-gray-400 hover:text-black'
-                }
-              `}
-            >
-              최신순
-            </button>
-
-            <button
-              onClick={() => setSort('popular')}
-              className={`
-                px-4 py-1.5 text-sm rounded-full transition cursor-pointer
-                ${
-                  sort === 'popular'
-                    ? 'bg-gray-900 text-white shadow-sm'
-                    : 'text-gray-400 hover:text-black'
-                }
-              `}
-            >
-              인기순
-            </button>
+        ) : (
+          // 데이터가 없는 경우 빈 상태 UI 표시
+          <div className="flex flex-col items-center justify-center py-24 text-gray-400">
+            <span className="text-5xl mb-4">👀</span>
+            <p className="text-lg font-medium">해당 카테고리의 볼거리가 없습니다</p>
+            <p className="text-sm mt-1">다른 카테고리를 선택해보세요</p>
           </div>
-        </div>
+        )}
 
-        {/* 카드 */}
-        <div className="grid grid-cols-4 gap-5 mb-12
-                lg:grid-cols-3 
-                md:grid-cols-2 
-                sm:grid-cols-1">
-          {dummyData.map((item, idx) => (
-            <AttractionCard key={idx} item={item} />
-          ))}
-        </div>
-
-        {/* 🔥 페이지네이션 */}
-        <div className="flex justify-center mt-4 mb-10 items-center gap-2">
-
-          {/* 이전 */}
-          <button
-            onClick={() => setActivePage(prev => prev > 1 ? prev - 1 : prev)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-900 hover:text-white cursor-pointer transition text-sm"
-          >
-            ←
-          </button>
-
-          {[1,2,3].map((n)=>(
-            <button
-              key={n}
-              onClick={() => setActivePage(n)}
-              className={`
-                w-9 h-9 rounded-lg text-sm transition cursor-pointer
-                flex items-center justify-center
-                ${activePage === n 
-                  ? 'bg-gray-900 text-white border-gray-900 shadow-sm' 
-                  : 'bg-white border border-gray-200 hover:bg-gray-100'}
-              `}
-            >
-              {n}
-            </button>
-          ))}
-
-          {/* 다음 */}
-          <button
-            onClick={() => setActivePage(prev => prev + 1)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-900 hover:text-white cursor-pointer transition text-sm"
-          >
-            →
-          </button>
-
-        </div>
+        {/* 페이지네이션 컴포넌트 */}
+        <AreaPagination
+          currentPage={currentPage}
+          totalPages={totalPages || 1}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
 
       </div>
     </div>
   );
 };
 
-export default SeeList;
+export default List;

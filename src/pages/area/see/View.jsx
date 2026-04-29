@@ -1,214 +1,176 @@
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { getSeeDataByRegion } from './seeData';
+import { toKorRegion } from '@utils/regionMap';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
+import {
+  AreaDescription,
+  AreaDetailHero,
+  AreaInfoSection,
+  AreaMap,
+  AreaRelated,
+  AreaReview,
+} from '@components/modules/area/areaview';
 
-const SeeView = () => {
+// 카테고리 목록 (List.jsx와 동일)
+const CATEGORIES = ['전체', '박물관', '도서관', '지역명소', '공원'];
+
+// 기본 리뷰 데이터 (데이터가 없을 때 표시할 샘플 리뷰)
+const DEFAULT_REVIEWS = [
+  {
+    user: '5스틴',
+    rating: 5,
+    comment: '분위기 최고예요.',
+  },
+  {
+    user: '여행가 영훈',
+    rating: 4,
+    comment: '가볍게 둘러보기 좋았습니다.',
+  },
+];
+
+/**
+ * 볼거리 상세 페이지 컴포넌트
+ * - 선택된 볼거리의 상세 정보를 표시
+ * - 연관 추천 목록, 리뷰, 지도 등을 포함
+ */
+const View = () => {
+  // URL 파라미터에서 region 정보 가져오기
+  const { region } = useParams();
   const navigate = useNavigate();
-  const { id } = useParams();
+  
+  // URL 쿼리 파라미터에서 id 가져오기
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get('id');
+  
+  // region을 한글 지역명으로 변환
+  const regionKor = toKorRegion(region || '수원');
+  const regionName = regionKor.replace(/[시군]$/, '');
 
-  // =========================
-  // 🔥 상세페이지 (id 있을 때)
-  // =========================
-  if (id) {
+  // 로그인 상태 (임시로 true 설정 - 실제 인증으로 대체 필요)
+  const isLoggedIn = true;
+
+  // 선택된 아이템 상태
+  const [item, setItem] = useState(null);
+  // 연관 추천 아이템 목록 상태
+  const [relatedItems, setRelatedItems] = useState([]);
+
+  // id 또는 regionName이 변경되면 데이터 로드
+  useEffect(() => {
+    // id가 없으면 실행하지 않음
+    if (!id) return;
+
+    // 해당 지역의 모든 볼거리 데이터 가져오기
+    const all = getSeeDataByRegion(regionName);
+    // id가 일치하는 아이템 찾기 (타입 비교를 위해 문자열로 변환)
+    const data = all.find((seeItem) => String(seeItem.id) === String(id));
+
+    // 아이템 상태 업데이트 (없으면 null)
+    setItem(data || null);
+
+    // 데이터가 있으면 연관 추천 아이템 계산
+    if (data) {
+      // 같은 카테고리면서 현재 아이템 제외하고 최대 4개까지
+      const related = all
+        .filter((seeItem) => seeItem.id !== data.id && seeItem.tag === data.tag)
+        .slice(0, 4);
+      setRelatedItems(related);
+    }
+  }, [id, regionName]);
+
+  // 아이템이 없는 경우 빈 상태 UI 표시
+  if (!item) {
     return (
-      <div style={{ padding: "20px", maxWidth: "1000px", margin: "0 auto" }}>
-        
-        {/* 상단 이미지 */}
-        <div style={{ position: "relative" }}>
-          <img
-            src="https://images.unsplash.com/photo-1590490359683-658d3d23f972"
-            alt="이미지"
-            style={{
-              width: "100%",
-              height: "300px",
-              objectFit: "cover",
-              borderRadius: "10px",
-            }}
-          />
-
-          {/* 제목 */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "20px",
-              left: "20px",
-              color: "white",
-            }}
-          >
-            <h1 style={{ fontSize: "28px", fontWeight: "bold" }}>
-              수원 화성
-            </h1>
-            <p>경기도 수원시 팔달구</p>
-          </div>
-        </div>
-
-        {/* 상세 설명 */}
-        <div
-          style={{
-            background: "#f5f5f5",
-            padding: "20px",
-            marginTop: "20px",
-            borderRadius: "10px",
-          }}
-        >
-          <h2>상세 설명</h2>
-          <p style={{ marginTop: "10px", lineHeight: "1.6" }}>
-            수원 화성은 조선 정조 때 축성된 성곽으로, 세계문화유산으로 지정된 역사적 명소입니다.
-            아름다운 성곽과 함께 다양한 문화재를 감상할 수 있습니다.
-          </p>
-        </div>
-
-        {/* 이용 정보 */}
-        <div
-          style={{
-            background: "#f5f5f5",
-            padding: "20px",
-            marginTop: "20px",
-            borderRadius: "10px",
-          }}
-        >
-          <h2>이용 정보</h2>
-
-          <div style={{ marginTop: "10px" }}>
-            <p>📍 주소: 경기도 수원시 팔달구</p>
-            <p>⏰ 이용시간: 09:00 ~ 18:00</p>
-            <p>💰 이용요금: 1,500원</p>
-            <p>📞 전화번호: 031-123-4567</p>
-          </div>
-        </div>
-
-        {/* 지도 */}
-        <div style={{ marginTop: "20px" }}>
-          <h2>위치</h2>
-
-          <iframe
-            title="map"
-            width="100%"
-            height="300"
-            style={{ border: 0, marginTop: "10px", borderRadius: "10px" }}
-            src="https://maps.google.com/maps?q=수원화성&t=&z=13&ie=UTF8&iwloc=&output=embed"
-          ></iframe>
-        </div>
-
-        {/* 리뷰 */}
-        <div style={{ marginTop: "20px" }}>
-          <h2>리뷰</h2>
-
-          <input
-            placeholder="소중한 리뷰를 남겨주세요."
-            style={{
-              width: "100%",
-              padding: "10px",
-              marginTop: "10px",
-              borderRadius: "5px",
-              border: "1px solid #ddd",
-            }}
-          />
-
+      <div className="flex-1 flex items-center justify-center text-gray-400 py-24">
+        <div className="text-center">
+          <p className="text-5xl mb-4">👀</p>
+          <p className="text-lg">볼거리 정보를 찾을 수 없습니다.</p>
+          {/* 이전 페이지로 이동 */}
           <button
-            style={{
-              marginTop: "10px",
-              padding: "10px 15px",
-              background: "#4CAF50",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
+            onClick={() => navigate(-1)}
+            className="mt-4 px-5 py-2 bg-[#0F9B73] text-white rounded-lg text-sm"
           >
-            리뷰 등록
+            돌아가기
           </button>
-
-          {/* 리뷰 리스트 */}
-          <div style={{ marginTop: "15px" }}>
-            <div style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-              ⭐⭐⭐⭐⭐ 너무 좋았어요!
-            </div>
-            <div style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-              👍 추천합니다
-            </div>
-          </div>
         </div>
-
-        {/* 추천 */}
-        <div style={{ marginTop: "30px" }}>
-          <h2>연관 추천 볼거리</h2>
-
-          <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-            {[1, 2, 3, 4].map((item) => (
-              <div
-                key={item}
-                style={{
-                  width: "23%",
-                  border: "1px solid #ddd",
-                  borderRadius: "10px",
-                  overflow: "hidden",
-                  cursor: "pointer"
-                }}
-                onClick={() => navigate(`/area/see/${item}`)}
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
-                  alt="추천"
-                  style={{ width: "100%", height: "100px", objectFit: "cover" }}
-                />
-                <p style={{ padding: "10px" }}>추천 장소 {item}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 🔥 뒤로가기 */}
-        <button
-          onClick={() => navigate("/area/see")}
-          style={{
-            marginTop: "30px",
-            padding: "10px 15px",
-            background: "#333",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          ← 목록으로
-        </button>
       </div>
     );
   }
 
-  // =========================
-  // 🔥 리스트페이지 (id 없을 때)
-  // =========================
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>👀 볼거리</h1>
+    <div>
 
-      <div
-        onClick={() => navigate("/area/see/1")}
-        style={{
-          border: "1px solid #ddd",
-          padding: "20px",
-          marginTop: "20px",
-          cursor: "pointer",
-          borderRadius: "10px",
-        }}
-      >
-        수원 화성
+      {/* 상세 페이지 히어로 섹션 (이미지, 이름, 카테고리, 찜 버튼) */}
+      <AreaDetailHero
+        image={item.image}
+        name={item.title}
+        category={item.tag}
+        categories={CATEGORIES}
+        renderHeart={() => (
+          <WishlistHeartButton item={item} itemType="see" region={region} />
+        )}
+      />
+
+      {/* 상세 설명 섹션 */}
+      <AreaDescription description={item.desc} />
+
+      {/* 정보 섹션 (주소, 이용시간, 전화번호, 이용요금, 해시태그) */}
+      <AreaInfoSection
+        infoItems={[
+          { icon: '📍', label: '주소', value: item.location },
+          { icon: '🕐', label: '이용시간', value: '09:00 - 18:00' },
+          { icon: '📞', label: '전화번호', value: '031-290-3600' },
+          { icon: '💰', label: '이용요금', value: '현장 확인', highlight: true },
+        ]}
+        tags={item.hashtags}
+        tagLabel="해시태그"
+      />
+
+      {/* 지도 섹션 (주소 기반 지도 표시) */}
+      <AreaMap address={item.location} />
+
+      {/* 리뷰 섹션 (평점, 리뷰 목록, 리뷰 작성) */}
+      <AreaReview
+        rating={item.rating ?? 0}
+        reviewCount={item.reviewCount ?? item.likes ?? DEFAULT_REVIEWS.length}
+        reviews={item.reviews ?? DEFAULT_REVIEWS}
+        isLoggedIn={isLoggedIn}
+        placeholder="볼거리에 대한 솔직한 리뷰를 남겨주세요."
+      />
+
+      {/* 연관 추천 섹션 (같은 카테고리의 다른 볼거리) */}
+      <AreaRelated
+        title="연관 추천 볼거리"
+        items={relatedItems}
+        onItemClick={(rel) => navigate(`/${region}/see/view?id=${rel.id}`)}
+        nameKey="title"
+      />
+
+      {/* 하단 액션 버튼 영역 (목록으로, 맨 위로) */}
+      <div className="flex items-center gap-3 mb-6">
+        {/* 목록으로 이동 버튼 */}
+        <button
+          onClick={() => navigate(`/${region}/see/list`)}
+          className="flex-1 py-3 border border-gray-300 bg-[#E8956D] rounded-xl text-sm text-white font-medium hover:bg-[#f07e48] transition"
+        >
+          ← 목록으로
+        </button>
+
+        {/* 맨 위로 스크롤 이동 버튼 */}
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="w-12 h-12 flex items-center justify-center border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition"
+          title="맨 위로"
+        >
+          {/* 화살표 아이콘 (SVG) */}
+          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current" strokeWidth="2">
+            <path d="M18 15l-6-6-6 6" />
+          </svg>
+        </button>
       </div>
 
-      <div
-        onClick={() => navigate("/area/see/2")}
-        style={{
-          border: "1px solid #ddd",
-          padding: "20px",
-          marginTop: "10px",
-          cursor: "pointer",
-          borderRadius: "10px",
-        }}
-      >
-        경기전
-      </div>
     </div>
   );
 };
 
-export default SeeView;
+export default View;

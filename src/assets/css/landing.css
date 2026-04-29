@@ -1,3 +1,18 @@
+.container,
+.container-max,
+.container-full,
+.container-fluid,
+.container-3xl,
+.container-2xl,
+.container-xl,
+.container-lg,
+.container-md,
+.container-sm {
+  max-width: 1200px;
+}
+
+
+
 /* 전체 배경 설정 (전통적인 느낌의 밝은 배경) */
 .landing-wrapper {
   display: flex;
@@ -40,11 +55,15 @@
 
 /* 거리에선 로고 */
 .landing-logo {
-  font-size: 80px;
+  font-size: 2.5em;
   font-family: 'GriunFont', sans-serif; /* 붓글씨 느낌 대체 */
-  margin-bottom: 50px;
   color: #222;
 }
+
+@media (min-width: 992px) { 
+  .landing-logo {font-size: 5em;}
+}
+
 
 /* 검색창 컨테이너 */
 .search-container {
