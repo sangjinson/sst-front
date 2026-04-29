@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getFoodDataByRegion } from './foodData';
 import { toKorRegion } from '@utils/regionMap';
+import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
+
 import {
   AreaDetailHero,
   AreaDescription,
@@ -33,7 +35,6 @@ export default function FoodView() {
 
   const [item, setItem]                 = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
-  const [isWished, setIsWished]         = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -78,8 +79,9 @@ export default function FoodView() {
           name={item.name}
           category={item.category}
           categories={CATEGORIES}
-          isWished={isWished}
-          onWish={() => setIsWished((prev) => !prev)}
+          renderHeart={() => (
+            <WishlistHeartButton item={item} itemType="food" region={region} />
+          )}
         />
 
         {/* 상세 설명 */}

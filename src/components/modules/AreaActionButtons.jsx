@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-// [원복 방법] 아래 줄 삭제, WishlistHeartButton 컴포넌트 전체 삭제
 import { useWishlist } from '@hooks/useWishlist';
 
 /**
@@ -104,10 +103,10 @@ export const WishlistHeartButton = ({ item, itemType, region }) => {
     e.stopPropagation();
     toggleWish({
       id: item.id,
-      name: item.name,
+      name: item.name || item.title,
       image: item.image,
-      category: item.category,
-      address: item.address,
+      category: item.category || item.tag,
+      address: item.address || item.location,
       type: itemType,
       region,
     });

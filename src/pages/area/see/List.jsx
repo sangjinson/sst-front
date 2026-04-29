@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getSeeDataByRegion } from './seeData';
 import { toKorRegion } from '@utils/regionMap';
 import { AreaFilterBar, AreaListCard, AreaPagination, sortData } from '@components/modules/arealist';
+import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
 
 // 페이지당 표시할 아이템 개수
 const ITEMS_PER_PAGE = 6;
@@ -30,25 +31,13 @@ const List = () => {
   const [sortOption, setSortOption] = useState('reviews');
   // 현재 페이지 번호 상태 (기본값: 1)
   const [currentPage, setCurrentPage] = useState(1);
-  // 좋아요 상태 관리 (아이디별 boolean 값 저장)
-  const [likedItems, setLikedItems] = useState({});
-
-  /**
-   * 좋아요 버튼 클릭 핸들러
-   * - 이벤트 전파를 막고 해당 아이템의 좋아요 상태를 토글
-   * @param {Event} e - 클릭 이벤트 객체
-   * @param {string|number} id - 아이템 ID
-   */
-  const handleLike = (e, id) => {
-    e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
-    setLikedItems((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
 
   // 필터링 및 정렬된 데이터 계산 (useMemo로 최적화)
   const filtered = useMemo(() => {
     // 해당 지역의 볼거리 데이터 가져오기
     const data = getSeeDataByRegion(regionName).map((item) => ({
       ...item,
+      title : item.title,
       category: item.tag,           // 태그를 카테고리로 매핑
       description: item.desc,       // 설명 매핑
       address: item.location,       // 위치 정보를 주소로 매핑
@@ -112,9 +101,10 @@ const List = () => {
                   // 카테고리 인덱스 계산 (전체 제외)
                   categoryIndex: CATEGORIES.filter((c) => c !== '전체').indexOf(item.tag),
                 }}
-                liked={!!likedItems[item.id]}
-                onLike={(e) => handleLike(e, item.id)}
                 onClick={() => goToDetail(item.id)}
+                renderHeart={() => (
+                  <WishlistHeartButton item={item} itemType="see" region={region} />
+                )}
               />
             ))}
           </div>
