@@ -15,13 +15,20 @@ const Header = () => {
   const { region } = useParams();
   const navigate = useNavigate();
 
+  // 🚀 1. 방어막 추가: 'showcase' 등 시스템 경로가 지역명으로 오염되는 것 차단
+  const forbiddenRegions = ['showcase', 'plan', 'user', 'search', 'login', 'customersupport', 'admin'];
+
   useEffect(() => {
-    if (region) {
+    // region이 존재하면서, 동시에 금지된 시스템 단어가 아닐 때만 저장!
+    if (region && !forbiddenRegions.includes(region)) {
       localStorage.setItem('lastVisitedRegion', region);
     }
   }, [region]);
 
-  const currentRegion = region || localStorage.getItem('lastVisitedRegion') || '수원시';
+  // 🚀 2. 현재 지역을 가져올 때도 방어막 적용
+  const currentRegion = (region && !forbiddenRegions.includes(region)) 
+    ? region 
+    : localStorage.getItem('lastVisitedRegion') || '수원시';
 
   const headerRef = useRef(null);
 
@@ -32,8 +39,9 @@ const Header = () => {
     { name: '놀거리', path: `/${currentRegion}/play/list` },
     { 
       name: '뽐낼거리', 
-      path: `/showcase`,
-      subMenu: [ // 하위 메뉴 추가
+      // 🚀 3. 빈 깡통 경로 대신, 핫플거리를 기본(Default) 목적지로 지정
+      path: `/showcase/hotplace`, 
+      subMenu: [
         { name: '핫플거리', path: '/showcase/hotplace' },
         { name: '인생거리', path: '/showcase/life' },
       ]
