@@ -32,6 +32,8 @@ import SearchPage from '@pages/search/SearchPage';
 import LoginPage from '@pages/auth/LoginPage';
 import SignupPage from '@pages/auth/SignupPage';
 
+import OAuthRedirectHandler from '@pages/auth/OAuthRedirectHandler';
+
 import AdminHome from '@pages/user/Home';
 import MemberList from '@pages/admin/MemberList';
 import AreaPostList from '@pages/admin/AreaPostList';
@@ -43,11 +45,14 @@ import LifeList from '@pages/admin/LifeList';
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* 🚀 1. 완벽히 공개된 단일 페이지 */}
+      {/* 🚀 공개된 페이지 영역에 OAuth 콜백 주소 추가 */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/login/signup" element={<SignupPage />} />
+      
+      {/* 🚀 백엔드가 돌려보내 줄 주소와 정확히 일치시켜야 해! */}
+      <Route path="/oauth/redirect" element={<OAuthRedirectHandler />} />
 
       {/* 🚀 2. 비로그인 사용자도 "조회"는 가능한 페이지 영역 (UserLayout 적용) */}
       <Route element={<UserLayout />}>
