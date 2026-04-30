@@ -102,6 +102,8 @@ const MemberInfo = ({ profile, onUpdate }) => {
           </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1.5">거주지</label>
+            
+
             <input name="location" value={form.location} onChange={handleChange}
               placeholder="예) 경기도 수원시"
               className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#0F9B73] focus:ring-1 focus:ring-[#0F9B73] transition-colors" />

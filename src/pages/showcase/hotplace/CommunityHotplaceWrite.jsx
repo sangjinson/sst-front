@@ -141,6 +141,9 @@ const CommunityHotplaceWrite = () => {
             </div>
             <div>
               <label htmlFor="placeName" className="block fs-down-2 font-bold text-gray-700 mb-3">구체적인 장소</label>
+
+              <input type="text" placeholder="Secondary" className="input input-lg input-secondary board-hover-green" />
+
               <TextInput id="placeName" value={placeName} onChange={(e) => setPlaceName(e.target.value)}
                 placeholder="예: 화성행궁, 두물머리" required />
             </div>

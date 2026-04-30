@@ -1,8 +1,8 @@
+import React from 'react';
+
 /**
- * Iunput 크기조절할때
- * size: sm, md, lg, xl, 2xl 
- * lable: 옵션값 넣으면 라벨도 달아줌
- *
+ * TextInput 컴포넌트
+ * @param {string} size - sm, md, lg, xl, 2xl 
  */
 const TextInput = ({
   id,
@@ -11,32 +11,45 @@ const TextInput = ({
   placeholder,
   type = "text",
   required = false,
-  className = "",
-  inputClassName = "",
+  label,
+  className = "", 
+  inputClassName = "", 
   size = "md",
   ...props
 }) => {
-  const baseInputClassName =
-    "w-full border border-gray-200 rounded-lg outline-none focus:border-[#009277] transition-colors";
+  // 베이스 클래스에 우리가 만든 커스텀 유틸리티 포함
+  const baseInputClassName = "input input-secondary input-hover-green w-full transition-all outline-none";
 
+  // DaisyUI 표준 클래스와 커스텀 높이 조합
   const sizeStyles = {
-    sm: "h-[2.5rem] px-[0.75rem] text-[0.875rem]",   // 40px
-    md: "h-[3rem] px-[1rem] text-[1rem]",           // 48px
-    lg: "h-[3.5rem] px-[1.25rem] text-[1.125rem]",  // 56px
-    xl: "h-[4rem] px-[1.5rem] text-[1.25rem]",      // 64px
-    "2xl": "h-[4.5rem] px-[1.75rem] text-[1.5rem]", // 72px
-    };
+    sm: "input-sm h-[2.5rem]",   // 40px
+    md: "input-md h-[3rem]",    // 48px
+    lg: "input-lg h-[3.5rem]",   // 56px
+    xl: "input-lg h-[4rem] text-xl",    // 64px (lg 베이스로 높이 확장)
+    "2xl": "input-lg h-[4.5rem] text-2xl", // 72px (lg 베이스로 높이 확장)
+  };
+
   return (
-    <input
-      id={id}
-      type={type}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      required={required}
-      className={`${baseInputClassName} ${sizeStyles[size]} ${inputClassName} ${className}`}
-      {...props}
-    />
+    <div className={`form-control w-full ${className}`}>
+      {label && (
+        <label className="label py-1" htmlFor={id}>
+          <span className="label-text font-medium text-gray-700">{label}</span>
+          {required && <span className="label-text-alt text-error font-bold">* 필수</span>}
+        </label>
+      )}
+      
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        required={required}
+        // DaisyUI 사이즈 클래스와 커스텀 높이를 함께 적용
+        className={`${baseInputClassName} ${sizeStyles[size] || sizeStyles.md} ${inputClassName}`}
+        {...props}
+      />
+    </div>
   );
 };
 
