@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getAllLifePosts, TYPE_LABEL, TYPE_COLOR } from "./communityLifeData";
+import { getAllLifePosts, COMPANION_EMOJI } from "./communityLifeData";
 
 const CommunityLife = () => {
   const navigate = useNavigate();
@@ -52,11 +52,11 @@ const CommunityLife = () => {
           <h2 className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">인생거리</h2>
           <p className="mt-2 text-sm md:text-base text-gray-500">여행자들이 직접 만든 인생 여행 코스를 공유해요.</p>
         </div>
-        <Link to="/showcase/life/write" className="w-fit">
-          <button className="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#0F9B73] hover:shadow-md active:scale-95">
-            코스 공유하기
-          </button>
-        </Link>
+        <button
+          onClick={() => navigate('/showcase/life/write')}
+          className="w-fit rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#0F9B73] hover:shadow-md active:scale-95">
+          코스 공유하기
+        </button>
       </section>
 
       {/* 검색/필터 */}
@@ -92,7 +92,7 @@ const CommunityLife = () => {
         </div>
       </section>
 
-      {/* 게시글 목록 - 네이버 블로그 스타일 */}
+      {/* 게시글 목록 */}
       {filteredPosts.length > 0 ? (
         <div className="flex flex-col gap-5">
           {filteredPosts.map((post) => (
@@ -112,7 +112,7 @@ const CommunityLife = () => {
                 {/* 내용 */}
                 <div className="flex-1 p-5 md:p-6 flex flex-col justify-between">
                   <div>
-                    {/* 상단 지역 + 날짜 */}
+                    {/* 지역 + 날짜 */}
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-2.5 py-1 bg-[#f0fdf9] text-[#0F9B73] text-xs font-semibold rounded-full">
                         📍 {post.region}
@@ -130,20 +130,19 @@ const CommunityLife = () => {
                       {post.description}
                     </p>
 
-                    {/* 코스 미리보기 */}
+                    {/* ✅ 동행유형 + 여행테마 태그 */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      {post.course.map((c, i) => (
-                        <React.Fragment key={c.order}>
-                          <div className="flex items-center gap-1">
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_COLOR[c.type]}`}>
-                              {TYPE_LABEL[c.type]}
-                            </span>
-                            <span className="text-xs text-gray-600 font-medium">{c.name}</span>
-                          </div>
-                          {i < post.course.length - 1 && (
-                            <span className="text-gray-300 text-xs">→</span>
-                          )}
-                        </React.Fragment>
+                      {/* 동행 유형 */}
+                      {post.companion && (
+                        <span className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full">
+                          {COMPANION_EMOJI[post.companion] || '👤'} {post.companion}
+                        </span>
+                      )}
+                      {/* 여행 테마 */}
+                      {(post.themes || []).map((theme, i) => (
+                        <span key={i} className="px-2.5 py-1 bg-[#f0fdf9] text-[#0F9B73] text-xs font-semibold rounded-full">
+                          {theme}
+                        </span>
                       ))}
                     </div>
                   </div>
