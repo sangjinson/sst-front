@@ -77,7 +77,7 @@ const AppRoutes = () => {
       </Route>
 
       {/* 🚀 3. 반드시 로그인이 필요한 페이지 영역 */}
-      <Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>
+      {/*<Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>*/}
         <Route element={<UserLayout />}>
           
           {/* 마이페이지 */}
@@ -93,7 +93,7 @@ const AppRoutes = () => {
           <Route path="/plan" element={<AIPlanPage />} />
           <Route path="/plan/result" element={<AIPlanResultPage />} />
         </Route>
-      </Route>
+      {/*</Route>*/}
 
       {/* 🚀 4. 관리자 전용 권한 (ROLE_ 접두사 확인 주의!) */}
       <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
