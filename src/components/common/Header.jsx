@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+// 🚀 추가: 전역 상태에서 유저 정보와 로그아웃 함수를 가져오기 위한 커스텀 훅 임포트
+import { useAuth } from '@hooks/useAuth'; 
 import '@assets/css/header.css';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
+
+  // 🚀 추가: AuthContext에서 user 상태와 logout 함수 추출
+  const { user, logout } = useAuth();
 
   const { region } = useParams();
   const navigate = useNavigate();
@@ -80,14 +85,13 @@ const Header = () => {
 
   return (
     <header ref={headerRef} className="w-full bg-white border-b border-gray-200 sticky top-0 z-[1000] relative">
-      <div className="container mx-auto flex justify-between items-end pt-7 pb-4 px-4">
+      <div className="container mx-auto flex justify-between items-end pt-7 pb-4">
         
-        {/* 로고 */}
+        {/* 로고 및 데스크톱 네비게이션 영역 (기존 동일) */}
         <div className="header-logo text-black no-underline fs-up-6">
           <Link to="/" onClick={closeMenu}>거리에섯</Link>
         </div>
         
-        {/* 데스크톱 네비게이션 */}
         <nav className="hidden md:flex gap-4 lg:gap-[30px] mb-2">
           {navItems.map((item) => (
             <div key={item.name} className="relative group">
@@ -128,11 +132,31 @@ const Header = () => {
             🔍
           </button>
           
-          <Link to="/login">
-            <button className="bg-primary text-white py-2 px-4 md:px-6 rounded fs-up-1 font-bold border-none cursor-pointer whitespace-nowrap">
-              로그인
-            </button>
-          </Link>
+          {/* 🚀 수정: user 상태에 따른 조건부 렌더링 적용 */}
+          {user ? (
+            <div className="flex items-center gap-3">
+              <Link to="/user/mypage" className="shrink-0 block">
+                <img 
+                  src="https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png" 
+                  alt="프로필" 
+                  className="w-[38px] h-[38px] md:w-[42px] md:h-[42px] rounded-full object-cover border-2 border-gray-100 hover:border-[#0F9B73] transition-colors cursor-pointer"
+                />
+              </Link>
+              <button 
+                onClick={logout}
+                className="bg-white text-gray-600 border border-gray-300 py-1.5 px-3 md:py-2 md:px-4 rounded fs-up-1 font-bold cursor-pointer whitespace-nowrap hover:bg-gray-50 transition"
+              >
+                로그아웃
+              </button>
+            </div>
+          ) : (
+            // 🚀 에러 수정: JSX 블록 주석 { /* ... */ } 대신, 일반 JS 주석(//)을 사용해야 에러가 나지 않아!
+            <Link to="/login">
+              <button className="bg-primary text-white py-2 px-4 md:px-6 rounded fs-up-1 font-bold border-none cursor-pointer whitespace-nowrap">
+                로그인
+              </button>
+            </Link>
+          )}
           
           <button
             className="block md:hidden w-9 h-9 flex items-center justify-center fs-up-3 text-gray-800 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition"
