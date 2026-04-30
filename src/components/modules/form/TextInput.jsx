@@ -17,16 +17,17 @@ const TextInput = ({
   size = "md",
   ...props
 }) => {
-  // 베이스 클래스에 우리가 만든 커스텀 유틸리티 포함
+  // 1. 베이스 클래스 (우리가 재정의한 초록색 테마)
   const baseInputClassName = "input input-secondary input-hover-green w-full transition-all outline-none";
 
-  // DaisyUI 표준 클래스와 커스텀 높이 조합
+  // 2. DaisyUI 표준 사이즈 클래스 매핑
   const sizeStyles = {
-    sm: "input-sm h-[2.5rem]",   // 40px
-    md: "input-md h-[3rem]",    // 48px
-    lg: "input-lg h-[3.5rem]",   // 56px
-    xl: "input-lg h-[4rem] text-xl",    // 64px (lg 베이스로 높이 확장)
-    "2xl": "input-lg h-[4.5rem] text-2xl", // 72px (lg 베이스로 높이 확장)
+    sm: "input-sm",      // DaisyUI 표준 높이 (32px)
+    md: "input-md",      // DaisyUI 표준 높이 (48px)
+    lg: "input-lg",      // DaisyUI 표준 높이 (64px)
+    // 표준을 넘어서는 사이즈만 커스텀 높이 적용
+    xl: "input-lg h-[4.5rem] text-xl", 
+    "2xl": "input-lg h-[5.5rem] text-2xl", 
   };
 
   return (
@@ -45,7 +46,7 @@ const TextInput = ({
         onChange={onChange}
         placeholder={placeholder}
         required={required}
-        // DaisyUI 사이즈 클래스와 커스텀 높이를 함께 적용
+        // h-를 제거하고 DaisyUI 표준 클래스(input-sm 등)가 높이를 결정하게 함
         className={`${baseInputClassName} ${sizeStyles[size] || sizeStyles.md} ${inputClassName}`}
         {...props}
       />
