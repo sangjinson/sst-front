@@ -37,12 +37,16 @@ const AdminLayout = () => {
     {
       key: 'showcase',
       label: '뽐낼거리 관리',
-      children: [{ label: '게시글 목록', path: '/admin1/showcase' }],
+      children: [
+        { label: '핫플거리 관리', path: '/admin1/showcase/hotplace' }, 
+        { label: '인생거리 관리', path: '/admin1/showcase/life' },      
+      ],
     },
+    // 신고 관리 추가
     {
-      key: 'report',
-      label: '신고 관리',
-      children: [{ label: '신고 관리', path: '/admin1/report' }],
+    key: 'report',
+    label: '신고 관리',
+    children: [{ label: '신고 관리', path: '/admin1/report' }],
     },
   ];
 
