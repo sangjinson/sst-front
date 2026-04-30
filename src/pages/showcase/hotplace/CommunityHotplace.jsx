@@ -1,10 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import { getAllPosts } from "./communityHotplaceData"; // ✅ 변경
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0); // ✅ 페이지 진입 시 맨 위로 이동
+  }, []);
+
+  // 사용자가 좋아요를 눌렀는지 저장하는 상태
   const [likedPosts, setLikedPosts] = useState({});
   const [keyword, setKeyword] = useState("");
   const [searchType, setSearchType] = useState("all");
