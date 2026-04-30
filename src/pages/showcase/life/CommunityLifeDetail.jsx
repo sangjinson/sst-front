@@ -1,229 +1,430 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { ClipButton } from '@components/modules/ActionButtons';
+import { ClipButton } from "@components/modules/ActionButtons";
+import { lifePosts, lifeComments } from "./communityLifeData";
+import { getBadgeColor } from "@components/modules/area/arealist/areaListUtils";
 
 const CommunityLifeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // --- 상태 관리 ---
-  const [isLiked, setIsLiked] = useState(false); // 찜 상태
-  const [newComment, setNewComment] = useState(""); // 새 댓글 입력값
-  const [comments, setComments] = useState([
-    { id: 1, user: "5스틴", text: "뮤지컬트레인", date: "2026.04.22" },
-    { id: 2, user: "여행가 영조", text: "집에가자", date: "2026.04.23" },
-  ]);
+  // ✅ 현재 게시글 찾기
+  const post = lifePosts.find((item) => item.id === Number(id));
 
-  const [editingId, setEditingId] = useState(null); // 수정 중인 댓글 ID
-  const [editText, setEditText] = useState(""); // 수정 중인 내용
+  // ✅ 찜 상태
+  const [isLiked, setIsLiked] = useState(false);
 
+  // ✅ 댓글 상태
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState(lifeComments);
+
+  // ✅ 댓글 수정 상태
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState("");
+
+  // ✅ 페이지 진입 시 화면 맨 위로 이동
   useEffect(() => {
-    window.scrollTo({ top: 0 });
+    window.scrollTo(0, 0);
   }, []);
 
-  // 더미 데이터
-  const posts = [
-    { id: 16, title: "서울 야경 명소 발견!", author: "서울시민", likes: 45, img: "https://picsum.photos/seed/16/400/533", category: "볼거리" },
-    { id: 15, title: "제주도 숨은 카페 공유해요", author: "여행가J", likes: 88, img: "https://picsum.photos/seed/15/400/533", category: "먹거리" },
-    { id: 14, title: "강릉 바다 힐링 여행", author: "파도사랑", likes: 23, img: "https://picsum.photos/seed/14/400/533", category: "볼거리" },
-    { id: 13, title: "부산 밀면 맛집 인증", author: "미식가", likes: 120, img: "https://picsum.photos/seed/13/400/533", category: "먹거리" },
-    { id: 12, title: "전주 한옥마을 산책", author: "한옥러버", likes: 56, img: "https://picsum.photos/seed/12/400/533", category: "놀거리" },
-    { id: 11, title: "속초 중앙시장 먹거리 탐방", author: "먹방러", likes: 77, img: "https://picsum.photos/seed/11/400/533", category: "먹거리" },
-    { id: 10, title: "가을 단풍 구경 다녀옴", author: "단풍맨", likes: 34, img: "https://picsum.photos/seed/10/400/533", category: "볼거리" },
-    { id: 9, title: "인천 월미도 나들이", author: "바다아이", likes: 12, img: "https://picsum.photos/seed/9/400/533", category: "놀거리" },
-    { id: 8, title: "경기도 화성 1일차", author: "경기도 청년", likes: 30, img: "https://picsum.photos/seed/8/400/533", category: "볼거리" },
-    { id: 7, title: "관악산 다녀왔습니다.", author: "부산 소녀", likes: 62, img: "https://picsum.photos/seed/7/400/533", category: "놀거리" },
-    { id: 6, title: "경기도에 이런 곳이 있네요??", author: "thstkdwls13", likes: 5, img: "https://picsum.photos/seed/6/400/533", category: "볼거리" },
-    { id: 5, title: "먹을거면 여기로 와라", author: "김길동", likes: 102, img: "https://picsum.photos/seed/5/400/533", category: "먹거리" },
-    { id: 4, title: "여자친구랑 최고의 숙소!", author: "이강도", likes: 1, img: "https://picsum.photos/seed/4/400/533", category: "잘거리" },
-    { id: 3, title: "컴포넌트랑 이천 힐링 여행", author: "useState()", likes: 404, img: "https://picsum.photos/seed/3/400/533", category: "놀거리" },
-    { id: 2, title: "소주맛이 어떠냐? 달아요", author: "callback", likes: 14, img: "https://picsum.photos/seed/2/400/533", category: "먹거리" },
-    { id: 1, title: "오늘 하루가 인상적이었다는거야", author: "박새로이", likes: 54, img: "https://picsum.photos/seed/1/400/533", category: "놀거리" },
-  ];
-
-  const currentPost = posts.find((p) => p.id === Number(id));
-
-  if (!currentPost) {
-    return <div className="py-20 text-center font-bold text-gray-500">존재하지 않는 게시물입니다.</div>;
+  // ✅ 게시글이 없을 때
+  if (!post) {
+    return (
+      <div className="py-20 text-center font-bold text-gray-500">
+        존재하지 않는 게시물입니다.
+      </div>
+    );
   }
 
-  const postDetail = {
-    ...currentPost,
-    date: "2026.04.22",
-    tags: [currentPost.category, "경기도", "여행"],
-    content: "경기도 여행의 순간을 공유하세요. 정말 멋진 곳이었어요!",
+  // ✅ 배지 색상용 카테고리 배열
+  const lifeCategories = ["전체", "볼거리", "먹거리", "놀거리"];
+
+  // ✅ 찜 수 계산
+  const wishCount = post.wishCnt + (isLiked ? 1 : 0);
+
+  // ✅ 내 일정으로 가져오기
+  const handleAddSchedule = () => {
+    alert("내 일정으로 가져왔습니다.");
   };
 
-  // --- 기능 함수들 ---
-
-  // const handleShare = async () => {
-  //   try {
-  //     if (navigator.share) {
-  //       await navigator.share({ title: postDetail.title, url: window.location.href });
-  //     } else {
-  //       await navigator.clipboard.writeText(window.location.href);
-  //       alert("링크가 복사되었습니다!");
-  //     }
-  //   } catch (err) { console.log(err); }
-  // };
-
+  // ✅ 게시글 신고
   const handleReport = () => {
-    if (window.confirm("이 게시물을 신고하시겠습니까?")) alert("신고 접수 완료");
+    if (window.confirm("이 게시물을 신고하시겠습니까?")) {
+      alert("신고가 접수되었습니다.");
+    }
   };
 
+  // ✅ 댓글 등록
   const handleCommentSubmit = () => {
-    if (!newComment.trim()) return alert("내용을 입력해주세요.");
-    const newObj = { id: Date.now(), user: "나", text: newComment, date: new Date().toLocaleDateString() };
+    if (!newComment.trim()) {
+      alert("댓글 내용을 입력해주세요.");
+      return;
+    }
+
+    const newObj = {
+      id: Date.now(),
+      user: "나",
+      text: newComment,
+      date: new Date().toLocaleDateString(),
+    };
+
     setComments([newObj, ...comments]);
     setNewComment("");
   };
 
+  // ✅ 댓글 삭제
   const handleDeleteComment = (commentId) => {
-    if (window.confirm("삭제하시겠습니까?")) setComments(comments.filter(c => c.id !== commentId));
+    if (window.confirm("댓글을 삭제하시겠습니까?")) {
+      setComments(comments.filter((comment) => comment.id !== commentId));
+    }
   };
 
-  const startEditing = (id, text) => { setEditingId(id); setEditText(text); };
+  // ✅ 댓글 수정 시작
+  const startEditing = (commentId, text) => {
+    setEditingId(commentId);
+    setEditText(text);
+  };
 
+  // ✅ 댓글 수정 저장
   const handleSaveEdit = (commentId) => {
-    setComments(comments.map(c => c.id === commentId ? { ...c, text: editText } : c));
+    setComments(
+      comments.map((comment) =>
+        comment.id === commentId ? { ...comment, text: editText } : comment
+      )
+    );
+
     setEditingId(null);
+    setEditText("");
+  };
+
+  // ✅ 댓글 신고
+  const handleReportComment = () => {
+    if (window.confirm("이 댓글을 신고하시겠습니까?")) {
+      alert("댓글 신고가 접수되었습니다.");
+    }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 transition-all font-sans">
-      <Breadcrumb 
-        paths={[{ label: '홈', to: '/' }, { label: '뽐낼거리', to: '/showcase' }, { label: '상세보기' }]} 
-        className="mb-4"
+    <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
+      {/* ✅ 상단 경로 */}
+      <Breadcrumb
+        paths={[
+          { label: "홈", to: "/" },
+          { label: "인생거리", to: "/showcase/life" },
+          { label: "상세보기" },
+        ]}
+        className="mb-6"
       />
 
-      {/* 헤더 섹션 */}
-      <div className="mb-8 mt-4 md:mt-7">
-        <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-800 underline decoration-emerald-300 underline-offset-4">뽐낼거리</h2>
-        <p className="text-gray-400 text-xs md:text-sm">경기도 여행의 순간을 공유하세요</p>
-      </div>
+      {/* ✅ 상단 페이지 제목 영역 */}
+      <section className="mt-6 mb-8 border-b border-gray-200 pb-6 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-bold text-emerald-600">Life Detail</p>
 
-      {/* 메인 컨텐츠 */}
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 mb-16">
-        
-        {/* 왼쪽: 이미지 영역 */}
-        <div className="flex-1 w-full shrink-0">
-          <div className="relative rounded-xl overflow-hidden bg-gray-100 shadow-inner group aspect-[4/3] md:aspect-[3/2]">
-            <img src={postDetail.img} alt={postDetail.title} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button className="bg-black/20 text-white w-8 h-8 rounded-full">&lt;</button>
-              <button className="bg-black/20 text-white w-8 h-8 rounded-full">&gt;</button>
+          <h2 className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">
+            인생거리
+          </h2>
+
+          <p className="mt-2 text-sm md:text-base text-gray-500">
+            여행자들이 남긴 인생샷 장소와 순간을 모아봤어요.
+          </p>
+        </div>
+
+        {/* ✅ 목록으로 버튼 */}
+        <button
+          type="button"
+          onClick={() => navigate("/showcase/life")}
+          className="shrink-0 rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-100">
+          목록으로
+        </button>
+      </section>
+
+      {/* ✅ 대표 이미지 Hero 영역 */}
+      <section className="relative overflow-hidden rounded-3xl bg-gray-100 shadow-sm">
+        <div className="relative h-[360px] md:h-[520px]">
+          {/* ✅ 첫 번째 이미지 = 썸네일 */}
+          <img
+            src={post.img}
+            alt={post.title}
+            className="h-full w-full object-cover"
+          />
+
+          {/* ✅ 이미지 위 어두운 그라데이션 */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+          {/* ✅ 이미지 위 제목 정보 */}
+          <div className="absolute left-5 right-5 bottom-6 md:left-10 md:right-10 md:bottom-10 text-white">
+            {/* ✅ 카테고리 배지 */}
+            <span
+              className={`inline-flex rounded-full px-3 py-1 text-xs font-bold shadow-sm ${getBadgeColor(
+                lifeCategories,
+                post.category
+              )}`}
+            >
+              {post.category}
+            </span>
+
+            {/* ✅ 게시글 제목 */}
+            <h1 className="mt-4 text-3xl md:text-5xl font-extrabold leading-tight drop-shadow-sm">
+              {post.title}
+            </h1>
+
+            {/* ✅ 장소 / 작성일 / 조회수 */}
+            <div className="mt-4 flex flex-wrap gap-3 text-sm md:text-base text-white/90">
+              <span>📍 {post.place}</span>
+              <span>🗓 {post.regDt}</span>
+              <span>👁 {post.viewCnt}</span>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* 오른쪽: 상세 정보 영역 */}
-        <div className="w-full lg:w-[400px] flex flex-col justify-between py-2">
-          <div>
-            {/* 공유/신고 버튼 */}
-            <div className="flex gap-2 mb-8 mt-4 lg:mt-0">
-              <ClipButton />
-              <button onClick={handleReport} className="text-xs md:text-sm px-4 py-2 border border-gray-200 rounded-full hover:text-red-500 transition-colors">🚩 신고</button>
+      {/* ✅ 액션 버튼 영역 */}
+      <section className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap gap-2">
+          {/* ✅ 내 일정으로 가져오기 */}
+          <button
+            type="button"
+            onClick={handleAddSchedule}
+            className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-emerald-700 active:scale-95"
+          >
+            내 일정으로 가져오기
+          </button>
+
+          {/* ✅ 기존 공통 링크 클립 버튼 */}
+          <ClipButton />
+
+          {/* ✅ 게시글 신고 */}
+          <button
+            type="button"
+            onClick={handleReport}
+            className="rounded-full border border-gray-200 px-4 py-2 text-sm font-bold text-gray-500 transition-all hover:border-red-300 hover:text-red-500"
+          >
+            🚩 신고
+          </button>
+        </div>
+
+        {/* ✅ 찜 버튼 */}
+        <button
+          type="button"
+          onClick={() => setIsLiked(!isLiked)}
+          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-extrabold transition-all active:scale-95 ${
+            isLiked
+              ? "bg-red-50 text-red-500"
+              : "bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-500"
+          }`}
+        >
+          <span>{isLiked ? "❤️" : "🤍"}</span>
+          <span>{wishCount}</span>
+        </button>
+      </section>
+
+      {/* ✅ 블로그형 본문 + 오른쪽 요약 카드 */}
+      <main className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+        {/* ✅ 왼쪽 본문 */}
+        <article className="rounded-3xl border border-gray-100 bg-white p-6 md:p-10 shadow-sm">
+          {/* ✅ 작성자 정보 */}
+          <div className="mb-8 flex items-center gap-3 border-b border-gray-100 pb-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-xl">
+              👤
             </div>
 
-            {/* 작성자 정보 및 찜 버튼 컨테이너 */}
-            <div className="flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-3 mb-8">
-              
-              {/* 작성자 정보 */}
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-xl shrink-0 border border-emerald-100 shadow-sm">😊</div>
-                <div>
-                  <h4 className="font-bold text-gray-800 text-[15px] md:text-lg leading-tight">{postDetail.author}</h4>
-                  <p className="text-[11px] md:text-sm text-gray-400 mt-0.5">작성일 {postDetail.date}</p>
-                </div>
-              </div>
-
-              {/* ✅ 찜 버튼: 공통 HeartButton으로 교체 및 크기 조정 */}
-              <button 
-                onClick={() => setIsLiked(!isLiked)}
-                className={`w-11 h-11 md:w-12 md:h-12 border rounded-full flex items-center justify-center transition-all active:scale-90 shrink-0 lg:mt-10 ${
-                  isLiked ? "border-red-500 text-red-500 bg-red-50" : "border-gray-200 text-gray-300 hover:text-red-500 hover:border-red-500"
-                }`}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill={isLiked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </button>
-
+            <div>
+              <p className="font-bold text-gray-800">{post.author}</p>
+              <p className="text-sm text-gray-400">
+                {post.regDt} 작성 · {post.place}
+              </p>
             </div>
           </div>
 
-          {/* 제목 및 태그 영역 */}
-          <div className="mt-6 lg:mt-auto">
-            <h3 className="text-xl md:text-2xl font-bold mb-4 text-gray-800 leading-snug decoration-emerald-300 underline underline-offset-8 decoration-2">✏️ {postDetail.title}</h3>
+          {/* ✅ 여행 소개 */}
+          <section className="mb-10">
+            <h2 className="mb-4 text-2xl font-extrabold text-gray-900">
+              여행 소개
+            </h2>
+
+            <p className="text-base leading-8 text-gray-600">
+              {post.description}
+            </p>
+
+            <p className="mt-4 text-base leading-8 text-gray-600">
+              이곳은 사진으로 남기기 좋은 분위기를 가진 장소예요. 여행 중
+              특별한 장면을 기록하고 싶다면 천천히 둘러보면서 마음에 드는
+              구도를 찾아보는 것을 추천합니다.
+            </p>
+          </section>
+
+          
+          {/* ✅ 해시태그 */}
+          <section>
             <div className="flex flex-wrap gap-2">
-              {postDetail.tags.map(tag => (
-                <span key={tag} className="text-xs md:text-sm font-semibold text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-md border border-emerald-100 shadow-inner">#{tag}</span>
+              {post.hashtags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700">
+                  #{tag}
+                </span>
               ))}
             </div>
-          </div>
-        </div>
-      </div>
+          </section>
+        </article>
 
-      {/* 하단 댓글 영역 */}
-      <div className="border-t border-gray-100 pt-10">
-        <h4 className="font-bold text-xl mb-6">댓글 <span className="text-emerald-500 font-extrabold">{comments.length}</span></h4>
-        
-        {/* 댓글 입력 */}
-        <div className="border border-gray-200 rounded-2xl p-5 mb-10 focus-within:ring-2 focus-within:ring-emerald-100 focus-within:border-emerald-500 transition-all bg-white shadow-sm">
-          <textarea 
+        {/* ✅ 오른쪽 여행 정보 요약 카드 */}
+        <aside className="h-fit rounded-3xl border border-gray-100 bg-white p-6 shadow-sm lg:sticky lg:top-24">
+          <h3 className="mb-5 text-lg font-extrabold text-gray-900">
+            여행 정보
+          </h3>
+
+          <div className="space-y-4 text-sm text-gray-600">
+            <div className="flex justify-between gap-4">
+              <span className="text-gray-400">장소</span>
+              <strong className="text-right text-gray-800">{post.place}</strong>
+            </div>
+
+            <div className="flex justify-between gap-4">
+              <span className="text-gray-400">작성일</span>
+              <strong className="text-gray-800">{post.regDt}</strong>
+            </div>
+
+            <div className="flex justify-between gap-4">
+              <span className="text-gray-400">작성자</span>
+              <strong className="text-gray-800">{post.author}</strong>
+            </div>
+
+            <div className="flex justify-between gap-4">
+              <span className="text-gray-400">조회수</span>
+              <strong className="text-gray-800">{post.viewCnt}</strong>
+            </div>
+
+            <div className="flex justify-between gap-4">
+              <span className="text-gray-400">댓글</span>
+              <strong className="text-gray-800">{comments.length}</strong>
+            </div>
+
+            <div className="flex justify-between gap-4">
+              <span className="text-gray-400">찜</span>
+              <strong className="text-red-500">{wishCount}</strong>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      {/* ✅ 댓글 영역 */}
+      <section className="mt-12 border-t border-gray-100 pt-10">
+        <h4 className="mb-6 text-xl font-extrabold text-gray-900">
+          댓글 <span className="text-emerald-500">{comments.length}</span>
+        </h4>
+
+        {/* ✅ 댓글 입력 */}
+        <div className="mb-10 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-100">
+          <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            className="w-full h-24 outline-none text-sm md:text-base resize-none bg-transparent"
-            placeholder="이 여행지에 대해 궁금한 점이나 감상을 남겨주세요."
+            className="h-24 w-full resize-none bg-transparent text-sm outline-none md:text-base"
+            placeholder="이 여행지에 대한 감상이나 질문을 남겨주세요."
           />
-          <div className="flex justify-end mt-2">
-            <button onClick={handleCommentSubmit} className="bg-emerald-600 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow active:scale-95">등록</button>
+
+          <div className="mt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={handleCommentSubmit}
+              className="rounded-xl bg-emerald-600 px-6 py-2 text-sm font-bold text-white shadow transition-all hover:bg-emerald-700 active:scale-95"
+            >
+              등록
+            </button>
           </div>
         </div>
 
-        {/* 댓글 리스트 */}
-        <div className="space-y-4 mb-16">
+        {/* ✅ 댓글 리스트 */}
+        <div className="mb-16 space-y-4">
           {comments.map((comment) => (
-            <div key={comment.id} className="border border-gray-100 rounded-2xl p-5 md:p-7 bg-gray-50/70 hover:bg-white transition-all shadow-inner group relative">
-              <div className="flex justify-between items-start mb-3">
+            <div
+              key={comment.id}
+              className="rounded-2xl border border-gray-100 bg-gray-50/70 p-5 shadow-inner transition-all hover:bg-white md:p-7"
+            >
+              <div className="mb-3 flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-xs border border-gray-100 shrink-0 shadow">👤</div>
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-white text-xs shadow">
+                    👤
+                  </div>
+
                   <div>
-                    <p className="font-bold text-[15px] text-gray-800">{comment.user}</p>
-                    <p className="text-[11px] text-gray-400">{comment.date}</p>
+                    <p className="font-bold text-gray-800">{comment.user}</p>
+                    <p className="text-xs text-gray-400">{comment.date}</p>
                   </div>
                 </div>
-                
-                <div className="flex gap-3 text-xs md:text-sm font-semibold pt-1">
+
+                {/* ✅ 댓글 수정 / 삭제 / 신고 */}
+                <div className="flex gap-3 pt-1 text-xs font-semibold md:text-sm">
                   {editingId === comment.id ? (
                     <>
-                      <button onClick={() => handleSaveEdit(comment.id)} className="text-blue-600 hover:text-blue-800">저장</button>
-                      <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600">취소</button>
+                      <button
+                        type="button"
+                        onClick={() => handleSaveEdit(comment.id)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        저장
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingId(null);
+                          setEditText("");
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        취소
+                      </button>
                     </>
                   ) : (
                     <>
-                      <button onClick={() => startEditing(comment.id, comment.text)} className="text-gray-400 hover:text-blue-500">수정</button>
-                      <button onClick={() => handleDeleteComment(comment.id)} className="text-gray-400 hover:text-red-500">삭제</button>
+                      <button
+                        type="button"
+                        onClick={() => startEditing(comment.id, comment.text)}
+                        className="text-gray-400 hover:text-blue-500"
+                      >
+                        수정
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        삭제
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleReportComment}
+                        className="text-gray-400 hover:text-orange-500"
+                      >
+                        신고
+                      </button>
                     </>
                   )}
                 </div>
               </div>
 
+              {/* ✅ 댓글 수정 입력 / 일반 댓글 내용 */}
               {editingId === comment.id ? (
-                <textarea 
+                <textarea
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
-                  className="w-full p-4 border border-gray-200 rounded-xl text-sm outline-none bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all resize-none shadow-inner"
+                  className="w-full resize-none rounded-xl border border-gray-200 bg-white p-4 text-sm outline-none transition-all focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                   rows="3"
                 />
               ) : (
-                <p className="text-sm md:text-[15px] text-gray-600 leading-relaxed pl-13 pr-2 whitespace-pre-wrap">{comment.text}</p>
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-600 md:text-[15px]">
+                  {comment.text}
+                </p>
               )}
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 };
