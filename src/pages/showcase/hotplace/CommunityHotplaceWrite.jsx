@@ -139,11 +139,34 @@ const CommunityHotplaceWrite = () => {
                   ))}
                 </div>
               )}
+
+              <div className="form-control w-full">
+                <select 
+                  className="select select-lg select-secondary select-hover-green w-full" 
+                  value={selectedRegion || ""}
+                  onChange={(e) => setSelectedRegion(e.target.value)}
+                >
+                  <option value="" disabled>지역 선택</option>
+                  {gyeonggiRegions.map((region) => (
+                    <option key={region} value={region}>
+                      {region}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <select class="select select-lg">
+              <option disabled selected>Pick a color</option>
+              <option>Crimson</option>
+              <option>Amber</option>
+              <option>Velvet</option>
+            </select>
+
             </div>
             <div>
               <label htmlFor="placeName" className="block fs-down-2 font-bold text-gray-700 mb-3">구체적인 장소</label>
               <TextInput id="placeName" value={placeName} onChange={(e) => setPlaceName(e.target.value)}
-                placeholder="예: 화성행궁, 두물머리" required />
+                placeholder="예: 화성행궁, 두물머리" required size="lg"/>
             </div>
           </div>
 

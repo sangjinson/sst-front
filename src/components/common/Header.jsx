@@ -162,21 +162,9 @@ const Header = () => {
                   className="w-[38px] h-[38px] md:w-[42px] md:h-[42px] rounded-full object-cover border-2 border-gray-100 hover:border-[#0F9B73] transition-colors cursor-pointer"
                 />
               </Link>
-              <button 
-                onClick={logout}
-                className="bg-white text-gray-600 border border-gray-300 py-1.5 px-3 md:py-2 md:px-4 rounded fs-up-1 font-bold cursor-pointer whitespace-nowrap hover:bg-gray-50 transition"
-              >
-                로그아웃
-              </button>
+              <button className='btn btn-darkgray' onClick={logout}>로그아웃</button>              
             </div>
-          ) : (
-            // 🚀 에러 수정: JSX 블록 주석 { /* ... */ } 대신, 일반 JS 주석(//)을 사용해야 에러가 나지 않아!
-            <Link to="/login">
-              <button className="bg-primary text-white py-2 px-4 md:px-6 rounded fs-up-1 font-bold border-none cursor-pointer whitespace-nowrap">
-                로그인
-              </button>
-            </Link>
-          )}
+          ) : ( <Link to="/login" class="btn btn-green px-5">로그인</Link> )}
           
           <button
             className="block md:hidden w-9 h-9 flex items-center justify-center fs-up-3 text-gray-800 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition"
