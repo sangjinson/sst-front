@@ -68,13 +68,13 @@ const CommunityHotplace = () => {
       <section className="mt-8 mb-8 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-bold text-emerald-600">Hotplace</p>
-            {/* ✅ 제목 + 이동 탭 */}
+            {/* 제목 + 이동 탭 */}
             <div className="mt-1 flex items-end gap-3">
-              {/* 👉 현재 페이지 */}
+              {/* 현재 페이지 */}
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
                 핫플거리
               </h2>
-              {/* 👉 이동 (인생거리) */}
+              {/* 이동 (인생거리) */}
               <Link
                 to="/showcase/life"
                 className="mb-1 fs-down-1 md:text-lg font-bold text-gray-400 transition-all hover:text-[#0F9B73] hover:scale-110">

@@ -11,6 +11,18 @@ const CommunityLife = () => {
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
 
+  // ✅ 좋아요 상태 관리 (핵심 추가)
+  // { postId: true/false }
+  const [likedPosts, setLikedPosts] = useState({});
+
+  // ✅ 좋아요 토글 함수 (핵심 추가)
+  const toggleLike = (postId) => {
+    setLikedPosts((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
+
   const posts = getAllLifePosts();
 
   const filteredPosts = useMemo(() => {
@@ -77,14 +89,11 @@ const CommunityLife = () => {
         <div>
           <p className="text-sm font-bold text-[#0F9B73]">Life Course</p>
 
-          {/* ✅ 제목 + 이동 탭 */}
           <div className="mt-1 flex items-end gap-3">
-            {/* 👉 현재 페이지 */}
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
               인생거리
             </h2>
 
-            {/* 👉 이동 버튼 */}
             <Link
               to="/showcase/hotplace"
               className="mb-1 fs-down-1 md:text-lg font-bold text-gray-400 transition-all hover:text-emerald-600 hover:scale-110"
@@ -173,7 +182,17 @@ const CommunityLife = () => {
             <CommunityLifeCard
               key={post.id}
               post={post}
-              onClick={() => navigate(`/showcase/life/view/${post.id}`)}
+
+              // ✅ 좋아요 상태 전달
+              liked={!!likedPosts[post.id]}
+
+              // ✅ 좋아요 클릭 이벤트 전달
+              onToggleLike={toggleLike}
+
+              // 카드 클릭
+              onClick={() =>
+                navigate(`/showcase/life/view/${post.id}`)
+              }
             />
           ))}
         </div>

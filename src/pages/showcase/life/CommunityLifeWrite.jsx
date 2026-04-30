@@ -175,7 +175,7 @@ const CommunityLifeWrite = () => {
 
           {/* 대표 이미지 */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-3">대표 이미지</label>
+            <label className="block text-sm font-bold text-gray-700 mb-3">이미지 가져오기</label>
             {thumbnail && (
               <div className="relative w-full h-48 rounded-xl overflow-hidden mb-3 border">
                 <img src={thumbnail} alt="썸네일" className="w-full h-full object-cover" />
