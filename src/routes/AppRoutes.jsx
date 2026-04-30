@@ -19,9 +19,13 @@ import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 import AIPlanPage from '@pages/aiplan/AIPlanPage';
 import AIPlanResultPage from '@pages/aiplan/AIPlanResultPage';
 
-import Community from '@pages/showcase/Community';
-import CommunityDetail from "@pages/showcase/CommunityDetail";
-import CommunityWrite from "@pages/showcase/CommunityWrite";
+import CommunityHotplace from "@pages/showcase/hotplace/CommunityHotplace";
+import CommunityHotplaceDetail from "@pages/showcase/hotplace/CommunityHotplaceDetail";
+import CommunityHotplaceWrite from "@pages/showcase/hotplace/CommunityHotplaceWrite";
+
+import CommunityLife from "@pages/showcase/life/CommunityLife";
+import CommunityLifeDetail from "@pages/showcase/life/CommunityLifeDetail";
+import CommunityLifeWrite from "@pages/showcase/life/CommunityLifeWrite";
 
 import SearchPage from '@pages/search/SearchPage';
 import LoginPage from '@pages/auth/LoginPage';
@@ -74,14 +78,21 @@ const AppRoutes = () => {
         </Route>
 
         {/* 커뮤니티 (뽐낼거리) 추가 */}
-          <Route path="/showcase" element={<UserLayout />}>
-            {/* /showcase 접속 시 바로 목록 출력 */}
-            <Route index element={<Community />} /> 
-            {/* 상세 보기 주소: /showcase/view/1 */}
-            <Route path="view/:id" element={<CommunityDetail />} />
-            {/* 3. 뽐낼거리 글쓰기 페이지 */}
-            <Route path="write" element={<CommunityWrite />} />
-          </Route>
+        <Route path="/showcase" element={<UserLayout />}>
+          {/* /showcase 접속 시 기본 목록 */}
+          <Route index element={<CommunityHotplace />} />
+
+          {/* 핫플거리 */}
+          <Route path="hotplace" element={<CommunityHotplace />} />
+          <Route path="hotplace/view/:id" element={<CommunityHotplaceDetail />} />
+          <Route path="hotplace/write" element={<CommunityHotplaceWrite />} />
+          <Route path="hotplace/write/:id" element={<CommunityHotplaceWrite />} />
+
+          {/* 인생거리 */}
+          <Route path="life" element={<CommunityLife />} />
+          <Route path="life/view/:id" element={<CommunityLifeDetail />} />
+          <Route path="life/write" element={<CommunityLifeWrite />} />
+        </Route>
         
 
         {/* 고객센터 */}
