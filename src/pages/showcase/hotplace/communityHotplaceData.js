@@ -11,8 +11,7 @@ export const hotplacePosts = [
     commentCnt: 8,
     hashtags: ["야경", "서울", "핫플"],
     img: "https://picsum.photos/seed/hotplace-16/720/920",
-    description:
-      "해가 진 뒤에 더 예뻐지는 전망 포인트예요. 산책 코스로도 좋았습니다.",
+    description: "해가 진 뒤에 더 예뻐지는 전망 포인트예요. 산책 코스로도 좋았습니다.",
     size: "tall",
   },
   {
@@ -40,8 +39,7 @@ export const hotplacePosts = [
     commentCnt: 5,
     hashtags: ["강릉", "바다", "힐링"],
     img: "https://picsum.photos/seed/hotplace-14/720/900",
-    description:
-      "사람이 많지 않은 시간대에 가면 바다 소리까지 온전히 즐길 수 있어요.",
+    description: "사람이 많지 않은 시간대에 가면 바다 소리까지 온전히 즐길 수 있어요.",
     size: "tall",
   },
   {
@@ -55,8 +53,7 @@ export const hotplacePosts = [
     commentCnt: 21,
     hashtags: ["부산", "맛집", "밀면"],
     img: "https://picsum.photos/seed/hotplace-13/720/720",
-    description:
-      "웨이팅은 있었지만 한입 먹자마자 기다린 보람이 느껴졌습니다.",
+    description: "웨이팅은 있었지만 한입 먹자마자 기다린 보람이 느껴졌습니다.",
     size: "square",
   },
   {
@@ -70,8 +67,7 @@ export const hotplacePosts = [
     commentCnt: 9,
     hashtags: ["전주", "한옥마을", "산책"],
     img: "https://picsum.photos/seed/hotplace-12/720/860",
-    description:
-      "골목마다 분위기가 달라서 천천히 걸을수록 더 재밌는 코스예요.",
+    description: "골목마다 분위기가 달라서 천천히 걸을수록 더 재밌는 코스예요.",
     size: "tall",
   },
   {
@@ -85,8 +81,7 @@ export const hotplacePosts = [
     commentCnt: 11,
     hashtags: ["속초", "시장", "먹거리"],
     img: "https://picsum.photos/seed/hotplace-11/720/620",
-    description:
-      "짧은 일정에도 들르기 좋은 시장 코스입니다. 간식 종류가 정말 많아요.",
+    description: "짧은 일정에도 들르기 좋은 시장 코스입니다. 간식 종류가 정말 많아요.",
     size: "wide",
   },
   {
@@ -114,8 +109,7 @@ export const hotplacePosts = [
     commentCnt: 2,
     hashtags: ["인천", "월미도", "나들이"],
     img: "https://picsum.photos/seed/hotplace-9/720/720",
-    description:
-      "바다와 놀이기구를 한 번에 즐기기 좋은 당일치기 장소입니다.",
+    description: "바다와 놀이기구를 한 번에 즐기기 좋은 당일치기 장소입니다.",
     size: "square",
   },
   {
@@ -129,26 +123,42 @@ export const hotplacePosts = [
     commentCnt: 6,
     hashtags: ["경기도", "화성", "당일치기"],
     img: "https://picsum.photos/seed/hotplace-8/720/840",
-    description:
-      "생각보다 볼 곳이 많아서 하루 코스로 꽉 채워 다녀왔어요.",
+    description: "생각보다 볼 곳이 많아서 하루 코스로 꽉 채워 다녀왔어요.",
     size: "tall",
   },
 ];
 
+// ✅ localStorage에서 유저가 작성한 게시글 불러오기
+export const getUserPosts = () => {
+  try {
+    return JSON.parse(localStorage.getItem('hotplacePosts') || '[]');
+  } catch {
+    return [];
+  }
+};
+
+// ✅ localStorage에 유저 게시글 저장
+export const saveUserPost = (post) => {
+  const posts = getUserPosts();
+  posts.unshift(post);
+  localStorage.setItem('hotplacePosts', JSON.stringify(posts));
+};
+
+// ✅ localStorage에서 유저 게시글 삭제
+export const deleteUserPost = (id) => {
+  const posts = getUserPosts().filter(p => p.id !== id);
+  localStorage.setItem('hotplacePosts', JSON.stringify(posts));
+};
+
+// ✅ 더미 + 유저 게시글 합쳐서 반환
+export const getAllPosts = () => {
+  return [...getUserPosts(), ...hotplacePosts];
+};
+
 // 댓글 더미 데이터
 export const hotplaceComments = [
-  {
-    id: 1,
-    user: "5스틴",
-    text: "여기 분위기 진짜 좋아 보여요!",
-    date: "2026.04.22",
-  },
-  {
-    id: 2,
-    user: "여행가 영조",
-    text: "다음 여행 코스에 넣어야겠네요.",
-    date: "2026.04.23",
-  },
+  { id: 1, user: "5스틴", text: "여기 분위기 진짜 좋아 보여요!", date: "2026.04.22" },
+  { id: 2, user: "여행가 영조", text: "다음 여행 코스에 넣어야겠네요.", date: "2026.04.23" },
 ];
 
 // 경기도 지역 목록
