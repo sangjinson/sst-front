@@ -19,6 +19,7 @@ import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 import AIPlanPage from '@pages/aiplan/AIPlanPage';
 import AIPlanResultPage from '@pages/aiplan/AIPlanResultPage';
 
+// 🚀 새롭게 분리된 커뮤니티 컴포넌트들
 import CommunityHotplace from "@pages/showcase/hotplace/CommunityHotplace";
 import CommunityHotplaceDetail from "@pages/showcase/hotplace/CommunityHotplaceDetail";
 import CommunityHotplaceWrite from "@pages/showcase/hotplace/CommunityHotplaceWrite";
@@ -52,13 +53,17 @@ const AppRoutes = () => {
       <Route element={<UserLayout />}>
         <Route path="/search/:keyword" element={<SearchPage />} />
 
-        {/* 고객센터 (보통 공지사항, FAQ는 모두가 볼 수 있음) */}
+        {/* 고객센터 */}
         <Route path="/customersupport/notice" element={<Notice />} />
         <Route path="/customersupport/faq" element={<Faq />} />
 
-        {/* 커뮤니티 (뽐낼거리) 목록 및 상세 보기 */}
-        <Route path="/showcase" element={<Community />} /> 
-        <Route path="/showcase/view/:id" element={<CommunityDetail />} />
+        {/* 🚀 커뮤니티 - 핫플레이스 (목록 및 상세) */}
+        <Route path="/showcase/hotplace" element={<CommunityHotplace />} /> 
+        <Route path="/showcase/hotplace/view/:id" element={<CommunityHotplaceDetail />} />
+
+        {/* 🚀 커뮤니티 - 일상 (목록 및 상세) */}
+        <Route path="/showcase/life" element={<CommunityLife />} /> 
+        <Route path="/showcase/life/view/:id" element={<CommunityLifeDetail />} />
 
         {/* 메인페이지 및 사거리 템플릿 (조회 전용) */}
         <Route path="/:region" element={<MainPage />} />
@@ -73,8 +78,9 @@ const AppRoutes = () => {
           {/* 마이페이지 */}
           <Route path="/user/mypage" element={<MyPage />} />
 
-          {/* 커뮤니티 글쓰기 (목록/상세는 위에 공개로 빼고, 글쓰기만 보호) */}
-          <Route path="/showcase/write" element={<CommunityWrite />} />
+          {/* 🚀 커뮤니티 - 핫플레이스 / 일상 글쓰기 (작성은 무조건 보호됨) */}
+          <Route path="/showcase/hotplace/write" element={<CommunityHotplaceWrite />} />
+          <Route path="/showcase/life/write" element={<CommunityLifeWrite />} />
 
           {/* 내거리(일정 관리) */}
           <Route path="/plan" element={<AIPlanPage />} />
@@ -86,6 +92,7 @@ const AppRoutes = () => {
       <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+          {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
         </Route>
       </Route> 
     </Routes>
