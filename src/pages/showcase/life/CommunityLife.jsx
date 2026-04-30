@@ -1,164 +1,81 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getBadgeColor } from "@components/modules/area/arealist/areaListUtils";
-
-
-// ✅ 라이프 게시글 더미 데이터 가져오기
-import { lifePosts } from "./communityLifeData";
+import { getAllLifePosts, TYPE_LABEL, TYPE_COLOR } from "./communityLifeData";
 
 const CommunityLife = () => {
-  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
-  const itemsPerPage = 8;
-
-  useEffect(() => {
-    window.scrollTo(0, 0); // ✅ 페이지 진입 시 맨 위로 이동
-  }, []);
-
-  // ✅ 검색어 상태
   const [keyword, setKeyword] = useState("");
-
-  // ✅ 검색 대상 상태
   const [searchType, setSearchType] = useState("all");
-
-  // ✅ 정렬 상태
   const [sortType, setSortType] = useState("latest");
 
-  // ✅ 찜 상태 관리
-  const [wishlistedPosts, setWishlistedPosts] = useState({});
+  const posts = getAllLifePosts();
 
-  // ✅ 찜 버튼 클릭 시 상태 변경
-  const toggleWishlist = (postId) => {
-    setWishlistedPosts((prev) => ({
-      ...prev,
-      [postId]: !prev[postId],
-    }));
-  };
-
-  const lifeCategories = ["전체", "볼거리", "먹거리", "놀거리"];
-
-  // ✅ 검색 + 정렬 처리된 게시글 목록
   const filteredPosts = useMemo(() => {
-    const trimmedKeyword = keyword.trim().toLowerCase();
+    const kw = keyword.trim().toLowerCase();
 
-    let result = lifePosts.filter((post) => {
-      if (!trimmedKeyword) return true;
-
+    let result = posts.filter((post) => {
+      if (!kw) return true;
       const title = post.title.toLowerCase();
       const content = post.description.toLowerCase();
       const author = post.author.toLowerCase();
-      const place = post.place.toLowerCase();
+      const region = post.region.toLowerCase();
       const hashtags = post.hashtags.join(" ").toLowerCase();
 
-      if (searchType === "title") return title.includes(trimmedKeyword);
-      if (searchType === "content") return content.includes(trimmedKeyword);
-      if (searchType === "author") return author.includes(trimmedKeyword);
-      if (searchType === "place") return place.includes(trimmedKeyword);
-      if (searchType === "hashtag") return hashtags.includes(trimmedKeyword);
-
-      return (
-        title.includes(trimmedKeyword) ||
-        content.includes(trimmedKeyword) ||
-        author.includes(trimmedKeyword) ||
-        place.includes(trimmedKeyword) ||
-        hashtags.includes(trimmedKeyword)
-      );
+      if (searchType === "title") return title.includes(kw);
+      if (searchType === "content") return content.includes(kw);
+      if (searchType === "author") return author.includes(kw);
+      if (searchType === "region") return region.includes(kw);
+      if (searchType === "hashtag") return hashtags.includes(kw);
+      return title.includes(kw) || content.includes(kw) || author.includes(kw) || region.includes(kw) || hashtags.includes(kw);
     });
 
     result = [...result].sort((a, b) => {
       if (sortType === "latest") return new Date(b.regDt) - new Date(a.regDt);
-
-      if (sortType === "popular") {
-        return (
-          b.viewCnt +
-          b.wishCnt +
-          b.commentCnt -
-          (a.viewCnt + a.wishCnt + a.commentCnt)
-        );
-      }
-
+      if (sortType === "popular") return (b.viewCnt + b.wishCnt + b.commentCnt) - (a.viewCnt + a.wishCnt + a.commentCnt);
       if (sortType === "view") return b.viewCnt - a.viewCnt;
       if (sortType === "wish") return b.wishCnt - a.wishCnt;
       if (sortType === "comment") return b.commentCnt - a.commentCnt;
-
       return 0;
     });
 
     return result;
-  }, [keyword, searchType, sortType]);
-
-  // ✅ 페이지네이션 계산
-  const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
-
-  const currentItems = filteredPosts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  }, [posts, keyword, searchType, sortType]);
 
   return (
     <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
-      <Breadcrumb
-        paths={[{ label: "홈", to: "/" }, { label: "인생거리" }]}
-        className="mb-4"
-      />
+      <Breadcrumb paths={[{ label: "홈", to: "/" }, { label: "인생거리", to: "/showcase/life" }]} className="mb-4" />
 
-      {/* ✅ 페이지 제목 영역 */}
       <section className="mt-8 mb-8 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-sm font-bold text-emerald-600">Life Shot</p>
-          <h2 className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">
-            인생거리
-          </h2>
-          <p className="mt-2 text-sm md:text-base text-gray-500">
-            여행자들이 남긴 인생샷 장소와 순간을 모아봤어요.
-          </p>
+          <p className="text-sm font-bold text-[#0F9B73]">Life Course</p>
+          <h2 className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">인생거리</h2>
+          <p className="mt-2 text-sm md:text-base text-gray-500">여행자들이 직접 만든 인생 여행 코스를 공유해요.</p>
         </div>
-
-        {/* ✅ 글쓰기 버튼 */}
         <Link to="/showcase/life/write" className="w-fit">
-          <button className="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-md active:scale-95">
-            글쓰기
+          <button className="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#0F9B73] hover:shadow-md active:scale-95">
+            코스 공유하기
           </button>
         </Link>
       </section>
 
-      {/* ✅ 검색 / 필터 영역 */}
+      {/* 검색/필터 */}
       <section className="mb-10 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-[160px_minmax(0,1fr)_160px]">
-          <select
-            value={searchType}
-            onChange={(e) => {
-              setSearchType(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
+          <select value={searchType} onChange={(e) => setSearchType(e.target.value)}
+            className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:border-[#0F9B73]">
             <option value="all">전체 검색</option>
             <option value="title">제목 검색</option>
             <option value="content">내용 검색</option>
             <option value="author">작성자 검색</option>
-            <option value="place">장소 검색</option>
+            <option value="region">지역 검색</option>
             <option value="hashtag">해시태그 검색</option>
           </select>
-
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => {
-              setKeyword(e.target.value);
-              setCurrentPage(1);
-            }}
+          <input type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)}
             placeholder="검색어를 입력하세요"
-            className="h-11 rounded-xl border border-gray-200 px-4 fs-down-1 text-gray-700 outline-none focus:border-emerald-500"
-          />
-
-          <select
-            value={sortType}
-            onChange={(e) => {
-              setSortType(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
+            className="h-11 rounded-xl border border-gray-200 px-4 text-sm text-gray-700 outline-none focus:border-[#0F9B73]" />
+          <select value={sortType} onChange={(e) => setSortType(e.target.value)}
+            className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:border-[#0F9B73]">
             <option value="latest">최신순</option>
             <option value="popular">인기순</option>
             <option value="view">조회수순</option>
@@ -166,95 +83,82 @@ const CommunityLife = () => {
             <option value="comment">댓글순</option>
           </select>
         </div>
-
-        <div className="mt-3 flex items-center justify-between fs-down-1 text-gray-400">
-          <span>
-            총{" "}
-            <strong className="text-emerald-600">
-              {filteredPosts.length}
-            </strong>
-            개의 게시글
-          </span>
-
+        <div className="mt-3 flex items-center justify-between text-sm text-gray-400">
+          <span>총 <strong className="text-[#0F9B73]">{filteredPosts.length}</strong>개의 코스</span>
           {keyword && (
-            <button
-              type="button"
-              onClick={() => {
-                setKeyword("");
-                setSearchType("all");
-                setCurrentPage(1);
-              }}
-              className="font-semibold text-gray-400 hover:text-emerald-600">
-              검색 초기화
-            </button>
+            <button onClick={() => { setKeyword(""); setSearchType("all"); }}
+              className="font-semibold text-gray-400 hover:text-[#0F9B73]">검색 초기화</button>
           )}
         </div>
       </section>
 
-      {/* ✅ 카드 목록 영역 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-16">
-        {currentItems.length > 0 ? (
-          currentItems.map((post) => {
-            const wished = !!wishlistedPosts[post.id];
-            const wishCount = post.wishCnt + (wished ? 1 : 0);
+      {/* 게시글 목록 - 네이버 블로그 스타일 */}
+      {filteredPosts.length > 0 ? (
+        <div className="flex flex-col gap-5">
+          {filteredPosts.map((post) => (
+            <article
+              key={post.id}
+              onClick={() => navigate(`/showcase/life/view/${post.id}`)}
+              className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden"
+            >
+              <div className="flex flex-col md:flex-row">
 
-            return (
-              // ✅ 이미지 + 내용 전체를 하나의 카드로 감싸는 부분
-              <article
-                key={post.id}
-                onClick={() => navigate(`/showcase/life/view/${post.id}`)}
-                className="group cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                {/* ✅ 카드 이미지 영역 */}
-                <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
-                  <img
-                    src={post.img}
-                    alt={post.title}
-                    className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
-                  />
-
-                  {/* ✅ 카테고리 */}
-                  <div className="absolute top-3 left-3">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold shadow-sm ${getBadgeColor(
-                        lifeCategories,
-                        post.category
-                      )}`}>
-                      {post.category}
-                    </span>
-                  </div>
+                {/* 썸네일 */}
+                <div className="w-full md:w-[280px] h-[200px] md:h-auto shrink-0 overflow-hidden">
+                  <img src={post.thumbnail} alt={post.title}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
                 </div>
 
-                {/* ✅ 카드 내용 영역 */}
-                <div className="p-4 bg-white">
-                  {/* ✅ 작성자 */}
-                  <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50 text-[10px]">
-                      👤
+                {/* 내용 */}
+                <div className="flex-1 p-5 md:p-6 flex flex-col justify-between">
+                  <div>
+                    {/* 상단 지역 + 날짜 */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-2.5 py-1 bg-[#f0fdf9] text-[#0F9B73] text-xs font-semibold rounded-full">
+                        📍 {post.region}
+                      </span>
+                      <span className="text-xs text-gray-400">{post.regDt}</span>
                     </div>
-                    <h4 className="text-[13px] font-bold text-[#E8956D]">
-                      {post.author}
-                    </h4>
+
+                    {/* 제목 */}
+                    <h3 className="text-lg font-extrabold text-gray-900 mb-2 line-clamp-1 hover:text-[#0F9B73] transition">
+                      {post.title}
+                    </h3>
+
+                    {/* 본문 미리보기 */}
+                    <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-3">
+                      {post.description}
+                    </p>
+
+                    {/* 코스 미리보기 */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {post.course.map((c, i) => (
+                        <React.Fragment key={c.order}>
+                          <div className="flex items-center gap-1">
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_COLOR[c.type]}`}>
+                              {TYPE_LABEL[c.type]}
+                            </span>
+                            <span className="text-xs text-gray-600 font-medium">{c.name}</span>
+                          </div>
+                          {i < post.course.length - 1 && (
+                            <span className="text-gray-300 text-xs">→</span>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* ✅ 제목 */}
-                  <p className="line-clamp-1 text-[14px] font-bold leading-tight text-gray-800 transition-colors group-hover:text-emerald-600">
-                    {post.title}
-                  </p>
-
-                  {/* ✅ 설명 */}
-                  <p className="mt-2 line-clamp-2 fs-down-1 leading-relaxed text-gray-500">
-                    {post.description}
-                  </p>
-
-                  {/* ✅ 해시태그 */}
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {post.hashtags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs font-semibold text-emerald-600 fs-down-0.5">
-                        #{tag}
-                      </span>
-                    ))}
+                  {/* 하단 작성자 + 통계 */}
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-sm">😊</div>
+                      <span className="text-sm font-semibold text-[#E8956D]">{post.author}</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-gray-400">
+                      <span>👁 {post.viewCnt}</span>
+                      <span>💬 {post.commentCnt}</span>
+                      <span>❤️ {post.wishCnt}</span>
+                    </div>
                   </div>
 
                   {/* ✅ 조회수 / 댓글 / 찜 영역 */}
@@ -281,51 +185,13 @@ const CommunityLife = () => {
                     </button>
                   </div>
                 </div>
-              </article>
-            );
-          })
-        ) : (
-          <div className="col-span-full py-32 text-center">
-            <p className="text-gray-400 text-lg">검색 결과가 없습니다.</p>
-          </div>
-        )}
-      </div>
-
-      {/* ✅ 페이지네이션 영역 */}
-      {totalPages > 0 && (
-        <div className="flex justify-center items-center gap-2 py-8">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
-            className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 transition-all">
-            &lt;
-          </button>
-
-          <div className="flex gap-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-              (page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-10 h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all ${
-                    currentPage === page
-                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100 scale-110"
-                      : "text-gray-500 hover:bg-gray-100"
-                  }`}>
-                  {page}
-                </button>
-              )
-            )}
-          </div>
-
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-            }
-            disabled={currentPage === totalPages}
-            className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-emerald-50 hover:border-emerald-200 disabled:opacity-30 transition-all">
-            &gt;
-          </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
+          검색 결과가 없습니다.
         </div>
       )}
     </div>

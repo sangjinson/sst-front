@@ -36,7 +36,8 @@ import MemberList from '@pages/admin/MemberList';
 import AreaPostList from '@pages/admin/AreaPostList';
 import ReportList from '@pages/admin/ReportList';
 import ReportDetail from '@pages/admin/ReportDetail';
-import ShowcaseList from '@pages/admin/ShowcaseList';
+import HotplaceList from '@pages/admin/HotplaceList';
+import LifeList from '@pages/admin/LifeList';
 
 const AppRoutes = () => {
   return (
@@ -49,12 +50,8 @@ const AppRoutes = () => {
         <Route path="area/:type" element={<AreaPostList />} />
         <Route path="report" element={<ReportList />} />
         <Route path="report/:id" element={<ReportDetail />} />
-        <Route path="showcase" element={<ShowcaseList />} />
-      </Route>
-
-      {/* 관리자 임시 경로!! */}
-      <Route path="/admin1" element={<AdminLayout />}>
-        <Route index element={<AdminHome />} />
+        <Route path="showcase/hotplace" element={<HotplaceList />} />
+        <Route path="showcase/life" element={<LifeList />} />
       </Route>
 
       {/* 공개 접근 가능 페이지 */}
@@ -65,7 +62,7 @@ const AppRoutes = () => {
         <Route path="/search/:keyword" element={<SearchPage />} />
       </Route>
 
-      {/* 로그인/회원가입 - 여기에 추가 */}
+      {/* 로그인/회원가입 */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/login/signup" element={<SignupPage />} />
 
@@ -74,12 +71,11 @@ const AppRoutes = () => {
 
         {/* 마이페이지 */}
         <Route path="/user" element={<UserLayout />}>
-        <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
+          <Route path="mypage" element={<MyPage />} />
         </Route>
 
-        {/* 커뮤니티 (뽐낼거리) 추가 */}
+        {/* 커뮤니티 (뽐낼거리) */}
         <Route path="/showcase" element={<UserLayout />}>
-          {/* /showcase 접속 시 기본 목록 */}
           <Route index element={<CommunityHotplace />} />
 
           {/* 핫플거리 */}
@@ -94,7 +90,6 @@ const AppRoutes = () => {
           <Route path="life/write" element={<CommunityLifeWrite />} />
           <Route path="life/write/:id" element={<CommunityLifeWrite />} />
         </Route>
-        
 
         {/* 고객센터 */}
         <Route path="/customersupport" element={<UserLayout />}>
@@ -128,9 +123,7 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
         </Route>
-      </Route>        
-
-
+      </Route>
 
     </Routes>
   );

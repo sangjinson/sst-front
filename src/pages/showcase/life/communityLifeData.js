@@ -1,170 +1,207 @@
-export const lifePosts = [
+// ✅ localStorage에서 유저가 작성한 인생거리 게시글 불러오기
+export const getUserLifePosts = () => {
+  try {
+    return JSON.parse(localStorage.getItem('lifePosts') || '[]');
+  } catch {
+    return [];
+  }
+};
+
+export const saveUserLifePost = (post) => {
+  const posts = getUserLifePosts();
+  posts.unshift(post);
+  localStorage.setItem('lifePosts', JSON.stringify(posts));
+};
+
+export const deleteUserLifePost = (id) => {
+  const posts = getUserLifePosts().filter(p => p.id !== id);
+  localStorage.setItem('lifePosts', JSON.stringify(posts));
+};
+
+export const getAllLifePosts = () => {
+  return [...getUserLifePosts(), ...lifePostsDummy];
+};
+
+// ✅ 더미 데이터
+export const lifePostsDummy = [
   {
-    id: 16,
-    title: "서울 야경 명소 발견!",
-    author: "서울시민",
-    place: "서울 남산타워",
-    regDt: "2026-04-29",
-    viewCnt: 312,
-    wishCnt: 45,
-    commentCnt: 8,
-    hashtags: ["야경", "서울", "핫플"],
-    img: "https://picsum.photos/seed/life-16/720/920",
-    description:
-      "인생샷 남기기 좋은 서울 야경 명소예요. 밤공기 맞으면서 산책하기도 좋았습니다.",
-    category: "볼거리",
-    size: "tall",
+    id: 1,
+    title: '수원 당일치기 완벽 코스 🏯',
+    author: '경기도민',
+    region: '수원시',
+    regDt: '2026-04-28',
+    viewCnt: 842,
+    wishCnt: 134,
+    commentCnt: 23,
+    hashtags: ['수원', '화성', '당일치기', '역사여행'],
+    thumbnail: 'https://images.unsplash.com/photo-1548115184-bc6544d06a58?w=800&q=80',
+    description: `수원 화성은 조선 정조 때 만들어진 성곽으로, 유네스코 세계문화유산에 등재된 곳이에요.
+
+저는 오전 일찍 출발해서 화성행궁부터 시작했어요. 입장료는 어른 기준 1,500원으로 정말 저렴한 편이에요.
+
+행궁을 둘러보고 나서 수원천을 따라 걷다 보면 팔달문이 나와요. 성벽 위를 걸으면서 수원 시내를 내려다보는 경치가 정말 멋졌어요.
+
+점심은 수원 통닭거리에서 유명한 통닭을 먹었는데, 줄이 길었지만 기다릴 만한 맛이었어요!
+
+오후에는 연무대에서 국궁 체험도 하고, 화홍문에서 사진도 찍었어요. 해질 무렵 성곽 위에서 보는 노을이 정말 아름다웠어요.`,
+    course: [
+      {
+        order: 1,
+        name: '화성행궁',
+        address: '경기도 수원시 팔달구 행궁로 11',
+        type: 'see',
+        image: 'https://images.unsplash.com/photo-1548115184-bc6544d06a58?w=400&q=80',
+        desc: '조선 정조가 세운 행궁, 유네스코 세계문화유산',
+      },
+      {
+        order: 2,
+        name: '수원 통닭거리',
+        address: '경기도 수원시 팔달구 정조로 1개',
+        type: 'food',
+        image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80',
+        desc: '수원 명물 왕갈비와 통닭이 유명한 먹거리 거리',
+      },
+      {
+        order: 3,
+        name: '연무대 국궁체험장',
+        address: '경기도 수원시 장안구 연무동',
+        type: 'play',
+        image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400&q=80',
+        desc: '전통 활쏘기 체험이 가능한 국궁 체험장',
+      },
+      {
+        order: 4,
+        name: '화홍문',
+        address: '경기도 수원시 장안구 수원천로',
+        type: 'see',
+        image: 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?w=400&q=80',
+        desc: '수원화성의 북수문, 야경이 아름다운 명소',
+      },
+    ],
   },
   {
-    id: 15,
-    title: "제주도 숨은 카페 공유해요",
-    author: "여행가J",
-    place: "제주 애월 카페거리",
-    regDt: "2026-04-28",
-    viewCnt: 521,
-    wishCnt: 88,
-    commentCnt: 14,
-    hashtags: ["제주", "카페", "바다뷰"],
-    img: "https://picsum.photos/seed/life-15/720/640",
-    description:
-      "창가 자리에서 인생샷 찍기 좋은 카페였어요. 바다뷰가 정말 예뻤습니다.",
-    category: "먹거리",
-    size: "wide",
+    id: 2,
+    title: '가평 1박2일 힐링 여행 🌿',
+    author: '힐링러버',
+    region: '가평군',
+    regDt: '2026-04-25',
+    viewCnt: 621,
+    wishCnt: 98,
+    commentCnt: 15,
+    hashtags: ['가평', '남이섬', '1박2일', '힐링'],
+    thumbnail: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+    description: `가평은 서울에서 차로 1시간 거리에 있어서 당일치기나 1박2일 여행지로 딱이에요.
+
+첫째 날은 남이섬에서 시작했어요. 배를 타고 들어가는 것부터 설레는 경험이었어요. 섬 안에서 자전거도 빌려서 곳곳을 돌아다녔는데, 메타세쿼이아 길이 정말 예쁘더라고요.
+
+점심은 섬 안에 있는 식당에서 먹고, 오후에는 쁘띠프랑스로 이동했어요. 프랑스 풍의 건물들이 독특하고 사진 찍기 좋은 곳이에요.
+
+숙소는 북한강 뷰가 보이는 펜션을 잡았는데, 아침에 일어나서 보는 강 뷰가 힐링 그 자체였어요.
+
+둘째 날은 아침 일찍 자라섬을 산책하고, 카페에서 커피 한 잔 마시고 여유롭게 돌아왔어요.`,
+    course: [
+      {
+        order: 1,
+        name: '남이섬',
+        address: '경기도 가평군 가평읍 북한강변로 1024',
+        type: 'see',
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
+        desc: '메타세쿼이아 길이 유명한 북한강의 아름다운 섬',
+      },
+      {
+        order: 2,
+        name: '쁘띠프랑스',
+        address: '경기도 가평군 청평면 호반로 1063',
+        type: 'play',
+        image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400&q=80',
+        desc: '프랑스 풍의 테마파크, 사진 명소',
+      },
+      {
+        order: 3,
+        name: '북한강 뷰 펜션',
+        address: '경기도 가평군 청평면 북한강변로',
+        type: 'sleep',
+        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80',
+        desc: '북한강이 보이는 힐링 펜션',
+      },
+      {
+        order: 4,
+        name: '자라섬',
+        address: '경기도 가평군 가평읍 달전리',
+        type: 'see',
+        image: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=400&q=80',
+        desc: '재즈 페스티벌로 유명한 북한강의 섬',
+      },
+    ],
   },
   {
-    id: 14,
-    title: "강릉 바다 힐링 여행",
-    author: "파도사랑",
-    place: "강릉 안목해변",
-    regDt: "2026-04-27",
-    viewCnt: 198,
-    wishCnt: 23,
-    commentCnt: 5,
-    hashtags: ["강릉", "바다", "힐링"],
-    img: "https://picsum.photos/seed/life-14/720/900",
-    description:
-      "바다를 배경으로 사진 찍기 좋은 여행 코스예요. 조용히 걷기에도 좋았습니다.",
-    category: "볼거리",
-    size: "tall",
-  },
-  {
-    id: 13,
-    title: "부산 밀면 맛집 인증",
-    author: "미식가",
-    place: "부산 서면",
-    regDt: "2026-04-26",
-    viewCnt: 742,
-    wishCnt: 120,
-    commentCnt: 21,
-    hashtags: ["부산", "맛집", "밀면"],
-    img: "https://picsum.photos/seed/life-13/720/720",
-    description:
-      "음식 사진도 예쁘게 나오는 부산 맛집이에요. 여행 중 먹거리 코스로 추천합니다.",
-    category: "먹거리",
-    size: "square",
-  },
-  {
-    id: 12,
-    title: "전주 한옥마을 산책",
-    author: "한옥러버",
-    place: "전주 한옥마을",
-    regDt: "2026-04-25",
-    viewCnt: 355,
-    wishCnt: 56,
-    commentCnt: 9,
-    hashtags: ["전주", "한옥마을", "산책"],
-    img: "https://picsum.photos/seed/life-12/720/860",
-    description:
-      "한복 입고 찍으면 분위기 좋은 인생샷 코스예요. 골목마다 볼거리가 많았습니다.",
-    category: "놀거리",
-    size: "tall",
-  },
-  {
-    id: 11,
-    title: "속초 중앙시장 먹거리 탐방",
-    author: "먹방러",
-    place: "속초 중앙시장",
-    regDt: "2026-04-24",
-    viewCnt: 410,
-    wishCnt: 77,
+    id: 3,
+    title: '파주 예술 기행 🎨',
+    author: '예술여행자',
+    region: '파주시',
+    regDt: '2026-04-20',
+    viewCnt: 445,
+    wishCnt: 76,
     commentCnt: 11,
-    hashtags: ["속초", "시장", "먹거리"],
-    img: "https://picsum.photos/seed/life-11/720/620",
-    description:
-      "시장 분위기와 먹거리 사진을 남기기 좋아요. 간식 종류가 많아서 구경하는 재미도 있었습니다.",
-    category: "먹거리",
-    size: "wide",
-  },
-  {
-    id: 10,
-    title: "가을 단풍 구경 다녀옴",
-    author: "단풍맨",
-    place: "내장산 국립공원",
-    regDt: "2026-04-23",
-    viewCnt: 167,
-    wishCnt: 34,
-    commentCnt: 3,
-    hashtags: ["단풍", "가을", "등산"],
-    img: "https://picsum.photos/seed/life-10/720/930",
-    description:
-      "단풍 배경으로 사진 찍기 정말 좋았어요. 가을 여행 코스로 기억에 남는 곳입니다.",
-    category: "볼거리",
-    size: "tall",
-  },
-  {
-    id: 9,
-    title: "인천 월미도 나들이",
-    author: "바다아이",
-    place: "인천 월미도",
-    regDt: "2026-04-22",
-    viewCnt: 94,
-    wishCnt: 12,
-    commentCnt: 2,
-    hashtags: ["인천", "월미도", "나들이"],
-    img: "https://picsum.photos/seed/life-9/720/720",
-    description:
-      "놀이기구와 바다 배경이 잘 어울리는 곳이에요. 가볍게 다녀오기 좋았습니다.",
-    category: "놀거리",
-    size: "square",
-  },
-  {
-    id: 8,
-    title: "경기도 화성 1일차",
-    author: "경기도 청년",
-    place: "경기도 화성",
-    regDt: "2026-04-21",
-    viewCnt: 226,
-    wishCnt: 30,
-    commentCnt: 6,
-    hashtags: ["경기도", "화성", "당일치기"],
-    img: "https://picsum.photos/seed/life-8/720/840",
-    description:
-      "당일치기로 다녀오기 좋은 사진 코스였어요. 생각보다 볼거리가 많았습니다.",
-    category: "볼거리",
-    size: "tall",
+    hashtags: ['파주', '헤이리', '출판도시', '예술'],
+    thumbnail: 'https://images.unsplash.com/photo-1517090504586-fde19ea6066f?w=800&q=80',
+    description: `파주는 예술과 문화가 살아숨쉬는 도시예요. 헤이리 예술마을과 파주 출판도시를 하루에 다 둘러볼 수 있어요.
+
+헤이리 예술마을은 건물 하나하나가 작품이에요. 독특한 건축물들과 갤러리, 카페들이 어우러진 공간이라 그냥 걷기만 해도 즐거워요.
+
+점심은 헤이리 안에 있는 감성 카페에서 브런치로 해결했어요. 인테리어가 너무 예뻐서 한참 머물렀어요.
+
+오후에는 파주 출판도시로 이동했어요. 아시아출판문화정보센터에서 책도 보고, 지혜의 숲에서 엄청난 양의 책들 사이를 거닐었어요.
+
+저녁은 임진각 근처에서 먹고, 평화 누리 공원을 산책하면서 하루를 마무리했어요.`,
+    course: [
+      {
+        order: 1,
+        name: '헤이리 예술마을',
+        address: '경기도 파주시 탄현면 헤이리마을길',
+        type: 'see',
+        image: 'https://images.unsplash.com/photo-1517090504586-fde19ea6066f?w=400&q=80',
+        desc: '예술가들이 모여 만든 복합 문화예술 공간',
+      },
+      {
+        order: 2,
+        name: '파주 출판도시 지혜의 숲',
+        address: '경기도 파주시 문발로 184',
+        type: 'see',
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
+        desc: '50만권의 책이 있는 거대한 도서관',
+      },
+      {
+        order: 3,
+        name: '헤이리 브런치 카페',
+        address: '경기도 파주시 탄현면 헤이리마을길',
+        type: 'food',
+        image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80',
+        desc: '헤이리 마을 안의 감성 브런치 카페',
+      },
+      {
+        order: 4,
+        name: '평화 누리 공원',
+        address: '경기도 파주시 탄현면 필승로 408',
+        type: 'play',
+        image: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=400&q=80',
+        desc: '임진각 옆 평화를 주제로 한 대형 공원',
+      },
+    ],
   },
 ];
 
 // 댓글 더미 데이터
 export const lifeComments = [
-  {
-    id: 1,
-    user: "여행초보",
-    text: "사진 분위기 너무 좋아요!",
-    date: "2026.04.22",
-  },
-  {
-    id: 2,
-    user: "감성러",
-    text: "저도 여기 가보고 싶네요.",
-    date: "2026.04.23",
-  },
+  { id: 1, user: '여행러버', text: '저도 이 코스로 가보고 싶어요!', date: '2026.04.29' },
+  { id: 2, user: '경기도민', text: '수원 화성 정말 좋죠! 저도 자주 가요.', date: '2026.04.28' },
 ];
 
-// 경기도 지역 목록
-export const gyeonggiRegions = [
-  "수원시", "용인시", "성남시", "부천시", "화성시", "안산시", "남양주시", "안양시", "평택시",
-  "시흥시", "파주시", "의정부시", "김포시", "광명시", "광주시", "군포시", "이천시", "오산시",
-  "하남시", "양주시", "구리시", "안성시", "포천시", "의왕시", "양평군", "여주시", "동두천시",
-  "가평군", "과천시", "연천군",
-];
+// 타입별 색상/라벨
+export const TYPE_LABEL = { see: '볼거리', food: '먹거리', sleep: '잘거리', play: '놀거리' };
+export const TYPE_COLOR = {
+  see:   'bg-blue-100 text-blue-700',
+  food:  'bg-orange-100 text-orange-700',
+  sleep: 'bg-green-100 text-green-700',
+  play:  'bg-purple-100 text-purple-700',
+};
