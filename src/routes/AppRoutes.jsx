@@ -80,7 +80,9 @@ const AppRoutes = () => {
 
           {/* 🚀 커뮤니티 - 핫플레이스 / 일상 글쓰기 (작성은 무조건 보호됨) */}
           <Route path="/showcase/hotplace/write" element={<CommunityHotplaceWrite />} />
+          <Route path="/showcase/hotplace/write/:id" element={<CommunityHotplaceWrite />} />
           <Route path="/showcase/life/write" element={<CommunityLifeWrite />} />
+          <Route path="/showcase/life/write/:id" element={<CommunityLifeWrite />} />
 
           {/* 내거리(일정 관리) */}
           <Route path="/plan" element={<AIPlanPage />} />
