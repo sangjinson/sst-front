@@ -1,6 +1,6 @@
 // src/pages/area/food/List.jsx
 import React, { useState, useMemo } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getFoodDataByRegion } from './dummydata';
 import { toKorRegion } from '@utils/regionMap';
 import { AreaListCard, AreaFilterBar, AreaPagination, sortData } from '@components/modules/area/arealist';
@@ -11,8 +11,8 @@ const ITEMS_PER_PAGE = 9;
 
 export default function PlayList() {
   const navigate = useNavigate();
-  const { selectedRegion, selectedType } = useOutletContext();
-  const regionKor = toKorRegion(selectedRegion);
+  const { region, type } = useParams(); 
+  const regionKor = toKorRegion(region);
 
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [sortOption, setSortOption]             = useState('reviews');
@@ -56,7 +56,7 @@ export default function PlayList() {
                   ...item,
                   categoryIndex: CATEGORIES['play'].filter(c => c !== '전체').indexOf(item.category),
                 }}
-                onClick={() => navigate(`/${selectedRegion}/${selectedType}/view?id=${item.id}`)}
+                onClick={() => navigate(`/${region}/${selectedType}/view?id=${item.id}`)}
                 renderHeart={() => (
                   <WishlistHeartButton item={item} itemType="food" region={regionKor} />
                 )}

@@ -51,6 +51,8 @@ const LandingPage = () => {
     <> 
       <Helmet>
         <title>거리에섯 - Index</title>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
       </Helmet>
       
       <div className="page-wrapper min-h-screen bg-[#f8f6f0]">
@@ -62,13 +64,13 @@ const LandingPage = () => {
               {user ? (
                 <button 
                   onClick={logout}
-                  className="bg-gray-500 text-white border-none py-3 px-9 rounded font-bold cursor-pointer hover:bg-gray-600 transition-colors"
+                  className="btn bg-gray-500 text-white border-none py-3 px-9 rounded font-bold cursor-pointer hover:bg-gray-600 transition-colors"
                 >
                   로그아웃
                 </button>
               ) : (
                 <Link to="/login">
-                  <button className="bg-[#0F9B73] text-white border-none py-3 px-9 rounded font-bold cursor-pointer hover:bg-[#0d8a66] transition-colors">
+                  <button className="btn bg-[#0F9B73] text-white border-none py-3 px-9 rounded font-bold cursor-pointer hover:bg-[#0d8a66] transition-colors">
                     로그인
                   </button>
                 </Link>
