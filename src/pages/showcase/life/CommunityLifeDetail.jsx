@@ -298,7 +298,16 @@ const CommunityLifeDetail = () => {
               <div className="flex flex-wrap items-center gap-4">
                 <span>👁 {viewCount}</span>
                 <span>💬 {comments.length}</span>
-                <span>❤️ {wishCount}</span>
+                <button
+                  type="button"
+                  onClick={() => setIsLiked(!isLiked)}
+                  className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold transition-all active:scale-95 ${
+                    isLiked
+                      ? "bg-blue-50 text-blue-500"
+                      : "bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500"
+                  }`}>
+                  👍 {wishCount}
+                </button>
                 <span>{post.regDt}</span>
               </div>
             </div>
@@ -321,59 +330,70 @@ const CommunityLifeDetail = () => {
             </h3>
 
             {courseList.length > 0 ? (
-              <div className="space-y-4">
-                {courseList.map((c, i) => (
-                  <div key={c.order || i} className="flex gap-4">
-                    {/* 순서 + 연결선 */}
-                    <div className="flex flex-col items-center">
-                      <div className="w-8 h-8 rounded-full bg-[#0F9B73] text-white text-sm font-bold flex items-center justify-center shrink-0">
-                        {c.order || i + 1}
-                      </div>
-
-                      {i < courseList.length - 1 && (
-                        <div className="w-0.5 h-full bg-gray-200 my-1 min-h-[20px]" />
-                      )}
+            <div className="space-y-4">
+              {courseList.map((c, i) => (
+                <div key={c.order || i} className="flex gap-4">
+                  {/* 순서 + 연결선 */}
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-[#0F9B73] text-white text-sm font-bold flex items-center justify-center shrink-0">
+                      {c.order || i + 1}
                     </div>
 
-                    {/* 장소 카드 */}
-                    <div className="flex-1 bg-gray-50 rounded-2xl p-4 flex gap-4 mb-2">
-                      <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-200">
-                        <img
-                          src={c.image || thumbnail}
-                          alt={c.name}
-                          className="w-full h-full object-cover"
-                        />
+                    {i < courseList.length - 1 && (
+                      <div className="w-0.5 h-full bg-gray-200 my-1 min-h-[20px]" />
+                    )}
+                  </div>
+
+                  {/* 장소 카드 */}
+                  <div className="flex-1 bg-gray-50 rounded-2xl p-4 flex gap-4 mb-2">
+                    {/* 장소 이미지 - 클릭 시 지역/타입별 상세 페이지로 이동 */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigate(`/${region}/${c.type}/view`, {
+                          state: {
+                            item: c,
+                            region,
+                            type: c.type,
+                          },
+                        });
+                      }}
+                      className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-200 transition hover:scale-105 active:scale-95">
+                      <img
+                        src={c.image || thumbnail}
+                        alt={c.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            TYPE_COLOR?.[c.type] ||
+                            "bg-emerald-50 text-emerald-600"
+                          }`}>
+                          {TYPE_LABEL?.[c.type] || "여행"}
+                        </span>
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                              TYPE_COLOR?.[c.type] ||
-                              "bg-emerald-50 text-emerald-600"
-                            }`}
-                          >
-                            {TYPE_LABEL?.[c.type] || "여행"}
-                          </span>
-                        </div>
-
-                        <p className="text-sm font-bold text-gray-900 truncate">
-                          {c.name}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-0.5">
-                          {c.address}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">{c.desc}</p>
-                      </div>
+                      <p className="text-sm font-bold text-gray-900 truncate">
+                        {c.name}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {c.address}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">{c.desc}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="rounded-2xl bg-gray-50 p-5 text-sm text-gray-500">
-                등록된 여행 코스가 없습니다.
-              </p>
-            )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-2xl bg-gray-50 p-5 text-sm text-gray-500">
+              등록된 여행 코스가 없습니다.
+            </p>
+          )}
 
             {/* 일정 버튼 */}
             <div className="flex flex-col gap-3 mt-6 sm:flex-row">

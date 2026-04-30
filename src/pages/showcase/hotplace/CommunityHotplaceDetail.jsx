@@ -197,12 +197,6 @@ const CommunityHotplaceDetail = () => {
             <div className="relative h-[400px] overflow-hidden bg-gray-100">
               <img src={slideImages[currentImageIndex]} alt={currentPost.title} className="h-full w-full object-cover" />
               <div className="absolute left-5 top-5 z-20 rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-gray-700 shadow-sm">{currentPost.place}</div>
-              <button type="button" onClick={() => setIsLiked(!isLiked)}
-                className={`absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full shadow-sm transition-all active:scale-90 ${isLiked ? "bg-red-50 text-red-500" : "bg-white/90 text-gray-500 hover:text-red-500"}`}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill={isLiked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </button>
               <button type="button" onClick={handlePrevImage} className="absolute left-4 top-1/2 z-40 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-md transition hover:bg-white active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
               </button>
@@ -258,21 +252,59 @@ const CommunityHotplaceDetail = () => {
 
           {/* 공유/신고 */}
           <div className="flex items-center gap-2">
-            <ClipButton />
-            <button type="button" onClick={handleReportPost}
-              className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500">
-              🚩 신고
+            {/* 공유 버튼 (작게) */}
+            <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-500">
+              <ClipButton />
+            </div>
+
+            {/* 신고 버튼 */}
+            <button
+              type="button"
+              onClick={handleReportPost}
+              className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500 flex items-center gap-1.5"
+            >
+              <svg viewBox="0 0 64 64" className="w-4 h-4">
+                <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor"/>
+                <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(45 32 32)"/>
+                <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(90 32 32)"/>
+                <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(135 32 32)"/>
+                <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(-45 32 32)"/>
+                <path d="M12 34 A20 20 0 0 1 52 34 Z" fill="currentColor"/>
+                <rect x="10" y="34" width="44" height="11" rx="5" fill="currentColor"/>
+                <rect x="8" y="45" width="48" height="10" rx="5" fill="#2d2d4e"/>
+              </svg>
+              신고
             </button>
           </div>
 
-          {/* 작성자 */}
-          <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 text-xl shadow-sm">😊</div>
+          <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+          {/* 왼쪽: 작성자 */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 text-xl shadow-sm">
+              😊
+            </div>
+
             <div className="min-w-0">
               <p className="text-sm text-gray-400">작성자</p>
-              <h4 className="truncate text-lg font-bold text-gray-900">{currentPost.author}</h4>
+              <h4 className="truncate text-lg font-bold text-gray-900">
+                {currentPost.author}
+              </h4>
             </div>
           </div>
+
+          {/* 오른쪽: 좋아요 버튼 */}
+          <button
+            type="button"
+            onClick={() => setIsLiked(!isLiked)}
+            className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold transition-all active:scale-95 ${
+              isLiked
+                ? "bg-blue-50 text-blue-500"
+                : "bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500"
+            }`}
+          >
+            👍 {wishCount}
+          </button>
+        </div>
 
           {/* 작성일 */}
           <div className="rounded-2xl bg-gray-50 p-4">
