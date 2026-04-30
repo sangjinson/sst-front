@@ -1,35 +1,61 @@
 // src/context/AuthContext.jsx
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import api from '@api/axios';
 
-export const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  
+  // 🚀 수정 1: 초기값의 권한 이름을 백엔드 DTO와 ProtectedRoute에 맞춰 'memberRole'로 변경!
+  const [user, setUser] = useState(() => {
+    const savedLogin = localStorage.getItem('isLogin');
+    // 🚀 수정: 백엔드가 주는 실제 데이터 형태와 완벽히 맞추기 위해 'ROLE_USER'로 변경
+    return savedLogin === 'true' ? { memberRole: 'ROLE_USER' } : null; 
+  });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 🚧 [수정됨] 프론트엔드 UI 개발을 위해 무조건 로그인된 것으로 강제 설정
-    const checkToken = () => {
-      // 로컬 스토리지 검사를 잠시 무시하고 강제로 유저 정보를 세팅합니다.
-      setUser({ id: 1, name: '홍길동', role: 'USER' });
-      setLoading(false);
+    const verifyUser = async () => {
+      // 🚀 방어막 1: 애초에 로그인한 적이 없으면 백엔드에 /me 요청 자체를 안 함!
+      if (localStorage.getItem('isLogin') !== 'true') {
+        setUser(null);
+        setLoading(false);
+        return; // 여기서 함수 종료
+      }
+
+      try {
+        const response = await api.get('/auth/me'); 
+        setUser(response.data.data); 
+        localStorage.setItem('isLogin', 'true');
+      } catch (error) {
+        setUser(null);
+        localStorage.removeItem('isLogin');
+      } finally {
+        setLoading(false);
+      }
     };
-    
-    setTimeout(checkToken, 300);
+
+    verifyUser();
   }, []);
 
-  const login = (userData, token) => {
-    localStorage.setItem('accessToken', token);
+  const login = (userData) => {
+    localStorage.setItem('isLogin', 'true');
     setUser(userData);
   };
 
-  const logout = () => {
-    localStorage.removeItem('accessToken');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } finally {
+      localStorage.removeItem('isLogin');
+      setUser(null);
+      window.location.href = '/';
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

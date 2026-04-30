@@ -19,6 +19,7 @@ import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 import AIPlanPage from '@pages/aiplan/AIPlanPage';
 import AIPlanResultPage from '@pages/aiplan/AIPlanResultPage';
 
+// 🚀 새롭게 분리된 커뮤니티 컴포넌트들
 import CommunityHotplace from "@pages/showcase/hotplace/CommunityHotplace";
 import CommunityHotplaceDetail from "@pages/showcase/hotplace/CommunityHotplaceDetail";
 import CommunityHotplaceWrite from "@pages/showcase/hotplace/CommunityHotplaceWrite";
@@ -42,89 +43,58 @@ import LifeList from '@pages/admin/LifeList';
 const AppRoutes = () => {
   return (
     <Routes>
-
-      {/* 관리자 임시 경로!! */}
-      <Route path="/admin1" element={<AdminLayout />}>
-        <Route index element={<AdminHome />} />
-        <Route path="members" element={<MemberList />} />
-        <Route path="area/:type" element={<AreaPostList />} />
-        <Route path="report" element={<ReportList />} />
-        <Route path="report/:id" element={<ReportDetail />} />
-        <Route path="showcase/hotplace" element={<HotplaceList />} />
-        <Route path="showcase/life" element={<LifeList />} />
-      </Route>
-
-      {/* 공개 접근 가능 페이지 */}
+      {/* 🚀 1. 완벽히 공개된 단일 페이지 */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-
-      <Route element={<UserLayout />}>
-        <Route path="/search/:keyword" element={<SearchPage />} />
-      </Route>
-
-      {/* 로그인/회원가입 */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/login/signup" element={<SignupPage />} />
 
-      {/* 일반 사용자 권한 (USER, ADMIN) */}
-      <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
-
-        {/* 마이페이지 */}
-        <Route path="/user" element={<UserLayout />}>
-          <Route path="mypage" element={<MyPage />} />
-        </Route>
-
-        {/* 커뮤니티 (뽐낼거리) */}
-        <Route path="/showcase" element={<UserLayout />}>
-          <Route index element={<CommunityHotplace />} />
-
-          {/* 핫플거리 */}
-          <Route path="hotplace" element={<CommunityHotplace />} />
-          <Route path="hotplace/view/:id" element={<CommunityHotplaceDetail />} />
-          <Route path="hotplace/write" element={<CommunityHotplaceWrite />} />
-          <Route path="hotplace/write/:id" element={<CommunityHotplaceWrite />} />
-
-          {/* 인생거리 */}
-          <Route path="life" element={<CommunityLife />} />
-          <Route path="life/view/:id" element={<CommunityLifeDetail />} />
-          <Route path="life/write" element={<CommunityLifeWrite />} />
-          <Route path="life/write/:id" element={<CommunityLifeWrite />} />
-        </Route>
+      {/* 🚀 2. 비로그인 사용자도 "조회"는 가능한 페이지 영역 (UserLayout 적용) */}
+      <Route element={<UserLayout />}>
+        <Route path="/search/:keyword" element={<SearchPage />} />
 
         {/* 고객센터 */}
-        <Route path="/customersupport" element={<UserLayout />}>
-          <Route path="notice" element={<Notice />} />
-          <Route path="faq" element={<Faq />} />
-        </Route>
+        <Route path="/customersupport/notice" element={<Notice />} />
+        <Route path="/customersupport/faq" element={<Faq />} />
 
-        {/* 내거리(일정) */}
-        <Route path="/plan" element={<UserLayout />}>
-          <Route index element={<AIPlanPage />} />
-          <Route path="result" element={<AIPlanResultPage />} />
-        </Route>
+        {/* 🚀 커뮤니티 - 핫플레이스 (목록 및 상세) */}
+        <Route path="/showcase/hotplace" element={<CommunityHotplace />} /> 
+        <Route path="/showcase/hotplace/view/:id" element={<CommunityHotplaceDetail />} />
 
-        {/* 메인페이지 */}
-        <Route path="/:region">
-          <Route element={<UserLayout />}>
-            <Route index element={<MainPage />} />
-          </Route>
-        </Route>
+        {/* 🚀 커뮤니티 - 일상 (목록 및 상세) */}
+        <Route path="/showcase/life" element={<CommunityLife />} /> 
+        <Route path="/showcase/life/view/:id" element={<CommunityLifeDetail />} />
 
-        {/* 사거리 탬플릿 */}
-        <Route path="/:region" element={<AreaBaseTemplate />}>
-          <Route path=":type/list" element={<AreaListTemplate />} />
-          <Route path=":type/view" element={<AreaViewTemplate />} />
-        </Route>
-
+        {/* 메인페이지 및 사거리 템플릿 (조회 전용) */}
+        <Route path="/:region" element={<MainPage />} />
+        <Route path="/:region/:type/list" element={<AreaListTemplate />} />
+        <Route path="/:region/:type/view" element={<AreaViewTemplate />} />
       </Route>
 
-      {/* 관리자 전용 권한 (ADMIN) */}
-      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+      {/* 🚀 3. 반드시 로그인이 필요한 페이지 영역 */}
+      <Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>
+        <Route element={<UserLayout />}>
+          
+          {/* 마이페이지 */}
+          <Route path="/user/mypage" element={<MyPage />} />
+
+          {/* 🚀 커뮤니티 - 핫플레이스 / 일상 글쓰기 (작성은 무조건 보호됨) */}
+          <Route path="/showcase/hotplace/write" element={<CommunityHotplaceWrite />} />
+          <Route path="/showcase/life/write" element={<CommunityLifeWrite />} />
+
+          {/* 내거리(일정 관리) */}
+          <Route path="/plan" element={<AIPlanPage />} />
+          <Route path="/plan/result" element={<AIPlanResultPage />} />
+        </Route>
+      </Route>
+
+      {/* 🚀 4. 관리자 전용 권한 (ROLE_ 접두사 확인 주의!) */}
+      <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+          {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
         </Route>
-      </Route>
-
+      </Route> 
     </Routes>
   );
 };
