@@ -118,7 +118,7 @@ const Faq = () => {
                     } fs-up-2 whitespace-nowrap`}
                   >
                     <span className="shrink-0">❓</span>
-                    <span className="truncate">자주 하는 질문</span>
+                    <span className="truncate">자주하는 질문</span>
                   </Link>
                 </li>
               </ul>
@@ -128,7 +128,7 @@ const Faq = () => {
           {/* 🔹 오른쪽 콘텐츠 영역 */}
           <div className="flex-1">
             <div className={containerStyle}>
-              <h2 className="fs-up-5 font-bold mb-8 md:mb-12 text-gray-900 tracking-tight">자주 하는 질문</h2>
+              <h2 className="fs-up-5 font-bold mb-8 md:mb-12 text-gray-900 tracking-tight">자주하는 질문</h2>
 
               <div className="border-t border-gray-200">
                 {faqData.map((faq) => (

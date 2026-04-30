@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+// 🚀 추가: 전역 상태에서 유저 정보와 로그아웃 함수를 가져오기 위한 커스텀 훅 임포트
+import { useAuth } from '@hooks/useAuth'; 
 import '@assets/css/header.css';
 
 const Header = () => {
@@ -7,16 +9,26 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
 
+  // 🚀 추가: AuthContext에서 user 상태와 logout 함수 추출
+  const { user, logout } = useAuth();
+
   const { region } = useParams();
   const navigate = useNavigate();
 
+  // 🚀 1. 방어막 추가: 'showcase' 등 시스템 경로가 지역명으로 오염되는 것 차단
+  const forbiddenRegions = ['showcase', 'plan', 'user', 'search', 'login', 'customersupport', 'admin'];
+
   useEffect(() => {
-    if (region) {
+    // region이 존재하면서, 동시에 금지된 시스템 단어가 아닐 때만 저장!
+    if (region && !forbiddenRegions.includes(region)) {
       localStorage.setItem('lastVisitedRegion', region);
     }
   }, [region]);
 
-  const currentRegion = region || localStorage.getItem('lastVisitedRegion') || '수원시';
+  // 🚀 2. 현재 지역을 가져올 때도 방어막 적용
+  const currentRegion = (region && !forbiddenRegions.includes(region)) 
+    ? region 
+    : localStorage.getItem('lastVisitedRegion') || '수원시';
 
   const headerRef = useRef(null);
 
@@ -27,8 +39,9 @@ const Header = () => {
     { name: '놀거리', path: `/${currentRegion}/play/list` },
     { 
       name: '뽐낼거리', 
-      path: `/showcase`,
-      subMenu: [ // 하위 메뉴 추가
+      // 🚀 3. 빈 깡통 경로 대신, 핫플거리를 기본(Default) 목적지로 지정
+      path: `/showcase/hotplace`, 
+      subMenu: [
         { name: '핫플거리', path: '/showcase/hotplace' },
         { name: '인생거리', path: '/showcase/life' },
       ]
@@ -80,38 +93,49 @@ const Header = () => {
 
   return (
     <header ref={headerRef} className="w-full bg-white border-b border-gray-200 sticky top-0 z-[1000] relative">
-      <div className="container mx-auto flex justify-between items-end pt-7 pb-4 px-4">
+      <div className="container mx-auto flex justify-between items-end pt-7 pb-4">
         
-        {/* 로고 */}
+        {/* 로고 및 데스크톱 네비게이션 영역 (기존 동일) */}
         <div className="header-logo text-black no-underline fs-up-6">
           <Link to="/" onClick={closeMenu}>거리에섯</Link>
         </div>
         
-        {/* 데스크톱 네비게이션 */}
         <nav className="hidden md:flex gap-4 lg:gap-[30px] mb-2">
           {navItems.map((item) => (
-            <div key={item.name} className="relative group">
-              <Link 
-                to={item.path} 
-                className="text-black fs-up-3 font-medium hover:text-primary transition-colors block py-1"
-              >
+            <div
+              key={item.name}
+              className="relative"
+              onMouseEnter={() => {
+                if (item.subMenu) setIsMenuOpen(true);
+              }}
+              onMouseLeave={() => {
+                if (item.subMenu) setIsMenuOpen(false);
+              }}>
+              <Link
+                to={item.path}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setIsSearchOpen(false);
+                }}
+                className="text-black fs-up-3 font-medium hover:text-primary transition-colors block py-1">
                 {item.name}
               </Link>
 
               {/* 🚀 뽐낼거리 하위 메뉴 드롭다운 */}
-              {item.subMenu && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out z-[1001]">
+              {item.subMenu && isMenuOpen && (
+                <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 transition-all duration-200 ease-in-out z-[1001]">
                   {/* 메뉴와 드롭다운 사이 마우스 이탈 방지를 위한 투명 레이어 */}
                   <div className="absolute -top-2 left-0 w-full h-2"></div>
-                  
                   <div className="w-32 bg-white border border-gray-100 shadow-xl rounded-md py-1">
                     {item.subMenu.map((sub) => (
                       <Link
                         key={sub.name}
                         to={sub.path}
-                        onClick={closeMenu}
-                        className="block px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors whitespace-nowrap text-center"
-                      >
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          setIsSearchOpen(false);
+                        }}
+                        className="block px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors whitespace-nowrap text-center">
                         {sub.name}
                       </Link>
                     ))}
@@ -128,11 +152,19 @@ const Header = () => {
             🔍
           </button>
           
-          <Link to="/login">
-            <button className="bg-primary text-white py-2 px-4 md:px-6 rounded fs-up-1 font-bold border-none cursor-pointer whitespace-nowrap">
-              로그인
-            </button>
-          </Link>
+          {/* 🚀 수정: user 상태에 따른 조건부 렌더링 적용 */}
+          {user ? (
+            <div className="flex items-center gap-3">
+              <Link to="/user/mypage" className="shrink-0 block">
+                <img 
+                  src="https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png" 
+                  alt="프로필" 
+                  className="w-[38px] h-[38px] md:w-[42px] md:h-[42px] rounded-full object-cover border-2 border-gray-100 hover:border-[#0F9B73] transition-colors cursor-pointer"
+                />
+              </Link>
+              <button className='btn btn-darkgray' onClick={logout}>로그아웃</button>              
+            </div>
+          ) : ( <Link to="/login" class="btn btn-green px-5">로그인</Link> )}
           
           <button
             className="block md:hidden w-9 h-9 flex items-center justify-center fs-up-3 text-gray-800 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition"

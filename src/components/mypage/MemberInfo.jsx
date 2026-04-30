@@ -1,6 +1,7 @@
 // src/components/mypage/MemberInfo.jsx
 import React, { useState } from 'react';
 import DaumPostcode from 'react-daum-postcode'; 
+import React, { useState, useRef } from 'react';
 
 const MemberInfo = ({ profile, onUpdate }) => {
   const [form, setForm] = useState({ 

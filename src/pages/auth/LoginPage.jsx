@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '@api/axios'; 
+import { useAuth } from '@hooks/useAuth';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   
-  // 🚀 DTO 필드명과 일치하도록 상태명 변경
+  const { login } = useAuth();
+
   const [memberEmail, setMemberEmail] = useState('');
   const [memberPassword, setMemberPassword] = useState('');
   
@@ -14,33 +16,38 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async () => {
-    // 간단한 프론트엔드 유효성 검사
     if (!memberEmail.trim() || !memberPassword.trim()) {
       alert('이메일과 비밀번호를 입력해주세요.');
       return;
     }
 
     try {
-      // 🚀 백엔드 LoginRequest DTO 구조에 정확히 맞춰서 전송
-      const response = await api.post('/auth/login', {
-        memberEmail: memberEmail,
-        memberPassword: memberPassword
-      });
-
-      console.log('로그인 성공:', response.data);
-      navigate('/');
+      const response = await api.post('/auth/login', { memberEmail, memberPassword });
       
+      // 🚀 수정: 'role' 대신 'memberRole', 'USER' 대신 'ROLE_USER' 사용
+      // (가장 좋은 건 response.data.data에 들어있는 값을 그대로 넣어주는 것)
+      const userData = response.data.data;
+      login(userData); // 🚀 하드코딩하지 않고 백엔드 응답을 그대로 Context에 저장
+      
+      navigate('/');
     } catch (error) {
       console.error('로그인 실패:', error);
       if (error.response && error.response.status === 401) {
         alert('이메일 또는 비밀번호가 일치하지 않습니다.');
       } else if (error.response && error.response.data.message) {
-        // 백엔드에서 보낸 validation 메시지가 있을 경우 출력
         alert(error.response.data.message);
       } else {
         alert('로그인 처리 중 에러가 발생했습니다.');
       }
     }
+  };
+
+  // 🚀 추가: 카카오 로그인 버튼 클릭 핸들러
+  const handleKakaoLogin = () => {
+    // 🚀 주의: 백엔드 Spring Security 설정에 따라 주소가 다를 수 있어. 
+    // 보통 Spring Security 기본값은 아래와 같아. 백엔드 코드 확인 후 맞춰줘!
+    // 백엔드 주소로 아예 브라우저를 이동시킴 (CORS 이슈 없음)
+    window.location.href = 'http://localhost:8080/oauth2/authorization/kakao'; 
   };
 
   return (
@@ -62,10 +69,10 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* 이메일 입력 (DTO: memberEmail) */}
+          {/* 이메일 입력 */}
           <div className="mb-6 border-b border-gray-300 flex items-center pb-3">
             <input
-              type="email" // 🚀 이메일 형식으로 변경
+              type="email"
               placeholder="이메일 주소"
               value={memberEmail}
               onChange={(e) => setMemberEmail(e.target.value)}
@@ -77,7 +84,7 @@ export default function LoginPage() {
             </svg>
           </div>
 
-          {/* 비밀번호 입력 (DTO: memberPassword) */}
+          {/* 비밀번호 입력 */}
           <div className="mb-4 border-b border-gray-300 flex items-center pb-3">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -103,6 +110,7 @@ export default function LoginPage() {
             </button>
           </div>
 
+          {/* 로그인 상태 유지 + 비밀번호 찾기 */}
           <div className="flex items-center justify-between mb-8">
             <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-500">
               <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 shadow-none" />
@@ -111,17 +119,30 @@ export default function LoginPage() {
             <button className="text-sm text-gray-500 hover:text-gray-700">비밀번호 찾기</button>
           </div>
 
-          <button className="w-full py-4 bg-[#FEE500] rounded-xl text-gray-900 font-bold text-base flex items-center justify-center gap-2 mb-3 hover:bg-[#f0d800] transition">
+          {/* 🚀 1. 일반 로그인 버튼 (위로 이동 & 테마 컬러 적용) */}
+          <button onClick={handleLogin} className="w-full py-4 bg-[#0F9B73] rounded-xl text-white font-bold text-base hover:bg-[#0d8a66] transition">
+            로그인
+          </button>
+
+          {/* 🚀 2. "또는" 구분선 추가 */}
+          <div className="flex items-center my-6">
+            <div className="flex-grow border-t border-gray-200"></div>
+            <span className="px-4 text-sm text-gray-400">또는</span>
+            <div className="flex-grow border-t border-gray-200"></div>
+          </div>
+
+          {/* 🚀 카카오 로그인 버튼 (기존 코드에서 onClick 속성만 추가) */}
+          <button 
+            onClick={handleKakaoLogin}
+            className="w-full py-4 bg-[#FEE500] rounded-xl text-gray-900 font-bold text-base flex items-center justify-center gap-2 mb-6 hover:bg-[#f0d800] transition"
+          >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 3C6.48 3 2 6.48 2 10.8c0 2.7 1.6 5.1 4 6.6l-1 3.6 4.2-2.8c.9.2 1.8.3 2.8.3 5.52 0 10-3.48 10-7.7S17.52 3 12 3z"/>
             </svg>
             카카오로 로그인
           </button>
 
-          <button onClick={handleLogin} className="w-full py-4 bg-gray-100 rounded-xl text-gray-700 font-bold text-base hover:bg-gray-200 transition mb-6">
-            로그인
-          </button>
-
+          {/* 회원가입 링크 */}
           <p className="text-center text-sm text-gray-400">
             계정이 없으신가요?{' '}
             <Link to="/login/signup" className="text-[#0F9B73] font-semibold hover:underline">

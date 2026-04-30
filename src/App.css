@@ -1,5 +1,7 @@
 
 @import "tailwindcss";
+@plugin "../node_modules/daisyui";
+
 @import '@assets/css/common.css';
 @import "./assets/fonts/Paperlogy.css";
 /* ===== CSS Reset 문법 추가는 가능하나, 내용은 수정 금지 =====*/
@@ -10,19 +12,115 @@
   font-style: normal;
 }
 
+/* theme 블록들은 한곳에 모으는 것이 관리하기 좋습니다 */
 @theme {
-  /* 메인 컬러 및 폰트 등록 */
-  --color-primary: #0F9B73;
+  --color-secondary : #009277;
+  --color-primary: #0F9B73;                               /* 메인 컬러 및 폰트 등록 */
+  --color-brand-green: #0F9B73;
+  --color-brand-green-content: #ffffff;
   --font-griun: 'GriunFont', sans-serif;
-  
-  /* 검색창 애니메이션 등록 */
-  --animate-slidedown: slideDown 0.3s ease-out forwards;
+  --animate-slidedown: slideDown 0.3s ease-out forwards;  /* 검색창 애니메이션 등록 */
 }
+
+@layer utilities {
+  .input, .select {
+    &:focus, &:focus-within {
+        outline: 0px solid var(--input-color);
+        outline-offset: 0px;
+        isolation: isolate;
+    }
+  }
+
+
+  .input {
+    max-width: none;
+    width: 100%;
+  }
+
+  .select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2rem;
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* 선택되었을 때 (옵션창이 뜰 때 시각적 피드백) */
+  .select.is-open {
+    outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 15l7-7 7 7' /%3E%3C/svg%3E");
+  }
+
+
+  .input-secondary {
+    --input-color: var(--color-secondary);
+    @apply input border-gray-200;
+    transition: all 0.2s ease-in-out;
+    outline: none;
+  }
+
+  /* select도 input과 동일하게 핑크색 제거 및 초록색 테마 적용 */
+  .select-secondary {
+    @apply select border-gray-200;
+    transition: all 0.2s ease-in-out;
+    outline: none;
+
+    &:focus, &:focus-within {
+      border-color: #0F9B73 !important;
+      box-shadow: 0 0 0 3px color-mix(in srgb, #0F9B73, transparent 85%) !important;
+    }
+  }
+
+  /* 2. 초록색 통합 유틸리티 (Hover + Focus) */
+  .board-hover-green {
+    /* 마우스를 올렸을 때 (호버) */
+    &:hover {
+      border-color: #0F9B73 !important;
+    }
+
+    /* 클릭해서 입력 중일 때 (포커스) */
+    &:focus, &:focus-within {
+      border-color: #0F9B73 !important;
+      box-shadow: 0 0 0 2px color-mix(in srgb, #0F9B73, transparent 85%) !important;
+      background-color: #ffffff;
+    }
+  }
+
+
+  
+    
+  .btn-darkgray {
+    @apply btn bg-gray-500 text-white hover:bg-gray-600;
+  }
+
+  
+  .btn-green {
+    @apply btn;
+    --btn-bg: var(--color-brand-green);
+    --btn-border: var(--color-brand-green);
+    --btn-color: var(--color-brand-green-content);
+
+    background-color: var(--btn-bg);
+    border-color: var(--btn-border);
+    color: var(--btn-color) !important;
+
+    &:hover {
+      --btn-bg: color-mix(in srgb, var(--color-brand-green), black 15%);
+      --btn-border: color-mix(in srgb, var(--color-brand-green), black 15%);
+      
+      background-color: var(--btn-bg);
+      border-color: var(--btn-border);
+    }
+  }
+}
+
 
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 
 
 .counter {

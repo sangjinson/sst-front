@@ -8,15 +8,16 @@ import ViewSkeleton from '@components/skeleton/ViewSkeleton';
 const FoodView = lazy(() => import('./food/View'));
 const SeeView = lazy(() => import('./see/View'));
 const SleepView = lazy(() => import('./sleep/View'));
+const PlayView = lazy(() => import('./play/View'));
 
 // ----------------------------------------------------
 // 🚀 URL type에 따른 동적 설정 맵핑 객체
 // ----------------------------------------------------
 const VIEW_CONFIG = {
-  // play: { Component: PlayView, label: '놀거리' },
   food: { Component: FoodView, label: '먹거리' },
   see: { Component: SeeView, label: '볼거리' },
   sleep: { Component: SleepView, label: '잘거리' },
+  play: { Component: PlayView, label: '놀거리' },
 };
 
 // ----------------------------------------------------
