@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import { ClipButton } from "@components/modules/ActionButtons";
-import { hotplacePosts, hotplaceComments } from "./communityHotplaceData";
+import { getAllPosts, hotplaceComments } from "./communityHotplaceData";
 import Swal from "sweetalert2";
 
 const CommunityHotplaceDetail = () => {
@@ -20,7 +20,7 @@ const CommunityHotplaceDetail = () => {
 
   useEffect(() => { window.scrollTo({ top: 0 }); }, []);
 
-  const posts = hotplacePosts;
+  const posts = getAllPosts();
   const currentPost = posts.find((post) => post.id === Number(id));
 
   if (!currentPost) {
