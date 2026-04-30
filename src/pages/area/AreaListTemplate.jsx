@@ -98,6 +98,7 @@ function AreaListTemplate() {
             bgImage={bgImage}
             title={regionKor}
             subtitle={subtitle}
+            to={`/${region}`} 
           />
           <div className="max-w-[1920px] mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px]">
             <Breadcrumb
