@@ -42,6 +42,14 @@ export default function LoginPage() {
     }
   };
 
+  // 🚀 추가: 카카오 로그인 버튼 클릭 핸들러
+  const handleKakaoLogin = () => {
+    // 🚀 주의: 백엔드 Spring Security 설정에 따라 주소가 다를 수 있어. 
+    // 보통 Spring Security 기본값은 아래와 같아. 백엔드 코드 확인 후 맞춰줘!
+    // 백엔드 주소로 아예 브라우저를 이동시킴 (CORS 이슈 없음)
+    window.location.href = 'http://localhost:8080/oauth2/authorization/kakao'; 
+  };
+
   return (
     <>
       <style>{`
@@ -123,8 +131,11 @@ export default function LoginPage() {
             <div className="flex-grow border-t border-gray-200"></div>
           </div>
 
-          {/* 🚀 3. 카카오 로그인 버튼 (아래로 이동) */}
-          <button className="w-full py-4 bg-[#FEE500] rounded-xl text-gray-900 font-bold text-base flex items-center justify-center gap-2 mb-6 hover:bg-[#f0d800] transition">
+          {/* 🚀 카카오 로그인 버튼 (기존 코드에서 onClick 속성만 추가) */}
+          <button 
+            onClick={handleKakaoLogin}
+            className="w-full py-4 bg-[#FEE500] rounded-xl text-gray-900 font-bold text-base flex items-center justify-center gap-2 mb-6 hover:bg-[#f0d800] transition"
+          >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 3C6.48 3 2 6.48 2 10.8c0 2.7 1.6 5.1 4 6.6l-1 3.6 4.2-2.8c.9.2 1.8.3 2.8.3 5.52 0 10-3.48 10-7.7S17.52 3 12 3z"/>
             </svg>

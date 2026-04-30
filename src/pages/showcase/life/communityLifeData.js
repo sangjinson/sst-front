@@ -33,6 +33,8 @@ export const lifePostsDummy = [
     viewCnt: 842,
     wishCnt: 134,
     commentCnt: 23,
+    companion: '가족',
+    themes: ['문화·역사', '맛집'],
     hashtags: ['수원', '화성', '당일치기', '역사여행'],
     thumbnail: 'https://images.unsplash.com/photo-1548115184-bc6544d06a58?w=800&q=80',
     description: `수원 화성은 조선 정조 때 만들어진 성곽으로, 유네스코 세계문화유산에 등재된 곳이에요.
@@ -56,7 +58,7 @@ export const lifePostsDummy = [
       {
         order: 2,
         name: '수원 통닭거리',
-        address: '경기도 수원시 팔달구 정조로 1개',
+        address: '경기도 수원시 팔달구 정조로',
         type: 'food',
         image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80',
         desc: '수원 명물 왕갈비와 통닭이 유명한 먹거리 거리',
@@ -88,6 +90,8 @@ export const lifePostsDummy = [
     viewCnt: 621,
     wishCnt: 98,
     commentCnt: 15,
+    companion: '커플',
+    themes: ['힐링', '액티비티'],
     hashtags: ['가평', '남이섬', '1박2일', '힐링'],
     thumbnail: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
     description: `가평은 서울에서 차로 1시간 거리에 있어서 당일치기나 1박2일 여행지로 딱이에요.
@@ -143,6 +147,8 @@ export const lifePostsDummy = [
     viewCnt: 445,
     wishCnt: 76,
     commentCnt: 11,
+    companion: '친구',
+    themes: ['문화·역사', '카페'],
     hashtags: ['파주', '헤이리', '출판도시', '예술'],
     thumbnail: 'https://images.unsplash.com/photo-1517090504586-fde19ea6066f?w=800&q=80',
     description: `파주는 예술과 문화가 살아숨쉬는 도시예요. 헤이리 예술마을과 파주 출판도시를 하루에 다 둘러볼 수 있어요.
@@ -204,4 +210,13 @@ export const TYPE_COLOR = {
   food:  'bg-orange-100 text-orange-700',
   sleep: 'bg-green-100 text-green-700',
   play:  'bg-purple-100 text-purple-700',
+};
+
+// 동행 유형 이모지
+export const COMPANION_EMOJI = {
+  '1인': '🙋',
+  '반려': '🐾',
+  '커플': '💑',
+  '가족': '👨‍👩‍👧',
+  '친구': '👫',
 };
