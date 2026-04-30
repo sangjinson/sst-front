@@ -160,30 +160,6 @@ const CommunityLife = () => {
                       <span>❤️ {post.wishCnt}</span>
                     </div>
                   </div>
-
-                  {/* ✅ 조회수 / 댓글 / 찜 영역 */}
-                  <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 fs-down-1 text-gray-400">
-                    {/* ✅ 왼쪽: 조회수 + 댓글 */}
-                    <div className="flex items-center gap-3">
-                      <span>👁 {post.viewCnt}</span>
-                      <span>💬 {post.commentCnt}</span>
-                    </div>
-
-                    {/* ✅ 오른쪽: 핫플거리처럼 반응하는 찜 버튼 */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleWishlist(post.id);
-                      }}
-                      className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold transition-all active:scale-95 ${
-                        wished
-                          ? "bg-red-50 text-red-500"
-                          : "bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-500"
-                      }`}>
-                      ❤️ {wishCount}
-                    </button>
-                  </div>
                 </div>
               </div>
             </article>
@@ -198,4 +174,4 @@ const CommunityLife = () => {
   );
 };
 
-export default CommunityLife; 
+export default CommunityLife;
