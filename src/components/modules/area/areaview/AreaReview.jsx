@@ -21,6 +21,14 @@ const StarSelector = ({ value, onChange }) => (
   </div>
 );
 
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).replace(/\. /g, '.').slice(0, -1);
+};
+
 const AreaReview = ({
   rating,
   reviewCount,
@@ -31,15 +39,24 @@ const AreaReview = ({
   const navigate = useNavigate();
 
   const [reviews, setReviews] = useState(
-    initialReviews.map((r, idx) => ({ ...r, id: idx, isMine: false }))
+    initialReviews.map((r, idx) => ({
+      ...r,
+      id: idx,
+      isMine: false,
+      date: r.date || '2026.01.01', // ✅ 더미데이터 기본 날짜
+    }))
   );
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
-
   const [editingId, setEditingId] = useState(null);
   const [editRating, setEditRating] = useState(0);
   const [editComment, setEditComment] = useState('');
+
+  // ✅ 평균 평점 계산
+  const avgRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : Number(rating).toFixed(1);
 
   const handleReviewSubmit = () => {
     if (reviewRating === 0) { alert('별점을 선택해주세요.'); return; }
@@ -50,6 +67,7 @@ const AreaReview = ({
       rating: reviewRating,
       comment: reviewComment.trim(),
       isMine: true,
+      date: formatDate(new Date()), // ✅ 작성 날짜
     };
     setReviews((prev) => [newReview, ...prev]);
     setReviewRating(0);
@@ -82,38 +100,30 @@ const AreaReview = ({
       title: '신고 사유를 선택해주세요',
       html: `
         <div style="display:flex; flex-direction:column; gap:10px; text-align:left; margin-top:8px;">
-          <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827; transition:all 0.2s;"
+          <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827;"
             onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
-            onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'"
-          >
+            onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'">
             <input type="radio" name="report" value="부적절한 댓글로 인한 신고" style="accent-color:#f97316; width:16px; height:16px;" />
             부적절한 댓글로 인한 신고
           </label>
-          <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827; transition:all 0.2s;"
+          <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827;"
             onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
-            onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'"
-          >
+            onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'">
             <input type="radio" name="report" value="불법 광고 및 홍보 인한 신고" style="accent-color:#f97316; width:16px; height:16px;" />
             불법 광고 및 홍보 인한 신고
           </label>
-          <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827; transition:all 0.2s;"
+          <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827;"
             onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
-            onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'"
-          >
+            onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'">
             <input type="radio" name="report" value="기타" id="report-etc"
               style="accent-color:#f97316; width:16px; height:16px;"
-              onclick="document.getElementById('etc-input-wrap').style.display='block'"
-            />
+              onclick="document.getElementById('etc-input-wrap').style.display='block'" />
             기타
           </label>
           <div id="etc-input-wrap" style="display:none; margin-top:4px;">
-            <textarea
-              id="etc-input"
-              placeholder="기타 신고 내용을 입력해주세요."
+            <textarea id="etc-input" placeholder="기타 신고 내용을 입력해주세요."
               style="width:100%; border:1.5px solid #e5e7eb; border-radius:10px; padding:10px 12px; font-size:13px; color:#374151; resize:none; outline:none; height:80px; box-sizing:border-box;"
-              onfocus="this.style.borderColor='#f97316'"
-              onblur="this.style.borderColor='#e5e7eb'"
-            ></textarea>
+              onfocus="this.style.borderColor='#f97316'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
           </div>
         </div>
       `,
@@ -124,22 +134,15 @@ const AreaReview = ({
       cancelButtonColor: '#9ca3af',
       preConfirm: () => {
         const selected = document.querySelector('input[name="report"]:checked');
-        if (!selected) {
-          Swal.showValidationMessage('신고 사유를 선택해주세요.');
-          return false;
-        }
+        if (!selected) { Swal.showValidationMessage('신고 사유를 선택해주세요.'); return false; }
         if (selected.value === '기타') {
           const etcText = document.getElementById('etc-input')?.value?.trim();
-          if (!etcText) {
-            Swal.showValidationMessage('기타 신고 내용을 입력해주세요.');
-            return false;
-          }
+          if (!etcText) { Swal.showValidationMessage('기타 신고 내용을 입력해주세요.'); return false; }
           return `기타: ${etcText}`;
         }
         return selected.value;
       },
     });
-
     if (result.isConfirmed) {
       await Swal.fire({
         icon: 'success',
@@ -154,11 +157,12 @@ const AreaReview = ({
   return (
     <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
 
-      {/* 헤더 */}
+      {/* ✅ 헤더 - 평균 평점 숫자 */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-900">평점 & 리뷰</h2>
         <div className="flex items-center gap-2">
           <StarRating rating={rating} theme={{ size: 'text-xl' }} />
+          <span className="text-base font-bold text-yellow-500">{avgRating}</span>
           <span className="text-sm text-gray-400">({reviewCount}개)</span>
         </div>
       </div>
@@ -201,6 +205,8 @@ const AreaReview = ({
       <div className="flex flex-col gap-3">
         {(showAllReviews ? reviews : reviews.slice(0, REVIEWS_PER_PAGE)).map((review) => (
           <div key={review.id} className="border border-gray-100 rounded-xl p-4">
+
+            {/* 수정 모드 */}
             {editingId === review.id ? (
               <div>
                 <div className="mb-2">
@@ -214,26 +220,28 @@ const AreaReview = ({
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none resize-none focus:border-[#E8956D] transition-colors mb-2"
                 />
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEditSave(review.id)}
-                    className="flex-1 py-2 bg-[#E8956D] text-white rounded-lg text-xs font-medium hover:bg-[#f07e48] transition"
-                  >
+                  <button onClick={() => handleEditSave(review.id)}
+                    className="flex-1 py-2 bg-[#E8956D] text-white rounded-lg text-xs font-medium hover:bg-[#f07e48] transition">
                     저장
                   </button>
-                  <button
-                    onClick={() => setEditingId(null)}
-                    className="flex-1 py-2 border border-gray-300 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-50 transition"
-                  >
+                  <button onClick={() => setEditingId(null)}
+                    className="flex-1 py-2 border border-gray-300 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-50 transition">
                     취소
                   </button>
                 </div>
               </div>
             ) : (
               <>
+                {/* ✅ 1줄: 작성자 + 날짜 */}
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-sm font-semibold text-gray-800">{review.user}</p>
+                  <p className="text-xs text-gray-400">{review.date}</p>
+                </div>
+
+                {/* ✅ 2줄: 별점 + 수정/삭제/신고 */}
+                <div className="flex items-center justify-between mb-2">
+                  <StarRating rating={review.rating} />
                   <div className="flex items-center gap-1">
-                    <StarRating rating={review.rating} />
                     {review.isMine ? (
                       <>
                         <button
@@ -279,6 +287,8 @@ const AreaReview = ({
                     )}
                   </div>
                 </div>
+
+                {/* 리뷰 내용 */}
                 <p className="text-sm text-gray-500">{review.comment}</p>
               </>
             )}
