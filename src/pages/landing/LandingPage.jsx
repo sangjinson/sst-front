@@ -96,7 +96,6 @@ const LandingPage = () => {
                     name="category"
                     className="w-full md:w-auto border-b md:border-b-0 md:border-r border-[#ddd] bg-transparent text-[#333] py-2 md:py-[10px] px-[20px] outline-none cursor-pointer text-center md:text-left">
                     <option>지역 선택</option>
-                    <option>테마 선택</option>
                   </select>
                   
                   <input 
