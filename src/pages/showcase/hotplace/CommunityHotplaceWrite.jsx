@@ -65,6 +65,7 @@ const CommunityHotplaceWrite = () => {
     if (!title.trim()) { alert('제목을 입력해주세요.'); return; }
     if (!placeName.trim()) { alert('장소를 입력해주세요.'); return; }
     if (!content.trim()) { alert('내용을 입력해주세요.'); return; }
+    if (!tags.length) { alert('해시태그를 입력해주세요.'); return; }
 
     if (isEditMode) {
       // ✅ 수정 - localStorage에서 해당 게시글 업데이트
@@ -178,28 +179,37 @@ const CommunityHotplaceWrite = () => {
 
           {/* 사진 등록 */}
           <div>
-            <label className="block fs-down-2 font-bold text-gray-700 mb-3">사진 등록</label>
-            <div className="flex flex-col items-center justify-center w-full">
+            <div className="mb-5 flex items-center justify-between">
+              <label className="block fs-down-2 font-bold text-gray-700">사진 등록</label>
+
+              {/* 👉 사진 추가 버튼을 제목 줄 오른쪽으로 이동 */}
+              <label className="w-40 h-12 shrink-0 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <p className="fs-down-2 font-semibold text-gray-400">사진 추가</p>
+                <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" multiple />
+              </label>
+            </div>
+
+            {/* 👉 사진 리스트 영역 */}
+            <div className="w-full">
               {imagePreviews.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full mb-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
                   {imagePreviews.map((preview, index) => (
                     <div key={index} className="relative aspect-[4/3] rounded-lg overflow-hidden border">
                       <img src={preview} alt={`미리보기 ${index + 1}`} className="w-full h-full object-cover" />
-                      <button type="button" onClick={() => setImagePreviews(imagePreviews.filter((_, i) => i !== index))}
-                        className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center">✕</button>
+                      <button
+                        type="button"
+                        onClick={() => setImagePreviews(imagePreviews.filter((_, i) => i !== index))}
+                        className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center"
+                      >
+                        ✕
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
-              <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
-                <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400">
-                  <svg className="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                  </svg>
-                  <p className="text-em font-semibold">클릭하여 사진 추가</p>
-                </div>
-                <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" multiple />
-              </label>
             </div>
           </div>
 

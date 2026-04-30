@@ -102,28 +102,40 @@ const Header = () => {
         
         <nav className="hidden md:flex gap-4 lg:gap-[30px] mb-2">
           {navItems.map((item) => (
-            <div key={item.name} className="relative group">
-              <Link 
-                to={item.path} 
-                className="text-black fs-up-3 font-medium hover:text-primary transition-colors block py-1"
-              >
+            <div
+              key={item.name}
+              className="relative"
+              onMouseEnter={() => {
+                if (item.subMenu) setIsMenuOpen(true);
+              }}
+              onMouseLeave={() => {
+                if (item.subMenu) setIsMenuOpen(false);
+              }}>
+              <Link
+                to={item.path}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setIsSearchOpen(false);
+                }}
+                className="text-black fs-up-3 font-medium hover:text-primary transition-colors block py-1">
                 {item.name}
               </Link>
 
               {/* 🚀 뽐낼거리 하위 메뉴 드롭다운 */}
-              {item.subMenu && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out z-[1001]">
+              {item.subMenu && isMenuOpen && (
+                <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 transition-all duration-200 ease-in-out z-[1001]">
                   {/* 메뉴와 드롭다운 사이 마우스 이탈 방지를 위한 투명 레이어 */}
                   <div className="absolute -top-2 left-0 w-full h-2"></div>
-                  
                   <div className="w-32 bg-white border border-gray-100 shadow-xl rounded-md py-1">
                     {item.subMenu.map((sub) => (
                       <Link
                         key={sub.name}
                         to={sub.path}
-                        onClick={closeMenu}
-                        className="block px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors whitespace-nowrap text-center"
-                      >
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          setIsSearchOpen(false);
+                        }}
+                        className="block px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors whitespace-nowrap text-center">
                         {sub.name}
                       </Link>
                     ))}

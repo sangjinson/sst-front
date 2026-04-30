@@ -66,11 +66,25 @@ const CommunityHotplace = () => {
       <Breadcrumb paths={[{ label: "홈", to: "/" }, { label: "핫플거리", to: "/showcase" }]} className="mb-4" />
 
       <section className="mt-8 mb-8 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-sm font-bold text-emerald-600">Hotplace</p>
-          <h2 className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">핫플거리</h2>
-          <p className="mt-2 text-sm md:text-base text-gray-500">여행자들이 직접 발견한 장소와 분위기를 사진 카드로 모아봤어요.</p>
-        </div>
+          <div>
+            <p className="text-sm font-bold text-emerald-600">Hotplace</p>
+            {/* 제목 + 이동 탭 */}
+            <div className="mt-1 flex items-end gap-3">
+              {/* 현재 페이지 */}
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                핫플거리
+              </h2>
+              {/* 이동 (인생거리) */}
+              <Link
+                to="/showcase/life"
+                className="mb-1 fs-down-1 md:text-lg font-bold text-gray-400 transition-all hover:text-[#0F9B73] hover:scale-110">
+                / 인생거리
+              </Link>
+            </div>
+            <p className="mt-2 text-sm md:text-base text-gray-500">
+              여행자들이 직접 발견한 장소와 분위기를 사진 카드로 모아봤어요.
+            </p>
+          </div>
         <Link to="/showcase/hotplace/write" className="w-fit">
           <button className="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-md active:scale-95">
             글쓰기
@@ -84,10 +98,8 @@ const CommunityHotplace = () => {
             className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
             <option value="all">전체 검색</option>
             <option value="title">제목 검색</option>
-            <option value="content">내용 검색</option>
             <option value="author">작성자 검색</option>
             <option value="place">장소 검색</option>
-            <option value="hashtag">해시태그 검색</option>
           </select>
           <input type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)}
             placeholder="검색어를 입력하세요"
@@ -97,8 +109,6 @@ const CommunityHotplace = () => {
             <option value="latest">최신순</option>
             <option value="popular">인기순</option>
             <option value="view">조회수순</option>
-            <option value="wish">찜순</option>
-            <option value="comment">댓글순</option>
           </select>
         </div>
         <div className="mt-3 flex items-center justify-between fs-down-1 text-gray-400">
@@ -148,14 +158,15 @@ const CommunityHotplace = () => {
                       <span>👁 {post.viewCnt}</span>
                       <span>💬 {post.commentCnt}</span>
                     </div>
-                    <button type="button" onClick={() => toggleLike(post.id)}
+                    <button
+                      type="button"
+                      onClick={() => toggleLike(post.id)}
                       className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold transition-all active:scale-95 ${
-                        liked ? "bg-red-50 text-red-500" : "bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-500"
+                        liked
+                          ? "bg-blue-50 text-blue-500"
+                          : "bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500"
                       }`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill={liked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      {likeCount}
+                      👍 {likeCount}
                     </button>
                   </div>
                 </div>
