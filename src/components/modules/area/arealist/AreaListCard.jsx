@@ -1,8 +1,8 @@
 import React from 'react';
 import { GridCard, GridCardHeader, GridCardBody, GridCardFooter } from '@components/modules/gridcard';
 import StarRating from '@components/modules/StarRating';
-import { BADGE_COLORS } from '@components/modules/arealist/areaListUtils';
-import { HeartButton } from '@components/modules/AreaActionButtons';
+import { BADGE_COLORS } from '@components/modules/area/arealist/areaListUtils';
+import { HeartButton } from '@components/modules/ActionButtons';
 
 /**
  * AreaListCard - 볼거리/먹거리/잘거리/놀거리 공통 리스트 카드
@@ -30,9 +30,10 @@ import { HeartButton } from '@components/modules/AreaActionButtons';
  *     // 카테고리 인덱스: CATEGORIES에서 '전체' 제외 후 해당 카테고리 순서
  *     categoryIndex: CATEGORIES.filter(c => c !== '전체').indexOf(item.category),
  *   }}
- *   liked={!!likedItems[item.id]}
- *   onLike={(e) => handleLike(e, item.id)}
  *   onClick={() => goToDetail(item.id)}
+ *   renderHeart={() => (
+      <WishlistHeartButton item={item} itemType="food" region={regionKor} />
+     )}
  * />
  * ────────────────────────────────────────────────
  *
@@ -47,7 +48,6 @@ import { HeartButton } from '@components/modules/AreaActionButtons';
  * - categoryIndex      : 배지 색상 순서 (0부터 시작, BADGE_COLORS 팔레트 순환)
  */
 
-// [원복 방법] renderHeart prop 제거, 아래 HeartButton 렌더링 부분도 원래대로 되돌리면 됨
 const AreaListCard = ({ item, liked, onLike, onClick, renderHeart }) => {
   const name        = item.name        || item.title    || '';
   const category    = item.category    || item.tag      || '';
@@ -71,7 +71,6 @@ const AreaListCard = ({ item, liked, onLike, onClick, renderHeart }) => {
             {category}
           </span>
           <div className="absolute top-2 right-2">
-            {/* [원복 방법] renderHeart 조건 제거 → <HeartButton liked={liked} onClick={onLike} /> 만 남기기 */}
             {renderHeart ? renderHeart() : <HeartButton liked={liked} onClick={onLike} />}
           </div>
         </div>

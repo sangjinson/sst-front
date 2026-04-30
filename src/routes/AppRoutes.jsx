@@ -19,13 +19,25 @@ import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 import AIPlanPage from '@pages/aiplan/AIPlanPage';
 import AIPlanResultPage from '@pages/aiplan/AIPlanResultPage';
 
-import Community from '@pages/showcase/Community';
-import CommunityDetail from "@pages/showcase/CommunityDetail";
-import CommunityWrite from "@pages/showcase/CommunityWrite";
+import CommunityHotplace from "@pages/showcase/hotplace/CommunityHotplace";
+import CommunityHotplaceDetail from "@pages/showcase/hotplace/CommunityHotplaceDetail";
+import CommunityHotplaceWrite from "@pages/showcase/hotplace/CommunityHotplaceWrite";
+
+import CommunityLife from "@pages/showcase/life/CommunityLife";
+import CommunityLifeDetail from "@pages/showcase/life/CommunityLifeDetail";
+import CommunityLifeWrite from "@pages/showcase/life/CommunityLifeWrite";
 
 import SearchPage from '@pages/search/SearchPage';
 import LoginPage from '@pages/auth/LoginPage';
 import SignupPage from '@pages/auth/SignupPage';
+
+import AdminHome from '@pages/user/Home';
+import MemberList from '@pages/admin/MemberList';
+import AreaPostList from '@pages/admin/AreaPostList';
+import ReportList from '@pages/admin/ReportList';
+import ReportDetail from '@pages/admin/ReportDetail';
+import HotplaceList from '@pages/admin/HotplaceList';
+import LifeList from '@pages/admin/LifeList';
 
 const AppRoutes = () => {
   return (
