@@ -5,24 +5,30 @@ import api from '@api/axios';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // 🚀 포인트 1: 초기값을 localStorage에서 읽어옵니다.
-  // 이렇게 하면 새로고침 직후에도 'isLogin' 값만큼은 즉시 살아납니다.
+  
+  // 🚀 수정 1: 초기값의 권한 이름을 백엔드 DTO와 ProtectedRoute에 맞춰 'memberRole'로 변경!
   const [user, setUser] = useState(() => {
     const savedLogin = localStorage.getItem('isLogin');
-    return savedLogin === 'true' ? { role: 'USER' } : null; 
+    // 🚀 수정: 백엔드가 주는 실제 데이터 형태와 완벽히 맞추기 위해 'ROLE_USER'로 변경
+    return savedLogin === 'true' ? { memberRole: 'ROLE_USER' } : null; 
   });
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const verifyUser = async () => {
+      // 🚀 방어막 1: 애초에 로그인한 적이 없으면 백엔드에 /me 요청 자체를 안 함!
+      if (localStorage.getItem('isLogin') !== 'true') {
+        setUser(null);
+        setLoading(false);
+        return; // 여기서 함수 종료
+      }
+
       try {
-        // 🚀 포인트 2: 새로고침 시 백엔드에 쿠키가 유효한지 물어봅니다. (/auth/me 또는 /auth/refresh)
         const response = await api.get('/auth/me'); 
-        setUser(response.data); // 서버에 저장된 실제 유저 정보로 업데이트
+        setUser(response.data.data); 
         localStorage.setItem('isLogin', 'true');
       } catch (error) {
-        // 토큰이 만료되었거나 없다면 로그아웃 처리
         setUser(null);
         localStorage.removeItem('isLogin');
       } finally {

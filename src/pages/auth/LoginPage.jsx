@@ -24,8 +24,11 @@ export default function LoginPage() {
     try {
       const response = await api.post('/auth/login', { memberEmail, memberPassword });
       
-      // 🚀 백엔드에서 받은 유저 정보(권한 등)를 context에 저장
-      login({ email: memberEmail, role: 'USER' /* 실제 response 데이터 활용 */ }); 
+      // 🚀 수정: 'role' 대신 'memberRole', 'USER' 대신 'ROLE_USER' 사용
+      // (가장 좋은 건 response.data.data에 들어있는 값을 그대로 넣어주는 것)
+      const userData = response.data.data;
+      login(userData); // 🚀 하드코딩하지 않고 백엔드 응답을 그대로 Context에 저장
+      
       navigate('/');
     } catch (error) {
       console.error('로그인 실패:', error);

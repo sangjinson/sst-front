@@ -23,24 +23,26 @@ const addRefreshSubscriber = (callback) => {
 
 // 응답 인터셉터 설정
 api.interceptors.response.use(
-  (response) => {
-    // 정상 응답은 그대로 반환
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // 🚀 에러가 401(만료)이고, 이전에 재시도한 적이 없는 요청일 경우
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // 무한 루프 방지용 플래그
+    // 🚀 수정: '/auth/me'는 제외하고, 오직 로그인 시도와 리프레시 요청 자체에서 난 에러만 reject 처리
+    // URL에 '/auth/login' 이나 '/auth/refresh'가 포함되어 있을 때만 방어막 작동
+    if (originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
 
+    // 🚀 백엔드 GlobalException을 수정했으므로, 이제 여기서 401을 정상적으로 캐치해서 재발급 로직을 탑니다.
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
       // 1. 토큰 갱신 중이 아니라면 갱신 요청 시작
       if (!isTokenRefreshing) {
         isTokenRefreshing = true;
 
         try {
-          // 백엔드에 토큰 갱신 요청 (Refresh Token 쿠키가 자동으로 넘어감)
-          // 주의: 여기서 api 인스턴스를 쓰면 인터셉터를 또 타게 되므로 기본 axios를 사용합니다.
+          // 🚀 백엔드에 토큰 갱신 요청 (Refresh Token 쿠키가 자동으로 넘어감)
           await axios.post('/api/auth/refresh', {}, { 
             withCredentials: true 
           });
@@ -50,30 +52,27 @@ api.interceptors.response.use(
           onTokenRefreshed(null); // 기다리던 원본 요청들 재실행
           
         } catch (refreshError) {
-          // Refresh Token마저 만료되었거나 갱신 실패 시
           isTokenRefreshing = false;
           onTokenRefreshed(refreshError); 
           
           alert('로그인이 만료되었습니다. 다시 로그인해 주세요.');
-          window.location.href = '/login'; // 로그인 페이지로 튕겨내기
+          window.location.href = '/login'; 
           return Promise.reject(refreshError);
         }
       }
 
-      // 2. 토큰 갱신 중이라면, 갱신이 끝날 때까지 기다렸다가 원본 요청을 다시 실행 (Promise 반환)
+      // 2. 토큰 갱신 중이라면 대기
       return new Promise((resolve, reject) => {
         addRefreshSubscriber((err) => {
           if (err) {
             reject(err);
           } else {
-            // 갱신 완료 후, 실패했던 원래 요청(originalRequest)을 다시 보냄
             resolve(api(originalRequest));
           }
         });
       });
     }
 
-    // 401 에러가 아니거나 재시도해도 안 되는 에러는 그대로 반환
     return Promise.reject(error);
   }
 );

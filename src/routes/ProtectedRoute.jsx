@@ -46,7 +46,12 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   if (loading) return <SkeletonLoader />;
   if (!user) return <Navigate to="/" replace />;
-  if (!allowedRoles.includes(user.role)) return <Navigate to="/unauthorized" replace />;
+  
+  // 🚀 수정: user.role -> user.memberRole 로 변경
+  // 백엔드 LoginResponse DTO와 AuthContext에 저장된 key 값과 완벽하게 일치시켜야 함
+  if (!allowedRoles.includes(user.memberRole)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
 
   return <Outlet />;
 };

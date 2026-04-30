@@ -30,73 +30,52 @@ import SignupPage from '@pages/auth/SignupPage';
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* 공개 접근 가능 페이지 */}
+      {/* 🚀 1. 완벽히 공개된 단일 페이지 */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-
-      <Route element={<UserLayout />}>
-        <Route path="/search/:keyword" element={<SearchPage />} />
-      </Route>
-
-      {/* 로그인/회원가입 - 여기에 추가 */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/login/signup" element={<SignupPage />} />
 
-      {/* 일반 사용자 권한 (USER, ADMIN) */}
-      <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
+      {/* 🚀 2. 비로그인 사용자도 "조회"는 가능한 페이지 영역 (UserLayout 적용) */}
+      <Route element={<UserLayout />}>
+        <Route path="/search/:keyword" element={<SearchPage />} />
 
-        {/* 마이페이지 */}
-        <Route path="/user" element={<UserLayout />}>
-        <Route path="mypage" element={<MyPage />} /> {/* 이 줄을 추가하세요! */}
-        </Route>
+        {/* 고객센터 (보통 공지사항, FAQ는 모두가 볼 수 있음) */}
+        <Route path="/customersupport/notice" element={<Notice />} />
+        <Route path="/customersupport/faq" element={<Faq />} />
 
-        {/* 커뮤니티 (뽐낼거리) 추가 */}
-          <Route path="/showcase" element={<UserLayout />}>
-            {/* /showcase 접속 시 바로 목록 출력 */}
-            <Route index element={<Community />} /> 
-            {/* 상세 보기 주소: /showcase/view/1 */}
-            <Route path="view/:id" element={<CommunityDetail />} />
-            {/* 3. 뽐낼거리 글쓰기 페이지 */}
-            <Route path="write" element={<CommunityWrite />} />
-          </Route>
-        
+        {/* 커뮤니티 (뽐낼거리) 목록 및 상세 보기 */}
+        <Route path="/showcase" element={<Community />} /> 
+        <Route path="/showcase/view/:id" element={<CommunityDetail />} />
 
-        {/* 고객센터 */}
-        <Route path="/customersupport" element={<UserLayout />}>
-          <Route path="notice" element={<Notice />} />
-          <Route path="faq" element={<Faq />} />
-        </Route>
-
-        {/* 내거리(일정) */}
-        <Route path="/plan" element={<UserLayout />}>
-          <Route index element={<AIPlanPage />} />
-          <Route path="result" element={<AIPlanResultPage />} />
-        </Route>
-
-        {/* 메인페이지 */}
-        <Route path="/:region">
-          <Route element={<UserLayout />}>
-            <Route index element={<MainPage />} />
-          </Route>
-        </Route>
-
-        {/* 사거리 탬플릿 */}
-        <Route path="/:region" element={<AreaBaseTemplate />}>
-          <Route path=":type/list" element={<AreaListTemplate />} />
-          <Route path=":type/view" element={<AreaViewTemplate />} />
-        </Route>
-
+        {/* 메인페이지 및 사거리 템플릿 (조회 전용) */}
+        <Route path="/:region" element={<MainPage />} />
+        <Route path="/:region/:type/list" element={<AreaListTemplate />} />
+        <Route path="/:region/:type/view" element={<AreaViewTemplate />} />
       </Route>
 
-      {/* 관리자 전용 권한 (ADMIN) */}
-      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+      {/* 🚀 3. 반드시 로그인이 필요한 페이지 영역 */}
+      <Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>
+        <Route element={<UserLayout />}>
+          
+          {/* 마이페이지 */}
+          <Route path="/user/mypage" element={<MyPage />} />
+
+          {/* 커뮤니티 글쓰기 (목록/상세는 위에 공개로 빼고, 글쓰기만 보호) */}
+          <Route path="/showcase/write" element={<CommunityWrite />} />
+
+          {/* 내거리(일정 관리) */}
+          <Route path="/plan" element={<AIPlanPage />} />
+          <Route path="/plan/result" element={<AIPlanResultPage />} />
+        </Route>
+      </Route>
+
+      {/* 🚀 4. 관리자 전용 권한 (ROLE_ 접두사 확인 주의!) */}
+      <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
         </Route>
-      </Route>        
-
-
-
+      </Route> 
     </Routes>
   );
 };
