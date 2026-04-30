@@ -92,6 +92,7 @@ const AppRoutes = () => {
           <Route path="life" element={<CommunityLife />} />
           <Route path="life/view/:id" element={<CommunityLifeDetail />} />
           <Route path="life/write" element={<CommunityLifeWrite />} />
+          <Route path="life/write/:id" element={<CommunityLifeWrite />} />
         </Route>
         
 
