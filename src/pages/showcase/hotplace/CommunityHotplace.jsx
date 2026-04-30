@@ -128,7 +128,7 @@ const CommunityHotplace = () => {
           <select
             value={searchType}
             onChange={(e) => setSearchType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
+            className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:border-emerald-500">
             <option value="all">전체 검색</option>
             <option value="title">제목 검색</option>
             <option value="content">내용 검색</option>
@@ -142,13 +142,13 @@ const CommunityHotplace = () => {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="검색어를 입력하세요"
-            className="h-11 rounded-xl border border-gray-200 px-4 fs-down-1 text-gray-700 outline-none focus:border-emerald-500"
+            className="h-11 rounded-xl border border-gray-200 px-4 text-sm text-gray-700 outline-none focus:border-emerald-500"
           />
 
           <select
             value={sortType}
             onChange={(e) => setSortType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500 ">
+            className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:border-emerald-500">
             <option value="latest">최신순</option>
             <option value="popular">인기순</option>
             <option value="view">조회수순</option>
@@ -157,7 +157,7 @@ const CommunityHotplace = () => {
           </select>
         </div>
 
-        <div className="mt-3 flex items-center justify-between fs-down-1 text-gray-400">
+        <div className="mt-3 flex items-center justify-between text-sm text-gray-400">
           <span>
             총 <strong className="text-emerald-600">{filteredPosts.length}</strong>개의 게시글
           </span>

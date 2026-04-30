@@ -1,18 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import Breadcrumb from "@components/common/Breadcrumb";
 
 const CommunityDetail = () => {
-
-    useEffect(()=>{
-        window.scrollTo({
-        top: 0,
-        });
-    },[])
-
-  const { id } = useParams(); // URL에서 게시물 ID를 가져옴 (문자열)
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  // 1. 목록 페이지와 동일한 데이터 (나중엔 공통 data.js 파일로 빼는 것이 좋습니다)
+  // --- 상태 관리 ---
+  const [isLiked, setIsLiked] = useState(false); // 찜 상태
+  const [newComment, setNewComment] = useState(""); // 새 댓글 입력값
+  const [comments, setComments] = useState([
+    { id: 1, user: "5스틴", text: "뮤지컬트레인", date: "2026.04.22" },
+    { id: 2, user: "여행가 영조", text: "집에가자", date: "2026.04.23" },
+  ]);
+
+  const [editingId, setEditingId] = useState(null); // 수정 중인 댓글 ID
+  const [editText, setEditText] = useState(""); // 수정 중인 내용
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  // 더미 데이터
   const posts = [
     { id: 16, title: "서울 야경 명소 발견!", author: "서울시민", likes: 45, img: "https://picsum.photos/seed/16/400/533", category: "볼거리" },
     { id: 15, title: "제주도 숨은 카페 공유해요", author: "여행가J", likes: 88, img: "https://picsum.photos/seed/15/400/533", category: "먹거리" },
@@ -32,49 +41,78 @@ const CommunityDetail = () => {
     { id: 1, title: "오늘 하루가 인상적이었다는거야", author: "박새로이", likes: 54, img: "https://picsum.photos/seed/1/400/533", category: "놀거리" },
   ];
 
-  // 2. 주소창의 id와 일치하는 데이터 찾기
-  // useParams()의 id는 문자열이므로 Number()로 형변환이 필요합니다.
   const currentPost = posts.find((p) => p.id === Number(id));
 
-  // 데이터가 없을 경우 예외 처리
   if (!currentPost) {
-    return <div className="py-20 text-center">존재하지 않는 게시물입니다.</div>;
+    return <div className="py-20 text-center font-bold text-gray-500">존재하지 않는 게시물입니다.</div>;
   }
 
-  // 3. 댓글 및 날짜 등은 아직 데이터에 없으므로 기존 더미 형식을 유지하거나 확장합니다.
   const postDetail = {
     ...currentPost,
-    date: "2026.04.22", // 나중에 데이터에 추가하면 좋습니다.
+    date: "2026.04.22",
     tags: [currentPost.category, "경기도", "여행"],
     content: "경기도 여행의 순간을 공유하세요. 정말 멋진 곳이었어요!",
-    comments: [
-      { id: 1, user: "5스틴", text: "뮤지컬트레인" },
-      { id: 2, user: "여행가 영조", text: "집에가자" },
-    ]
+  };
+
+  // --- 기능 함수들 ---
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: postDetail.title, url: window.location.href });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("링크가 복사되었습니다!");
+      }
+    } catch (err) { console.log(err); }
+  };
+
+  const handleReport = () => {
+    if (window.confirm("이 게시물을 신고하시겠습니까?")) alert("신고 접수 완료");
+  };
+
+  const handleCommentSubmit = () => {
+    if (!newComment.trim()) return alert("내용을 입력해주세요.");
+    const newObj = { id: Date.now(), user: "나", text: newComment, date: new Date().toLocaleDateString() };
+    setComments([newObj, ...comments]);
+    setNewComment("");
+  };
+
+  const handleDeleteComment = (commentId) => {
+    if (window.confirm("삭제하시겠습니까?")) setComments(comments.filter(c => c.id !== commentId));
+  };
+
+  const startEditing = (id, text) => { setEditingId(id); setEditText(text); };
+
+  const handleSaveEdit = (commentId) => {
+    setComments(comments.map(c => c.id === commentId ? { ...c, text: editText } : c));
+    setEditingId(null);
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 transition-all font-sans">
+      <Breadcrumb 
+        paths={[{ label: '홈', to: '/' }, { label: '뽐낼거리', to: '/showcase' }, { label: '상세보기' }]} 
+        className="mb-4"
+      />
 
-    {/* 경로 안내 */}
-    <nav className="text-xs text-gray-500 mb-15">
-        홈 &gt; 뽐낼거리 &gt; <span className="font-bold text-gray-800">갤러리</span>
-
-      </nav>
-      {/* 상단 타이틀 */}
-      <div className="mb-10">
-        <h2 className="text-2xl font-bold mb-2">뽐낼거리</h2>
-        <p className="text-gray-400 text-sm">경기도 여행의 순간을 공유하세요</p>
+      {/* 헤더 섹션: 모바일 대응 mt 조정 */}
+      <div className="mb-8 mt-4 md:mt-7">
+        <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-800 underline decoration-emerald-300 underline-offset-4">뽐낼거리</h2>
+        <p className="text-gray-400 text-xs md:text-sm">경기도 여행의 순간을 공유하세요</p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-10 mb-16">
-        {/* 왼쪽: 이미지 슬라이더 */}
-        <div className="flex-1">
-          <div className="relative aspect-auto rounded-sm overflow-hidden bg-gray-100 border border-gray-100">
-            {/* ✅ 클릭한 게시물의 이미지로 변경 */}
-            <img src={postDetail.img} alt={postDetail.title} className="w-full h-full object-cover aspect-[4/3]" />
-            <button className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 text-2xl">&lt;</button>
-            <button className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 text-2xl">&gt;</button>
+      {/* 메인 컨텐츠: flex-col(모바일) -> flex-row(PC) */}
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 mb-16">
+        
+        {/* 왼쪽: 이미지 영역 */}
+        <div className="flex-1 w-full shrink-0">
+          <div className="relative rounded-xl overflow-hidden bg-gray-100 shadow-inner group aspect-[4/3] md:aspect-[3/2]">
+            <img src={postDetail.img} alt={postDetail.title} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button className="bg-black/20 text-white w-8 h-8 rounded-full">&lt;</button>
+              <button className="bg-black/20 text-white w-8 h-8 rounded-full">&gt;</button>
+            </div>
           </div>
         </div>
 
@@ -106,31 +144,69 @@ const CommunityDetail = () => {
             <h3 className="text-lg font-bold mb-3">✏️ {postDetail.title}</h3>
             <div className="flex flex-wrap gap-2">
               {postDetail.tags.map(tag => (
-                <span key={tag} className="text-sm font-bold text-gray-800">#{tag}</span>
+                <span key={tag} className="text-xs md:text-sm font-semibold text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-md border border-emerald-100 shadow-inner">#{tag}</span>
               ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 하단 댓글 영역 (postDetail.comments 사용) */}
-      <div className="border-t border-gray-100 pt-6">
-        <h4 className="font-bold mb-6">댓글 ({postDetail.comments.length})</h4>
-        <div className="border border-gray-200 rounded-md p-4 mb-10">
+      {/* 하단 댓글 영역 */}
+      <div className="border-t border-gray-100 pt-10">
+        <h4 className="font-bold text-xl mb-6">댓글 <span className="text-emerald-500 font-extrabold">{comments.length}</span></h4>
+        
+        {/* 댓글 입력 */}
+        <div className="border border-gray-200 rounded-2xl p-5 mb-10 focus-within:ring-2 focus-within:ring-emerald-100 focus-within:border-emerald-500 transition-all bg-white shadow-sm">
           <textarea 
-            className="w-full h-20 outline-none text-sm resize-none placeholder:text-gray-300"
-            placeholder="소중한 댓글을 남겨주세요."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            className="w-full h-24 outline-none text-sm md:text-base resize-none bg-transparent"
+            placeholder="이 여행지에 대해 궁금한 점이나 감상을 남겨주세요."
           />
           <div className="flex justify-end mt-2">
-            <button className="bg-[#009277] text-white px-5 py-1.5 rounded-md text-xs font-bold">댓글 등록</button>
+            <button onClick={handleCommentSubmit} className="bg-emerald-600 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow active:scale-95">등록</button>
           </div>
         </div>
 
-        <div className="space-y-4">
-          {postDetail.comments.map(comment => (
-            <div key={comment.id} className="border border-gray-100 rounded-md p-4 bg-gray-100">
-              <p className="font-bold text-[13px] mb-1">{comment.user}</p>
-              <p className="text-xs text-gray-500">{comment.text}</p>
+        {/* 댓글 리스트 */}
+        <div className="space-y-4 mb-16">
+          {comments.map((comment) => (
+            <div key={comment.id} className="border border-gray-100 rounded-2xl p-5 md:p-7 bg-gray-50/70 hover:bg-white transition-all shadow-inner group relative">
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-xs border border-gray-100 shrink-0 shadow">👤</div>
+                  <div>
+                    <p className="font-bold text-[15px] text-gray-800">{comment.user}</p>
+                    <p className="text-[11px] text-gray-400">{comment.date}</p>
+                  </div>
+                </div>
+                
+                {/* 댓글 액션 버튼: 모바일에서도 상시 노출 */}
+                <div className="flex gap-3 text-xs md:text-sm font-semibold pt-1">
+                  {editingId === comment.id ? (
+                    <>
+                      <button onClick={() => handleSaveEdit(comment.id)} className="text-blue-600 hover:text-blue-800">저장</button>
+                      <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600">취소</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => startEditing(comment.id, comment.text)} className="text-gray-400 hover:text-blue-500">수정</button>
+                      <button onClick={() => handleDeleteComment(comment.id)} className="text-gray-400 hover:text-red-500">삭제</button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {editingId === comment.id ? (
+                <textarea 
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  className="w-full p-4 border border-gray-200 rounded-xl text-sm outline-none bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all resize-none shadow-inner"
+                  rows="3"
+                />
+              ) : (
+                <p className="text-sm md:text-[15px] text-gray-600 leading-relaxed pl-13 pr-2 whitespace-pre-wrap">{comment.text}</p>
+              )}
             </div>
           ))}
         </div>
