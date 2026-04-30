@@ -1,6 +1,7 @@
 // src/pages/area/food/List.jsx
 import React, { useState, useMemo } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+// 🚀 수정: useOutletContext 대신 useParams를 임포트
+import { useNavigate, useParams } from 'react-router-dom';
 import { getFoodDataByRegion } from './foodData';
 import { toKorRegion } from '@utils/regionMap';
 import { AreaListCard, AreaFilterBar, AreaPagination, sortData } from '@components/modules/area/arealist';
@@ -11,7 +12,11 @@ const CATEGORIES = ['전체', '한식', '중식', '일식', '양식'];
 
 export default function FoodList() {
   const navigate = useNavigate();
-  const { selectedRegion } = useOutletContext();
+  // 🚀 수정: 부모의 OutletContext에 의존하지 않고, URL에서 직접 region 값을 가져옴
+  const { region } = useParams(); 
+  
+  // 🚀 기존 selectedRegion 변수명을 그대로 유지해서 하위 코드 수정을 최소화함
+  const selectedRegion = region; 
   const regionKor = toKorRegion(selectedRegion);
 
   const [selectedCategory, setSelectedCategory] = useState('전체');
@@ -56,6 +61,7 @@ export default function FoodList() {
                   ...item,
                   categoryIndex: CATEGORIES.filter(c => c !== '전체').indexOf(item.category),
                 }}
+                // 🚀 selectedRegion이 이제 useParams에서 왔으므로 문제없이 작동함
                 onClick={() => navigate(`/${selectedRegion}/food/view?id=${item.id}`)}
                 renderHeart={() => (
                   <WishlistHeartButton item={item} itemType="food" region={regionKor} />
