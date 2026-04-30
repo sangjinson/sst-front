@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import { getAllLifePosts } from "./communityLifeData";
 import CommunityLifeCard from "@components/modules/community/CommunityLifeCard";
