@@ -1,4 +1,36 @@
 
+/*
+ * 핫플거리 상세 페이지에서 이미지 슬라이드를 보여주는 컴포넌트입니다.
+
+ * import HotplaceImageSlider from "@components/modules/community/hotplace/HotplaceImageSlider";
+
+* 사용 예시:
+ *
+ * const [currentImageIndex, setCurrentImageIndex] = useState(0);
+ *
+ * const handlePrevImage = () => {
+ *   setCurrentImageIndex((prev) =>
+ *     prev === 0 ? slideImages.length - 1 : prev - 1
+ *   );
+ * };
+ *
+ * const handleNextImage = () => {
+ *   setCurrentImageIndex((prev) =>
+ *     prev === slideImages.length - 1 ? 0 : prev + 1
+ *   );
+ * };
+ *
+ * <HotplaceImageSlider
+ *   slideImages={slideImages}
+ *   currentImageIndex={currentImageIndex}
+ *   setCurrentImageIndex={setCurrentImageIndex}
+ *   currentPost={post}
+ *   handlePrevImage={handlePrevImage}
+ *   handleNextImage={handleNextImage}
+
+*/
+
+
 const HotplaceImageSlider = ({
   slideImages,
   currentImageIndex,

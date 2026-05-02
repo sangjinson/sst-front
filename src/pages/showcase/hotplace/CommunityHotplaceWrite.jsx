@@ -177,14 +177,14 @@ const CommunityHotplaceWrite = () => {
       {/* 내용 */}
       <div>
         <label className="block fs-down-2 font-bold text-gray-700 mb-3">내용</label>
-        <div className="fs-down-2 border border-gray-200 rounded-lg  overflow-hidden shadow-sm focus-within:border-blue-400 transition-colors">
+        <div className="fs-down-2 border border-gray-200 rounded-lg  overflow-hidden shadow-sm focus-within:border-[#0F9B73] transition-colors">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            rows="15"
+            rows="15" 
             placeholder="경기도 여행의 추억을 담아보세요."
             className="w-full px-4 py-4 outline-none resize-none text-gray-700 leading-relaxed"
-            required
+            // required
           />
         </div>
       </div>

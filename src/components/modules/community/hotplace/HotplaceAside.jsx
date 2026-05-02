@@ -1,4 +1,27 @@
 
+/*
+ * 핫플거리 상세 페이지에서 우측 사이드 영역을 담당하는 컴포넌트입니다.
+
+ * 사용 예시:
+
+ * import HotplaceAside from "@components/modules/community/hotplace/HotplaceAside";
+ *
+ * const [isLiked, setIsLiked] = useState(false);
+ *
+ * const openReportModal = (type) => {
+ *   console.log(type); // "post"
+ * };
+ *
+ * <HotplaceAside
+ *   currentPost={post}
+ *   isLiked={isLiked}
+ *   setIsLiked={setIsLiked}
+ *   wishCount={post.wishCnt}
+ *   openReportModal={openReportModal}
+ * />
+
+*/
+
 import { ClipButton } from "@components/modules/ActionButtons";
 
 const HotplaceAside = ({

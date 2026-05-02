@@ -16,7 +16,7 @@ import HotplaceStats from "@components/modules/community/hotplace/HotplaceStats"
 import HotplaceAside from "@components/modules/community/hotplace/HotplaceAside";
 
 // 댓글 컴포넌트
-import CommentSection from "@components/modules/community/hotplace/CommentSection";
+import CommentSection from "@components/modules/community/common/CommentSection";
 
 const CommunityHotplaceDetail = () => {
   const { id } = useParams();
@@ -95,7 +95,7 @@ const CommunityHotplaceDetail = () => {
         </button>
       </section>
 
-      <section className="grid grid-cols-1 gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-8 lg:items-stretch">
+      <section className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr] lg:gap-8 lg:items-stretch">
         <div className="space-y-6">
           <HotplaceImageSlider
             slideImages={slideImages}

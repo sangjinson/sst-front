@@ -1,3 +1,37 @@
+/*
+ * 상세 페이지에서 댓글 작성, 댓글 목록, 댓글 수정/삭제/신고 UI를 담당하는 컴포넌트입니다.
+
+* 사용 예시:
+ *
+ * import CommentSection from "@components/modules/community/comment/CommentSection";
+ * 
+ * const [comments, setComments] = useState([]);
+ * const [newComment, setNewComment] = useState("");
+ * const [editingId, setEditingId] = useState(null);
+ * const [editText, setEditText] = useState("");
+ * 
+ * 상태 업데이트 로직
+ * const handleCommentSubmit = () => {};
+ * const startEditing = (id, text) => {};
+ * const handleSaveEdit = (id) => {};
+ * const handleDeleteComment = (id) => {};
+ * const openReportModal = (type) => {};
+ *
+ * <CommentSection
+ *   comments={comments}  // 댓글 목록 배열
+ *   newComment={newComment} // 새 댓글 입력값 (textarea 값)
+ *   setNewComment={setNewComment} // 새 댓글 입력값을 변경하는 함수
+ *   handleCommentSubmit={handleCommentSubmit} // 댓글 등록 버튼 클릭 시 실행되는 함수
+ *   editingId={editingId} // 현재 수정 중인 댓글의 id (없으면 null)
+ *   setEditingId={setEditingId} // 수정 상태를 변경하는 함수
+ *   editText={editText} // 수정 중인 댓글 내용
+ *   setEditText={setEditText} // 수정 중인 댓글 내용을 변경하는 함수
+ *   startEditing={startEditing} // 댓글 수정 버튼 클릭 시 실행되는 함수 (수정 모드 진입)
+ *   handleSaveEdit={handleSaveEdit} // 수정 완료(저장) 시 실행되는 함수
+ *   handleDeleteComment={handleDeleteComment} // 댓글 삭제 함수
+ *   openReportModal={openReportModal} // 신고 버튼 클릭 시 실행되는 함수 ("comment" 타입 전달)
+*/
+
 
 const CommentSection = ({
   comments,
@@ -31,7 +65,7 @@ const CommentSection = ({
           <button
             type="button"
             onClick={handleCommentSubmit}
-            className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95"
+            className="rounded-xl bg-emerald-600 px-6 py-2.5 fs-down-1 font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95"
           >
             댓글 등록
           </button>
