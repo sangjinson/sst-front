@@ -9,21 +9,27 @@ export default function LoginPage() {
   
   const { login } = useAuth();
 
-  const [memberEmail, setMemberEmail] = useState('');
-  const [memberPassword, setMemberPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async () => {
-    if (!memberEmail.trim() || !memberPassword.trim()) {
+    if (!email.trim() || !password.trim()) {
       alert('이메일과 비밀번호를 입력해주세요.');
       return;
     }
 
     try {
-      const response = await api.post('/auth/login', { memberEmail, memberPassword });
-      
+      // 🚀 수정: Key 이름을 백엔드 DTO에 맞게 'email'과 'password'로 명시해서 전송해!
+      // (기존 { memberEmail, memberPassword } 는 { memberEmail: memberEmail, memberPassword: memberPassword } 와 같아서 에러 발생)
+      const payload = {
+        mbrEmail: email,
+        mbrPassword: password
+      };
+
+      const response = await api.post('/auth/login', payload);
       // 🚀 수정: 'role' 대신 'memberRole', 'USER' 대신 'ROLE_USER' 사용
       // (가장 좋은 건 response.data.data에 들어있는 값을 그대로 넣어주는 것)
       const userData = response.data.data;
@@ -74,8 +80,8 @@ export default function LoginPage() {
             <input
               type="email"
               placeholder="이메일 주소"
-              value={memberEmail}
-              onChange={(e) => setMemberEmail(e.target.value)}
+              value={email} // 🚀 수정
+              onChange={(e) => setEmail(e.target.value)} // 🚀 수정
               className="flex-1 outline-none text-base text-gray-700 placeholder-gray-400 bg-transparent"
             />
             <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -89,8 +95,8 @@ export default function LoginPage() {
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="비밀번호"
-              value={memberPassword}
-              onChange={(e) => setMemberPassword(e.target.value)}
+              value={password} // 🚀 수정
+              onChange={(e) => setPassword(e.target.value)} // 🚀 수정
               onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
               className="flex-1 outline-none text-base text-gray-700 placeholder-gray-400 bg-transparent"
             />
