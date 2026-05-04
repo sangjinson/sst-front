@@ -52,7 +52,7 @@ const Footer = () => {
             <ul className="list-none p-0 m-0 text-gray-300 grid grid-cols-1 md:grid-cols-2 gap-x-6 leading-[2]">
               <li>김영훈 weed3029@gmail.com</li>
               <li>김지태 jtkim4510@gmail.com</li>
-              <li>노승현 dlfakxm12@gmail.com</li>
+              <li>노송현 dlfakxm12@gmail.com</li>
               <li>소제우 sjo8080@naver.com</li>
               <li>손상진 thstkdwls13@naver.com</li>
               <li>한상인 blueunycon@gmail.com</li>
