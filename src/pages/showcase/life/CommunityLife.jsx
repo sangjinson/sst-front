@@ -11,11 +11,11 @@ const CommunityLife = () => {
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
 
-  // ✅ 좋아요 상태 관리 (핵심 추가)
+  // 좋아요 상태 관리 (핵심 추가)
   // { postId: true/false }
   const [likedPosts, setLikedPosts] = useState({});
 
-  // ✅ 좋아요 토글 함수 (핵심 추가)
+  // 좋아요 토글 함수 (핵심 추가)
   const toggleLike = (postId) => {
     setLikedPosts((prev) => ({
       ...prev,
@@ -96,8 +96,7 @@ const CommunityLife = () => {
 
             <Link
               to="/showcase/hotplace"
-              className="mb-1 fs-down-1 md:text-lg font-bold text-gray-400 transition-all hover:text-emerald-600 hover:scale-110"
-            >
+              className="mb-1 fs-down-1 md:text-lg font-bold text-gray-400 transition-all hover:text-emerald-600 hover:scale-110">
               / 핫플거리
             </Link>
           </div>
@@ -120,8 +119,7 @@ const CommunityLife = () => {
           <select
             value={searchType}
             onChange={(e) => setSearchType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500"
-          >
+            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
             <option value="all">전체 검색</option>
             <option value="title">제목 검색</option>
             <option value="content">내용 검색</option>
@@ -141,8 +139,7 @@ const CommunityLife = () => {
           <select
             value={sortType}
             onChange={(e) => setSortType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500"
-          >
+            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
             <option value="latest">최신순</option>
             <option value="popular">인기순</option>
             <option value="view">조회수순</option>
@@ -183,10 +180,10 @@ const CommunityLife = () => {
               key={post.id}
               post={post}
 
-              // ✅ 좋아요 상태 전달
+              // 좋아요 상태 전달
               liked={!!likedPosts[post.id]}
 
-              // ✅ 좋아요 클릭 이벤트 전달
+              // 좋아요 클릭 이벤트 전달
               onToggleLike={toggleLike}
 
               // 카드 클릭
