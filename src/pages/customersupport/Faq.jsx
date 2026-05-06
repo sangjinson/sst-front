@@ -21,7 +21,6 @@ const Faq = () => {
   };
 
   useEffect(() => {
-
     fetch("http://localhost:8080/api/customersupport/faq")
       .then((res) => {
         if (!res.ok) {
@@ -36,7 +35,7 @@ const Faq = () => {
         console.error("FAQ 조회 실패", err);
         setFaqList([]);
       });
-
+    window.scrollTo({ top: 0 });
   }, [currentPage]);
 
   return (
