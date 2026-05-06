@@ -1,4 +1,4 @@
-// ✅ localStorage에서 유저가 작성한 인생거리 게시글 불러오기
+// localStorage에서 유저가 작성한 인생거리 게시글 불러오기
 export const getUserLifePosts = () => {
   try {
     return JSON.parse(localStorage.getItem('lifePosts') || '[]');
@@ -22,7 +22,7 @@ export const getAllLifePosts = () => {
   return [...getUserLifePosts(), ...lifePostsDummy];
 };
 
-// ✅ 더미 데이터
+// 더미 데이터
 export const lifePostsDummy = [
   {
     id: 1,
@@ -102,7 +102,7 @@ export const lifePostsDummy = [
 
 숙소는 북한강 뷰가 보이는 펜션을 잡았는데, 아침에 일어나서 보는 강 뷰가 힐링 그 자체였어요.
 
-  둘째 날은 아침 일찍 자라섬을 산책하고, 카페에서 커피 한 잔 마시고 여유롭게 돌아왔어요.`,
+둘째 날은 아침 일찍 자라섬을 산책하고, 카페에서 커피 한 잔 마시고 여유롭게 돌아왔어요.`,
     course: [
       {
         order: 1,
