@@ -21,25 +21,11 @@ const PERIOD_OPTIONS = [
 // 동행 유형
 // ────────────────────────────────────────────
 const COMPANION_OPTIONS = [
-  { value: '1인', label: '1인', emoji: '🙋' },
+  { value: '1인',  label: '1인',    emoji: '🙋' },
   { value: '반려', label: '반려동물', emoji: '🐾' },
-  { value: '커플', label: '커플', emoji: '💑' },
-  { value: '가족', label: '가족', emoji: '👨‍👩‍👧' },
-  { value: '친구', label: '친구', emoji: '👫' },
-];
-
-// ────────────────────────────────────────────
-// 여행 테마
-// ────────────────────────────────────────────
-const THEME_OPTIONS = [
-  { value: '테마파크', label: '테마파크', emoji: '🎡' },
-  { value: '실내여행', label: '실내여행', emoji: '🏛' },
-  { value: '문화·역사', label: '문화·역사', emoji: '🏯' },
-  { value: '카페',     label: '카페',     emoji: '☕' },
-  { value: '액티비티', label: '액티비티', emoji: '🏄' },
-  { value: '캠핑',     label: '캠핑',     emoji: '⛺' },
-  { value: '맛집',     label: '맛집',     emoji: '🍽' },
-  { value: '바다',     label: '바다',     emoji: '🌊' },
+  { value: '커플', label: '커플',    emoji: '💑' },
+  { value: '가족', label: '가족',    emoji: '👨‍👩‍👧' },
+  { value: '친구', label: '친구',    emoji: '👫' },
 ];
 
 // ────────────────────────────────────────────
@@ -65,20 +51,18 @@ const Calendar = ({ onSelect, onClose, nights = 0, mode = 'start', startDate = n
   };
 
   const handleDayClick = (day) => {
-  const dateStr = toDateStr(day);
-  if (mode === 'start') {
-    const endStr = nights > 0 ? addDays(dateStr, nights) : dateStr;
-    onSelect(dateStr, endStr);
-  } else {
-    // ✅ 종료일 먼저 누르면 nights만큼 역으로 계산해서 시작일 자동 설정
-    if (nights > 0) {
-      const autoStart = addDays(dateStr, -nights);
-      onSelect(autoStart, dateStr);
+    const dateStr = toDateStr(day);
+    if (mode === 'start') {
+      const endStr = nights > 0 ? addDays(dateStr, nights) : dateStr;
+      onSelect(dateStr, endStr);
     } else {
-      // 당일여행이면 시작일 = 종료일
-      onSelect(dateStr, dateStr);
+      if (nights > 0) {
+        const autoStart = addDays(dateStr, -nights);
+        onSelect(autoStart, dateStr);
+      } else {
+        onSelect(dateStr, dateStr);
+      }
     }
-  }
   };
 
   const isStart = (day) => startDate === toDateStr(day);
@@ -139,7 +123,7 @@ const Calendar = ({ onSelect, onClose, nights = 0, mode = 'start', startDate = n
 };
 
 // ────────────────────────────────────────────
-// 선택 요약 배너 (고정)
+// 선택 요약 배너
 // ────────────────────────────────────────────
 const SelectionSummary = ({ selectedRegion, selectedPeriod, startDate, endDate, selectedCompanion, selectedThemes }) => {
   const items = [
@@ -170,23 +154,22 @@ const SelectionSummary = ({ selectedRegion, selectedPeriod, startDate, endDate, 
 const AIPlanPage = () => {
   const navigate = useNavigate();
 
-  const [step, setStep]                         = useState(0);
-  const [selectedRegion, setSelectedRegion]     = useState('');
-  const [selectedPeriod, setSelectedPeriod]     = useState('');
-  const [selectedNights, setSelectedNights]     = useState(0);
+  const [step, setStep]                           = useState(0);
+  const [selectedRegion, setSelectedRegion]       = useState('');
+  const [selectedPeriod, setSelectedPeriod]       = useState('');
+  const [selectedNights, setSelectedNights]       = useState(0);
   const [selectedCompanion, setSelectedCompanion] = useState('');
-  const [selectedThemes, setSelectedThemes]     = useState([]);
-  const [startDate, setStartDate]               = useState('');
-  const [endDate, setEndDate]                   = useState('');
-  const [showStartCal, setShowStartCal]         = useState(false);
-  const [showEndCal, setShowEndCal]             = useState(false);
+  const [selectedThemes, setSelectedThemes]       = useState([]);
+  const [startDate, setStartDate]                 = useState('');
+  const [endDate, setEndDate]                     = useState('');
+  const [showStartCal, setShowStartCal]           = useState(false);
+  const [showEndCal, setShowEndCal]               = useState(false);
 
-  // 동행 선택 - 단일
   const handleCompanion = (val) => {
     setSelectedCompanion(prev => prev === val ? '' : val);
   };
 
-  // 테마 토글 - 최대 3개
+  // 🚀 toggleTheme을 AIPlanThemeGrid의 onToggle prop으로 그대로 전달
   const toggleTheme = (theme) => {
     setSelectedThemes(prev => {
       if (prev.includes(theme)) return prev.filter(t => t !== theme);
@@ -246,7 +229,6 @@ const AIPlanPage = () => {
 
         <AIPlanStepIndicator current={step} />
 
-        {/* ✅ 선택 요약 배너 - 고정 표시 */}
         <SelectionSummary
           selectedRegion={selectedRegion}
           selectedPeriod={selectedPeriod}
@@ -295,7 +277,7 @@ const AIPlanPage = () => {
                 ))}
               </div>
 
-              {/* ✅ 날짜 선택 - 달력 아이콘 제거, div 클릭으로 달력 열기 */}
+              {/* 날짜 선택 */}
               <div className="border-t border-gray-100 pt-5">
                 <p className="text-sm font-semibold text-gray-700 mb-3">
                   날짜를 선택해주세요
@@ -337,10 +319,7 @@ const AIPlanPage = () => {
                   {/* 종료일 */}
                   <div className="relative flex-1">
                     <div
-                      onClick={() => {
-                        setShowEndCal(prev => !prev);
-                        setShowStartCal(false);
-                      }}
+                      onClick={() => { setShowEndCal(prev => !prev); setShowStartCal(false); }}
                       className={`border rounded-xl px-4 py-3 bg-gray-50 text-sm text-gray-600 cursor-pointer hover:border-[#0F9B73] transition ${
                         showEndCal ? 'border-[#0F9B73]' : 'border-gray-200'
                       }`}
@@ -354,7 +333,7 @@ const AIPlanPage = () => {
                         startDate={startDate}
                         nights={selectedNights}
                         onSelect={(start, end) => {
-                          setStartDate(start);  // ✅ 시작일도 같이 업데이트
+                          setStartDate(start);
                           setEndDate(end);
                           setShowEndCal(false);
                         }}
@@ -367,7 +346,7 @@ const AIPlanPage = () => {
             </div>
           )}
 
-          {/* STEP 2: 여행 테마 */}
+          {/* STEP 2: 동행 유형 + 여행 테마 */}
           {step === 2 && (
             <div>
               <div className="text-center mb-6">
@@ -380,7 +359,7 @@ const AIPlanPage = () => {
                 <p className="text-sm text-gray-400">동행 유형을 선택하고 테마를 골라주세요</p>
               </div>
 
-              {/* ✅ 동행 유형 - 단일 선택 */}
+              {/* 동행 유형 - 단일 선택 */}
               <div className="mb-6">
                 <p className="text-sm font-semibold text-gray-700 mb-3">
                   동행 유형
@@ -401,29 +380,11 @@ const AIPlanPage = () => {
                 </div>
               </div>
 
-              {/* ✅ 여행 테마 - 최대 3개 */}
-              <div>
-                <p className="text-sm font-semibold text-gray-700 mb-3">
-                  여행 테마
-                  <span className="ml-2 text-xs text-gray-400 font-normal">최대 3개 선택</span>
-                  {selectedThemes.length > 0 && (
-                    <span className="ml-2 text-xs text-[#0F9B73] font-semibold">{selectedThemes.length}/3</span>
-                  )}
-                </p>
-                <div className="grid grid-cols-4 gap-3">
-                  {THEME_OPTIONS.map(theme => (
-                    <button key={theme.value} onClick={() => toggleTheme(theme.value)}
-                      className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition ${
-                        selectedThemes.includes(theme.value)
-                          ? 'border-[#0F9B73] bg-green-50'
-                          : 'border-gray-200 hover:border-green-200'
-                      }`}>
-                      <span className="text-2xl">{theme.emoji}</span>
-                      <span className="text-xs font-medium text-gray-700">{theme.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              {/* 🚀 여행 테마 - 인라인 코드 제거하고 AIPlanThemeGrid 컴포넌트로 교체 */}
+              <AIPlanThemeGrid
+                selectedThemes={selectedThemes}
+                onToggle={toggleTheme}
+              />
             </div>
           )}
 

@@ -24,9 +24,9 @@ const AIPlanThemeGrid = ({ selectedThemes = [], onToggle }) => {
           </svg>
           <h2 className="text-lg font-bold text-gray-800">어떤 여행을 원하시나요?</h2>
         </div>
-        <p className="text-sm text-gray-400">테마는 최대 2개까지 선택 가능합니다</p>
+        <p className="text-sm text-gray-400">테마는 최대 3개까지 선택 가능합니다</p>
         {selectedThemes.length > 0 && (
-          <p className="text-xs text-[#0F9B73] mt-1">{selectedThemes.length}/2 선택됨</p>
+          <p className="text-xs text-[#0F9B73] mt-1">{selectedThemes.length}/3 선택됨</p>
         )}
       </div>
 
