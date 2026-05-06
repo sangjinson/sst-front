@@ -135,6 +135,54 @@ const seeData = {
   ]
 };
 
+const DEFAULT_REVIEWS = [
+  { user: '문화산책러', rating: 5, comment: '가볍게 둘러보기 좋았어요.' },
+  { user: '주말여행자', rating: 4, comment: '사진 찍기 좋고 접근성도 괜찮았습니다.' },
+  { user: '동네탐험가', rating: 4, comment: '근처에 들른다면 추천하고 싶은 장소예요.' },
+];
+
+const REGION_COORDS = {
+  수원시: { lat: 37.2636, lng: 127.0286 },
+};
+
+const normalizeRegionKey = (region = '수원') => region.replace(/[시군]$/, '') || '수원';
+
+const toRegionLabel = (region = '수원') => {
+  const key = normalizeRegionKey(region);
+  return /[시군]$/.test(region) ? region : `${key}시`;
+};
+
+const getDefaultCoords = (region, index = 0) => {
+  const base = REGION_COORDS[toRegionLabel(region)] || REGION_COORDS.수원시;
+  return {
+    lat: Number((base.lat + index * 0.003).toFixed(4)),
+    lng: Number((base.lng + index * 0.003).toFixed(4)),
+  };
+};
+
+const normalizeSeeItem = (item, region, index = 0) => {
+  const regionLabel = toRegionLabel(region);
+  const coords = getDefaultCoords(regionLabel, index);
+
+  return {
+    ...item,
+    name: item.name || item.title,
+    category: item.category || item.tag,
+    region: item.region || regionLabel,
+    rating: item.rating ?? 0,
+    reviewCount: item.reviewCount ?? item.likes ?? 0,
+    price: item.price || '현장 확인',
+    address: item.address || item.location || regionLabel,
+    phone: item.phone || '031-290-3600',
+    hours: item.hours || '09:00 - 18:00',
+    description: item.description || item.desc,
+    tags: item.tags || item.hashtags || [],
+    lat: item.lat ?? coords.lat,
+    lng: item.lng ?? coords.lng,
+    reviews: item.reviews || DEFAULT_REVIEWS,
+  };
+};
+
 const defaultSeeTemplates = [
   {
     title: '역사문화관',
@@ -228,5 +276,18 @@ const createDefaultSeeData = (region) =>
   }));
 
 export const getSeeDataByRegion = (region) => {
-  return seeData[region] || createDefaultSeeData(region || '수원');
+  const regionKey = normalizeRegionKey(region);
+  const data = seeData[regionKey] || createDefaultSeeData(regionKey);
+
+  return data.map((item, index) => normalizeSeeItem(item, regionKey, index));
+};
+
+export const getSeeDataById = (id, region) => {
+  if (region) {
+    return getSeeDataByRegion(region).find((item) => item.id === Number(id)) || null;
+  }
+
+  return Object.keys(seeData)
+    .flatMap((regionKey) => getSeeDataByRegion(regionKey))
+    .find((item) => item.id === Number(id)) || null;
 };

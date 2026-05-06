@@ -110,7 +110,7 @@ const List = ({rows}) => {
                 categories={CATEGORIES}
                 onClick={() => goToDetail(item.id)}
                 renderHeart={() => (
-                  <WishlistHeartButton item={item} itemType="see" region={region} />
+                  <WishlistHeartButton item={item} itemType="play" region={region} />
                 )}
               />
             ))}
