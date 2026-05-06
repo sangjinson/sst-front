@@ -22,7 +22,6 @@ export default function LoginPage() {
     }
 
     try {
-      // 🚀 수정: Key 이름을 백엔드 DTO에 맞게 'email'과 'password'로 명시해서 전송해!
       // (기존 { memberEmail, memberPassword } 는 { memberEmail: memberEmail, memberPassword: memberPassword } 와 같아서 에러 발생)
       const payload = {
         mbrEmail: email,
@@ -30,12 +29,15 @@ export default function LoginPage() {
       };
 
       const response = await api.post('/auth/login', payload);
-      // 🚀 수정: 'role' 대신 'memberRole', 'USER' 대신 'ROLE_USER' 사용
       // (가장 좋은 건 response.data.data에 들어있는 값을 그대로 넣어주는 것)
       const userData = response.data.data;
-      login(userData); // 🚀 하드코딩하지 않고 백엔드 응답을 그대로 Context에 저장
+      login(userData); 
       
-      navigate('/');
+      if (userData.memberRole === 'ROLE_ADMIN') {
+        navigate('/admin'); // 🚀 관리자면 회원 목록 페이지(또는 대시보드)로 바로 이동
+      } else {
+        navigate('/'); // 🚀 일반 유저면 메인 페이지로 이동
+      }
     } catch (error) {
       console.error('로그인 실패:', error);
       if (error.response && error.response.status === 401) {

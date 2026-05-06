@@ -99,6 +99,7 @@ const AppRoutes = () => {
       <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="members" element={<MemberList />} />
           {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
         </Route>
       </Route> 
