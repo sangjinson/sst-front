@@ -6,6 +6,7 @@ export const iconsList = Object.fromEntries(
       .replace('./', '')
       .replace('.jsx', '');
 
+
     return [name, module.default];
   })
 );

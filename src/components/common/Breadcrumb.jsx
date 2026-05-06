@@ -21,30 +21,28 @@ import IconSVG from "@components/Icon/IconSVG";
 const Breadcrumb = ({ paths, className = '' }) => {
   return (
     /* w-full과 flex-end를 유지하여 오른쪽 상단 배치를 살리되, daisyUI의 breadcrumbs 스타일을 입힙니다. */
-    <div className={`text-sm breadcrumbs w-full flex justify-center md:justify-start px-2 ${className}`}>
+    <div className={`text-sm breadcrumbs w-full flex justify-center md:justify-start ${className}`}>
       <ul>
         {paths.map((path, index) => {
           const isLast = index === paths.length - 1;
 
           return (
-            <li key={index} className="flex items-center fs-up-3">
-              {path.to && !isLast ? (
+            <li key={index} className="flex items-center fs-up-2">
+              {isLast ? (
+                <span className="text-gray-900 font-bold tracking-tight">
+                  {path.label}
+                </span>
+              ) : (
                 <Link
                   to={path.to}
                   className="text-gray-500 hover:text-[#0F9B73] transition-all duration-200 ease-in-out"
                 >
-                  {/* 첫 번째 '홈' 아이콘을 추가하면 훨씬 내비게이션답게 보입니다 */}
-                  {index === 0 && (
-                    <IconSVG name="home" size = {20} />
-                    
+                  {index === 0 ? (
+                    <IconSVG name="home" size={20} />
+                  ) : (
+                    path.label
                   )}
-                  {path.label}
                 </Link>
-              ) : (
-                /* 마지막 현재 페이지는 굵고 진하게 표현 */
-                <span className="text-gray-900 font-bold tracking-tight">
-                  {path.label}
-                </span>
               )}
             </li>
           );

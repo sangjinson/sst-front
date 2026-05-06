@@ -5,6 +5,9 @@ import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
 import ListSkeleton from '@components/skeleton/ListSkeleton';
 
+/* API 규약을 통일하기 위한 임시 공통 파일 */
+import TEMP_API_LIST_DATA from './temp/ListData';
+
 const PlayList = lazy(() => import('./play/List'));
 const FoodList = lazy(() => import('./food/List'));
 const SeeList = lazy(() => import('./see/List'));
@@ -85,6 +88,10 @@ function AreaListTemplate() {
 
   const bgImage = regionBanner?.bgImage || currentConfig?.bgImage;
   const subtitle = `${regionKor}${currentConfig?.subtitleSuffix}`;
+  
+  // 차후 지역으로 나눠야 함.
+  // const dataSet = TEMP_API_LIST_DATA?.[type]?.[regionKor] ?? {};
+  const dataSet = TEMP_API_LIST_DATA?.[type]?.['성남시'] ?? {};
 
   return (
     <Suspense fallback={<ListSkeleton />}>
@@ -100,16 +107,16 @@ function AreaListTemplate() {
             subtitle={subtitle}
             to={`/${region}`} 
           />
-          <div className="max-w-[1920px] mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px]">
+          <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px]">
             <Breadcrumb
               paths={[
                 { label: '홈', to: '/' },
                 { label: regionKor, to: `/${region}` },
                 { label: currentConfig.label, to: `/${region}/${type}/list` },
               ]}
-              className="mb-6"
+              className="mb-3"
             />
-            <currentConfig.Component />
+            <currentConfig.Component rows={dataSet}/>
           </div>
         </div>
       )}
