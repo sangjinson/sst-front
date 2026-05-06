@@ -1,29 +1,39 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getSeeDataByRegion } from './seeData';
 import { toKorRegion } from '@utils/regionMap';
 import { AreaFilterBar, AreaListCard, AreaPagination, sortData } from '@components/modules/area/arealist';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
+import EyesFollow from '@components/modules/anim/EyesFollow';
 
-// 페이지당 표시할 아이템 개수
-const ITEMS_PER_PAGE = 6;
-// 카테고리 목록 (전체 + 세부 카테고리)
-const CATEGORIES = ['전체', '박물관', '도서관', '지역명소', '공원'];
 
 /**
- * 볼거리 목록 페이지 컴포넌트
- * - 지역별 볼거리 목록을 필터링, 정렬, 페이지네이션하여 표시
+ * 목록 페이지 컴포넌트
+ * - 지역별 목록을 필터링, 정렬, 페이지네이션하여 표시
  * - 카테고리별 필터링 및 좋아요 기능 지원
  */
-const List = () => {
+const pageLabel = "볼거리";
+
+const List = ({rows}) => {
   // URL 파라미터에서 region 정보 가져오기
-  const { region } = useParams();
+  const { region, type } = useParams();
   const navigate = useNavigate();
-  
+
   // region을 한글 지역명으로 변환 (예: 'suwon' -> '수원')
   const regionKor = toKorRegion(region || '수원');
+
   // '시', '군' 접미사 제거하여 지역명만 추출
   const regionName = regionKor.replace(/[시군]$/, '');
+
+  // 카테고리 목록
+  const CATEGORIES = rows?.['categories'] ?? [];
+
+
+
+  
+
+
+  const items = rows['items'];
+
 
   // 선택된 카테고리 상태 (기본값: '전체')
   const [selectedCategory, setSelectedCategory] = useState('전체');
@@ -35,17 +45,12 @@ const List = () => {
   // 필터링 및 정렬된 데이터 계산 (useMemo로 최적화)
   const filtered = useMemo(() => {
     // 해당 지역의 볼거리 데이터 가져오기
-    const data = getSeeDataByRegion(regionName).map((item) => ({
+    const data = items.map((item) => ({
       ...item,
-      title : item.title,
-      category: item.tag,           // 태그를 카테고리로 매핑
-      description: item.desc,       // 설명 매핑
-      address: item.location,       // 위치 정보를 주소로 매핑
-      reviewCount: item.likes ?? 0, // 좋아요 수를 리뷰수로 매핑 (기본값: 0)
-      rating: item.rating ?? 0,     // 평점 매핑 (기본값: 0)
     }));
-
     let result = [...data];
+
+    
 
     // '전체'가 아닌 경우 카테고리 필터링 적용
     if (selectedCategory !== '전체') {
@@ -55,6 +60,10 @@ const List = () => {
     // 정렬 옵션에 따라 데이터 정렬
     return sortData(result, sortOption);
   }, [regionName, selectedCategory, sortOption]);
+
+
+  // 페이지당 표시할 아이템 개수
+  const ITEMS_PER_PAGE = rows?.['perPage'] ?? 12;
 
   // 전체 페이지 수 계산
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -69,9 +78,7 @@ const List = () => {
    * 상세 페이지로 이동하는 함수
    * @param {string|number} id - 아이템 ID
    */
-  const goToDetail = (id) => {
-    navigate(`/${region}/see/view?id=${id}`);
-  };
+  const goToDetail = (id) => { navigate(`/${region}/${type}/view?id=${id}`); };
 
   return (
     <div className="min-h-screen bg-[#f8f6f0]">
@@ -87,12 +94,14 @@ const List = () => {
           // 정렬 변경 시 첫 페이지로 리셋
           onSortChange={(sort) => { setSortOption(sort); setCurrentPage(1); }}
           totalCount={filtered.length}
-          countLabel="볼거리"
+          countLabel={pageLabel}
         />
+
+        <hr className="h-[2px] bg-gray-200 border-0 mb-6" />
 
         {/* 데이터가 있는 경우 그리드 형태로 카드 표시 */}
         {paginated.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {paginated.map((item) => (
               <AreaListCard
                 key={item.id}
@@ -101,6 +110,7 @@ const List = () => {
                   // 카테고리 인덱스 계산 (전체 제외)
                   categoryIndex: CATEGORIES.filter((c) => c !== '전체').indexOf(item.tag),
                 }}
+                categories={CATEGORIES}
                 onClick={() => goToDetail(item.id)}
                 renderHeart={() => (
                   <WishlistHeartButton item={item} itemType="see" region={region} />
@@ -110,12 +120,15 @@ const List = () => {
           </div>
         ) : (
           // 데이터가 없는 경우 빈 상태 UI 표시
-          <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-            <span className="text-5xl mb-4">👀</span>
-            <p className="text-lg font-medium">해당 카테고리의 볼거리가 없습니다</p>
-            <p className="text-sm mt-1">다른 카테고리를 선택해보세요</p>
+          <div className="flex flex-col items-center justify-center py-15 text-gray-400">
+            <EyesFollow />
+            <p className="fs-up-7 font-bold mt-7">죄송합니다.</p>
+            <p className="fs-up-3 mt-5">해당 {pageLabel} 컨텐츠는 현재 준비 중입니다.</p>
           </div>
         )}
+
+        <hr className="h-[2px] bg-gray-200 border-0 mt-6" />
+
 
         {/* 페이지네이션 컴포넌트 */}
         <AreaPagination
