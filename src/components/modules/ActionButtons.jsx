@@ -152,9 +152,9 @@ export const WishlistHeartButton = ({ item, itemType, region }) => {
 export const HeartButton = ({ liked, onClick }) => (
   <button
     onClick={onClick}
-    className={`group/heart w-9 h-9 flex items-center justify-center rounded-full backdrop-blur-md transition-all duration-200 cursor-pointer border-none outline-none
+    className={`group/heart w-9 h-9 flex items-center justify-center rounded-full backdrop-blur-md transition-colors duration-200 cursor-pointer border-none outline-none
       ${liked ? 'bg-white shadow-md' : 'bg-white/80 hover:bg-white'}
-      hover:scale-105 active:scale-90`}
+      active:scale-90`}
     aria-label="좋아요"
   >
     <svg

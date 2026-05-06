@@ -1,5 +1,5 @@
 // src/pages/area/food/View.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getFoodDataByRegion } from './foodData';
 import { toKorRegion } from '@utils/regionMap';
@@ -33,22 +33,26 @@ export default function FoodView() {
 
   const isLoggedIn = true; // ※ 실제 AuthContext로 교체 필요
 
-  const [item, setItem]                 = useState(null);
-  const [relatedItems, setRelatedItems] = useState([]);
+  const allItems = useMemo(
+    () => getFoodDataByRegion(currentRegionKor),
+    [currentRegionKor]
+  );
+
+  const item = useMemo(
+    () => allItems.find((entry) => String(entry.id) === String(id)) || null,
+    [allItems, id]
+  );
+
+  const relatedItems = useMemo(() => {
+    if (!item) return [];
+    return allItems
+      .filter((entry) => entry.id !== item.id && entry.category === item.category)
+      .slice(0, 4);
+  }, [allItems, item]);
 
   useEffect(() => {
-    if (!id) return;
-    const allFoods = getFoodDataByRegion(currentRegionKor);
-    const food = allFoods.find((f) => String(f.id) === String(id));
-    if (food) {
-      setItem(food); // ✅ 원본 그대로 저장
-      const related = allFoods
-        .filter((f) => f.id !== food.id && f.category === food.category)
-        .slice(0, 4);
-      setRelatedItems(related);
-    }
     window.scrollTo(0, 0);
-  }, [id, currentRegionKor]);
+  }, [id]);
 
   if (!item) {
     return (

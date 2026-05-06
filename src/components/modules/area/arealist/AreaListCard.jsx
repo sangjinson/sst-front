@@ -54,15 +54,14 @@ const AreaListCard = ({ item, categories, liked, onLike, onClick, renderHeart })
   const name        = item.name        || item.title    || '';
   const category    = item.category    || item.tag      || '';
   const description = item.description || item.desc     || '';
-  const address     = item.address     || item.location || '';
   const location     = item.location     || item.address || '';
   const reviewCount = item.reviewCount ?? item.reviews  ?? 0;
 
   
   const badgeColorIdx =
-  (Array.isArray(categories)
-    ? categories.filter((c) => c !== '전체').indexOf(item?.category)
-    : 0);
+    (Array.isArray(categories)
+      ? categories.filter((c) => c !== '전체').indexOf(category)
+      : 0);
 
   const safeBadgeColorIdx = badgeColorIdx >= 0 ? badgeColorIdx : 0;
   const badgeColor = BADGE_COLORS[safeBadgeColorIdx % BADGE_COLORS.length];

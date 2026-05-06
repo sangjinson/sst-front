@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getSeeDataByRegion } from './seeData';
+import { getSeeDataById, getSeeDataByRegion } from './seeData';
 import { toKorRegion } from '@utils/regionMap';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import {
@@ -14,20 +14,6 @@ import {
 
 // 카테고리 목록 (List.jsx와 동일)
 const CATEGORIES = ['전체', '박물관', '도서관', '지역명소', '공원'];
-
-// 기본 리뷰 데이터 (데이터가 없을 때 표시할 샘플 리뷰)
-const DEFAULT_REVIEWS = [
-  {
-    user: '5스틴',
-    rating: 5,
-    comment: '분위기 최고예요.',
-  },
-  {
-    user: '여행가 영훈',
-    rating: 4,
-    comment: '가볍게 둘러보기 좋았습니다.',
-  },
-];
 
 /**
  * 볼거리 상세 페이지 컴포넌트
@@ -45,38 +31,24 @@ const View = () => {
   
   // region을 한글 지역명으로 변환
   const regionKor = toKorRegion(region || '수원');
-  const regionName = regionKor.replace(/[시군]$/, '');
 
   // 로그인 상태 (임시로 true 설정 - 실제 인증으로 대체 필요)
   const isLoggedIn = true;
 
-  // 선택된 아이템 상태
-  const [item, setItem] = useState(null);
-  // 연관 추천 아이템 목록 상태
-  const [relatedItems, setRelatedItems] = useState([]);
+  // 선택된 아이템
+  const item = useMemo(() => {
+    if (!id) return null;
+    return getSeeDataById(id, regionKor);
+  }, [id, regionKor]);
 
-  // id 또는 regionName이 변경되면 데이터 로드
-  useEffect(() => {
-    // id가 없으면 실행하지 않음
-    if (!id) return;
+  // 연관 추천 아이템 목록
+  const relatedItems = useMemo(() => {
+    if (!item) return [];
 
-    // 해당 지역의 모든 볼거리 데이터 가져오기
-    const all = getSeeDataByRegion(regionName);
-    // id가 일치하는 아이템 찾기 (타입 비교를 위해 문자열로 변환)
-    const data = all.find((seeItem) => String(seeItem.id) === String(id));
-
-    // 아이템 상태 업데이트 (없으면 null)
-    setItem(data || null);
-
-    // 데이터가 있으면 연관 추천 아이템 계산
-    if (data) {
-      // 같은 카테고리면서 현재 아이템 제외하고 최대 4개까지
-      const related = all
-        .filter((seeItem) => seeItem.id !== data.id && seeItem.tag === data.tag)
-        .slice(0, 4);
-      setRelatedItems(related);
-    }
-  }, [id, regionName]);
+    return getSeeDataByRegion(item.region)
+      .filter((seeItem) => seeItem.id !== item.id && seeItem.category === item.category)
+      .slice(0, 4);
+  }, [item]);
 
   // 아이템이 없는 경우 빈 상태 UI 표시
   if (!item) {
@@ -103,8 +75,8 @@ const View = () => {
       {/* 상세 페이지 히어로 섹션 (이미지, 이름, 카테고리, 찜 버튼) */}
       <AreaDetailHero
         image={item.image}
-        name={item.title}
-        category={item.tag}
+        name={item.name}
+        category={item.category}
         categories={CATEGORIES}
         renderHeart={() => (
           <WishlistHeartButton item={item} itemType="see" region={region} />
@@ -112,28 +84,28 @@ const View = () => {
       />
 
       {/* 상세 설명 섹션 */}
-      <AreaDescription description={item.desc} />
+      <AreaDescription description={item.description} />
 
       {/* 정보 섹션 (주소, 이용시간, 전화번호, 이용요금, 해시태그) */}
       <AreaInfoSection
         infoItems={[
-          { icon: '📍', label: '주소', value: item.location },
-          { icon: '🕐', label: '이용시간', value: '09:00 - 18:00' },
-          { icon: '📞', label: '전화번호', value: '031-290-3600' },
-          { icon: '💰', label: '이용요금', value: '현장 확인', highlight: true },
+          { icon: '📍', label: '주소', value: item.address },
+          { icon: '🕐', label: '이용시간', value: item.hours },
+          { icon: '📞', label: '전화번호', value: item.phone },
+          { icon: '💰', label: '이용요금', value: item.price, highlight: true },
         ]}
-        tags={item.hashtags}
+        tags={item.tags}
         tagLabel="해시태그"
       />
 
       {/* 지도 섹션 (주소 기반 지도 표시) */}
-      <AreaMap address={item.location} />
+      <AreaMap lat={item.lat} lng={item.lng} address={item.address} />
 
       {/* 리뷰 섹션 (평점, 리뷰 목록, 리뷰 작성) */}
       <AreaReview
-        rating={item.rating ?? 0}
-        reviewCount={item.reviewCount ?? item.likes ?? DEFAULT_REVIEWS.length}
-        reviews={item.reviews ?? DEFAULT_REVIEWS}
+        rating={item.rating}
+        reviewCount={item.reviewCount}
+        reviews={item.reviews}
         isLoggedIn={isLoggedIn}
         placeholder="볼거리에 대한 솔직한 리뷰를 남겨주세요."
       />
@@ -143,7 +115,7 @@ const View = () => {
         title="연관 추천 볼거리"
         items={relatedItems}
         onItemClick={(rel) => navigate(`/${region}/see/view?id=${rel.id}`)}
-        nameKey="title"
+        nameKey="name"
       />
 
       {/* 하단 액션 버튼 영역 (목록으로, 맨 위로) */}

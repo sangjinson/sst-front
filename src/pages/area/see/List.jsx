@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toKorRegion } from '@utils/regionMap';
 import { AreaFilterBar, AreaListCard, AreaPagination, sortData } from '@components/modules/area/arealist';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import EyesFollow from '@components/modules/anim/EyesFollow';
@@ -17,22 +16,9 @@ const List = ({rows}) => {
   // URL 파라미터에서 region 정보 가져오기
   const { region, type } = useParams();
   const navigate = useNavigate();
-
-  // region을 한글 지역명으로 변환 (예: 'suwon' -> '수원')
-  const regionKor = toKorRegion(region || '수원');
-
-  // '시', '군' 접미사 제거하여 지역명만 추출
-  const regionName = regionKor.replace(/[시군]$/, '');
-
   // 카테고리 목록
   const CATEGORIES = rows?.['categories'] ?? [];
-
-
-
-  
-
-
-  const items = rows['items'];
+  const items = rows?.['items'] ?? [];
 
 
   // 선택된 카테고리 상태 (기본값: '전체')
@@ -44,13 +30,12 @@ const List = ({rows}) => {
 
   // 필터링 및 정렬된 데이터 계산 (useMemo로 최적화)
   const filtered = useMemo(() => {
-    // 해당 지역의 볼거리 데이터 가져오기
+    // 템플릿에서 내려준 현재 지역의 볼거리 데이터 사용
     const data = items.map((item) => ({
       ...item,
     }));
-    let result = [...data];
 
-    
+    let result = [...data];
 
     // '전체'가 아닌 경우 카테고리 필터링 적용
     if (selectedCategory !== '전체') {
@@ -59,7 +44,7 @@ const List = ({rows}) => {
 
     // 정렬 옵션에 따라 데이터 정렬
     return sortData(result, sortOption);
-  }, [regionName, selectedCategory, sortOption]);
+  }, [items, selectedCategory, sortOption]);
 
 
   // 페이지당 표시할 아이템 개수
