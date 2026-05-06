@@ -185,7 +185,7 @@ const Header = () => {
             <Search className="w-8 h-8 text-gray-600" />
           </button>
           
-          {/* 🚀 수정: user 상태에 따른 조건부 렌더링 적용 */}
+          {/* 수정: user 상태에 따른 조건부 렌더링 적용 */}
           {user ? (
             <div className="flex items-center gap-3">
               <Link to="/user/mypage" className="shrink-0 block">
