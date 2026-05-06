@@ -77,8 +77,14 @@ export default function LoginPage() {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.18); }
         }
+        @keyframes routeFlag {
+          0% { transform: translateY(-18px) scale(0.92); opacity: 0; }
+          70% { transform: translateY(3px) scale(1); opacity: 1; }
+          100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
         .animate-routeLine { animation: routeLine 1.4s ease-out 1.75s forwards; }
         .animate-routeDot { opacity: 0; animation: routeDot 0.45s ease-out forwards, routeDotPulse 1.6s ease-in-out 2.3s infinite; }
+        .animate-routeFlag { opacity: 0; animation: routeFlag 0.45s ease-out 3.15s forwards; }
       `}</style>
 
       <div className="login-wrap min-h-screen bg-[#f8f6f0] flex items-center justify-center px-6 py-10">
@@ -131,6 +137,27 @@ export default function LoginPage() {
                     <div className="absolute inset-0 rounded-full bg-white opacity-40 animate-ping" />
                   </div>
                 ))}
+
+                <div className="absolute left-[264px] top-[119px] text-white animate-routeFlag">
+                  <svg
+                    viewBox="0 0 28 40"
+                    className="h-14 w-10"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M6 6v28"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M7 7h15l-3.5 5L22 17H7V7z"
+                      fill="currentColor"
+                    />
+                    <circle cx="6" cy="34" r="3" fill="currentColor" />
+                  </svg>
+                </div>
               </div>
 
               <div className="text-center text-white">
