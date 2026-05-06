@@ -92,8 +92,8 @@ const AppRoutes = () => {
           {/* 내거리(일정 관리) */}
           <Route path="/plan" element={<AIPlanPage />} />
           <Route path="/plan/result" element={<AIPlanResultPage />} />
+          </Route>
         </Route>
-      </Route>
 
       {/* 4. 관리자 전용 권한 (ROLE_ 접두사 확인 주의!) */}
       <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
