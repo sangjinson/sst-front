@@ -4,6 +4,9 @@ import HeroBanner from '../../components/common/HeroBanner';
 import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
 import ListSkeleton from '@components/skeleton/ListSkeleton';
+import { getSeeDataByRegion } from './see/seeData';
+import { getSleepDataByRegion } from './sleep/sleepDummyData';
+import { getFoodDataByRegion } from './food/foodData';
 
 /* API 규약을 통일하기 위한 임시 공통 파일 */
 import TEMP_API_LIST_DATA from './temp/ListData';
@@ -74,6 +77,46 @@ const LIST_CONFIG = {
   },
 };
 
+const LIST_DATA_CONFIG = {
+  see: {
+    categories: ['전체', '박물관', '도서관', '지역명소', '공원'],
+    getItems: getSeeDataByRegion,
+  },
+  sleep: {
+    categories: ['전체', '호텔', '리조트', '펜션', '모텔', '게스트하우스'],
+    getItems: getSleepDataByRegion,
+  },
+  food: {
+    categories: ['전체', '한식', '중식', '일식', '양식'],
+    getItems: getFoodDataByRegion,
+  },
+};
+
+const normalizeListItem = (item) => ({
+  ...item,
+  title: item.title || item.name,
+  tag: item.tag || item.category,
+  location: item.location || item.address,
+  reviews: item.reviews ?? item.reviewCount ?? 0,
+});
+
+const createListRows = (type, regionKor) => {
+  const listDataConfig = LIST_DATA_CONFIG[type];
+
+  if (listDataConfig) {
+    const items = listDataConfig.getItems(regionKor).map(normalizeListItem);
+
+    return {
+      totalCount: items.length,
+      perPage: 12,
+      categories: listDataConfig.categories,
+      items,
+    };
+  }
+
+  return TEMP_API_LIST_DATA?.[type]?.[regionKor] ?? TEMP_API_LIST_DATA?.[type]?.['성남시'] ?? {};
+};
+
 function AreaListTemplate() {
   const { region, type } = useParams();
   const { pathname } = useLocation();
@@ -89,9 +132,7 @@ function AreaListTemplate() {
   const bgImage = regionBanner?.bgImage || currentConfig?.bgImage;
   const subtitle = `${regionKor}${currentConfig?.subtitleSuffix}`;
   
-  // 차후 지역으로 나눠야 함.
-  // const dataSet = TEMP_API_LIST_DATA?.[type]?.[regionKor] ?? {};
-  const dataSet = TEMP_API_LIST_DATA?.[type]?.['성남시'] ?? {};
+  const dataSet = createListRows(type, regionKor);
 
   return (
     <Suspense fallback={<ListSkeleton />}>

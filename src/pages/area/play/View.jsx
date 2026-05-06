@@ -1,5 +1,5 @@
-// src/pages/area/food/View.jsx
-import React, { useState, useEffect } from 'react';
+// src/pages/area/play/View.jsx
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getFoodDataByRegion } from './dummydata';
 import { CATEGORIES } from '../DataSet';
@@ -36,29 +36,33 @@ export default function PlayView() {
 
   const isLoggedIn = true; // ※ 실제 AuthContext로 교체 필요
 
-  const [item, setItem]                 = useState(null);
-  const [relatedItems, setRelatedItems] = useState([]);
+  const allItems = useMemo(
+    () => getFoodDataByRegion(currentRegionKor),
+    [currentRegionKor]
+  );
+
+  const item = useMemo(
+    () => allItems.find((entry) => String(entry.id) === String(id)) || null,
+    [allItems, id]
+  );
+
+  const relatedItems = useMemo(() => {
+    if (!item) return [];
+    return allItems
+      .filter((entry) => entry.id !== item.id && entry.category === item.category)
+      .slice(0, 4);
+  }, [allItems, item]);
 
   useEffect(() => {
-    if (!id) return;
-    const allFoods = getFoodDataByRegion(currentRegionKor);
-    const food = allFoods.find((f) => String(f.id) === String(id));
-    if (food) {
-      setItem(food); // ✅ 원본 그대로 저장
-      const related = allFoods
-        .filter((f) => f.id !== food.id && f.category === food.category)
-        .slice(0, 4);
-      setRelatedItems(related);
-    }
     window.scrollTo(0, 0);
-  }, [id, currentRegionKor]);
+  }, [id]);
 
   if (!item) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-400">
         <div className="text-center">
-          <p className="text-5xl mb-4">🍽️</p>
-          <p className="text-lg">음식점 정보를 찾을 수 없습니다.</p>
+          <p className="text-5xl mb-4">🎮</p>
+          <p className="text-lg">놀거리 정보를 찾을 수 없습니다.</p>
           <button
             onClick={() => navigate(-1)}
             className="mt-4 px-5 py-2 bg-[#0F9B73] text-white rounded-lg text-sm"
@@ -83,7 +87,7 @@ export default function PlayView() {
           category={item.category}
           categories={CATEGORIES['play']}
           renderHeart={() => (
-            <WishlistHeartButton item={item} itemType="food" region={region} />
+            <WishlistHeartButton item={item} itemType="play" region={region} />
           )}
         />
 
@@ -111,21 +115,21 @@ export default function PlayView() {
           reviewCount={item.reviews}           // ✅ 숫자 (foodData의 reviews 필드)
           reviews={generateReviews(item.name)} // ✅ 더미 리뷰 배열
           isLoggedIn={isLoggedIn}
-          placeholder="음식점에 대한 솔직한 리뷰를 남겨주세요."
+          placeholder="놀거리에 대한 솔직한 리뷰를 남겨주세요."
         />
 
         {/* 연관 추천 음식점 */}
         <AreaRelated
-          title={`${currentRegionKor} 비슷한 음식점`}
+          title={`${currentRegionKor} 비슷한 놀거리`}
           items={relatedItems}
-          onItemClick={(rel) => navigate(`/${currentRegion}/food/view?id=${rel.id}`)}
+          onItemClick={(rel) => navigate(`/${currentRegion}/play/view?id=${rel.id}`)}
           nameKey="name"
         />
 
         {/* 하단 버튼 */}
         <div className="flex items-center gap-3 mb-6">
           <button
-            onClick={() => navigate(`/${currentRegion}/food/list`)}
+            onClick={() => navigate(`/${currentRegion}/play/list`)}
             className="flex-1 py-3 border border-[#E8956D] bg-[#E8956D] rounded-xl text-sm text-white font-medium hover:bg-[#f07e48] transition"
           >
             ← 목록으로
