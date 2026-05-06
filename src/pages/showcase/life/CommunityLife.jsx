@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import { getAllLifePosts } from "./communityLifeData";
 import CommunityLifeCard from "@components/modules/community/life/CommunityLifeCard";
+
 
 const CommunityLife = () => {
   const navigate = useNavigate();
@@ -10,6 +11,10 @@ const CommunityLife = () => {
   const [keyword, setKeyword] = useState("");
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   //  좋아요 상태 관리 (핵심 추가)
   // { postId: true/false }
