@@ -48,7 +48,7 @@ const SearchPage = () => {
     : DUMMY_RESULTS.filter(item => item.category === activeTab);
 
   return (
-    <div className="min-h-screen bg-white pb-20 font-paperlogy">
+    <div className="min-h-screen bg-[#f8f6f0] pb-20 font-paperlogy">
       <div className="max-w-[1200px] mx-auto px-5 pt-12 md:pt-16">
         
         {/* 1. 타이틀 영역 */}
