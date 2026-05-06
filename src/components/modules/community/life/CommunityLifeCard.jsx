@@ -1,5 +1,4 @@
 import React from "react";
-import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
 
 /*
   사용법 예시
@@ -22,6 +21,15 @@ import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
     />
   );
 */
+
+const THEME_COLOR = [
+  "bg-emerald-100 text-emerald-700",
+  "bg-sky-100 text-sky-700",
+  "bg-violet-100 text-violet-700",
+  "bg-orange-100 text-orange-700",
+  "bg-pink-100 text-pink-700",
+  "bg-amber-100 text-amber-700",
+];
 
 const CommunityLifeCard = ({
   post,
@@ -73,29 +81,21 @@ const CommunityLifeCard = ({
               {post.description}
             </p>
 
-            {/* 코스 */}
-            <div className="flex items-center gap-2 flex-wrap overflow-hidden max-h-[26px]">
-              {(post.course || []).slice(0, 4).map((c, i) => (
-                <React.Fragment key={c.order || i}>
-                  <div className="flex items-center gap-1">
-                    <span
-                      className={`fs-down-1 px-2 py-0.5 rounded-full font-medium ${
-                        TYPE_COLOR[c.type]
-                      }`}
->
-                      {TYPE_LABEL[c.type]}
-                    </span>
-                    <span className="fs-down-1 text-gray-600 font-medium">
-                      {c.name}
-                    </span>
-                  </div>
-
-                  {i < Math.min((post.course || []).length, 4) - 1 && (
-                    <span className="text-gray-300 fs-down-1">→</span>
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
+            {/* 테마 뱃지 */}
+            {(post.themes || []).length > 0 && (
+              <div className="flex items-center gap-1.5 flex-wrap overflow-hidden max-h-[26px]">
+                {(post.themes || []).map((theme, i) => (
+                  <span
+                    key={i}
+                    className={`px-2.5 py-0.5 rounded-full fs-down-1 font-semibold ${
+                      THEME_COLOR[i % THEME_COLOR.length]
+                    }`}
+                  >
+                    {theme}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* 작성자 + 통계 */}
