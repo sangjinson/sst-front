@@ -79,7 +79,7 @@ const Notice = () => {
                     } fs-up-2 whitespace-nowrap`}
                   >
                     <span className="shrink-0">❓</span>
-                    <span className="truncate">자주 하는 질문</span>
+                    <span className="truncate">자주하는 질문</span>
                   </Link>
                 </li>
               </ul>
