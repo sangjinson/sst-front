@@ -1,5 +1,4 @@
 import React from "react";
-import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
 
 /*
   사용법 예시
@@ -22,6 +21,15 @@ import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
     />
   );
 */
+
+const THEME_COLOR = [
+  "bg-emerald-100 text-emerald-700",
+  "bg-sky-100 text-sky-700",
+  "bg-violet-100 text-violet-700",
+  "bg-orange-100 text-orange-700",
+  "bg-pink-100 text-pink-700",
+  "bg-amber-100 text-amber-700",
+];
 
 const CommunityLifeCard = ({
   post,
@@ -57,45 +65,37 @@ const CommunityLifeCard = ({
           <div className="overflow-hidden">
             {/* 지역 + 날짜 */}
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-1 bg-[#f0fdf9] text-[#0F9B73] text-xs font-semibold rounded-full">
+              <span className="px-2.5 py-1 bg-[#f0fdf9] text-[#0F9B73] fs-down-1 font-semibold rounded-full">
                 📍 {post.region}
               </span>
-              <span className="text-xs text-gray-400">{post.regDt}</span>
+              <span className="fs-down-1 text-gray-400">{post.regDt}</span>
             </div>
 
             {/* 제목 */}
-            <h3 className="text-lg font-extrabold text-gray-900 mb-2 line-clamp-1 hover:text-[#0F9B73] transition">
+            <h3 className="fs-down-3 font-extrabold text-gray-900 mb-2 line-clamp-1 hover:text-[#0F9B73] transition">
               {post.title}
             </h3>
 
             {/* 설명 */}
-            <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-3">
+            <p className="fs-down-1 text-gray-500 leading-relaxed line-clamp-2 mb-3">
               {post.description}
             </p>
 
-            {/* 코스 */}
-            <div className="flex items-center gap-2 flex-wrap overflow-hidden max-h-[26px]">
-              {(post.course || []).slice(0, 4).map((c, i) => (
-                <React.Fragment key={c.order || i}>
-                  <div className="flex items-center gap-1">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        TYPE_COLOR[c.type]
-                      }`}
-                    >
-                      {TYPE_LABEL[c.type]}
-                    </span>
-                    <span className="text-xs text-gray-600 font-medium">
-                      {c.name}
-                    </span>
-                  </div>
-
-                  {i < Math.min((post.course || []).length, 4) - 1 && (
-                    <span className="text-gray-300 text-xs">→</span>
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
+            {/* 테마 뱃지 */}
+            {(post.themes || []).length > 0 && (
+              <div className="flex items-center gap-1.5 flex-wrap overflow-hidden max-h-[26px]">
+                {(post.themes || []).map((theme, i) => (
+                  <span
+                    key={i}
+                    className={`px-2.5 py-0.5 rounded-full fs-down-1 font-semibold ${
+                      THEME_COLOR[i % THEME_COLOR.length]
+                    }`}
+                  >
+                    {theme}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* 작성자 + 통계 */}
@@ -105,13 +105,13 @@ const CommunityLifeCard = ({
               <div className="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-sm">
                 😊
               </div>
-              <span className="text-sm font-semibold text-[#E8956D]">
+              <span className="fs-down-1 font-semibold text-[#E8956D]">
                 {post.author}
               </span>
             </div>
 
             {/* 조회수 + 댓글 + 좋아요 */}
-            <div className="flex items-center gap-4 text-xs text-gray-400">
+            <div className="flex items-center gap-4 fs-down-1 text-gray-400">
               <span>👁 {post.viewCnt}</span>
               <span>💬 {post.commentCnt}</span>
 
@@ -125,7 +125,7 @@ const CommunityLifeCard = ({
                   // 부모 컴포넌트에서 받은 좋아요 토글 함수 실행
                   onToggleLike?.(post.id);
                 }}
-                className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold transition-all active:scale-95 ${
+                className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 fs-down-1 font-bold transition-all active:scale-95 ${
                   liked
                     ? "bg-blue-50 text-blue-500"
                     : "bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500"
