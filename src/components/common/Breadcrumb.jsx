@@ -1,6 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
+import IconSVG from "@components/Icon/IconSVG";
+
+
 
 /*
 // 사용법
@@ -16,35 +19,35 @@ import { Link } from "react-router-dom";
 */
 // 🚀 className을 props로 추가로 받습니다 (기본값은 빈 문자열)
 const Breadcrumb = ({ paths, className = '' }) => {
-  const navigate = useNavigate();
-
   return (
-    /* 🚀 고정되어 있던 mb-[50px]를 지우고, 밖에서 받아온 className을 합쳐줍니다! */
-    <div className="w-full flex justify-center md:justify-end">
-      <p className={`fs-up-2 text-gray-400 flex flex-wrap items-center gap-1.5 ${className}`}>
+    /* w-full과 flex-end를 유지하여 오른쪽 상단 배치를 살리되, daisyUI의 breadcrumbs 스타일을 입힙니다. */
+    <div className={`text-sm breadcrumbs w-full flex justify-center md:justify-start ${className}`}>
+      <ul>
         {paths.map((path, index) => {
           const isLast = index === paths.length - 1;
 
           return (
-            <React.Fragment key={index}>
-              {path.to && !isLast ? (
-                <Link
-                  to={path.to}
-                  className="cursor-pointer hover:text-[#0F9B73] transition-colors"
-                >
-                  {path.label}
-                </Link>
-              ) : (
-                <span className="text-gray-900 font-bold cursor-default">
+            <li key={index} className="flex items-center fs-up-2">
+              {isLast ? (
+                <span className="text-gray-900 font-bold tracking-tight">
                   {path.label}
                 </span>
+              ) : (
+                <Link
+                  to={path.to}
+                  className="text-gray-500 hover:text-[#0F9B73] transition-all duration-200 ease-in-out"
+                >
+                  {index === 0 ? (
+                    <IconSVG name="home" size={20} />
+                  ) : (
+                    path.label
+                  )}
+                </Link>
               )}
-
-              {!isLast && <span>{' > '}</span>}
-            </React.Fragment>
+            </li>
           );
         })}
-      </p>
+      </ul>
     </div>
   );
 };
