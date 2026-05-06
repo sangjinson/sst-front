@@ -104,7 +104,6 @@ const MainPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setIsLoading(true);
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 500);
@@ -166,7 +165,7 @@ const MainPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#f8f6f0]">
 
       <HeroBanner
         bgImage={currentBannerImage}
