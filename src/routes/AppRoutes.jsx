@@ -45,16 +45,16 @@ import LifeList from '@pages/admin/LifeList';
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* 🚀 공개된 페이지 영역에 OAuth 콜백 주소 추가 */}
+      {/* 공개된 페이지 영역에 OAuth 콜백 주소 추가 */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/login/signup" element={<SignupPage />} />
       
-      {/* 🚀 백엔드가 돌려보내 줄 주소와 정확히 일치시켜야 해! */}
+      {/* 백엔드가 돌려보내 줄 주소와 정확히 일치시켜야 해! */}
       <Route path="/oauth/redirect" element={<OAuthRedirectHandler />} />
 
-      {/* 🚀 2. 비로그인 사용자도 "조회"는 가능한 페이지 영역 (UserLayout 적용) */}
+      {/* 2. 비로그인 사용자도 "조회"는 가능한 페이지 영역 (UserLayout 적용) */}
       <Route element={<UserLayout />}>
         <Route path="/search/:keyword" element={<SearchPage />} />
 
@@ -84,7 +84,7 @@ const AppRoutes = () => {
           {/* 마이페이지 */}
           <Route path="/user/mypage" element={<MyPage />} />
 
-          {/* 🚀 커뮤니티 - 핫플레이스 / 일상 글쓰기 (작성은 무조건 보호됨) */}
+          {/* 커뮤니티 - 핫플레이스 / 일상 글쓰기 (작성은 무조건 보호됨) */}
           <Route path="/showcase/hotplace/write" element={<CommunityHotplaceWrite />} />
           <Route path="/showcase/hotplace/write/:id" element={<CommunityHotplaceWrite />} />
           <Route path="/showcase/life/write" element={<CommunityLifeWrite />} />
@@ -96,7 +96,7 @@ const AppRoutes = () => {
           </Route>
           </Route>
 
-      {/* 🚀 4. 관리자 전용 권한 (ROLE_ 접두사 확인 주의!) */}
+      {/* 4. 관리자 전용 권한 (ROLE_ 접두사 확인 주의!) */}
       <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
