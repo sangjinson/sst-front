@@ -24,6 +24,7 @@ const IconSVG = ({
   const key = name?.toLowerCase().trim();
   const icon = iconsList[key];
 
+
   if (!icon) {
     console.warn(`Icon "${name}" not found`);
     return null;

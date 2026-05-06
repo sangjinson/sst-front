@@ -14,7 +14,7 @@ const LandingPage = () => {
   const [activeTab, setActiveTab] = useState('남부');
   const [searchKeyword, setSearchKeyword] = useState('');
 
-  // 🚀 핵심 수정: 무조건 false가 아니라, localStorage에 'true'라고 적혀있는지 확인해서 초기값 설정
+  // 핵심 수정: 무조건 false가 아니라, localStorage에 'true'라고 적혀있는지 확인해서 초기값 설정
   const [isLogin, setIsLogin] = useState(() => localStorage.getItem('isLogin') === 'true');
 
   const citiesSouth = ['수원시', '성남시', '용인시', '안양시', '안산시', '과천시', '광명시', '광주시', '군포시', '부천시', '시흥시', '안성시', '오산시', '의왕시', '이천시', '평택시', '하남시', '화성시', '여주시', '양평군'];

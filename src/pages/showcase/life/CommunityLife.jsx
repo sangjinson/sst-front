@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import { getAllLifePosts } from "./communityLifeData";
-import CommunityLifeCard from "@components/modules/community/CommunityLifeCard";
+import CommunityLifeCard from "@components/modules/community/life/CommunityLifeCard";
 
 const CommunityLife = () => {
   const navigate = useNavigate();
@@ -11,11 +11,11 @@ const CommunityLife = () => {
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
 
-  // ✅ 좋아요 상태 관리 (핵심 추가)
+  //  좋아요 상태 관리 (핵심 추가)
   // { postId: true/false }
   const [likedPosts, setLikedPosts] = useState({});
 
-  // ✅ 좋아요 토글 함수 (핵심 추가)
+  //  좋아요 토글 함수 (핵심 추가)
   const toggleLike = (postId) => {
     setLikedPosts((prev) => ({
       ...prev,
@@ -75,7 +75,7 @@ const CommunityLife = () => {
   }, [posts, keyword, searchType, sortType]);
 
   return (
-    <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
       <Breadcrumb
         paths={[
           { label: "홈", to: "/" },
@@ -177,16 +177,16 @@ const CommunityLife = () => {
 
       {/* 게시글 목록 */}
       {filteredPosts.length > 0 ? (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-8">
           {filteredPosts.map((post) => (
             <CommunityLifeCard
               key={post.id}
               post={post}
 
-              // ✅ 좋아요 상태 전달
+              //  좋아요 상태 전달
               liked={!!likedPosts[post.id]}
 
-              // ✅ 좋아요 클릭 이벤트 전달
+              //  좋아요 클릭 이벤트 전달
               onToggleLike={toggleLike}
 
               // 카드 클릭
