@@ -164,7 +164,7 @@ const Header = () => {
               </Link>
               <button className='btn btn-darkgray' onClick={logout}>로그아웃</button>              
             </div>
-          ) : ( <Link to="/login" class="btn btn-green px-5">로그인</Link> )}
+          ) : ( <Link to="/login" className="btn btn-green px-5">로그인</Link> )}
           
           <button
             className="block md:hidden w-9 h-9 flex items-center justify-center fs-up-3 text-gray-800 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition"

@@ -22,8 +22,6 @@ const List = () => {
   
   // region을 한글 지역명으로 변환 (예: 'suwon' -> '수원')
   const regionKor = toKorRegion(region || '수원');
-  // '시', '군' 접미사 제거하여 지역명만 추출
-  const regionName = regionKor.replace(/[시군]$/, '');
 
   // 선택된 카테고리 상태 (기본값: '전체')
   const [selectedCategory, setSelectedCategory] = useState('전체');
@@ -35,26 +33,18 @@ const List = () => {
   // 필터링 및 정렬된 데이터 계산 (useMemo로 최적화)
   const filtered = useMemo(() => {
     // 해당 지역의 볼거리 데이터 가져오기
-    const data = getSeeDataByRegion(regionName).map((item) => ({
-      ...item,
-      title : item.title,
-      category: item.tag,           // 태그를 카테고리로 매핑
-      description: item.desc,       // 설명 매핑
-      address: item.location,       // 위치 정보를 주소로 매핑
-      reviewCount: item.likes ?? 0, // 좋아요 수를 리뷰수로 매핑 (기본값: 0)
-      rating: item.rating ?? 0,     // 평점 매핑 (기본값: 0)
-    }));
+    const data = getSeeDataByRegion(regionKor);
 
     let result = [...data];
 
     // '전체'가 아닌 경우 카테고리 필터링 적용
     if (selectedCategory !== '전체') {
-      result = result.filter((item) => item.tag === selectedCategory);
+      result = result.filter((item) => item.category === selectedCategory);
     }
 
     // 정렬 옵션에 따라 데이터 정렬
     return sortData(result, sortOption);
-  }, [regionName, selectedCategory, sortOption]);
+  }, [regionKor, selectedCategory, sortOption]);
 
   // 전체 페이지 수 계산
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -99,7 +89,7 @@ const List = () => {
                 item={{
                   ...item,
                   // 카테고리 인덱스 계산 (전체 제외)
-                  categoryIndex: CATEGORIES.filter((c) => c !== '전체').indexOf(item.tag),
+                  categoryIndex: CATEGORIES.filter((c) => c !== '전체').indexOf(item.category),
                 }}
                 onClick={() => goToDetail(item.id)}
                 renderHeart={() => (
