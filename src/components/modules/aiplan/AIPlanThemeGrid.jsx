@@ -30,7 +30,7 @@ const AIPlanThemeGrid = ({ selectedThemes = [], onToggle }) => {
         )}
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         {THEME_OPTIONS.map(theme => (
           <button
             key={theme.value}
