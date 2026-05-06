@@ -178,8 +178,11 @@ const Header = () => {
         <div className="flex items-center gap-4 md:gap-5 mb-2">
           <button
             onClick={toggleSearch}
-            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors cursor-pointer bg-transparent border-none"
+            className={`inline-flex items-center justify-center bg-transparent px-2.5 text-[24px] border-none cursor-pointer transition-transform duration-200 ${
+              isSearchOpen ? 'scale-110' : 'hover:scale-110'
+            }`}
             aria-label="검색"
+            aria-pressed={isSearchOpen}
           >
             <Search className="w-8 h-8 text-gray-600" />
           </button>
