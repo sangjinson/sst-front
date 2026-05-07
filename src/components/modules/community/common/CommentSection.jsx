@@ -106,8 +106,9 @@ const CommentSection = ({
       <div className="mb-16 space-y-4">
         {comments.map((comment) => {
           const isOwnComment = comment.user === currentUser || comment.user === "나";
+          const isOwnPost = postAuthor === currentUser;
           const canEdit = isOwnComment;
-          const canDelete = isOwnComment || postAuthor === currentUser;
+          const canDelete = isOwnComment || isOwnPost;
           const canReport = !isOwnComment;
 
           return (
