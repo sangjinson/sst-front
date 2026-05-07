@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getAllPosts } from "./communityHotplaceData"; // ✅ 변경
+import { getAllPosts } from "./communityHotplaceData";
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    window.scrollTo(0, 0); // ✅ 페이지 진입 시 맨 위로 이동
+    window.scrollTo(0, 0); // 페이지 진입 시 맨 위로 이동
   }, []);
 
   // 사용자가 좋아요를 눌렀는지 저장하는 상태
@@ -16,7 +16,7 @@ const CommunityHotplace = () => {
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
 
-  // ✅ 더미 + 유저 게시글 합쳐서 사용
+  // 더미 + 유저 게시글 합쳐서 사용
   const posts = getAllPosts();
 
   const filteredPosts = useMemo(() => {
@@ -95,8 +95,7 @@ const CommunityHotplace = () => {
               <Link
                 to="/showcase/life"
                 className="group mb-1 inline-flex h-8 items-center gap-1.5 rounded-full text-gray-400 transition-all duration-200 hover:text-[#0F9B73]"
-                aria-label="인생거리로 전환"
-              >
+                aria-label="인생거리로 전환">
                 <span className="inline-flex h-8 w-8 items-center justify-center">
                   <svg
                     viewBox="0 0 24 24"
@@ -105,8 +104,7 @@ const CommunityHotplace = () => {
                     stroke="currentColor"
                     strokeWidth="2.2"
                     strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                    strokeLinejoin="round">
                     <path d="M5 12h14" />
                     <path d="M13 6l6 6-6 6" />
                   </svg>

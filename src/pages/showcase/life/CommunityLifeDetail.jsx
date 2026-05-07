@@ -13,6 +13,9 @@ import LifePostHeader from "@components/modules/community/life/LifePostHeader";
 import { openReportModal } from "@components/modules/community/common/reportModal";
 import IconSVG from "@components/Icon/IconSVG";
 
+// 공통 이미지 슬라이더 컴포넌트 import
+import ImageSlider from "@components/modules/community/common/ImageSlider";
+
 const CommunityLifeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,7 +32,7 @@ const CommunityLifeDetail = () => {
     window.scrollTo({ top: 0 });
   }, []);
 
-  // ✅ 게시글 찾기
+  // 게시글 찾기
   const posts = getAllLifePosts ? getAllLifePosts() : [];
   const post = posts.find((p) => p.id === Number(id));
 
@@ -41,7 +44,7 @@ const CommunityLifeDetail = () => {
     );
   }
 
-  // ✅ 데이터 안전 처리
+  // 데이터 안전 처리
   const thumbnail = post.thumbnail || post.img;
   const region = post.region || post.place || "장소 정보 없음";
   const courseList = post.course || [];
@@ -53,6 +56,14 @@ const CommunityLifeDetail = () => {
   };
 
   // ✅ 내 일정으로 가져오기
+  // 기존 이미지/내용은 변경하지 않음
+  // 기존 대표 이미지(thumbnail) + 코스 이미지(course.image)를 슬라이더에 보여줌
+  // 중복 이미지는 제거
+  const slideImages = Array.from(
+    new Set([thumbnail, ...courseList.map((c) => c.image).filter(Boolean)])
+  );
+
+  // 내 일정으로 가져오기
   const handleImportSchedule = () => {
     if (!isLogin) {
       navigate("/login");
@@ -105,7 +116,7 @@ const CommunityLifeDetail = () => {
     });
   };
 
-  // ✅ 이 코스로 일정 만들기
+  // 이 코스로 일정 만들기
   const handleMakePlan = () => {
     const scheduleItems = courseList.map((c, i) => ({
       id: `life-${post.id}-${c.order || i + 1}`,
@@ -131,8 +142,7 @@ const CommunityLifeDetail = () => {
     });
   };
 
-
-  // ✅ 댓글 등록
+  // 댓글 등록
   const handleCommentSubmit = () => {
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
@@ -151,13 +161,13 @@ const CommunityLifeDetail = () => {
     setNewComment("");
   };
 
-  // ✅ 댓글 수정 시작
+  // 댓글 수정 시작
   const startEditing = (commentId, text) => {
     setEditingId(commentId);
     setEditText(text);
   };
 
-  // ✅ 댓글 수정 저장
+  // 댓글 수정 저장
   const handleSaveEdit = (commentId) => {
     if (!editText.trim()) {
       alert("수정할 내용을 입력해주세요.");
@@ -173,7 +183,7 @@ const CommunityLifeDetail = () => {
     setEditText("");
   };
 
-  // ✅ 댓글 삭제
+  // 댓글 삭제
   const handleDeleteComment = (commentId) => {
     if (window.confirm("댓글을 삭제하시겠습니까?")) {
       setComments(comments.filter((c) => c.id !== commentId));
@@ -213,8 +223,6 @@ const CommunityLifeDetail = () => {
         </button>
       </section>
 
-      
-
       {/* 메인 */}
       <section className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
         {/* 왼쪽 본문 */}
@@ -231,6 +239,12 @@ const CommunityLifeDetail = () => {
               {region}
             </span>
           </div>
+          {/* 기존 대표 이미지 위치에 ImageSlider 컴포넌트만 적용 */}
+          <ImageSlider
+            images={slideImages}
+            alt={post.title}
+            height="h-[400px]"
+          />
 
           {/* 제목 + 메타 */}
           <LifePostHeader
@@ -252,13 +266,13 @@ const CommunityLifeDetail = () => {
 
           {/* 여행 코스 */}
           <LifeCourseView
-          courseList={courseList}
-          region={region}
-          thumbnail={thumbnail}
-          navigate={navigate}
-          handleImportSchedule={handleImportSchedule}
-          handleMakePlan={handleMakePlan}
-        />
+            courseList={courseList}
+            region={region}
+            thumbnail={thumbnail}
+            navigate={navigate}
+            handleImportSchedule={handleImportSchedule}
+            handleMakePlan={handleMakePlan}
+          />
         </div>
 
         {/* 오른쪽 사이드 정보 */}

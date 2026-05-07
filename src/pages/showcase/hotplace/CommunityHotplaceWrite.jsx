@@ -129,8 +129,7 @@ const CommunityHotplaceWrite = () => {
       descriptionText={isEditMode ? "작성한 경기도 여행 순간을 수정해보세요." : "나만의 경기도 여행 순간을 기록해 보세요."}
       onSubmit={handleSubmit}
       onCancel={() => navigate(-1)}
-      submitText={isEditMode ? "수정하기" : "등록하기"}
-    >
+      submitText={isEditMode ? "수정하기" : "등록하기"}>
       {/* 지역 및 장소 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <RegionSelect

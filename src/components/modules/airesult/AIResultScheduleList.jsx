@@ -1,6 +1,8 @@
 import React from 'react';
 import AIResultScheduleItem from './AIResultScheduleItem';
 
+
+// 좌측 일정 목록 + 일차탭
 const AIResultScheduleList = ({
   schedule,
   activeDay,

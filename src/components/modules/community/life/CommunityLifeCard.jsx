@@ -120,8 +120,7 @@ const CommunityLifeCard = ({
                     key={i}
                     className={`px-2.5 py-0.5 rounded-full fs-down-1 font-semibold ${
                       THEME_COLOR[i % THEME_COLOR.length]
-                    }`}
-                  >
+                    }`}>
                     {theme}
                   </span>
                 ))}
@@ -152,6 +151,24 @@ const CommunityLifeCard = ({
               <CommentIcon />
               {post.commentCnt}
             </span>
+              {/* 좋아요 버튼 */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  // 좋아요 버튼 클릭 시 article의 onClick이 같이 실행되는 것을 방지
+                  e.stopPropagation();
+
+                  // 부모 컴포넌트에서 받은 좋아요 토글 함수 실행
+                  onToggleLike?.(post.id);
+                }}
+                className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 fs-down-1 font-bold transition-all active:scale-95 ${
+                  liked
+                    ? "bg-blue-50 text-blue-500"
+                    : "bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500"
+                }`}>
+                👍 {likeCount}
+              </button>
+            </div>
           </div>
 
           {/* 조회 */}

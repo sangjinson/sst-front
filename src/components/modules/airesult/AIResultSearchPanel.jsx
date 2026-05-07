@@ -1,6 +1,8 @@
 import React from 'react';
 import { SEARCH_CATEGORIES } from './aiResultUtils';
 
+
+// 장소 검색 패널
 const AIResultSearchPanel = ({
   searchKeyword,
   searchCategory,
