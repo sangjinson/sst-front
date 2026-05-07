@@ -62,6 +62,22 @@ const DeleteIcon = () => (
   </svg>
 );
 
+const normalizeName = (name) => String(name || "").trim();
+
+const getDisplayName = (item) => {
+  if (typeof item === "string") return normalizeName(item) || "익명";
+  return normalizeName(item?.user || item?.nickname || item?.name || item?.author || item?.writer) || "익명";
+};
+
+const getCommentText = (comment, authorName = "") => {
+  const rawText = String(comment?.text || comment?.content || comment?.comment || "").trim();
+  const author = normalizeName(authorName);
+
+  if (!author || !rawText.startsWith(author)) return rawText;
+
+  return rawText.slice(author.length).replace(/^\s*[:：-]?\s*/, "").trim();
+};
+
 const CommentSection = ({
   comments,
   newComment,
@@ -105,8 +121,10 @@ const CommentSection = ({
 
       <div className="mb-16 space-y-4">
         {comments.map((comment) => {
-          const isOwnComment = comment.user === currentUser || comment.user === "나";
-          const isOwnPost = postAuthor === currentUser;
+          const commentAuthor = getDisplayName(comment);
+          const postOwner = getDisplayName(postAuthor);
+          const isOwnComment = normalizeName(commentAuthor) === normalizeName(currentUser) || normalizeName(commentAuthor) === "나";
+          const isOwnPost = normalizeName(postOwner) === normalizeName(currentUser);
           const canEdit = isOwnComment;
           const canDelete = isOwnComment || isOwnPost;
           const canReport = !isOwnComment;
@@ -138,7 +156,7 @@ const CommentSection = ({
                 canReport && (
                   <button
                     type="button"
-                    onClick={() => openReportModal("comment")}
+                    onClick={() => openReportModal?.("comment")}
                     className="absolute right-5 top-5 inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-orange-50 hover:text-orange-500 active:scale-95 md:right-6 md:top-6"
                     aria-label="댓글 신고"
                   >
@@ -154,7 +172,7 @@ const CommentSection = ({
                   </div>
 
                   <div>
-                    <p className="font-bold text-gray-900">{comment.user}</p>
+                    <p className="text-base font-bold text-gray-900">{commentAuthor}</p>
                     <p className="fs-down-1 text-gray-400">{comment.date}</p>
                   </div>
                 </div>
@@ -169,7 +187,7 @@ const CommentSection = ({
                 />
               ) : (
                 <p className="whitespace-pre-wrap fs-down-1 leading-7 text-gray-700">
-                  {comment.text}
+                  {getCommentText(comment, commentAuthor)}
                 </p>
               )}
 
@@ -178,7 +196,7 @@ const CommentSection = ({
                   {canEdit && (
                     <button
                       type="button"
-                      onClick={() => startEditing(comment.id, comment.text)}
+                      onClick={() => startEditing(comment.id, getCommentText(comment, commentAuthor))}
                       className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 active:scale-95"
                       aria-label="댓글 수정"
                     >

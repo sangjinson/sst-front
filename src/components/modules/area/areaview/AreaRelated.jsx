@@ -1,4 +1,5 @@
 import React from 'react';
+import { getBadgeColor } from '@components/modules/area/arealist/areaListUtils';
 
 /**
  * AreaRelated - 뷰 페이지 공통 연관 추천 섹션
@@ -45,6 +46,7 @@ const AreaRelated = ({
   items = [],
   onItemClick,
   nameKey = 'name',
+  categories = [],
 }) => {
   if (items.length === 0) return null;
 
@@ -54,26 +56,36 @@ const AreaRelated = ({
       <hr className="w-full border-b border-t-0 border-gray-200 mt-3 mb-5 order-2 md:order-4" />
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        {items.map((rel) => (
-          <div
+        {items.map((rel) => {
+          const category = rel.category || rel.tag;
+          const badgeColor = getBadgeColor(categories, category);
+
+          return (
+            <div
             key={rel.id}
             onClick={() => onItemClick?.(rel)}
             className="cursor-pointer group"
           >
-            <div className="aspect-[7/3] md:aspect-[7/5] rounded-xl overflow-hidden mb-2">
+            <div className="relative aspect-[7/3] md:aspect-[7/5] rounded-xl overflow-hidden">
               <img
                 src={rel.image}
                 alt={rel[nameKey] || rel.name || rel.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3">
+                {category && (
+                  <span className={`mb-1 inline-block rounded-full px-3 py-1 fs-up-1 font-semibold ${badgeColor}`}>
+                    {category}
+                  </span>
+                )}
+                <p className="fs-up-4 font-bold text-white truncate drop-shadow-[0_1px_4px_rgba(0,0,0,0.75)]">
+                  {rel[nameKey] || rel.name || rel.title}
+                </p>
+              </div>
             </div>
-            <p className="fs-up-2 font-semibold text-gray-800 truncate group-hover:text-[#0F9B73] transition-colors">
-              {rel[nameKey] || rel.name || rel.title}
-            </p>
-
-            <p className="fs-up-2 text-gray-400">{rel.category || rel.tag}</p>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
