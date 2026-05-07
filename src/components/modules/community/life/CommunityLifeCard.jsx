@@ -1,4 +1,5 @@
 import React from "react";
+import IconSVG from "@components/Icon/IconSVG";
 
 /*
   사용법 예시
@@ -31,6 +32,26 @@ const THEME_COLOR = [
   "bg-amber-100 text-amber-700",
 ];
 
+const EyeIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const CommentIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5 translate-y-[1px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+  </svg>
+);
+
+const LikeIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M7 11v10H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h3z" />
+    <path d="M7 11l4.4-7.1A2 2 0 0 1 15 5v4h4a2 2 0 0 1 2 2.3l-1.2 8A2 2 0 0 1 17.8 21H7V11z" />
+  </svg>
+);
+
 const CommunityLifeCard = ({
   post,
   onClick,
@@ -52,23 +73,33 @@ const CommunityLifeCard = ({
     >
       <div className="flex h-full">
         {/* 썸네일 */}
-        <div className="w-[280px] h-full shrink-0 overflow-hidden">
+        <div className="relative w-[280px] h-full shrink-0 overflow-hidden">
           <img
             src={post.thumbnail}
             alt={post.title}
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 fs-down-1 font-semibold text-gray-900 shadow-sm">
+            <IconSVG name="location" size={15} className="shrink-0 fill-none stroke-gray-900" strokeWidth={2} />
+            {post.region}
+          </span>
         </div>
 
         {/* 내용 */}
-        <div className="flex-1 h-full p-5 md:p-6 flex flex-col justify-between overflow-hidden">
-          <div className="overflow-hidden">
-            {/* 지역 + 날짜 */}
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-1 bg-[#f0fdf9] text-[#0F9B73] fs-down-1 font-semibold rounded-full">
-                📍 {post.region}
+        <div className="relative flex-1 h-full p-5 pb-16 md:p-6 md:pb-16 flex flex-col overflow-hidden">
+          <span className="absolute right-5 top-5 fs-down-1 text-gray-400 md:right-6 md:top-6">
+            {post.regDt}
+          </span>
+
+          <div className="overflow-hidden pr-28">
+            {/* 작성자 */}
+            <div className="mb-2 flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-sm">
+                😊
+              </div>
+              <span className="fs-down-1 font-semibold text-[#E8956D]">
+                {post.author}
               </span>
-              <span className="fs-down-1 text-gray-400">{post.regDt}</span>
             </div>
 
             {/* 제목 */}
@@ -97,23 +128,29 @@ const CommunityLifeCard = ({
             )}
           </div>
 
-          {/* 작성자 + 통계 */}
-          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-            {/* 작성자 */}
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-sm">
-                😊
-              </div>
-              <span className="fs-down-1 font-semibold text-[#E8956D]">
-                {post.author}
-              </span>
-            </div>
+          {/* 좋아요 / 댓글 */}
+          <div className="absolute bottom-5 left-5 flex items-center gap-4 fs-down-1 font-bold text-gray-900 md:left-6">
+            <button
+              type="button"
+              onClick={(e) => {
+                // 좋아요 버튼 클릭 시 article의 onClick이 같이 실행되는 것을 방지
+                e.stopPropagation();
 
-            {/* 조회수 + 댓글 + 좋아요 */}
-            <div className="flex items-center gap-4 fs-down-1 text-gray-400">
-              <span>👁 {post.viewCnt}</span>
-              <span>💬 {post.commentCnt}</span>
+                // 부모 컴포넌트에서 받은 좋아요 토글 함수 실행
+                onToggleLike?.(post.id);
+              }}
+              className={`inline-flex min-w-[58px] cursor-pointer items-center gap-1.5 transition-colors active:scale-95 ${
+                liked ? "text-blue-500" : "hover:text-blue-500"
+              }`}
+            >
+              <LikeIcon />
+              {likeCount}
+            </button>
 
+            <span className="inline-flex items-center gap-1.5">
+              <CommentIcon />
+              {post.commentCnt}
+            </span>
               {/* 좋아요 버튼 */}
               <button
                 type="button"
@@ -133,8 +170,15 @@ const CommunityLifeCard = ({
               </button>
             </div>
           </div>
-        </div>
-      </div>
+
+          {/* 조회 */}
+          <div className="absolute bottom-5 right-5 flex items-center fs-down-1 text-gray-400 md:right-6">
+            <span className="inline-flex items-center gap-1.5">
+              <EyeIcon />
+              {post.viewCnt}
+            </span>
+          </div>
+        </div>      </div>
     </article>
   );
 };
