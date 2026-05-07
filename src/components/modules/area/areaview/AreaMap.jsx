@@ -41,9 +41,6 @@ const AreaMap = ({ lat, lng, address }) => {
           src={`https://maps.google.com/maps?q=${query}&z=15&output=embed`}
         />
       </div>
-      {address && (
-        <p className="text-xs text-gray-400 mt-2">📍 {address}</p>
-      )}
     </div>
   );
 };
