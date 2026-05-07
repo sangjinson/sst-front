@@ -19,7 +19,8 @@ const MySchedule = () => {
   
   return (
     <div className="p-4 md:p-7">
-      <h2 className="text-lg md:text-xl font-bold mb-5 text-gray-900">내 일정 관리</h2>
+      <h3 className="fs-up-3 font-bold text-gray-700 mb-4">내 일정 관리</h3>
+      <hr className="w-full border-b border-t-0 border-gray-200 mt-2 mb-7 order-2 md:order-4" />
       <div className="overflow-x-auto">
         <table className="w-full min-w-[400px] border-collapse">
           <thead>
