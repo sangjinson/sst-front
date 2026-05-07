@@ -79,19 +79,6 @@ const AIPlanPage = () => {
     });
   };
 
-  const handleSkip = () => {
-    navigate('/plan/result', {
-      state: {
-        region: selectedRegion,
-        period: selectedPeriod,
-        themes: [],
-        companion: selectedCompanion,
-        startDate,
-        endDate,
-      }
-    });
-  };
-
   const isNextDisabled =
     (step === 0 && !selectedRegion) ||
     (step === 1 && (!selectedPeriod || !startDate));
@@ -163,10 +150,6 @@ const AIPlanPage = () => {
 
           {step === 2 ? (
             <div className="flex gap-3">
-              <button onClick={handleSkip}
-                className="px-5 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition">
-                건너뛰기
-              </button>
               <button onClick={handleSubmit}
                 disabled={!selectedRegion || selectedThemes.length === 0}
                 className="px-6 py-2.5 bg-[#0F9B73] text-white rounded-xl text-sm font-semibold hover:bg-[#0d8a66] disabled:opacity-50 transition">

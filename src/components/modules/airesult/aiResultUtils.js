@@ -2,6 +2,9 @@ import { getFoodDataByRegion } from '@pages/area/food/foodData';
 import { getSeeDataByRegion } from '@pages/area/see/seeData';
 import { getSleepDataByRegion } from '@pages/area/sleep/sleepDummyData';
 
+
+// 유틸 함수 모음
+
 // ────────────────────────────────────────────
 // 카테고리 타입 한글/색상
 // ────────────────────────────────────────────

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 
+
+// 공유 버튼
 /**
  * AIResultShareButton - 공유 버튼 + 드롭다운
  *
