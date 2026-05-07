@@ -1,6 +1,6 @@
 
 /*
- * 핫플거리 상세 페이지에서 해시태그, 조회수, 댓글 수, 찜 수를 보여주는 컴포넌트입니다.
+ * 핫플거리 상세 페이지에서 해시태그, 좋아요 수, 댓글 수, 조회수를 보여주는 컴포넌트입니다.
 
  * 사용 예시:
 
@@ -48,16 +48,16 @@ const HotplaceStats = ({
 
         <div className="grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 text-center">
           <div className="rounded-2xl bg-gray-50 px-3 py-4">
-            <p className="fs-down-1 text-gray-400">조회</p>
-            <strong className="mt-1 block text-lg text-gray-900">{viewCount}</strong>
+            <p className="fs-down-1 text-gray-400">좋아요</p>
+            <strong className="mt-1 block text-lg text-gray-900">{wishCount}</strong>
           </div>
           <div className="rounded-2xl bg-gray-50 px-3 py-4">
             <p className="fs-down-1 text-gray-400">댓글</p>
             <strong className="mt-1 block text-lg text-gray-900">{comments.length}</strong>
           </div>
           <div className="rounded-2xl bg-gray-50 px-3 py-4">
-            <p className="fs-down-1 text-gray-400">좋아요</p>
-            <strong className="mt-1 block text-lg text-gray-900">{wishCount}</strong>
+            <p className="fs-down-1 text-gray-400">조회</p>
+            <strong className="mt-1 block text-lg text-gray-900">{viewCount}</strong>
           </div>
         </div>
 

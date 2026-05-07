@@ -48,7 +48,9 @@ const AreaDetailHero = ({
   const navigate = useNavigate();
 
   return (
-    <div className="relative rounded-2xl overflow-hidden mb-6 h-64 md:h-96">
+    <div className="relative rounded-lg overflow-hidden mb-6 
+                aspect-[3/4] md:aspect-[16/4] 
+                w-full h-auto">
       <img
         src={image}
         alt={name}
@@ -57,10 +59,12 @@ const AreaDetailHero = ({
 
       {/* 이름 오버레이 */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-5">
-        <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-2 ${badgeColor}`}>
+        <span className={`inline-block px-4 py-1 rounded-full fs-up-2 font-semibold mb-1 ${badgeColor}`}>
           {category}
         </span>
-        <h1 className="text-2xl md:text-3xl font-bold text-white">{name}</h1>
+        <h1 className="fs-up-7 font-bold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+          {name}
+        </h1>
       </div>
 
       {/* 공유 & 찜 버튼 */}
@@ -72,9 +76,9 @@ const AreaDetailHero = ({
       {/* 뒤로가기 버튼 */}
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-4 left-4 bg-white/80 backdrop-blur-sm text-gray-700 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-white transition"
+        className="absolute top-4 left-4 flex items-center gap-2 bg-white/90 backdrop-blur-md text-gray-800 px-5 py-2 rounded-xl fs-up-2 font-semibold shadow-lg shadow-black/5 border border-white/20 hover:bg-white hover:shadow-xl transition-all duration-200"
       >
-        ← 목록으로
+        <span className="mb-0.5">←</span> 목록으로
       </button>
     </div>
   );

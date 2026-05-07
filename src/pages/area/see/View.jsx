@@ -12,6 +12,8 @@ import {
   AreaReview,
 } from '@components/modules/area/areaview';
 
+import IconSVG from "@components/Icon/IconSVG";
+
 // 카테고리 목록 (List.jsx와 동일)
 const CATEGORIES = ['전체', '박물관', '도서관', '지역명소', '공원'];
 
@@ -89,10 +91,12 @@ const View = () => {
       {/* 정보 섹션 (주소, 이용시간, 전화번호, 이용요금, 해시태그) */}
       <AreaInfoSection
         infoItems={[
-          { icon: '📍', label: '주소', value: item.address },
-          { icon: '🕐', label: '이용시간', value: item.hours },
-          { icon: '📞', label: '전화번호', value: item.phone },
-          { icon: '💰', label: '이용요금', value: item.price, highlight: true },
+          { icon: <IconSVG name="location" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address },
+          { icon: <IconSVG name="time" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '이용시간', value: item.hours },
+          { icon: <IconSVG name="phone" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2} />, label: '전화번호', value: item.phone },
+          { icon: <IconSVG name="circleprice" size={18} className=" shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '이용요금', value: item.price, highlight: true },
+
+          
         ]}
         tags={item.tags}
         tagLabel="해시태그"
@@ -116,26 +120,26 @@ const View = () => {
         items={relatedItems}
         onItemClick={(rel) => navigate(`/${region}/see/view?id=${rel.id}`)}
         nameKey="name"
+        categories={CATEGORIES}
       />
 
       {/* 하단 액션 버튼 영역 (목록으로, 맨 위로) */}
-      <div className="flex items-center gap-3 mb-6">
-        {/* 목록으로 이동 버튼 */}
+      <div className="flex items-center justify-between gap-3 mb-6">
+        {/* 목록으로 이동 버튼: 이제 왼쪽 끝에 붙습니다 */}
         <button
           onClick={() => navigate(`/${region}/see/list`)}
-          className="flex-1 py-3 border border-gray-300 bg-[#E8956D] rounded-xl text-sm text-white font-medium hover:bg-[#f07e48] transition"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-white/90 backdrop-blur-md text-gray-800 rounded-xl fs-up-2 font-semibold shadow-lg shadow-black/5 border border-white/20 hover:bg-white hover:shadow-xl transition-all duration-200"
         >
-          ← 목록으로
+          <span className="mb-0.5 text-lg">←</span> 목록으로
         </button>
 
-        {/* 맨 위로 스크롤 이동 버튼 */}
+        {/* 맨 위로 스크롤 이동 버튼: 이제 오른쪽 끝에 붙습니다 */}
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="w-12 h-12 flex items-center justify-center border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition"
+          className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md border border-white/20 rounded-xl text-gray-800 shadow-lg shadow-black/5 hover:bg-white hover:shadow-xl transition-all duration-200"
           title="맨 위로"
         >
-          {/* 화살표 아이콘 (SVG) */}
-          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current" strokeWidth="2">
+          <svg viewBox="0 0 24 24" className="w-6 h-6 fill-none stroke-current" strokeWidth="2.5">
             <path d="M18 15l-6-6-6 6" />
           </svg>
         </button>
