@@ -32,6 +32,51 @@
  *   openReportModal={openReportModal} // 신고 버튼 클릭 시 실행되는 함수 ("comment" 타입 전달)
 */
 
+const ReportIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4 19h16" />
+    <path d="M6 19v-5a6 6 0 0 1 12 0v5" />
+    <path d="M5 21h14" />
+    <path d="M12 2v2" />
+    <path d="M4.9 4.9 6.3 6.3" />
+    <path d="M19.1 4.9 17.7 6.3" />
+    <path d="M2 12h2" />
+    <path d="M20 12h2" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+  </svg>
+);
+
+const DeleteIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M3 6h18" />
+    <path d="M8 6V4h8v2" />
+    <path d="M19 6l-1 15H6L5 6" />
+    <path d="M10 11v6" />
+    <path d="M14 11v6" />
+  </svg>
+);
+
+const normalizeName = (name) => String(name || "").trim();
+
+const getDisplayName = (item) => {
+  if (typeof item === "string") return normalizeName(item) || "익명";
+  return normalizeName(item?.user || item?.nickname || item?.name || item?.author || item?.writer) || "익명";
+};
+
+const getCommentText = (comment, authorName = "") => {
+  const rawText = String(comment?.text || comment?.content || comment?.comment || "").trim();
+  const author = normalizeName(authorName);
+
+  if (!author || !rawText.startsWith(author)) return rawText;
+
+  return rawText.slice(author.length).replace(/^\s*[:：-]?\s*/, "").trim();
+};
 
 const CommentSection = ({
   comments,
@@ -46,6 +91,8 @@ const CommentSection = ({
   handleSaveEdit,
   handleDeleteComment,
   openReportModal,
+  currentUser = "경기도민",
+  postAuthor,
 }) => {
   return (
     <section className="mt-12 border-t border-gray-100 pt-10">
@@ -73,83 +120,105 @@ const CommentSection = ({
       </div>
 
       <div className="mb-16 space-y-4">
-        {comments.map((comment) => (
-          <div
-            key={comment.id}
-            className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm transition hover:shadow-md md:p-6">
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 text-sm">
-                  👤
-                </div>
+        {comments.map((comment) => {
+          const commentAuthor = getDisplayName(comment);
+          const postOwner = getDisplayName(postAuthor);
+          const isOwnComment = normalizeName(commentAuthor) === normalizeName(currentUser) || normalizeName(commentAuthor) === "나";
+          const isOwnPost = normalizeName(postOwner) === normalizeName(currentUser);
+          const canEdit = isOwnComment;
+          const canDelete = isOwnComment || isOwnPost;
+          const canReport = !isOwnComment;
 
-                <div>
-                  <p className="font-bold text-gray-900">{comment.user}</p>
-                  <p className="fs-down-1 text-gray-400">{comment.date}</p>
+          return (
+            <div
+              key={comment.id}
+              className="relative rounded-3xl border border-gray-100 bg-white p-5 pb-14 shadow-sm transition hover:shadow-md md:p-6 md:pb-14">
+              {editingId === comment.id ? (
+                <div className="absolute right-5 top-5 flex shrink-0 items-center gap-3 fs-down-1 font-semibold md:right-6 md:top-6">
+                  <button
+                    type="button"
+                    onClick={() => handleSaveEdit(comment.id)}
+                    className="cursor-pointer text-blue-500 hover:text-blue-700">
+                    저장
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingId(null);
+                      setEditText("");
+                    }}
+                    className="cursor-pointer text-gray-400 hover:text-gray-600">
+                    취소
+                  </button>
+                </div>
+              ) : (
+                canReport && (
+                  <button
+                    type="button"
+                    onClick={() => openReportModal?.("comment")}
+                    className="absolute right-5 top-5 inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-orange-50 hover:text-orange-500 active:scale-95 md:right-6 md:top-6"
+                    aria-label="댓글 신고"
+                  >
+                    <ReportIcon />
+                  </button>
+                )
+              )}
+
+              <div className="mb-4 flex items-start gap-4 pr-12">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 text-sm">
+                    👤
+                  </div>
+
+                  <div>
+                    <p className="text-base font-bold text-gray-900">{commentAuthor}</p>
+                    <p className="fs-down-1 text-gray-400">{comment.date}</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex shrink-0 items-center gap-3 fs-down-1 font-semibold">
-                {editingId === comment.id ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => handleSaveEdit(comment.id)}
-                      className="text-blue-500 hover:text-blue-700">
-                      저장
-                    </button>
+              {editingId === comment.id ? (
+                <textarea
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  rows="3"
+                  className="w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 p-4 text-base text-gray-700 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                />
+              ) : (
+                <p className="whitespace-pre-wrap fs-down-1 leading-7 text-gray-700">
+                  {getCommentText(comment, commentAuthor)}
+                </p>
+              )}
 
+              {editingId !== comment.id && (canEdit || canDelete) && (
+                <div className="absolute bottom-5 right-5 flex items-center gap-2 md:right-6">
+                  {canEdit && (
                     <button
                       type="button"
-                      onClick={() => {
-                        setEditingId(null);
-                        setEditText("");
-                      }}
-                      className="text-gray-400 hover:text-gray-600">
-                      취소
+                      onClick={() => startEditing(comment.id, getCommentText(comment, commentAuthor))}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 active:scale-95"
+                      aria-label="댓글 수정"
+                    >
+                      <EditIcon />
                     </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => startEditing(comment.id, comment.text)}
-                      className="text-gray-400 hover:text-blue-500">
-                      수정
-                    </button>
+                  )}
 
+                  {canDelete && (
                     <button
                       type="button"
                       onClick={() => handleDeleteComment(comment.id)}
-                      className="text-gray-400 hover:text-red-500">
-                      삭제
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 active:scale-95"
+                      aria-label="댓글 삭제"
+                    >
+                      <DeleteIcon />
                     </button>
-
-                    <button
-                      type="button"
-                      onClick={() => openReportModal("comment")}
-                      className="text-gray-400 hover:text-orange-500">
-                      신고
-                    </button>
-                  </>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
-
-            {editingId === comment.id ? (
-              <textarea
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-                rows="3"
-                className="w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 p-4 text-base text-gray-700 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
-              />
-            ) : (
-              <p className="whitespace-pre-wrap fs-down-1 leading-7 text-gray-700">
-                {comment.text}
-              </p>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

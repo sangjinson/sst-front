@@ -136,7 +136,7 @@ const SearchPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             
             {/* 뽐낼거리 게시판 */}
-            <div className="border border-gray-800 rounded-xl p-5 md:p-6 bg-white">
+            <div className="rounded-xl p-5 md:p-6 bg-white">
               {/* 🚀 카드 내부 제목 영역: flex justify-between으로 더보기 배치 */}
               <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
                 <h3 className="text-[17px] font-bold text-gray-900">뽐낼거리 게시판</h3>
@@ -159,7 +159,7 @@ const SearchPage = () => {
             </div>
 
             {/* 공지사항 */}
-            <div className="border border-gray-800 rounded-xl p-5 md:p-6 bg-white">
+            <div className="rounded-xl p-5 md:p-6 bg-white">
               {/* 🚀 카드 내부 제목 영역: flex justify-between으로 더보기 배치 */}
               <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
                 <h3 className="text-[17px] font-bold text-gray-900">공지사항</h3>
@@ -182,7 +182,7 @@ const SearchPage = () => {
             </div>
 
             {/* 자주 하는 질문 */}
-            <div className="border border-gray-800 rounded-xl p-5 md:p-6 bg-white">
+            <div className="rounded-xl p-5 md:p-6 bg-white">
               {/* 🚀 카드 내부 제목 영역: flex justify-between으로 더보기 배치 */}
               <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
                 <h3 className="text-[17px] font-bold text-gray-900">자주 하는 질문</h3>

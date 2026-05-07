@@ -5,6 +5,36 @@ import Swal from 'sweetalert2';
 
 const REVIEWS_PER_PAGE = 3;
 
+const ReportIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4 19h16" />
+    <path d="M6 19v-5a6 6 0 0 1 12 0v5" />
+    <path d="M5 21h14" />
+    <path d="M12 2v2" />
+    <path d="M4.9 4.9 6.3 6.3" />
+    <path d="M19.1 4.9 17.7 6.3" />
+    <path d="M2 12h2" />
+    <path d="M20 12h2" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+  </svg>
+);
+
+const DeleteIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M3 6h18" />
+    <path d="M8 6V4h8v2" />
+    <path d="M19 6l-1 15H6L5 6" />
+    <path d="M10 11v6" />
+    <path d="M14 11v6" />
+  </svg>
+);
+
 const StarSelector = ({ value, onChange }) => (
   <div className="flex items-center gap-1">
     {[1, 2, 3, 4, 5].map((star) => (
@@ -174,36 +204,54 @@ const AreaReview = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+    <div className="bg-white rounded-lg p-5 mb-4 shadow-sm">
 
       {/* ✅ 헤더 - 평균 평점 숫자 */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-gray-900">평점 & 리뷰</h2>
-        <div className="flex items-center gap-2">
-          <StarRating rating={Number(avgRating)} theme={{ size: 'text-xl', fillColor: 'text-[#E8956D]' }} />
-          <span className="text-base font-bold text-[#E8956D]">{avgRating}</span>
-          <span className="text-sm text-gray-400">({reviewCount}개)</span>
+      <div className="flex items-end justify-between mb-3">
+        <h2 className="fs-up-3 font-bold text-gray-900">평점 & 리뷰</h2>
+        
+        <div className="flex items-end gap-2 fs-5">
+          <StarRating rating={Number(avgRating)} theme={{ size: 'fs-5', fillColor: 'text-[#E8956D]' }} />
+          <span className="font-bold text-[#E8956D]">{avgRating}</span>
+          <span className="text-gray-400">({reviewCount}개)</span>
         </div>
       </div>
+      <hr className="w-full border-b border-t-0 border-gray-200 mt-3 mb-5 order-2 md:order-4" />
 
       {/* 리뷰 등록 폼 */}
       {isLoggedIn ? (
-        <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
-          <p className="text-sm font-semibold text-gray-700 mb-3">리뷰 작성</p>
-          <div className="mb-3">
-            <p className="text-xs text-gray-400 mb-1">별점 선택</p>
-            <StarSelector value={reviewRating} onChange={setReviewRating} />
+        <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100 flex flex-col">
+          {/* 헤더 영역: 타이틀과 버튼을 포함 */}
+          <div className="flex items-end justify-between mb-3 md:mb-4">
+            <p className="fs-5 font-semibold text-gray-700 order-1">리뷰 작성</p>
+            
+            {/* 버튼: PC에서는 타이틀 옆(order-2), 모바일에서는 맨 아래로(md:order-2 지정 및 아래 flex-col 영향) */}
+            <button
+              onClick={handleReviewSubmit}
+              className="hidden md:block md:order-2 px-6 py-2 bg-[#E8956D] text-white rounded-lg fs-up-1 font-medium hover:bg-[#f07e48] transition-colors"
+            >
+              리뷰 등록
+            </button>
           </div>
-          <textarea
-            value={reviewComment}
-            onChange={(e) => setReviewComment(e.target.value)}
-            placeholder={placeholder}
-            rows={3}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none resize-none focus:border-[#E8956D] transition-colors"
-          />
+
+          {/* 입력 영역: 모바일/PC 모두 중간 위치 */}
+          <div className="mb-3 order-2">
+            <div className="mb-2">
+              <StarSelector value={reviewRating} onChange={setReviewRating} />
+            </div>
+            <textarea
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder={placeholder}
+              rows={3}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 fs-4 text-gray-700 outline-none resize-none focus:border-[#E8956D] transition-colors"
+            />
+          </div>
+
+          {/* 모바일용 버튼: 모바일에서만 보이고 맨 아래 배치 (order-3) */}
           <button
             onClick={handleReviewSubmit}
-            className="mt-2 w-full py-2.5 bg-[#E8956D] text-white rounded-xl text-sm font-medium hover:bg-[#f07e48] transition-colors"
+            className="md:hidden order-3 w-full py-2.5 bg-[#E8956D] text-white rounded-xl fs-up-3 font-medium hover:bg-[#f07e48] transition-colors"
           >
             리뷰 등록
           </button>
@@ -221,15 +269,32 @@ const AreaReview = ({
       )}
 
       {/* 리뷰 목록 */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 fs-4">
         {(showAllReviews ? reviews : reviews.slice(0, REVIEWS_PER_PAGE)).map((review) => (
-          <div key={review.id} className="border border-gray-100 rounded-xl p-4">
+          <div key={review.id} className="relative border border-gray-100 rounded-xl p-4 pb-14">
 
             {/* 수정 모드 */}
             {editingId === review.id ? (
               <div>
-                <div className="mb-2">
-                  <p className="text-xs text-gray-400 mb-1">별점 수정</p>
+                <div className="absolute right-4 top-4 flex items-center gap-3 text-sm font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => handleEditSave(review.id)}
+                    className="cursor-pointer text-[#E8956D] hover:text-[#f07e48]"
+                  >
+                    저장
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingId(null)}
+                    className="cursor-pointer text-gray-400 hover:text-gray-600"
+                  >
+                    취소
+                  </button>
+                </div>
+
+                <div className="mb-2 pr-20">
+                  <p className="mb-1 text-sm font-medium text-gray-500">별점 수정</p>
                   <StarSelector value={editRating} onChange={setEditRating} />
                 </div>
                 <textarea
@@ -238,77 +303,55 @@ const AreaReview = ({
                   rows={3}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none resize-none focus:border-[#E8956D] transition-colors mb-2"
                 />
-                <div className="flex gap-2">
-                  <button onClick={() => handleEditSave(review.id)}
-                    className="flex-1 py-2 bg-[#E8956D] text-white rounded-lg text-xs font-medium hover:bg-[#f07e48] transition">
-                    저장
-                  </button>
-                  <button onClick={() => setEditingId(null)}
-                    className="flex-1 py-2 border border-gray-300 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-50 transition">
-                    취소
-                  </button>
-                </div>
               </div>
             ) : (
               <>
-                {/* ✅ 1줄: 작성자 + 날짜 */}
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-semibold text-gray-800">{review.user}</p>
-                  <p className="text-xs text-gray-400">{review.date}</p>
-                </div>
+                {!review.isMine && (
+                  <button
+                    type="button"
+                    onClick={handleReport}
+                    className="absolute right-4 top-4 inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-orange-50 hover:text-orange-500 active:scale-95"
+                    aria-label="리뷰 신고"
+                    title="신고하기"
+                  >
+                    <ReportIcon />
+                  </button>
+                )}
 
-                {/* ✅ 2줄: 별점 + 수정/삭제/신고 */}
-                <div className="flex items-center justify-between mb-2">
-                  <StarRating rating={review.rating} />
-                  <div className="flex items-center gap-1">
-                    {review.isMine ? (
-                      <>
-                        <button
-                          onClick={() => handleEditStart(review)}
-                          className="p-1.5 rounded-md text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition"
-                          title="수정하기"
-                        >
-                          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M12 20h9" />
-                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => handleDelete(review.id)}
-                          className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
-                          title="삭제하기"
-                        >
-                          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6l-1 14H6L5 6" />
-                            <path d="M10 11v6M14 11v6" />
-                            <path d="M9 6V4h6v2" />
-                          </svg>
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={handleReport}
-                        className="p-1.5 rounded-md text-orange-400 hover:text-orange-600 hover:bg-orange-50 transition"
-                        title="신고하기"
-                      >
-                        <svg viewBox="0 0 64 64" className="w-4 h-4">
-                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor"/>
-                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(45 32 32)"/>
-                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(90 32 32)"/>
-                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(135 32 32)"/>
-                          <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(-45 32 32)"/>
-                          <path d="M12 34 A20 20 0 0 1 52 34 Z" fill="currentColor"/>
-                          <rect x="10" y="34" width="44" height="11" rx="5" fill="currentColor"/>
-                          <rect x="8" y="45" width="48" height="10" rx="5" fill="#2d2d4e"/>
-                        </svg>
-                      </button>
-                    )}
+                {/* 작성자 + 별점 + 날짜 */}
+                <div className="mb-3 pr-12">
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg font-bold text-gray-900">{review.user}</p>
+                    <StarRating rating={review.rating} theme={{ size: 'text-xl' }} />
                   </div>
+                  <p className="mt-1 text-sm font-medium text-gray-400">{review.date}</p>
                 </div>
 
                 {/* 리뷰 내용 */}
-                <p className="text-sm text-gray-500">{review.comment}</p>
+                <p className="text-gray-500">{review.comment}</p>
+
+                {review.isMine && (
+                  <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleEditStart(review)}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 active:scale-95"
+                      aria-label="리뷰 수정"
+                      title="수정하기"
+                    >
+                      <EditIcon />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(review.id)}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 active:scale-95"
+                      aria-label="리뷰 삭제"
+                      title="삭제하기"
+                    >
+                      <DeleteIcon />
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -318,7 +361,7 @@ const AreaReview = ({
       {/* 더보기 / 접기 */}
       <button
         onClick={() => setShowAllReviews((prev) => !prev)}
-        className="w-full mt-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition"
+        className="mt-4 w-full rounded-xl border border-gray-200 bg-white py-3 fs-up-2 font-semibold text-gray-600 transition-all duration-200 hover:border-[#E8956D]/40 hover:bg-[#E8956D]/10 hover:text-[#E8956D] active:scale-[0.99]"
       >
         {showAllReviews ? '접기 ▲' : '리뷰 더보기 ▼'}
       </button>

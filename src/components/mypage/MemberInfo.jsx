@@ -162,7 +162,8 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
 
   return (
     <div className="p-4 md:p-7 relative">
-      <h2 className="text-lg md:text-xl font-bold mb-5 text-gray-900">회원 정보 수정</h2>
+      <h3 className="fs-up-3 font-bold text-gray-700 mb-4">회원 정보 수정</h3>
+      <hr className="w-full border-b border-t-0 border-gray-200 mt-2 mb-7 order-2 md:order-4" />
 
       <div className="flex flex-col items-center mb-6">
         <div className="relative w-24 h-24">

@@ -1,6 +1,37 @@
 import React from "react";
 import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
 
+const DownloadIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 3v12" />
+    <path d="m7 10 5 5 5-5" />
+    <path d="M5 21h14" />
+  </svg>
+);
+
+const MapIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0 text-[#0F9B73]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M9 18 3 21V6l6-3 6 3 6-3v15l-6 3-6-3Z" />
+    <path d="M9 3v15" />
+    <path d="M15 6v15" />
+  </svg>
+);
+
+const CalendarPlanIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="4" y="5" width="16" height="16" rx="4" />
+    <path d="M8 3v4" />
+    <path d="M16 3v4" />
+    <path d="M4 10h16" />
+    <path d="M8.5 14h.01" />
+    <path d="M12 14h.01" />
+    <path d="M15.5 14h.01" />
+    <path d="M8.5 17.5h.01" />
+    <path d="M12 17.5h.01" />
+    <path d="M15.5 17.5h.01" />
+  </svg>
+);
+
 /**
  * LifeCourseView
  *
@@ -32,7 +63,8 @@ const LifeCourseView = ({
   return (
     <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
       <h3 className="fs-down-2 font-extrabold text-gray-900 mb-5 flex items-center gap-2">
-        🗺 여행 코스
+        <MapIcon />
+        여행 코스
         <span className="fs-down-1 font-normal text-gray-400">
           {courseList.length}개 장소
         </span>
@@ -111,17 +143,19 @@ const LifeCourseView = ({
         <button
           type="button"
           onClick={handleImportSchedule}
-          className="flex-1 py-3 bg-[#0F9B73] text-white fs-down-1font-bold rounded-xl hover:bg-[#0d8a66] transition flex items-center justify-center gap-2"
+          className="flex-1 py-3 bg-[#0F9B73] text-white fs-down-1 font-bold rounded-xl hover:bg-[#0d8a66] transition inline-flex items-center justify-center gap-2 leading-none"
         >
-          📅 내 일정으로 가져오기
+          <DownloadIcon />
+          <span className="leading-none">내 일정으로 가져오기</span>
         </button>
 
         <button
           type="button"
           onClick={handleMakePlan}
-          className="flex-1 py-3 border border-[#0F9B73] text-[#0F9B73] fs-down-1 font-bold rounded-xl hover:bg-green-50 transition flex items-center justify-center gap-2"
+          className="flex-1 py-3 border border-[#0F9B73] text-[#0F9B73] fs-down-1 font-bold rounded-xl hover:bg-green-50 transition inline-flex items-center justify-center gap-2 leading-none"
         >
-          🗺 이 코스로 일정 만들기
+          <CalendarPlanIcon />
+          <span className="leading-none">이 코스로 일정 만들기</span>
         </button>
       </div>
     </div>
