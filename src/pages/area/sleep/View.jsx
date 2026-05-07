@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
+import { getSleepDataByRegion } from './sleepDummyData';
+import { toKorRegion } from '@utils/regionMap';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import {
   AreaDetailHero,
@@ -26,23 +27,26 @@ const View = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
+  const regionKor = toKorRegion(region);
 
   const isLoggedIn = true; // ※ 실제 AuthContext로 교체 필요
 
-  const [item, setItem]                = useState(null);
-  const [relatedItems, setRelatedItems] = useState([]);
+  const allItems = useMemo(
+    () => getSleepDataByRegion(regionKor),
+    [regionKor]
+  );
 
+  const item = useMemo(() => {
+    if (!id) return null;
+    return allItems.find((sleepItem) => String(sleepItem.id) === String(id)) || null;
+  }, [allItems, id]);
 
-  useEffect(() => {
-    if (!id) return;
-    const data = getSleepDataById(id);
-    setItem(data);
-    if (data) {
-      const all = getSleepDataByRegion(data.region);
-      const related = all.filter((d) => d.id !== data.id).slice(0, 4);
-      setRelatedItems(related);
-    }
-  }, [id]);
+  const relatedItems = useMemo(() => {
+    if (!item) return [];
+    return allItems
+      .filter((sleepItem) => sleepItem.id !== item.id)
+      .slice(0, 4);
+  }, [allItems, item]);
 
   // 데이터 없을 때
   if (!item) {

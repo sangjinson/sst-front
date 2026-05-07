@@ -89,8 +89,7 @@ const CommunityLifeCard = ({
                     key={i}
                     className={`px-2.5 py-0.5 rounded-full fs-down-1 font-semibold ${
                       THEME_COLOR[i % THEME_COLOR.length]
-                    }`}
-                  >
+                    }`}>
                     {theme}
                   </span>
                 ))}
@@ -129,8 +128,7 @@ const CommunityLifeCard = ({
                   liked
                     ? "bg-blue-50 text-blue-500"
                     : "bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500"
-                }`}
-              >
+                }`}>
                 👍 {likeCount}
               </button>
             </div>

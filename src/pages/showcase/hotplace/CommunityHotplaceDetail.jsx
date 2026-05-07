@@ -5,16 +5,12 @@ import { getAllPosts, hotplaceComments } from "./communityHotplaceData";
 
 // 신고 모달
 import { openReportModal } from "@components/modules/community/common/reportModal";
-
 // 이미지 슬라이더
 import HotplaceImageSlider from "@components/modules/community/hotplace/HotplaceImageSlider";
-
 // Stats 컴포넌트
 import HotplaceStats from "@components/modules/community/hotplace/HotplaceStats";
-
 // 오른쪽 Aside 컴포넌트
 import HotplaceAside from "@components/modules/community/hotplace/HotplaceAside";
-
 // 댓글 컴포넌트
 import CommentSection from "@components/modules/community/common/CommentSection";
 

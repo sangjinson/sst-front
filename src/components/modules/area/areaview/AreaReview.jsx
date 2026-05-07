@@ -99,24 +99,43 @@ const AreaReview = ({
     const result = await Swal.fire({
       title: '신고 사유를 선택해주세요',
       html: `
+        <style>
+          .report-radio {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #E8956D;
+            border-radius: 9999px;
+            background: #fff;
+            cursor: pointer;
+            flex: 0 0 auto;
+          }
+          .report-radio:checked {
+            border-color: #E8956D;
+            background: radial-gradient(circle, #E8956D 0 42%, #fff 46%);
+          }
+          .report-radio:focus {
+            outline: 2px solid rgba(232, 149, 109, 0.35);
+            outline-offset: 2px;
+          }
+        </style>
         <div style="display:flex; flex-direction:column; gap:10px; text-align:left; margin-top:8px;">
           <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827;"
             onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
             onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'">
-            <input type="radio" name="report" value="부적절한 댓글로 인한 신고" style="accent-color:#f97316; width:16px; height:16px;" />
+            <input class="report-radio" type="radio" name="report" value="부적절한 댓글로 인한 신고" />
             부적절한 댓글로 인한 신고
           </label>
           <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827;"
             onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
             onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'">
-            <input type="radio" name="report" value="불법 광고 및 홍보 인한 신고" style="accent-color:#f97316; width:16px; height:16px;" />
+            <input class="report-radio" type="radio" name="report" value="불법 광고 및 홍보 인한 신고" />
             불법 광고 및 홍보 인한 신고
           </label>
           <label style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; color:#111827;"
             onmouseover="this.style.borderColor='#f97316'; this.style.background='#fff7ed'"
             onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'">
-            <input type="radio" name="report" value="기타" id="report-etc"
-              style="accent-color:#f97316; width:16px; height:16px;"
+            <input class="report-radio" type="radio" name="report" value="기타" id="report-etc"
               onclick="document.getElementById('etc-input-wrap').style.display='block'" />
             기타
           </label>
@@ -161,8 +180,8 @@ const AreaReview = ({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-900">평점 & 리뷰</h2>
         <div className="flex items-center gap-2">
-          <StarRating rating={rating} theme={{ size: 'text-xl' }} />
-          <span className="text-base font-bold text-yellow-500">{avgRating}</span>
+          <StarRating rating={Number(avgRating)} theme={{ size: 'text-xl', fillColor: 'text-[#E8956D]' }} />
+          <span className="text-base font-bold text-[#E8956D]">{avgRating}</span>
           <span className="text-sm text-gray-400">({reviewCount}개)</span>
         </div>
       </div>

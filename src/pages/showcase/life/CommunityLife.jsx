@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import { getAllLifePosts } from "./communityLifeData";
 import CommunityLifeCard from "@components/modules/community/life/CommunityLifeCard";
+
 
 const CommunityLife = () => {
   const navigate = useNavigate();
@@ -10,6 +11,10 @@ const CommunityLife = () => {
   const [keyword, setKeyword] = useState("");
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   //  좋아요 상태 관리 (핵심 추가)
   // { postId: true/false }
@@ -89,18 +94,32 @@ const CommunityLife = () => {
         <div>
           <p className="text-sm font-bold text-[#0F9B73]">Life Course</p>
 
-          <div className="mt-1 flex items-end gap-3">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              인생거리
-            </h2>
-
-            <Link
-              to="/showcase/hotplace"
-              className="mb-1 fs-down-1 md:text-lg font-bold text-gray-400 transition-all hover:text-emerald-600 hover:scale-110"
-            >
-              / 핫플거리
-            </Link>
-          </div>
+          <div className="mt-1 flex items-center gap-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                인생거리
+              </h2>
+              <Link
+                to="/showcase/hotplace"
+                className="group mb-1 inline-flex h-8 items-center gap-1.5 rounded-full text-gray-400 transition-all duration-200 hover:text-[#0F9B73]"
+                aria-label="핫플거리로 전환">
+                <span className="inline-flex h-8 w-8 items-center justify-center">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <path d="M5 12h14" />
+                    <path d="M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+                <span className="fs-down-1 md:text-lg font-bold">
+                  핫플거리
+                </span>
+              </Link>
+            </div>
 
           <p className="mt-2 text-sm md:text-base text-gray-500">
             여행자들이 직접 만든 인생 여행 코스를 공유해요.
@@ -120,8 +139,7 @@ const CommunityLife = () => {
           <select
             value={searchType}
             onChange={(e) => setSearchType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500"
-          >
+            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
             <option value="all">전체 검색</option>
             <option value="title">제목 검색</option>
             <option value="content">내용 검색</option>
@@ -141,8 +159,7 @@ const CommunityLife = () => {
           <select
             value={sortType}
             onChange={(e) => setSortType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500"
-          >
+            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
             <option value="latest">최신순</option>
             <option value="popular">인기순</option>
             <option value="view">조회수순</option>

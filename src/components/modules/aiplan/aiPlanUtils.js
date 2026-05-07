@@ -31,12 +31,10 @@ export const PERIOD_OPTIONS = [
 // ────────────────────────────────────────────
 export const THEME_OPTIONS = [
   { value: '테마파크', label: '테마파크', emoji: '🎡' },
-  { value: '실내여행', label: '실내여행', emoji: '🏛' },
   { value: '문화·역사', label: '문화·역사', emoji: '🏯' },
-  { value: '카페',     label: '카페',     emoji: '☕' },
-  { value: '해수',     label: '해수',     emoji: '🌊' },
-  { value: '캠핑',     label: '캠핑',     emoji: '⛺' },
-  { value: '축제',     label: '축제',     emoji: '🎉' },
+  { value: '레저',     label: '레저',     emoji: '🌊' },
+  { value: '체험',     label: '체험',     emoji: '⛺' },
+  { value: '축제/행사',     label: '축제/행사',     emoji: '🎉' },
   { value: '식도락',   label: '식도락',   emoji: '🍽' },
 ];
 

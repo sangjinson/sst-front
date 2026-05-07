@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getAllPosts } from "./communityHotplaceData"; // ✅ 변경
+import { getAllPosts } from "./communityHotplaceData";
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    window.scrollTo(0, 0); // ✅ 페이지 진입 시 맨 위로 이동
+    window.scrollTo(0, 0); // 페이지 진입 시 맨 위로 이동
   }, []);
 
   // 사용자가 좋아요를 눌렀는지 저장하는 상태
@@ -16,7 +16,7 @@ const CommunityHotplace = () => {
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
 
-  // ✅ 더미 + 유저 게시글 합쳐서 사용
+  // 더미 + 유저 게시글 합쳐서 사용
   const posts = getAllPosts();
 
   const filteredPosts = useMemo(() => {
@@ -68,17 +68,30 @@ const CommunityHotplace = () => {
       <section className="mt-8 mb-8 flex flex-col gap-6 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-bold text-emerald-600">Hotplace</p>
-            {/* 제목 + 이동 탭 */}
-            <div className="mt-1 flex items-end gap-3">
-              {/* 현재 페이지 */}
+            <div className="mt-1 flex items-center gap-2">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
                 핫플거리
               </h2>
-              {/* 이동 (인생거리) */}
               <Link
                 to="/showcase/life"
-                className="mb-1 fs-down-1 md:text-lg font-bold text-gray-400 transition-all hover:text-[#0F9B73] hover:scale-110">
-                / 인생거리
+                className="group mb-1 inline-flex h-8 items-center gap-1.5 rounded-full text-gray-400 transition-all duration-200 hover:text-[#0F9B73]"
+                aria-label="인생거리로 전환">
+                <span className="inline-flex h-8 w-8 items-center justify-center">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <path d="M5 12h14" />
+                    <path d="M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+                <span className="fs-down-1 md:text-lg font-bold">
+                  인생거리
+                </span>
               </Link>
             </div>
             <p className="mt-2 text-sm md:text-base text-gray-500">
