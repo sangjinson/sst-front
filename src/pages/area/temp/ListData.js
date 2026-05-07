@@ -1,4 +1,5 @@
 
+/* 임시데이터 */
 const TEMP_API_LIST_DATA = {
     see: {
         "성남시" : {
