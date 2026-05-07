@@ -26,7 +26,7 @@ export const getAllLifePosts = () => {
 export const lifePostsDummy = [
   {
     id: 1,
-    title: '수원 당일치기 완벽 코스 🏯',
+    title: '수원 당일치기 완벽 코스',
     author: '경기도민',
     region: '수원시',
     regDt: '2026-04-28',
@@ -83,7 +83,7 @@ export const lifePostsDummy = [
   },
   {
     id: 2,
-    title: '가평 1박2일 힐링 여행 🌿',
+    title: '가평 1박2일 힐링 여행',
     author: '힐링러버',
     region: '가평군',
     regDt: '2026-04-25',
@@ -140,7 +140,7 @@ export const lifePostsDummy = [
   },
   {
     id: 3,
-    title: '파주 예술 기행 🎨',
+    title: '파주 예술 기행',
     author: '예술여행자',
     region: '파주시',
     regDt: '2026-04-20',

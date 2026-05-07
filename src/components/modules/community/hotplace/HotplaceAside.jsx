@@ -24,6 +24,14 @@
 
 import { ClipButton } from "@components/modules/ActionButtons";
 
+// 라이프 뷰페이지와 통일한 좋아요 아이콘
+const LikeIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M7 11v10H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h3z" />
+    <path d="M7 11l4.4-7.1A2 2 0 0 1 15 5v4h4a2 2 0 0 1 2 2.3l-1.2 8A2 2 0 0 1 17.8 21H7V11z" />
+  </svg>
+);
+
 const HotplaceAside = ({
   currentPost,
   isLiked,
@@ -79,13 +87,10 @@ const HotplaceAside = ({
         <button
           type="button"
           onClick={() => setIsLiked(!isLiked)}
-          className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold transition-all active:scale-95 ${
-            isLiked
-              ? "bg-blue-50 text-blue-500"
-              : "bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500"
-          }`}
+          className={`shrink-0 inline-flex min-w-[58px] cursor-pointer items-center gap-1.5 text-sm font-bold transition-colors active:scale-95 ${isLiked ? "text-blue-500" : "text-gray-900 hover:text-blue-500"}`}
         >
-          👍 {wishCount}
+          <LikeIcon />
+          {wishCount}
         </button>
       </div>
 

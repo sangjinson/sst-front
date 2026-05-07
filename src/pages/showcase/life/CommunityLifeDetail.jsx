@@ -11,6 +11,7 @@ import LifeCourseView from "@components/modules/community/life/LifeCourseView";
 import LifeAside from "@components/modules/community/life/LifeAside";
 import LifePostHeader from "@components/modules/community/life/LifePostHeader";
 import { openReportModal } from "@components/modules/community/common/reportModal";
+import IconSVG from "@components/Icon/IconSVG";
 
 const CommunityLifeDetail = () => {
   const { id } = useParams();
@@ -22,6 +23,7 @@ const CommunityLifeDetail = () => {
   const [comments, setComments] = useState(lifeComments || []);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
+  const currentUser = "경기도민";
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -45,6 +47,10 @@ const CommunityLifeDetail = () => {
   const courseList = post.course || [];
   const viewCount = (post.viewCnt || 0) + 1;
   const wishCount = (post.wishCnt || 0) + (isLiked ? 1 : 0);
+
+  const scrollToComments = () => {
+    document.getElementById("life-comments")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // ✅ 내 일정으로 가져오기
   const handleImportSchedule = () => {
@@ -214,23 +220,27 @@ const CommunityLifeDetail = () => {
         {/* 왼쪽 본문 */}
         <div className="space-y-6">
           {/* 대표 이미지 */}
-          <div className="w-full h-[400px] rounded-3xl overflow-hidden bg-gray-100">
+          <div className="relative w-full h-[400px] rounded-3xl overflow-hidden bg-gray-100">
             <img
               src={thumbnail}
               alt={post.title}
               className="w-full h-full object-cover"
             />
+            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 fs-down-1 font-semibold text-gray-900 shadow-sm">
+              <IconSVG name="location" size={16} className="shrink-0 fill-none stroke-gray-900" strokeWidth={2} />
+              {region}
+            </span>
           </div>
 
           {/* 제목 + 메타 */}
           <LifePostHeader
             post={post}
-            region={region}
             viewCount={viewCount}
             comments={comments}
             wishCount={wishCount}
             isLiked={isLiked}
             setIsLiked={setIsLiked}
+            onCommentClick={scrollToComments}
           />
 
           {/* 본문 */}
@@ -266,10 +276,12 @@ const CommunityLifeDetail = () => {
           handleImportSchedule={handleImportSchedule}
           handleMakePlan={handleMakePlan}
           openReportModal={openReportModal}
+          onCommentClick={scrollToComments}
         />
       </section>
-
       {/* 댓글 영역 */}
+      <div id="life-comments" className="scroll-mt-24">
+
         <CommentSection
           comments={comments}                        // 댓글 목록
           newComment={newComment}                    // 입력값
@@ -283,7 +295,10 @@ const CommunityLifeDetail = () => {
           handleSaveEdit={handleSaveEdit}            // 수정 저장
           handleDeleteComment={handleDeleteComment}  // 삭제
           openReportModal={openReportModal}          // 신고
+          currentUser={currentUser}                    // 현재 로그인 사용자
+          postAuthor={post.author}                     // 게시글 작성자
         />
+      </div>
     </div>
   );
 };

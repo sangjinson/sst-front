@@ -92,6 +92,7 @@ const AreaListCard = ({ item, categories, liked, onLike, onClick, renderHeart })
           {name}
         </h3>
         <div className="flex items-center gap-1 mt-2 py-1 fs-up-1">
+          {/* 리스트 카드 위치 마크: "수원시 팔달구" 앞 아이콘 */}
           <IconSVG name="location" size={17} className=" shrink-0 fill-none stroke-[#E8956D]" strokeWidth={2}/>
           <span className="text-gray-800 truncate">{location}</span>
         </div>
