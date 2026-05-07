@@ -120,6 +120,7 @@ const View = () => {
         items={relatedItems}
         onItemClick={(rel) => navigate(`/${region}/see/view?id=${rel.id}`)}
         nameKey="name"
+        categories={CATEGORIES}
       />
 
       {/* 하단 액션 버튼 영역 (목록으로, 맨 위로) */}
@@ -127,7 +128,7 @@ const View = () => {
         {/* 목록으로 이동 버튼: 이제 왼쪽 끝에 붙습니다 */}
         <button
           onClick={() => navigate(`/${region}/see/list`)}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-white/90 backdrop-blur-md text-gray-800 rounded-xl fs-up-2 font-semibold shadow-lg shadow-black/5 border border-white/20 hover:bg-white hover:shadow-xl transition-all duration-200 hover:bg-[#E8956D] hover:text-white"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-white/90 backdrop-blur-md text-gray-800 rounded-xl fs-up-2 font-semibold shadow-lg shadow-black/5 border border-white/20 hover:bg-white hover:shadow-xl transition-all duration-200"
         >
           <span className="mb-0.5 text-lg">←</span> 목록으로
         </button>
@@ -135,7 +136,7 @@ const View = () => {
         {/* 맨 위로 스크롤 이동 버튼: 이제 오른쪽 끝에 붙습니다 */}
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md border border-white/20 rounded-xl text-gray-600 shadow-lg shadow-black/5 hover:bg-white hover:text-[#E8956D] transition-all duration-200 "
+          className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md border border-white/20 rounded-xl text-gray-800 shadow-lg shadow-black/5 hover:bg-white hover:shadow-xl transition-all duration-200"
           title="맨 위로"
         >
           <svg viewBox="0 0 24 24" className="w-6 h-6 fill-none stroke-current" strokeWidth="2.5">

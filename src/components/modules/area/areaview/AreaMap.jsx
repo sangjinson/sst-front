@@ -39,7 +39,7 @@ const AreaMap = ({ lat, lng, address }) => {
           style={{ border: 0 }}
           loading="lazy"
           allowFullScreen
-          src={`https://maps.google.com/maps?q=${query}&z=15&output=embed`}
+          src={`https://maps.google.com/maps?q=${query}&z=15&output=embed&iwloc=0`}
         />
       </div>
       {/* address && (

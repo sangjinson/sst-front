@@ -66,10 +66,10 @@ const AreaInfoSection = ({ infoItems = [], tags = [], tagLabel = '태그' }) => 
       {/* 태그 영역 - tags가 있을 때만 표시 */}
       {tags.length > 0 && (
         <div className="mt-4 pt-4 border-t border-gray-100">
-          <p className="text-xs text-gray-400 mb-2">{tagLabel}</p>
+          <p className="fs-up-1 font-semibold text-gray-500 mb-2">{tagLabel}</p>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              <span key={tag} className="px-3 py-1.5 bg-gray-100 text-gray-700 fs-up-1 font-semibold rounded-full">
                 {tag}
               </span>
             ))}

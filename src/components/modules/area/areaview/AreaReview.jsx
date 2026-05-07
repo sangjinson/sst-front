@@ -306,11 +306,17 @@ const AreaReview = ({
               </div>
             ) : (
               <>
-                {/* ✅ 1줄: 작성자 + 날짜 */}
-                <div className="flex items-center justify-between mb-1">
-                  <p className="font-semibold text-gray-800">{review.user}</p>
-                  <p className="fs-3 text-gray-400">{review.date}</p>
-                </div>
+                {!review.isMine && (
+                  <button
+                    type="button"
+                    onClick={handleReport}
+                    className="absolute right-4 top-4 inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-orange-50 hover:text-orange-500 active:scale-95"
+                    aria-label="리뷰 신고"
+                    title="신고하기"
+                  >
+                    <ReportIcon />
+                  </button>
+                )}
 
                 {/* 작성자 + 별점 + 날짜 */}
                 <div className="mb-3 pr-12">
@@ -323,6 +329,29 @@ const AreaReview = ({
 
                 {/* 리뷰 내용 */}
                 <p className="text-gray-500">{review.comment}</p>
+
+                {review.isMine && (
+                  <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleEditStart(review)}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 active:scale-95"
+                      aria-label="리뷰 수정"
+                      title="수정하기"
+                    >
+                      <EditIcon />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(review.id)}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 active:scale-95"
+                      aria-label="리뷰 삭제"
+                      title="삭제하기"
+                    >
+                      <DeleteIcon />
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -332,7 +361,7 @@ const AreaReview = ({
       {/* 더보기 / 접기 */}
       <button
         onClick={() => setShowAllReviews((prev) => !prev)}
-        className="mt-4 pt-4 border-t border-gray-100 w-full fs-up-2 text-gray-600 hover:bg-gray-50 transition"
+        className="mt-4 w-full rounded-xl border border-gray-200 bg-white py-3 fs-up-2 font-semibold text-gray-600 transition-all duration-200 hover:border-[#E8956D]/40 hover:bg-[#E8956D]/10 hover:text-[#E8956D] active:scale-[0.99]"
       >
         {showAllReviews ? '접기 ▲' : '리뷰 더보기 ▼'}
       </button>
