@@ -56,7 +56,7 @@ const HotplaceStats = ({
             <strong className="mt-1 block text-lg text-gray-900">{comments.length}</strong>
           </div>
           <div className="rounded-2xl bg-gray-50 px-3 py-4">
-            <p className="fs-down-1 text-gray-400">찜</p>
+            <p className="fs-down-1 text-gray-400">좋아요</p>
             <strong className="mt-1 block text-lg text-gray-900">{wishCount}</strong>
           </div>
         </div>

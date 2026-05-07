@@ -132,7 +132,7 @@ const LifeAside = ({
             isLiked ? "bg-red-50" : "bg-gray-50 hover:bg-red-50"
           }`}
         >
-          <p className="fs-down-1 text-gray-400">찜</p>
+          <p className="fs-down-1 text-gray-400">좋아요</p>
           <strong
             className={`mt-1 block text-lg ${
               isLiked ? "text-red-500" : "text-gray-900"
