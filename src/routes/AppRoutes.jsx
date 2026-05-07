@@ -77,8 +77,8 @@ const AppRoutes = () => {
       </Route>
 
         
-        {/* 🚀 3. 반드시 로그인이 필요한 페이지 영역 */}
-        <Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>
+      {/* 🚀 3. 반드시 로그인이 필요한 페이지 영역 */}
+      <Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>
         <Route element={<UserLayout />}>
           
           {/* 마이페이지 */}

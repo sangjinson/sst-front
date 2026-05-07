@@ -174,36 +174,54 @@ const AreaReview = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
+    <div className="bg-white rounded-lg p-5 mb-4 shadow-sm">
 
       {/* ✅ 헤더 - 평균 평점 숫자 */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-gray-900">평점 & 리뷰</h2>
-        <div className="flex items-center gap-2">
-          <StarRating rating={Number(avgRating)} theme={{ size: 'text-xl', fillColor: 'text-[#E8956D]' }} />
-          <span className="text-base font-bold text-[#E8956D]">{avgRating}</span>
-          <span className="text-sm text-gray-400">({reviewCount}개)</span>
+      <div className="flex items-end justify-between mb-3">
+        <h2 className="fs-up-3 font-bold text-gray-900">평점 & 리뷰</h2>
+        
+        <div className="flex items-end gap-2 fs-5">
+          <StarRating rating={Number(avgRating)} theme={{ size: 'fs-5', fillColor: 'text-[#E8956D]' }} />
+          <span className="font-bold text-[#E8956D]">{avgRating}</span>
+          <span className="text-gray-400">({reviewCount}개)</span>
         </div>
       </div>
+      <hr className="w-full border-b border-t-0 border-gray-200 mt-3 mb-5 order-2 md:order-4" />
 
       {/* 리뷰 등록 폼 */}
       {isLoggedIn ? (
-        <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
-          <p className="text-sm font-semibold text-gray-700 mb-3">리뷰 작성</p>
-          <div className="mb-3">
-            <p className="text-xs text-gray-400 mb-1">별점 선택</p>
-            <StarSelector value={reviewRating} onChange={setReviewRating} />
+        <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100 flex flex-col">
+          {/* 헤더 영역: 타이틀과 버튼을 포함 */}
+          <div className="flex items-end justify-between mb-3 md:mb-4">
+            <p className="fs-5 font-semibold text-gray-700 order-1">리뷰 작성</p>
+            
+            {/* 버튼: PC에서는 타이틀 옆(order-2), 모바일에서는 맨 아래로(md:order-2 지정 및 아래 flex-col 영향) */}
+            <button
+              onClick={handleReviewSubmit}
+              className="hidden md:block md:order-2 px-6 py-2 bg-[#E8956D] text-white rounded-lg fs-up-1 font-medium hover:bg-[#f07e48] transition-colors"
+            >
+              리뷰 등록
+            </button>
           </div>
-          <textarea
-            value={reviewComment}
-            onChange={(e) => setReviewComment(e.target.value)}
-            placeholder={placeholder}
-            rows={3}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none resize-none focus:border-[#E8956D] transition-colors"
-          />
+
+          {/* 입력 영역: 모바일/PC 모두 중간 위치 */}
+          <div className="mb-3 order-2">
+            <div className="mb-2">
+              <StarSelector value={reviewRating} onChange={setReviewRating} />
+            </div>
+            <textarea
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder={placeholder}
+              rows={3}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 fs-4 text-gray-700 outline-none resize-none focus:border-[#E8956D] transition-colors"
+            />
+          </div>
+
+          {/* 모바일용 버튼: 모바일에서만 보이고 맨 아래 배치 (order-3) */}
           <button
             onClick={handleReviewSubmit}
-            className="mt-2 w-full py-2.5 bg-[#E8956D] text-white rounded-xl text-sm font-medium hover:bg-[#f07e48] transition-colors"
+            className="md:hidden order-3 w-full py-2.5 bg-[#E8956D] text-white rounded-xl fs-up-3 font-medium hover:bg-[#f07e48] transition-colors"
           >
             리뷰 등록
           </button>
@@ -221,7 +239,7 @@ const AreaReview = ({
       )}
 
       {/* 리뷰 목록 */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 fs-4">
         {(showAllReviews ? reviews : reviews.slice(0, REVIEWS_PER_PAGE)).map((review) => (
           <div key={review.id} className="border border-gray-100 rounded-xl p-4">
 
@@ -253,8 +271,8 @@ const AreaReview = ({
               <>
                 {/* ✅ 1줄: 작성자 + 날짜 */}
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-semibold text-gray-800">{review.user}</p>
-                  <p className="text-xs text-gray-400">{review.date}</p>
+                  <p className="font-semibold text-gray-800">{review.user}</p>
+                  <p className="fs-3 text-gray-400">{review.date}</p>
                 </div>
 
                 {/* ✅ 2줄: 별점 + 수정/삭제/신고 */}
@@ -308,7 +326,7 @@ const AreaReview = ({
                 </div>
 
                 {/* 리뷰 내용 */}
-                <p className="text-sm text-gray-500">{review.comment}</p>
+                <p className="text-gray-500">{review.comment}</p>
               </>
             )}
           </div>
@@ -318,7 +336,7 @@ const AreaReview = ({
       {/* 더보기 / 접기 */}
       <button
         onClick={() => setShowAllReviews((prev) => !prev)}
-        className="w-full mt-4 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition"
+        className="mt-4 pt-4 border-t border-gray-100 w-full fs-up-2 text-gray-600 hover:bg-gray-50 transition"
       >
         {showAllReviews ? '접기 ▲' : '리뷰 더보기 ▼'}
       </button>

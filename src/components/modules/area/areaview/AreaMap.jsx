@@ -28,9 +28,10 @@ const AreaMap = ({ lat, lng, address }) => {
     : encodeURIComponent(address);
 
   return (
-    <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-      <h2 className="text-lg font-bold text-gray-900 mb-3">위치</h2>
-      <div className="w-full h-52 rounded-xl overflow-hidden bg-gray-100">
+    <div className="bg-white rounded-lg p-5 mb-4 shadow-sm">
+      <h2 className="fs-up-3 font-bold text-gray-900 mb-3">위치</h2>
+      <hr className="w-full border-b border-t-0 border-gray-200 mt-3 mb-5 order-2 md:order-4" />
+      <div className="w-full h-96 overflow-hidden bg-gray-100">
         <iframe
           title="지도"
           width="100%"
@@ -41,9 +42,9 @@ const AreaMap = ({ lat, lng, address }) => {
           src={`https://maps.google.com/maps?q=${query}&z=15&output=embed`}
         />
       </div>
-      {address && (
+      {/* address && (
         <p className="text-xs text-gray-400 mt-2">📍 {address}</p>
-      )}
+      ) */ }
     </div>
   );
 };
