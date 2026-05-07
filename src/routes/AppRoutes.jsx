@@ -41,6 +41,8 @@ import ReportList from '@pages/admin/ReportList';
 import ReportDetail from '@pages/admin/ReportDetail';
 import HotplaceList from '@pages/admin/HotplaceList';
 import LifeList from '@pages/admin/LifeList';
+import NoticeManage from '@pages/admin/NoticeManage';
+import FaqManage from '@pages/admin/FaqManage';
 
 const AppRoutes = () => {
   return (
@@ -101,6 +103,8 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="members" element={<MemberList />} />
+          <Route path="notices" element={<NoticeManage />} />
+          <Route path="faq" element={<FaqManage />} />
           {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
         </Route>
       </Route> 
