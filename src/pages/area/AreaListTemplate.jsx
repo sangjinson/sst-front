@@ -79,15 +79,15 @@ const LIST_CONFIG = {
 
 const LIST_DATA_CONFIG = {
   see: {
-    categories: ['전체', '박물관', '도서관', '지역명소', '공원'],
+    categories: ['전체', '역사', '자연', '랜드마크', '도시공원','전시장'],
     getItems: getSeeDataByRegion,
   },
   sleep: {
-    categories: ['전체', '호텔', '리조트', '펜션', '모텔', '게스트하우스'],
+    categories: ['전체', '호텔/모텔', '콘도', '펜션', '캠핑', '게스트하우스'],
     getItems: getSleepDataByRegion,
   },
   food: {
-    categories: ['전체', '한식', '중식', '일식', '양식'],
+    categories: ['전체', '한식', '중식', '일식', '양식','카페'],
     getItems: getFoodDataByRegion,
   },
 };
