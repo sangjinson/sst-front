@@ -228,23 +228,17 @@ const CommunityLifeDetail = () => {
         {/* 왼쪽 본문 */}
         <div className="space-y-6">
           {/* 대표 이미지 */}
-          <div className="relative w-full h-[400px] rounded-3xl overflow-hidden bg-gray-100">
-            <img
-              src={thumbnail}
+          <div className="relative">
+            <ImageSlider
+              images={slideImages}
               alt={post.title}
-              className="w-full h-full object-cover"
+              height="h-[400px]"
             />
-            <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 fs-down-1 font-semibold text-gray-900 shadow-sm">
+            <span className="absolute left-4 top-4 z-10 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 fs-down-1 font-semibold text-gray-900 shadow-sm">
               <IconSVG name="location" size={16} className="shrink-0 fill-none stroke-gray-900" strokeWidth={2} />
               {region}
             </span>
           </div>
-          {/* 기존 대표 이미지 위치에 ImageSlider 컴포넌트만 적용 */}
-          <ImageSlider
-            images={slideImages}
-            alt={post.title}
-            height="h-[400px]"
-          />
 
           {/* 제목 + 메타 */}
           <LifePostHeader
