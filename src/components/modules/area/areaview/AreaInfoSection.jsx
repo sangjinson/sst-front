@@ -45,16 +45,17 @@ import React from 'react';
  */
 const AreaInfoSection = ({ infoItems = [], tags = [], tagLabel = '태그' }) => {
   return (
-    <div className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-      <h2 className="text-lg font-bold text-gray-900 mb-4">이용 정보</h2>
+    <div className="bg-white rounded-lg p-5 mb-4 shadow-sm">
+      <h2 className="fs-up-3 font-bold text-gray-900 mb-4">이용 정보</h2>
+      <hr className="w-full border-b border-t-0 border-gray-200 mt-3 mb-5 order-2 md:order-4" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {infoItems.map((info, idx) => (
-          <div key={idx} className="flex items-start gap-3">
-            <span className="text-xl">{info.icon}</span>
+          <div key={idx} className="flex items-start gap-2">
+            <span className="fs-3">{info.icon}</span>
             <div>
-              <p className="text-xs text-gray-400 mb-0.5">{info.label}</p>
-              <p className={`text-sm ${info.highlight ? 'font-semibold text-[#E8956D]' : 'text-gray-700'}`}>
+              <p className="fs-up-2 font-semibold text-gray-400 mb-0.5">{info.label}</p>
+              <p className={`fs-up-2 ${info.highlight ? 'font-semibold text-[#E8956D]' : 'text-gray-700'}`}>
                 {info.value}
               </p>
             </div>

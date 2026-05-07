@@ -14,7 +14,9 @@ const MyShowcase = () => {
 
   return (
     <div className="p-4 md:p-7">
-      <h2 className="text-lg md:text-xl font-bold mb-5 text-gray-900">내 뽐낼 거리</h2>
+      <h3 className="fs-up-3 font-bold text-gray-700 mb-4">내 뽐낼 거리</h3>
+      <hr className="w-full border-b border-t-0 border-gray-200 mt-2 mb-7 order-2 md:order-4" />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
         {DUMMY_POSTS.map((post) => (
           <div 

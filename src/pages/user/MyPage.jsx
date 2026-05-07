@@ -85,9 +85,9 @@ const MyPage = () => {
   const sectionLabel = CARDS.find((c) => c.key === activeSection)?.label || '';
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-gray-50">
       {/* 🚀 전체 컨테이너를 잡고, 그 안에서 브레드크럼과 아래쪽(사이드바+본문) 영역을 수직으로 나눔 */}
-      <div className="max-w-[1400px] mx-auto px-4 py-6 md:px-10 lg:py-10">
+      <div className="container mx-auto px-4 py-6 md:px-10 lg:py-10">
         
         {/* 🚀 1. 브레드크럼을 젤 위로 분리해서 사이드바와 메뉴의 윗줄을 깔끔하게 맞춤 */}
         <div className="w-full flex justify-start mb-6">
@@ -108,28 +108,47 @@ const MyPage = () => {
           {!loading && profile && (
             <Sidebar profile={profile} profileImg={profileImg} />
           )}
+          <Sidebar profile={profile} profileImg={profileImg} />
 
           {/* 메인 컨텐츠 */}
           <section className="flex-1 min-w-0 flex flex-col gap-4 w-full">
             {/* 카드 메뉴 */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {CARDS.map((card) => (
-                <div key={card.key} onClick={() => setActiveSection(card.key)}
-                  className={`bg-white border-[1.5px] rounded-2xl p-4 md:p-5 flex flex-col items-center gap-3 cursor-pointer transition-all hover:-translate-y-1 ${
-                    activeSection === card.key
-                      ? 'border-[#0F9B73] bg-[#f0fdf9] shadow-md'
-                      : 'border-gray-200 shadow-sm hover:border-[#0F9B73]'
-                  }`}>
-                  <span className={`text-sm font-bold self-start ${activeSection === card.key ? 'text-[#0F9B73]' : 'text-gray-700'}`}>
-                    {card.label}
-                  </span>
-                  <div className={`w-12 h-12 md:w-[58px] md:h-[58px] rounded-full border-[3px] flex items-center justify-center text-xl md:text-2xl transition-colors ${
-                    activeSection === card.key ? 'border-[#0F9B73]' : 'border-blue-500'
-                  }`}>
-                    {card.icon}
+            <div className="relative">
+              {/* 모바일에서는 하단 고정 바, 데스크탑에서는 일반 그리드 레이아웃 */}
+              <div className={`
+                fixed bottom-0 left-0 right-0 z-[100] px-2 h-16 bg-white/90 backdrop-blur-md border-t border-gray-100 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]
+                md:relative md:h-auto md:bg-transparent md:backdrop-blur-none md:border-none md:shadow-none md:px-0 md:z-0
+                grid grid-cols-4 gap-x-2 md:gap-x-4 
+              `}>
+                {CARDS.map((card) => (
+                  <div
+                    key={card.key}
+                    onClick={() => setActiveSection(card.key)}
+                    className={`
+                      flex flex-col items-center justify-center flex-1 gap-1 cursor-pointer transition-all
+                      md:flex-row md:justify-between md:px-5 md:py-3.5 md:rounded-lg md:border-[1.5px] md:hover:shadow-md
+                      ${activeSection === card.key
+                        ? 'text-[#0F9B73] md:border-[#0F9B73] md:bg-[#f0fdf9]'
+                        : 'text-gray-400 md:text-gray-700 md:border-gray-200 md:bg-white md:hover:border-[#0F9B73]'
+                      }
+                    `}
+                  >
+                    {/* 아이콘 */}
+                    <span className="text-2xl md:text-xl md:order-2">{card.icon}</span>
+                    
+                    {/* 라벨 */}
+                    <span className="text-[10px] font-bold md:text-[15px] md:order-1">{card.label}</span>
+                    
+                    {/* 모바일 활성화 점 (데스크탑에선 숨김) */}
+                    {activeSection === card.key && (
+                      <div className="w-1 h-1 bg-[#0F9B73] rounded-full md:hidden" />
+                    )}
                   </div>
-                </div>
-              ))}
+                ))}
+                {/* 아이폰 하단 홈바 대응 (데스크탑에선 0) */}
+                <div className="h-[env(safe-area-inset-bottom)] md:h-0" />
+              </div>
+
             </div>
 
             {/* 섹션 컨텐츠 렌더링 영역 */}

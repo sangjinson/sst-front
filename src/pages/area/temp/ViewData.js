@@ -1,6 +1,6 @@
 
 /* 임시데이터 */
-const TEMP_API_LIST_DATA = {
+const TEMP_API_VIEW_DATA = {
     see: {
         "성남시" : {
             totalCount : 1,
