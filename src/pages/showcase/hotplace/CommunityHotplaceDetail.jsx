@@ -1,39 +1,83 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getAllPosts, hotplaceComments } from "./communityHotplaceData";
+import { getAllPosts } from "./communityHotplaceData";
 
-// 신고 모달
 import { openReportModal } from "@components/modules/community/common/reportModal";
-// 이미지 슬라이더
 import HotplaceImageSlider from "@components/modules/community/hotplace/HotplaceImageSlider";
-// Stats 컴포넌트
 import HotplaceStats from "@components/modules/community/hotplace/HotplaceStats";
-// 오른쪽 Aside 컴포넌트
 import HotplaceAside from "@components/modules/community/hotplace/HotplaceAside";
-// 댓글 컴포넌트
 import CommentSection from "@components/modules/community/common/CommentSection";
 
 const CommunityHotplaceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const isLogin = true;
 
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState(hotplaceComments);
+  const [comments, setComments] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
 
-  useEffect(() => { window.scrollTo({ top: 0 }); }, []);
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
+    api
+      .get("/auth/me")
+      .then((res) => {
+        setCurrentUserId(res.data.data.mbrId);
+      })
+      .catch((err) => {
+        console.error("로그인 사용자 조회 실패:", err);
+      });
+  }, []);
 
   const posts = getAllPosts();
   const currentPost = posts.find((post) => post.id === Number(id));
 
+  // 댓글 조회 함수
+  const fetchComments = (commNo) => {
+    axios
+      .get(`http://localhost:8080/api/comments/${commNo}`)
+      .then((res) => {
+        const mappedComments = res.data.map((comment) => ({
+          id: comment.cmntNo,
+          user: comment.mbrNickname,
+          text: comment.cmntContent,
+          date: comment.cmntRegDate?.substring(0, 10),
+          cmntNo: comment.cmntNo,
+          cmntCommNo: comment.cmntCommNo,
+          cmntMbrId: comment.cmntMbrId,
+        }));
+
+        setComments(mappedComments);
+      })
+      .catch((err) => {
+        console.error("댓글 조회 실패:", err);
+      });
+  };
+
+  useEffect(() => {
+    if (!currentPost) return;
+
+    const commNo = currentPost.commNo ?? currentPost.id;
+
+    fetchComments(commNo);
+  }, [currentPost]);
+
   if (!currentPost) {
-    return <div className="py-20 text-center font-bold text-gray-500">존재하지 않는 게시물입니다.</div>;
+    return (
+      <div className="py-20 text-center font-bold text-gray-500">
+        존재하지 않는 게시물입니다.
+      </div>
+    );
   }
 
   const slideImages = currentPost.images || [
@@ -42,34 +86,95 @@ const CommunityHotplaceDetail = () => {
     `https://picsum.photos/seed/hotplace-${currentPost.id}-sub2/900/650`,
   ];
 
-  const handlePrevImage = () => setCurrentImageIndex((prev) => prev === 0 ? slideImages.length - 1 : prev - 1);
-  const handleNextImage = () => setCurrentImageIndex((prev) => prev === slideImages.length - 1 ? 0 : prev + 1);
+  const handlePrevImage = () =>
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? slideImages.length - 1 : prev - 1
+    );
+
+  const handleNextImage = () =>
+    setCurrentImageIndex((prev) =>
+      prev === slideImages.length - 1 ? 0 : prev + 1
+    );
 
   const viewCount = currentPost.viewCnt + 1;
   const wishCount = currentPost.wishCnt + (isLiked ? 1 : 0);
 
+  // 댓글 등록
   const handleCommentSubmit = () => {
-    if (!newComment.trim()) { alert("댓글 내용을 입력해주세요."); return; }
-    setComments([{ id: Date.now(), user: "나", text: newComment, date: new Date().toLocaleDateString() }, ...comments]);
-    setNewComment("");
-  };
-
-  const startEditing = (commentId, text) => { setEditingId(commentId); setEditText(text); };
-
-  const handleSaveEdit = (commentId) => {
-    if (!editText.trim()) { alert("수정할 내용을 입력해주세요."); return; }
-    setComments(comments.map((c) => c.id === commentId ? { ...c, text: editText } : c));
-    setEditingId(null); setEditText("");
-  };
-
-  const handleDeleteComment = (commentId) => {
-    if (window.confirm("댓글을 삭제하시겠습니까?")) {
-      setComments(comments.filter((c) => c.id !== commentId));
+    if (!currentUserId) {
+      alert("로그인이 필요합니다.");
+      return;
     }
+
+    if (!newComment.trim()) {
+      alert("댓글 내용을 입력해주세요.");
+      return;
+    }
+
+    const commNo = currentPost.commNo ?? currentPost.id;
+
+    axios
+      .post("http://localhost:8080/api/comments", {
+        cmntCommNo: commNo,
+        cmntMbrId: currentUserId,
+        cmntContent: newComment,
+      })
+      .then(() => {
+        fetchComments(commNo);
+        setNewComment("");
+      })
+      .catch((err) => {
+        console.error("댓글 등록 실패:", err);
+      });
+  };
+
+  const startEditing = (commentId, text) => {
+    setEditingId(commentId);
+    setEditText(text);
+  };
+
+  // 댓글 수정
+  const handleSaveEdit = (commentId) => {
+    if (!editText.trim()) {
+      alert("수정할 내용을 입력해주세요.");
+      return;
+    }
+
+    const commNo = currentPost.commNo ?? currentPost.id;
+
+    axios
+      .put(`http://localhost:8080/api/comments/${commentId}`, {
+        cmntContent: editText,
+      })
+      .then(() => {
+        fetchComments(commNo);
+
+        setEditingId(null);
+        setEditText("");
+      })
+      .catch((err) => {
+        console.error("댓글 수정 실패:", err);
+      });
+  };
+
+  // 댓글 삭제
+  const handleDeleteComment = (commentId) => {
+    if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
+
+    const commNo = currentPost.commNo ?? currentPost.id;
+
+    axios
+      .delete(`http://localhost:8080/api/comments/${commentId}`)
+      .then(() => {
+        fetchComments(commNo);
+      })
+      .catch((err) => {
+        console.error("댓글 삭제 실패:", err);
+      });
   };
 
   return (
-    <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
       <Breadcrumb
         paths={[
           { label: "홈", to: "/" },
@@ -81,11 +186,20 @@ const CommunityHotplaceDetail = () => {
 
       <section className="mb-8 mt-6 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-sm font-bold text-emerald-600 pt-2">Hotplace Detail</p>
-          <h2 className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">핫플거리</h2>
-          <p className="mt-2 text-sm md:text-base text-gray-500">여행자가 남긴 장소의 분위기와 이야기를 자세히 확인해보세요.</p>
+          <p className="text-sm font-bold text-emerald-600 pt-2">
+            Hotplace Detail
+          </p>
+          <h2 className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">
+            핫플거리
+          </h2>
+          <p className="mt-2 text-sm md:text-base text-gray-500">
+            여행자가 남긴 장소의 분위기와 이야기를 자세히 확인해보세요.
+          </p>
         </div>
-        <button type="button" onClick={() => navigate("/showcase/hotplace")}
+
+        <button
+          type="button"
+          onClick={() => navigate("/showcase/hotplace")}
           className="w-fit rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-600 transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:text-emerald-600 hover:shadow-sm active:scale-95">
           목록으로
         </button>
@@ -117,7 +231,12 @@ const CommunityHotplaceDetail = () => {
           isLiked={isLiked}
           setIsLiked={setIsLiked}
           wishCount={wishCount}
-          openReportModal={openReportModal}
+          openReportModal={() =>
+            openReportModal({
+              type: "post",
+              commNo: currentPost.commNo ?? currentPost.id,
+            })
+          }
         />
       </section>
 
@@ -133,7 +252,13 @@ const CommunityHotplaceDetail = () => {
         startEditing={startEditing}
         handleSaveEdit={handleSaveEdit}
         handleDeleteComment={handleDeleteComment}
-        openReportModal={openReportModal}
+        openReportModal={(comment) =>
+          openReportModal({
+            type: "comment",
+            cmntNo: comment.cmntNo ?? comment.id,
+          })
+        }
+        currentUserId={currentUserId}
       />
     </div>
   );

@@ -9,6 +9,7 @@ const AdminLayout = () => {
     area: true,
     showcase: true,
     report: true,
+    support: true,
   });
 
   const toggleMenu = (key) => {
@@ -46,6 +47,14 @@ const AdminLayout = () => {
       key: 'report',
       label: '신고 관리',
       children: [{ label: '신고 관리', path: '/admin/report' }],   
+    },
+    {
+      key: 'support',
+      label: '고객지원 관리',
+      children: [
+        { label: '공지사항 관리', path: '/admin/notices' },
+        { label: 'FAQ 관리', path: '/admin/faq' },
+      ],
     },
   ];
 
