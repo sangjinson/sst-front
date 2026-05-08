@@ -29,6 +29,7 @@ export const regionMap = {
   '포천시': 'pocheon',
   '연천군': 'yeoncheon',
   '가평군': 'gapyeong',
+  '김포시': 'gimpo', 
 };
 
 // 한글 → 영어

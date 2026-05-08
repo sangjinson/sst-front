@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import HeroBanner from '../../components/common/HeroBanner';
 import Breadcrumb from '@components/common/Breadcrumb';
@@ -7,13 +7,13 @@ import ListSkeleton from '@components/skeleton/ListSkeleton';
 import { getSeeDataByRegion } from './see/seeData';
 import { getSleepDataByRegion } from './sleep/sleepDummyData';
 import { getFoodDataByRegion } from './food/foodData';
-
-/* API 규약을 통일하기 위한 임시 공통 파일 */
+import { getPlayDataByRegion } from './play/playData';
+  
 import TEMP_API_LIST_DATA from './temp/ListData';
 
-const PlayList = lazy(() => import('./play/List'));
-const FoodList = lazy(() => import('./food/List'));
-const SeeList = lazy(() => import('./see/List'));
+const PlayList  = lazy(() => import('./play/List'));
+const FoodList  = lazy(() => import('./food/List'));
+const SeeList   = lazy(() => import('./see/List'));
 const SleepList = lazy(() => import('./sleep/List'));
 
 const REGION_BANNER = {
@@ -79,16 +79,20 @@ const LIST_CONFIG = {
 
 const LIST_DATA_CONFIG = {
   see: {
-    categories: ['전체', '박물관', '도서관', '지역명소', '공원'],
+    categories: ['전체', '역사', '자연', '랜드마크', '도시공원', '전시장'],
     getItems: getSeeDataByRegion,
   },
   sleep: {
-    categories: ['전체', '호텔', '리조트', '펜션', '모텔', '게스트하우스'],
+    categories: ['전체', '호텔/모텔', '콘도', '펜션', '캠핑', '게스트하우스'],
     getItems: getSleepDataByRegion,
   },
   food: {
-    categories: ['전체', '한식', '중식', '일식', '양식'],
+    categories: ['전체', '한식', '중식', '일식', '양식', '카페','간이음식'],
     getItems: getFoodDataByRegion,
+  },
+  play: {
+    categories: ['전체', '축제', '행사', '체험', '레저', '테마파크'],
+    getItems: getPlayDataByRegion,
   },
 };
 
@@ -100,39 +104,68 @@ const normalizeListItem = (item) => ({
   reviews: item.reviews ?? item.reviewCount ?? 0,
 });
 
-const createListRows = (type, regionKor) => {
-  const listDataConfig = LIST_DATA_CONFIG[type];
-
-  if (listDataConfig) {
-    const items = listDataConfig.getItems(regionKor).map(normalizeListItem);
-
-    return {
-      totalCount: items.length,
-      perPage: 12,
-      categories: listDataConfig.categories,
-      items,
-    };
-  }
-
-  return TEMP_API_LIST_DATA?.[type]?.[regionKor] ?? TEMP_API_LIST_DATA?.[type]?.['성남시'] ?? {};
-};
-
 function AreaListTemplate() {
   const { region, type } = useParams();
   const { pathname } = useLocation();
   const regionKor = toKorRegion(region);
 
+  const [dataSet, setDataSet] = useState({
+    totalCount: 0,
+    perPage: 12,
+    categories: LIST_DATA_CONFIG[type]?.categories || ['전체'],
+    items: [],
+  });
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  const currentConfig = LIST_CONFIG[type];
-  const regionBanner = REGION_BANNER[regionKor];
+  // ✅ 비동기 데이터 로딩
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const listDataConfig = LIST_DATA_CONFIG[type];
 
-  const bgImage = regionBanner?.bgImage || currentConfig?.bgImage;
+        if (listDataConfig?.getItems) {
+          // ✅ see는 async, sleep/food는 동기 함수라 둘 다 처리
+          const raw = listDataConfig.getItems(regionKor);
+          const items = (raw instanceof Promise ? await raw : raw).map(normalizeListItem);
+
+          setDataSet({
+            totalCount: items.length,
+            perPage: 12,
+            categories: listDataConfig.categories,
+            items,
+          });
+        } else {
+          const fallback =
+            TEMP_API_LIST_DATA?.[type]?.[regionKor] ??
+            TEMP_API_LIST_DATA?.[type]?.['성남시'] ??
+            {};
+          setDataSet(fallback);
+        }
+      } catch (err) {
+        console.error('데이터 로딩 실패:', err);
+        setDataSet({
+          totalCount: 0,
+          perPage: 12,
+          categories: LIST_DATA_CONFIG[type]?.categories || ['전체'],
+          items: [],
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [type, regionKor]);
+
+  const currentConfig = LIST_CONFIG[type];
+  const regionBanner  = REGION_BANNER[regionKor];
+  const bgImage  = regionBanner?.bgImage || currentConfig?.bgImage;
   const subtitle = `${regionKor}${currentConfig?.subtitleSuffix}`;
-  
-  const dataSet = createListRows(type, regionKor);
 
   return (
     <Suspense fallback={<ListSkeleton />}>
@@ -146,7 +179,7 @@ function AreaListTemplate() {
             bgImage={bgImage}
             title={regionKor}
             subtitle={subtitle}
-            to={`/${region}`} 
+            to={`/${region}`}
           />
           <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px]">
             <Breadcrumb
@@ -157,7 +190,12 @@ function AreaListTemplate() {
               ]}
               className="mb-3"
             />
-            <currentConfig.Component rows={dataSet}/>
+            {/* ✅ 로딩 중이면 스켈레톤 */}
+            {loading ? (
+              <ListSkeleton />
+            ) : (
+              <currentConfig.Component rows={dataSet} />
+            )}
           </div>
         </div>
       )}

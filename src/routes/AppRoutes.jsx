@@ -8,6 +8,7 @@ import AdminLayout from '@layouts/AdminLayout';
 import MainPage from '@pages/main/MainPage';
 import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
+import NotFoundPage from '@pages/error/NotFoundPage';
 import MyPage from '@pages/user/MyPage';
 
 import Notice from "@pages/customersupport/Notice";
@@ -41,6 +42,8 @@ import ReportList from '@pages/admin/ReportList';
 import ReportDetail from '@pages/admin/ReportDetail';
 import HotplaceList from '@pages/admin/HotplaceList';
 import LifeList from '@pages/admin/LifeList';
+import NoticeManage from '@pages/admin/NoticeManage';
+import FaqManage from '@pages/admin/FaqManage';
 
 const AppRoutes = () => {
   return (
@@ -78,6 +81,7 @@ const AppRoutes = () => {
 
         
         {/* 🚀 3. 반드시 로그인이 필요한 페이지 영역 */}
+        
         <Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>
         <Route element={<UserLayout />}>
           
@@ -101,9 +105,13 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="members" element={<MemberList />} />
+          <Route path="notices" element={<NoticeManage />} />
+          <Route path="faq" element={<FaqManage />} />
           {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
         </Route>
       </Route> 
+
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

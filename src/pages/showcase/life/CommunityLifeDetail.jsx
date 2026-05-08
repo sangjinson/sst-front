@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import {
@@ -11,6 +13,7 @@ import LifeCourseView from "@components/modules/community/life/LifeCourseView";
 import LifeAside from "@components/modules/community/life/LifeAside";
 import LifePostHeader from "@components/modules/community/life/LifePostHeader";
 import { openReportModal } from "@components/modules/community/common/reportModal";
+import IconSVG from "@components/Icon/IconSVG";
 
 // 공통 이미지 슬라이더 컴포넌트 import
 import ImageSlider from "@components/modules/community/common/ImageSlider";
@@ -20,6 +23,7 @@ const CommunityLifeDetail = () => {
   const navigate = useNavigate();
   const isLogin = true;
 
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(lifeComments || []);
@@ -30,9 +34,50 @@ const CommunityLifeDetail = () => {
     window.scrollTo({ top: 0 });
   }, []);
 
+  useEffect(() => {
+    api
+      .get("/auth/me")
+      .then((res) => {
+        setCurrentUserId(res.data.data.mbrId);
+      })
+      .catch((err) => {
+        console.error("로그인 사용자 조회 실패:", err);
+      });
+  }, []);
+
   // 게시글 찾기
   const posts = getAllLifePosts ? getAllLifePosts() : [];
   const post = posts.find((p) => p.id === Number(id));
+
+  // 댓글 조회 함수
+  const fetchComments = (commNo) => {
+    axios
+      .get(`http://localhost:8080/api/comments/${commNo}`)
+      .then((res) => {
+        const mappedComments = res.data.map((comment) => ({
+          id: comment.cmntNo,
+          user: comment.mbrNickname,
+          text: comment.cmntContent,
+          date: comment.cmntRegDate?.substring(0, 10),
+          cmntNo: comment.cmntNo,
+          cmntCommNo: comment.cmntCommNo,
+          cmntMbrId: comment.cmntMbrId,
+        }));
+
+        setComments(mappedComments);
+      })
+      .catch((err) => {
+        console.error("댓글 조회 실패:", err);
+      });
+  };
+
+  useEffect(() => {
+    if (!post) return;
+
+    const commNo = post.commNo ?? post.id;
+
+    fetchComments(commNo);
+  }, [post]);
 
   if (!post) {
     return (
@@ -49,6 +94,11 @@ const CommunityLifeDetail = () => {
   const viewCount = (post.viewCnt || 0) + 1;
   const wishCount = (post.wishCnt || 0) + (isLiked ? 1 : 0);
 
+  const scrollToComments = () => {
+    document.getElementById("life-comments")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // 내 일정으로 가져오기
   // 기존 이미지/내용은 변경하지 않음
   // 기존 대표 이미지(thumbnail) + 코스 이미지(course.image)를 슬라이더에 보여줌
   // 중복 이미지는 제거
@@ -137,21 +187,31 @@ const CommunityLifeDetail = () => {
 
   // 댓글 등록
   const handleCommentSubmit = () => {
+    if (!currentUserId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
       return;
     }
 
-    setComments([
-      {
-        id: Date.now(),
-        user: "나",
-        text: newComment,
-        date: new Date().toLocaleDateString(),
-      },
-      ...comments,
-    ]);
-    setNewComment("");
+    const commNo = post.commNo ?? post.id;
+
+    axios
+      .post("http://localhost:8080/api/comments", {
+        cmntCommNo: commNo,
+        cmntMbrId: currentUserId,
+        cmntContent: newComment,
+      })
+      .then(() => {
+        fetchComments(commNo);
+        setNewComment("");
+      })
+      .catch((err) => {
+        console.error("댓글 등록 실패:", err);
+      });
   };
 
   // 댓글 수정 시작
@@ -167,24 +227,40 @@ const CommunityLifeDetail = () => {
       return;
     }
 
-    setComments(
-      comments.map((c) =>
-        c.id === commentId ? { ...c, text: editText } : c
-      )
-    );
-    setEditingId(null);
-    setEditText("");
+    const commNo = post.commNo ?? post.id;
+
+    axios
+      .put(`http://localhost:8080/api/comments/${commentId}`, {
+        cmntContent: editText,
+      })
+      .then(() => {
+        fetchComments(commNo);
+        setEditingId(null);
+        setEditText("");
+      })
+      .catch((err) => {
+        console.error("댓글 수정 실패:", err);
+      });
   };
 
   // 댓글 삭제
   const handleDeleteComment = (commentId) => {
-    if (window.confirm("댓글을 삭제하시겠습니까?")) {
-      setComments(comments.filter((c) => c.id !== commentId));
-    }
+    if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
+
+    const commNo = post.commNo ?? post.id;
+
+    axios
+      .delete(`http://localhost:8080/api/comments/${commentId}`)
+      .then(() => {
+        fetchComments(commNo);
+      })
+      .catch((err) => {
+        console.error("댓글 삭제 실패:", err);
+      });
   };
 
   return (
-    <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
       <Breadcrumb
         paths={[
           { label: "홈", to: "/" },
@@ -220,22 +296,28 @@ const CommunityLifeDetail = () => {
       <section className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
         {/* 왼쪽 본문 */}
         <div className="space-y-6">
-          {/* 기존 대표 이미지 위치에 ImageSlider 컴포넌트만 적용 */}
-          <ImageSlider
-            images={slideImages}
-            alt={post.title}
-            height="h-[400px]"
-          />
+          {/* 대표 이미지 */}
+          <div className="relative">
+            <ImageSlider
+              images={slideImages}
+              alt={post.title}
+              height="h-[400px]"
+            />
+            <span className="absolute left-4 top-4 z-10 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 fs-down-1 font-semibold text-gray-900 shadow-sm">
+              <IconSVG name="location" size={16} className="shrink-0 fill-none stroke-gray-900" strokeWidth={2} />
+              {region}
+            </span>
+          </div>
 
           {/* 제목 + 메타 */}
           <LifePostHeader
             post={post}
-            region={region}
             viewCount={viewCount}
             comments={comments}
             wishCount={wishCount}
             isLiked={isLiked}
             setIsLiked={setIsLiked}
+            onCommentClick={scrollToComments}
           />
 
           {/* 본문 */}
@@ -270,25 +352,40 @@ const CommunityLifeDetail = () => {
           navigate={navigate}
           handleImportSchedule={handleImportSchedule}
           handleMakePlan={handleMakePlan}
-          openReportModal={openReportModal}
+          openReportModal={() =>
+            openReportModal({
+              type: "post",
+              commNo: post.commNo ?? post.id,
+            })
+          }
+          onCommentClick={scrollToComments}
         />
       </section>
-
       {/* 댓글 영역 */}
-      <CommentSection
-        comments={comments}
-        newComment={newComment}
-        setNewComment={setNewComment}
-        handleCommentSubmit={handleCommentSubmit}
-        editingId={editingId}
-        setEditingId={setEditingId}
-        editText={editText}
-        setEditText={setEditText}
-        startEditing={startEditing}
-        handleSaveEdit={handleSaveEdit}
-        handleDeleteComment={handleDeleteComment}
-        openReportModal={openReportModal}
-      />
+      <div id="life-comments" className="scroll-mt-24">
+
+        <CommentSection
+          comments={comments}                        // 댓글 목록
+          newComment={newComment}                    // 입력값
+          setNewComment={setNewComment}              // 입력 변경
+          handleCommentSubmit={handleCommentSubmit}  // 등록
+          editingId={editingId}                      // 수정중 id
+          setEditingId={setEditingId}                // 수정 상태 변경
+          editText={editText}                        // 수정 내용
+          setEditText={setEditText}                  // 수정 입력
+          startEditing={startEditing}                // 수정 시작
+          handleSaveEdit={handleSaveEdit}            // 수정 저장
+          handleDeleteComment={handleDeleteComment}  // 삭제
+          openReportModal={(comment) =>
+            openReportModal({
+              type: "comment",
+              cmntNo: comment.cmntNo ?? comment.id,
+            })
+          }        // 신고
+          currentUserId={currentUserId}              // 현재 로그인 사용자
+          postAuthor={post.author}                   // 게시글 작성자
+        />
+      </div>
     </div>
   );
 };

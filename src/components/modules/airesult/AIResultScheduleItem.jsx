@@ -1,6 +1,8 @@
 import React from 'react';
 import { TYPE_LABEL, TYPE_COLOR } from './aiResultUtils';
 
+
+// 일정 아이템 카드 1개
 const AIResultScheduleItem = ({
   item,
   idx,
