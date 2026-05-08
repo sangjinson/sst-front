@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getSleepDataByRegion } from './sleepDummyData';
+import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
 import { toKorRegion } from '@utils/regionMap';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import {
@@ -12,8 +12,9 @@ import {
   AreaRelated,
 } from '@components/modules/area/areaview';
 import IconSVG from '@components/Icon/IconSVG';
+import ViewSkeleton from '@components/skeleton/ViewSkeleton';
 
-const CATEGORIES = ['전체', '호텔', '리조트', '펜션', '모텔', '게스트하우스'];
+const CATEGORIES = ['전체', '호텔/모텔', '콘도', '펜션', '게스트하우스', '캠핑'];
 
 const View = () => {
   const { region } = useParams();
@@ -23,23 +24,51 @@ const View = () => {
   const regionKor = toKorRegion(region || '수원');
   const isLoggedIn = true;
 
-  const allItems = useMemo(
-    () => getSleepDataByRegion(regionKor),
-    [regionKor]
-  );
+  const [item, setItem] = useState(null);
+  const [relatedItems, setRelatedItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const item = useMemo(() => {
-    if (!id) return null;
-    return allItems.find((sleepItem) => String(sleepItem.id) === String(id)) || null;
-  }, [allItems, id]);
+  // ✅ 상세 데이터 조회
+  useEffect(() => {
+    if (!id) { setLoading(false); return; }
 
-  const relatedItems = useMemo(() => {
-    if (!item) return [];
+    const fetchDetail = async () => {
+      setLoading(true);
+      try {
+        const data = await getSleepDataById(id);
+        setItem(data);
+      } catch (err) {
+        console.error('상세 조회 실패:', err);
+        setItem(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return allItems
-      .filter((sleepItem) => sleepItem.id !== item.id && sleepItem.category === item.category)
-      .slice(0, 4);
-  }, [allItems, item]);
+    fetchDetail();
+  }, [id]);
+
+  // ✅ 연관 추천 조회
+  useEffect(() => {
+    if (!item) return;
+
+    const fetchRelated = async () => {
+      try {
+        const all = await getSleepDataByRegion(regionKor);
+        const filtered = all
+          .filter((s) => s.id !== item.id && s.category === item.category)
+          .slice(0, 4);
+        setRelatedItems(filtered);
+      } catch (err) {
+        console.error('연관 추천 조회 실패:', err);
+        setRelatedItems([]);
+      }
+    };
+
+    fetchRelated();
+  }, [item, regionKor]);
+
+  if (loading) return <ViewSkeleton />;
 
   if (!item) {
     return (
@@ -74,12 +103,14 @@ const View = () => {
 
       <AreaInfoSection
         infoItems={[
-          { icon: <IconSVG name="location" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '주소', value: item.address },
-          { icon: <IconSVG name="phone" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2} />, label: '전화번호', value: item.phone },
-          { icon: <IconSVG name="time" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '체크인/체크아웃', value: `체크인 ${item.checkIn} / 체크아웃 ${item.checkOut}` },
-          { icon: <IconSVG name="circleprice" size={18} className=" shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '요금', value: item.price, highlight: true },
+          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address },
+          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || '' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '체크인', value: item.checkIn || '' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '체크아웃', value: item.checkOut || '' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '예약', value: item.reservation || '' },
         ]}
-        tags={item.facilities || item.tags}
+        tags={item.facilities || []}
         tagLabel="편의시설"
       />
 
@@ -88,7 +119,7 @@ const View = () => {
       <AreaReview
         rating={item.rating}
         reviewCount={item.reviewCount}
-        reviews={item.reviews}
+        reviews={item.reviews || []}
         isLoggedIn={isLoggedIn}
         placeholder="숙소에 대한 솔직한 리뷰를 남겨주세요."
       />
@@ -108,7 +139,6 @@ const View = () => {
         >
           <span className="mb-0.5 text-lg">←</span> 목록으로
         </button>
-
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md border border-white/20 rounded-xl text-gray-800 shadow-lg shadow-black/5 hover:bg-white hover:shadow-xl transition-all duration-200"
