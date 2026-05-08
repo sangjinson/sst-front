@@ -13,14 +13,12 @@ const REGION_CODE_MAP = {
   '포천시': 65, '가평군': 82, '용인시': 46,
 };
 
-// ✅ FLT 코드 → 한글 이름 매핑 (먹거리 카테고리)
 const FLT_LABEL_MAP = {
-  'FLT006': '한식',
-  'FLT007': '일식',
-  'FLT008': '양식',
-  'FLT009': '중식', 
-  'FLT010': '카페',
-  'FLT021': '간이음식',
+  'FLT016': '축제',
+  'FLT017': '행사',
+  'FLT018': '체험',
+  'FLT019': '레저',
+  'FLT020': '테마파크',
 };
 
 const stripHtml = (str) => str?.replace(/<[^>]*>/g, ' ').trim() || '';
@@ -29,50 +27,48 @@ const normalizeApiItem = (item) => ({
   id: item.plcNo,
   name: item.plcName,
   title: item.plcName,
-  category: FLT_LABEL_MAP[item.plcFltCd] || '한식',
-  tag: FLT_LABEL_MAP[item.plcFltCd] || '한식',
+  category: FLT_LABEL_MAP[item.plcFltCd] || '액티비티',
+  tag: FLT_LABEL_MAP[item.plcFltCd] || '액티비티',
   rating: item.rating ?? 0,
-  reviews: item.reviewCount ?? 0,
   reviewCount: item.reviewCount ?? 0,
+  reviews: [],
   description: stripHtml(item.plcOverview) || '',
   desc: stripHtml(item.plcOverview) || '',
   address: item.plcAddr || '',
   location: item.plcAddr || '',
-  image: item.plcMainImgUrl || item.plcThumImgUrl || 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80',
-  phone: stripHtml(item.plcTelno) || '',
-  hours: stripHtml(item.foodOpeningHours) || '09:00 - 22:00',
+  image: item.plcMainImgUrl || item.plcThumImgUrl || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80',
+  phone: item.plcTelno?.trim() || item.playInfocenter?.trim() || '',
+  hours: stripHtml(item.playUsetime) || '',
   lat: item.plcLat ? Number(item.plcLat) : 37.2636,
   lng: item.plcLot ? Number(item.plcLot) : 127.0286,
   tags: [],
-  parking: stripHtml(item.foodParking) || '',
-  restdate: stripHtml(item.foodRestdate) || '',
-  menu: stripHtml(item.foodMenu) || '',
-  infocenter: stripHtml(item.foodInfocenter) || '',
+  parking: stripHtml(item.playParking) || '',
+  restdate: stripHtml(item.playRestdate) || '',
+  eventStart: item.playEventStart || '',
+  eventEnd: item.playEventEnd || '',
 });
 
-// ✅ 지역별 먹거리 목록 조회
-export const getFoodDataByRegion = async (regionName) => {
+export const getPlayDataByRegion = async (region) => {
   try {
-    const rgnCd = REGION_CODE_MAP[regionName];
-    const res = await axios.get(`${BASE_URL}/api/food/list`, {
+    const rgnCd = REGION_CODE_MAP[region];
+    const res = await axios.get(`${BASE_URL}/api/play/list`, {
       params: { rgnCd },
     });
     return res.data.map(normalizeApiItem);
   } catch (err) {
-    console.error('먹거리 목록 조회 실패:', err);
+    console.error('놀거리 목록 조회 실패:', err);
     return [];
   }
 };
 
-// ✅ 먹거리 상세 조회
-export const getFoodDataById = async (id) => {
+export const getPlayDataById = async (id) => {
   try {
-    const res = await axios.get(`${BASE_URL}/api/food/${id}`);
+    const res = await axios.get(`${BASE_URL}/api/play/${id}`);
     return normalizeApiItem(res.data);
   } catch (err) {
-    console.error('먹거리 상세 조회 실패:', err);
+    console.error('놀거리 상세 조회 실패:', err);
     return null;
   }
 };
 
-export default getFoodDataByRegion;
+export default getPlayDataByRegion;

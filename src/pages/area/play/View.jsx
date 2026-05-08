@@ -1,8 +1,6 @@
-// src/pages/area/play/View.jsx
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getFoodDataByRegion } from './dummydata';
-import { CATEGORIES } from '../DataSet';
+import { getPlayDataById, getPlayDataByRegion } from './playData';
 import { toKorRegion } from '@utils/regionMap';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import {
@@ -14,42 +12,62 @@ import {
   AreaRelated,
 } from '@components/modules/area/areaview';
 import IconSVG from '@components/Icon/IconSVG';
+import ViewSkeleton from '@components/skeleton/ViewSkeleton';
 
-const PLAY_CATEGORIES = CATEGORIES.play;
-
-const generateReviews = (placeName) => [
-  { user: '체험러' + placeName.slice(0, 1) + '123', rating: 5, comment: `${placeName} 정말 재밌었어요! 강력 추천합니다.` },
-  { user: '주말여행자', rating: 4, comment: '사진 찍기 좋고 접근성도 괜찮았습니다.' },
-  { user: '동네탐험가', rating: 5, comment: '근처에 들른다면 추천하고 싶은 장소예요.' },
-];
+const CATEGORIES = ['전체', '액티비티', '테마파크', '체험', '공연/축제', '스포츠'];
 
 const PlayView = () => {
   const { region } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
-
   const currentRegion = region || '';
   const currentRegionKor = toKorRegion(currentRegion);
   const isLoggedIn = true;
 
-  const allItems = useMemo(
-    () => getFoodDataByRegion(currentRegionKor),
-    [currentRegionKor]
-  );
+  const [item, setItem] = useState(null);
+  const [relatedItems, setRelatedItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const item = useMemo(() => {
-    if (!id) return null;
-    return allItems.find((entry) => String(entry.id) === String(id)) || null;
-  }, [allItems, id]);
+  useEffect(() => {
+    if (!id) { setLoading(false); return; }
 
-  const relatedItems = useMemo(() => {
-    if (!item) return [];
+    const fetchDetail = async () => {
+      setLoading(true);
+      try {
+        const data = await getPlayDataById(id);
+        setItem(data);
+      } catch (err) {
+        console.error('상세 조회 실패:', err);
+        setItem(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return allItems
-      .filter((entry) => entry.id !== item.id && entry.category === item.category)
-      .slice(0, 4);
-  }, [allItems, item]);
+    fetchDetail();
+  }, [id]);
+
+  useEffect(() => {
+    if (!item) return;
+
+    const fetchRelated = async () => {
+      try {
+        const all = await getPlayDataByRegion(currentRegionKor);
+        const filtered = all
+          .filter((s) => s.id !== item.id && s.category === item.category)
+          .slice(0, 4);
+        setRelatedItems(filtered);
+      } catch (err) {
+        console.error('연관 추천 조회 실패:', err);
+        setRelatedItems([]);
+      }
+    };
+
+    fetchRelated();
+  }, [item, currentRegionKor]);
+
+  if (loading) return <ViewSkeleton />;
 
   if (!item) {
     return (
@@ -74,7 +92,7 @@ const PlayView = () => {
         image={item.image}
         name={item.name}
         category={item.category}
-        categories={PLAY_CATEGORIES}
+        categories={CATEGORIES}
         renderHeart={() => (
           <WishlistHeartButton item={item} itemType="play" region={region} />
         )}
@@ -84,11 +102,13 @@ const PlayView = () => {
 
       <AreaInfoSection
         infoItems={[
-          { icon: <IconSVG name="location" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '주소', value: item.address },
-          { icon: <IconSVG name="phone" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2} />, label: '전화번호', value: item.phone || '031-000-0000' },
-          { icon: <IconSVG name="time" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '운영시간', value: item.hours || '11:00 - 21:00' },
-          { icon: <IconSVG name="circleprice" size={18} className=" shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '이용요금', value: item.price || '10,000원 ~ 30,000원', highlight: true },
-        ]}
+          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address },
+          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone || '' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '운영시간', value: item.hours || '' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '휴무일', value: item.restdate || '' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '행사기간', value: item.eventStart && item.eventEnd ? `${item.eventStart} ~ ${item.eventEnd}` : '' },
+        ].filter(info => info.value)}
         tags={item.tags}
         tagLabel="태그"
       />
@@ -97,8 +117,8 @@ const PlayView = () => {
 
       <AreaReview
         rating={item.rating}
-        reviewCount={item.reviewCount || item.reviews}
-        reviews={item.reviewList || generateReviews(item.name)}
+        reviewCount={item.reviewCount}
+        reviews={item.reviews || []}
         isLoggedIn={isLoggedIn}
         placeholder="놀거리에 대한 솔직한 리뷰를 남겨주세요."
       />
@@ -108,7 +128,7 @@ const PlayView = () => {
         items={relatedItems}
         onItemClick={(rel) => navigate(`/${currentRegion}/play/view?id=${rel.id}`)}
         nameKey="name"
-        categories={PLAY_CATEGORIES}
+        categories={CATEGORIES}
       />
 
       <div className="flex items-center justify-between gap-3 mb-6">
@@ -118,7 +138,6 @@ const PlayView = () => {
         >
           <span className="mb-0.5 text-lg">←</span> 목록으로
         </button>
-
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md border border-white/20 rounded-xl text-gray-800 shadow-lg shadow-black/5 hover:bg-white hover:shadow-xl transition-all duration-200"
