@@ -128,7 +128,6 @@ export const getSearchResults = async (selectedRegion, searchKeyword, searchCate
 export const getDetailPath = (item, selectedRegion) => {
   const type = item.type;
   const rawId = String(item.id).replace(`${type}-`, '');
-  const { toEnRegion } = require('@utils/regionMap');
   const regionEn = toEnRegion(selectedRegion);
   return `/${regionEn}/${type}/view?id=${rawId}`;
 };
