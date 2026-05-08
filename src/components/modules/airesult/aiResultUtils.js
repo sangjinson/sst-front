@@ -1,10 +1,8 @@
 import { getFoodDataByRegion } from '@pages/area/food/foodData';
 import { getSeeDataByRegion } from '@pages/area/see/seeData';
 import { getSleepDataByRegion } from '@pages/area/sleep/sleepDummyData';
-
-
-// 유틸 함수 모음
-
+import { getPlayDataByRegion } from '@pages/area/play/playData';
+import { toEnRegion } from '@utils/regionMap';
 // ────────────────────────────────────────────
 // 카테고리 타입 한글/색상
 // ────────────────────────────────────────────
@@ -12,24 +10,35 @@ export const TYPE_LABEL = {
   see:   '볼거리',
   food:  '먹거리',
   sleep: '잘거리',
+  play:  '놀거리',
 };
 
 export const TYPE_COLOR = {
   see:   'bg-blue-100 text-blue-700',
   food:  'bg-orange-100 text-orange-700',
   sleep: 'bg-green-100 text-green-700',
+  play:  'bg-purple-100 text-purple-700',
 };
 
-export const SEARCH_CATEGORIES = ['전체', '볼거리', '먹거리', '잘거리'];
+export const SEARCH_CATEGORIES = ['전체', '볼거리', '먹거리', '잘거리', '놀거리'];
 
 // ────────────────────────────────────────────
-// 더미 일정 생성 함수
+// ✅ 일정 생성 함수 - 전부 async API 호출
 // ────────────────────────────────────────────
-export const generateSchedule = (region, days) => {
+export const generateSchedule = async (region, days) => {
   const regionKor = region || '수원시';
-  const see   = getSeeDataByRegion(regionKor.replace('시', '').replace('군', '')).slice(0, 3);
-  const food  = getFoodDataByRegion(regionKor).slice(0, 4);
-  const sleep = getSleepDataByRegion(regionKor).slice(0, 1);
+
+  const [seeRaw, foodRaw, sleepRaw, playRaw] = await Promise.all([
+    getSeeDataByRegion(regionKor.replace('시', '').replace('군', '')),
+    getFoodDataByRegion(regionKor),
+    getSleepDataByRegion(regionKor),
+    getPlayDataByRegion(regionKor),
+  ]);
+
+  const see   = seeRaw.slice(0, 2);
+  const food  = foodRaw.slice(0, 2);
+  const sleep = sleepRaw.slice(0, 1);
+  const play  = playRaw.slice(0, 2);
 
   const times = ['09:00', '11:00', '13:00', '15:00', '17:00', '19:00'];
 
@@ -52,6 +61,15 @@ export const generateSchedule = (region, days) => {
       type: 'food',
       region: regionKor,
     })),
+    ...play.map((item, i) => ({
+      id: `play-${item.id}`,
+      time: times[(i + 4) % times.length],
+      name: item.name,
+      desc: item.description || '',
+      image: item.image,
+      type: 'play',
+      region: regionKor,
+    })),
     ...sleep.map((item) => ({
       id: `sleep-${item.id}`,
       time: '20:00',
@@ -72,23 +90,29 @@ export const generateSchedule = (region, days) => {
 };
 
 // ────────────────────────────────────────────
-// 검색 결과 생성 함수
+// ✅ 검색 결과 생성 함수 - 전부 async API 호출
 // ────────────────────────────────────────────
-export const getSearchResults = (selectedRegion, searchKeyword, searchCategory) => {
+export const getSearchResults = async (selectedRegion, searchKeyword, searchCategory) => {
   const kw = searchKeyword.trim().toLowerCase();
 
-  const seeList = getSeeDataByRegion(selectedRegion.replace('시', '').replace('군', ''))
-    .map(i => ({ ...i, name: i.title || i.name, type: 'see', id: `see-${i.id}` }));
-  const foodList = getFoodDataByRegion(selectedRegion)
-    .map(i => ({ ...i, type: 'food', id: `food-${i.id}` }));
-  const sleepList = getSleepDataByRegion(selectedRegion)
-    .map(i => ({ ...i, type: 'sleep', id: `sleep-${i.id}` }));
+  const [seeRaw, foodRaw, sleepRaw, playRaw] = await Promise.all([
+    getSeeDataByRegion(selectedRegion.replace('시', '').replace('군', '')),
+    getFoodDataByRegion(selectedRegion),
+    getSleepDataByRegion(selectedRegion),
+    getPlayDataByRegion(selectedRegion),
+  ]);
 
-  let all = [...seeList, ...foodList, ...sleepList];
+  const seeList   = seeRaw.map(i => ({ ...i, name: i.title || i.name, type: 'see',   id: `see-${i.id}` }));
+  const foodList  = foodRaw.map(i => ({ ...i, type: 'food',  id: `food-${i.id}` }));
+  const sleepList = sleepRaw.map(i => ({ ...i, type: 'sleep', id: `sleep-${i.id}` }));
+  const playList  = playRaw.map(i => ({ ...i, type: 'play',  id: `play-${i.id}` }));
+
+  let all = [...seeList, ...foodList, ...sleepList, ...playList];
 
   if (searchCategory === '볼거리') all = seeList;
   else if (searchCategory === '먹거리') all = foodList;
   else if (searchCategory === '잘거리') all = sleepList;
+  else if (searchCategory === '놀거리') all = playList;
 
   if (kw) all = all.filter(i =>
     (i.name || '').toLowerCase().includes(kw) ||
@@ -104,6 +128,7 @@ export const getSearchResults = (selectedRegion, searchKeyword, searchCategory) 
 export const getDetailPath = (item, selectedRegion) => {
   const type = item.type;
   const rawId = String(item.id).replace(`${type}-`, '');
-  const regionEn = selectedRegion.replace('시', '').replace('군', '').toLowerCase();
+  const { toEnRegion } = require('@utils/regionMap');
+  const regionEn = toEnRegion(selectedRegion);
   return `/${regionEn}/${type}/view?id=${rawId}`;
 };

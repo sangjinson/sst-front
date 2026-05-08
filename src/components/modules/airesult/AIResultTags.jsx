@@ -2,13 +2,6 @@ import React from 'react';
 
 // 선택 조건 태그 (지역/기간/테마)
 
-const COMPANION_EMOJI = {
-  '1인': '🙋',
-  '반려': '🐾',
-  '커플': '💑',
-  '가족': '👨‍👩‍👧',
-  '친구': '👫',
-};
 
 const AIResultTags = ({
   selectedRegion,

@@ -31,18 +31,73 @@ const AIPlanResultPage = () => {
                  : selectedPeriod === '1박2일'   ? 2
                  : 3;
 
-  const [activeDay, setActiveDay]           = useState(0);
-  const [schedule, setSchedule]             = useState(() =>
-    state.schedule || generateSchedule(selectedRegion, dayCount)
-  );
-  const [dragIndex, setDragIndex]           = useState(null);
-  const [showSearch, setShowSearch]         = useState(false);
-  const [searchKeyword, setSearchKeyword]   = useState('');
-  const [searchCategory, setSearchCategory] = useState('전체');
-  const [searchResults, setSearchResults]   = useState([]);
-  const [selectedItem, setSelectedItem]     = useState(null);
+  const [activeDay, setActiveDay]             = useState(0);
+  const [schedule, setSchedule]               = useState(state.schedule || []);
+  const [dragIndex, setDragIndex]             = useState(null);
+  const [showSearch, setShowSearch]           = useState(false);
+  const [searchKeyword, setSearchKeyword]     = useState('');
+  const [searchCategory, setSearchCategory]   = useState('전체');
+  const [searchResults, setSearchResults]     = useState([]);
+  const [selectedItem, setSelectedItem]       = useState(null);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
 
   const dragOverIndex = useRef(null);
+
+  // ✅ schedule 변경될 때마다 sessionStorage에 저장
+  useEffect(() => {
+    if (schedule.length > 0) {
+      sessionStorage.setItem('currentSchedule', JSON.stringify(schedule));
+    }
+  }, [schedule]);
+
+  // ✅ 초기 schedule 로딩
+  useEffect(() => {
+    // 마이페이지에서 넘어온 경우 기존 일정 유지
+    if (state.schedule) {
+      setSchedule(state.schedule);
+      return;
+    }
+
+    // sessionStorage에 저장된 일정 있으면 복원 (상세페이지 갔다 돌아온 경우)
+    const saved = sessionStorage.getItem('currentSchedule');
+    if (saved) {
+      setSchedule(JSON.parse(saved));
+      return;
+    }
+
+    // 없으면 API로 새로 생성
+    const fetchSchedule = async () => {
+      setScheduleLoading(true);
+      try {
+        const generated = await generateSchedule(selectedRegion, dayCount);
+        setSchedule(generated);
+      } catch (err) {
+        console.error('일정 생성 실패:', err);
+        setSchedule([]);
+      } finally {
+        setScheduleLoading(false);
+      }
+    };
+
+    fetchSchedule();
+  }, []);
+
+  // ✅ 장소 검색 - async
+  useEffect(() => {
+    if (!showSearch) return;
+
+    const fetchSearch = async () => {
+      try {
+        const results = await getSearchResults(selectedRegion, searchKeyword, searchCategory);
+        setSearchResults(results);
+      } catch (err) {
+        console.error('장소 검색 실패:', err);
+        setSearchResults([]);
+      }
+    };
+
+    fetchSearch();
+  }, [showSearch, searchKeyword, searchCategory, selectedRegion]);
 
   const handleDelete = (idx) => {
     setSchedule(prev => {
@@ -112,6 +167,9 @@ const AIPlanResultPage = () => {
         localStorage.setItem('savedTrips', JSON.stringify(savedTrips));
       }
 
+      // ✅ 저장 후 sessionStorage 초기화
+      sessionStorage.removeItem('currentSchedule');
+
       await Swal.fire({
         icon: 'success',
         title: existingId ? '수정되었습니다!' : '저장되었습니다!',
@@ -123,11 +181,6 @@ const AIPlanResultPage = () => {
       navigate('/user/mypage', { state: { tab: 'schedule' } });
     }
   };
-
-  useEffect(() => {
-    if (!showSearch) return;
-    setSearchResults(getSearchResults(selectedRegion, searchKeyword, searchCategory));
-  }, [showSearch, searchKeyword, searchCategory, selectedRegion]);
 
   const handleAddPlace = (item) => {
     const newItem = {
@@ -155,13 +208,13 @@ const AIPlanResultPage = () => {
     <div className="min-h-screen bg-[#f7f8fa]">
       <div className="container mx-auto py-6 px-4 max-w-[1200px]">
 
-        {/* ✅ 브레드크럼 */}
+        {/* 브레드크럼 */}
         <AIResultBreadcrumb existingId={existingId} />
 
-        {/* ✅ 상단 헤더 */}
+        {/* 상단 헤더 */}
         <AIResultHeader existingId={existingId} onSave={handleSave} />
 
-        {/* ✅ 선택 조건 태그 */}
+        {/* 선택 조건 태그 */}
         <AIResultTags
           selectedRegion={selectedRegion}
           selectedPeriod={selectedPeriod}
@@ -173,54 +226,61 @@ const AIPlanResultPage = () => {
           savedName={state.savedName}
         />
 
-        {/* 메인 컨텐츠 */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex flex-col md:flex-row">
-
-            {/* 좌측: 일정 목록 */}
-            <AIResultScheduleList
-              schedule={schedule}
-              activeDay={activeDay}
-              dragIndex={dragIndex}
-              dragOverIndex={dragOverIndex}
-              onDayChange={handleDayChange}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              onDelete={handleDelete}
-              onGoDetail={handleGoDetail}
-              onSave={handleSave}
-              onToggleSearch={() => setShowSearch(prev => !prev)}
-              showSearch={showSearch}
-              onItemClick={(item) => setSelectedItem(item)}
-              selectedItem={selectedItem}
-            />
-
-            {/* 우측: 지도 */}
-            <AIResultMapView
-              selectedRegion={selectedRegion}
-              schedule={schedule}
-              activeDay={activeDay}
-              selectedItem={selectedItem}
-              onSelectItem={(item) => setSelectedItem(item)}
-            />
-
+        {/* ✅ 일정 로딩 중 표시 */}
+        {scheduleLoading ? (
+          <div className="bg-white rounded-2xl shadow-sm p-12 text-center text-gray-400">
+            <div className="text-4xl mb-3">🗺</div>
+            <p className="text-sm">AI가 최적의 여행 코스를 생성하고 있어요...</p>
           </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex flex-col md:flex-row">
 
-          {/* 장소 검색 패널 */}
-          {showSearch && (
-            <AIResultSearchPanel
-              searchKeyword={searchKeyword}
-              searchCategory={searchCategory}
-              searchResults={searchResults}
-              currentDayItems={currentDayItems}
-              onKeywordChange={(kw) => setSearchKeyword(kw)}
-              onCategoryChange={(cat) => setSearchCategory(cat)}
-              onAddPlace={handleAddPlace}
-              onClose={() => setShowSearch(false)}
-            />
-          )}
-        </div>
+              {/* 좌측: 일정 목록 */}
+              <AIResultScheduleList
+                schedule={schedule}
+                activeDay={activeDay}
+                dragIndex={dragIndex}
+                dragOverIndex={dragOverIndex}
+                onDayChange={handleDayChange}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onDelete={handleDelete}
+                onGoDetail={handleGoDetail}
+                onSave={handleSave}
+                onToggleSearch={() => setShowSearch(prev => !prev)}
+                showSearch={showSearch}
+                onItemClick={(item) => setSelectedItem(item)}
+                selectedItem={selectedItem}
+              />
+
+              {/* 우측: 지도 */}
+              <AIResultMapView
+                selectedRegion={selectedRegion}
+                schedule={schedule}
+                activeDay={activeDay}
+                selectedItem={selectedItem}
+                onSelectItem={(item) => setSelectedItem(item)}
+              />
+
+            </div>
+
+            {/* 장소 검색 패널 */}
+            {showSearch && (
+              <AIResultSearchPanel
+                searchKeyword={searchKeyword}
+                searchCategory={searchCategory}
+                searchResults={searchResults}
+                currentDayItems={currentDayItems}
+                onKeywordChange={(kw) => setSearchKeyword(kw)}
+                onCategoryChange={(cat) => setSearchCategory(cat)}
+                onAddPlace={handleAddPlace}
+                onClose={() => setShowSearch(false)}
+              />
+            )}
+          </div>
+        )}
 
       </div>
     </div>
