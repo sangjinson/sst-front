@@ -18,14 +18,84 @@ const LandingPage = () => {
   const [activeTab, setActiveTab] = useState('남부');
   const [searchKeyword, setSearchKeyword] = useState('');
 
-  const citiesSouth = ['수원시', '성남시', '용인시', '안양시', '안산시', '과천시', '광명시', '광주시', '군포시', '부천시', '시흥시', '안성시', '오산시', '의왕시', '이천시', '평택시', '하남시', '화성시', '여주시', '양평군'];
-  const citiesNorth = ['고양시', '구리시', '남양주시', '동두천시', '양주시', '의정부시', '파주시', '포천시', '연천군', '가평군'];
+  const citiesSouth = [
+  '수원시',
+  '성남시',
+  '용인시',
+  '안양시',
+  '안산시',
+  '과천시',
+  '광명시',
+  '광주시',
+  '군포시',
+  '부천시',
+  '시흥시',
+  '안성시',
+  '오산시',
+  '의왕시',
+  '이천시',
+  '평택시',
+  '하남시',
+  '화성시',
+  '여주시',
+  '김포시'
+];
+
+const citiesNorth = [
+  '고양시',
+  '구리시',
+  '남양주시',
+  '동두천시',
+  '양주시',
+  '의정부시',
+  '파주시',
+  '포천시',
+  '연천군',
+  '가평군'
+];
+
+  const regionCodeMap = {
+  고양시: 28,
+  구리시: 31,
+  남양주시: 36,
+  동두천시: 25,
+  양주시: 63,
+  연천군: 80,
+  의정부시: 15,
+  파주시: 48,
+  포천시: 65,
+  가평군: 82,
+  수원시: 11,
+  성남시: 13,
+  용인시: 46,
+  안양시: 17,
+  안산시: 27,
+  화성시: 59,
+  평택시: 22,
+  시흥시: 39,
+  부천시: 19,
+  광명시: 21,
+  광주시: 61,
+  이천시: 50,
+  여주시: 67,
+  하남시: 45,
+  의왕시: 43,
+  군포시: 41,
+  오산시: 37,
+  안성시: 55,
+  김포시: 57,
+  과천시: 29,
+};
 
   const currentCities = activeTab === '남부' ? citiesSouth : citiesNorth;
 
   const goToMainPage = (regionName) => {
-    navigate(`/${toEnRegion(regionName)}`);
-  };
+  const regionCode = regionCodeMap[regionName];
+
+  navigate(
+    `/${toEnRegion(regionName)}?regionCode=${regionCode}`
+  );
+};
 
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;

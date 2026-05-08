@@ -8,6 +8,7 @@ import AdminLayout from '@layouts/AdminLayout';
 import MainPage from '@pages/main/MainPage';
 import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
+import NotFoundPage from '@pages/error/NotFoundPage';
 import MyPage from '@pages/user/MyPage';
 
 import Notice from "@pages/customersupport/Notice";
@@ -105,6 +106,8 @@ const AppRoutes = () => {
           {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
         </Route>
       </Route> 
+
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };
