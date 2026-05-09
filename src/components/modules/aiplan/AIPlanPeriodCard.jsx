@@ -8,6 +8,7 @@ import AIPlanCalendar from './AIPlanCalendar';
  * 사용 예시:
  * <AIPlanPeriodCard
  *   selectedPeriod={selectedPeriod}
+ *   selectedNights={selectedNights}
  *   startDate={startDate}
  *   endDate={endDate}
  *   onPeriodSelect={(opt) => { setSelectedPeriod(opt.value); setSelectedNights(opt.nights); }}
@@ -30,7 +31,8 @@ const AIPlanPeriodCard = ({
   onPeriodSelect,
   onDateSelect,
 }) => {
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [showStartCal, setShowStartCal] = useState(false);
+  const [showEndCal, setShowEndCal]     = useState(false);
 
   return (
     <div>
@@ -65,51 +67,70 @@ const AIPlanPeriodCard = ({
         ))}
       </div>
 
-      {/* 직접 날짜 선택 */}
+      {/* 날짜 선택 - 시작일/종료일 각각 분리 */}
       <div className="border-t border-gray-100 pt-5">
-        <div className="flex items-center gap-2 mb-3">
-          <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-[#0F9B73]" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-          <p className="text-sm font-semibold text-gray-700">
-            원하는 일정을 골라주세요
-            {selectedPeriod && (
-              <span className="ml-2 text-xs text-[#0F9B73] font-normal">
-                (날짜 클릭 시 {selectedPeriod} 자동 선택)
-              </span>
-            )}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 relative">
-          <div className="flex-1 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 text-sm text-gray-600">
-            <span className="text-xs text-gray-400 block">시작일</span>
-            {startDate || '날짜 선택'}
-          </div>
-          <span className="text-gray-400">~</span>
-          <div className="flex-1 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 text-sm text-gray-600">
-            <span className="text-xs text-gray-400 block">종료일</span>
-            {endDate || '날짜 선택'}
-          </div>
-          <button
-            onClick={() => setShowCalendar(prev => !prev)}
-            className="w-10 h-10 flex items-center justify-center bg-[#0F9B73] text-white rounded-xl hover:bg-[#0d8a66] transition"
-          >
-            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-white" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </button>
-          {showCalendar && (
-            <AIPlanCalendar
-              onSelect={(start, end) => { onDateSelect(start, end); setShowCalendar(false); }}
-              onClose={() => setShowCalendar(false)}
-              nights={selectedNights}
-            />
+        <p className="text-sm font-semibold text-gray-700 mb-3">
+          날짜를 선택해주세요
+          {selectedPeriod && (
+            <span className="ml-2 text-xs text-[#0F9B73] font-normal">
+              (시작일 선택 시 {selectedPeriod} 자동 적용)
+            </span>
           )}
+        </p>
+
+        <div className="flex items-center gap-3">
+
+          {/* 시작일 */}
+          <div className="relative flex-1">
+            <div
+              onClick={() => { setShowStartCal(prev => !prev); setShowEndCal(false); }}
+              className={`border rounded-xl px-4 py-3 bg-gray-50 text-sm text-gray-600 cursor-pointer hover:border-[#0F9B73] transition ${
+                showStartCal ? 'border-[#0F9B73]' : 'border-gray-200'
+              }`}
+            >
+              <span className="text-xs text-gray-400 block">시작일</span>
+              {startDate || '날짜 선택'}
+            </div>
+            {showStartCal && (
+              <AIPlanCalendar
+                mode="start"
+                nights={selectedNights}
+                onSelect={(start, end) => {
+                  onDateSelect(start, end);
+                  setShowStartCal(false);
+                }}
+                onClose={() => setShowStartCal(false)}
+              />
+            )}
+          </div>
+
+          <span className="text-gray-400">~</span>
+
+          {/* 종료일 */}
+          <div className="relative flex-1">
+            <div
+              onClick={() => { setShowEndCal(prev => !prev); setShowStartCal(false); }}
+              className={`border rounded-xl px-4 py-3 bg-gray-50 text-sm text-gray-600 cursor-pointer hover:border-[#0F9B73] transition ${
+                showEndCal ? 'border-[#0F9B73]' : 'border-gray-200'
+              }`}
+            >
+              <span className="text-xs text-gray-400 block">종료일</span>
+              {endDate || '날짜 선택'}
+            </div>
+            {showEndCal && (
+              <AIPlanCalendar
+                mode="end"
+                startDate={startDate}
+                nights={selectedNights}
+                onSelect={(start, end) => {
+                  onDateSelect(start, end);
+                  setShowEndCal(false);
+                }}
+                onClose={() => setShowEndCal(false)}
+              />
+            )}
+          </div>
+
         </div>
       </div>
     </div>

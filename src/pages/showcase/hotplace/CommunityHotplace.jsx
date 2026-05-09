@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getAllPosts } from "./communityHotplaceData"; // ✅ 변경
+import { getAllPosts } from "./communityHotplaceData";
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    window.scrollTo(0, 0); // ✅ 페이지 진입 시 맨 위로 이동
+    window.scrollTo(0, 0); // 페이지 진입 시 맨 위로 이동
   }, []);
 
   // 사용자가 좋아요를 눌렀는지 저장하는 상태
@@ -16,7 +16,7 @@ const CommunityHotplace = () => {
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
 
-  // ✅ 더미 + 유저 게시글 합쳐서 사용
+  // 더미 + 유저 게시글 합쳐서 사용
   const posts = getAllPosts();
 
   const filteredPosts = useMemo(() => {
@@ -61,24 +61,57 @@ const CommunityHotplace = () => {
     return "aspect-[3/4]";
   };
 
+  const EyeIcon = () => (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+
+  const CommentIcon = () => (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 translate-y-[1px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+    </svg>
+  );
+
+  const LikeIcon = () => (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M7 11v10H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h3z" />
+      <path d="M7 11l4.4-7.1A2 2 0 0 1 15 5v4h4a2 2 0 0 1 2 2.3l-1.2 8A2 2 0 0 1 17.8 21H7V11z" />
+    </svg>
+  );
+
   return (
-    <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
       <Breadcrumb paths={[{ label: "홈", to: "/" }, { label: "핫플거리", to: "/showcase" }]} className="mb-4" />
 
-      <section className="mt-8 mb-8 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
+      <section className="mt-8 mb-8 flex flex-col gap-6 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-bold text-emerald-600">Hotplace</p>
-            {/* 제목 + 이동 탭 */}
-            <div className="mt-1 flex items-end gap-3">
-              {/* 현재 페이지 */}
+            <div className="mt-1 flex items-center gap-2">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
                 핫플거리
               </h2>
-              {/* 이동 (인생거리) */}
               <Link
                 to="/showcase/life"
-                className="mb-1 fs-down-1 md:text-lg font-bold text-gray-400 transition-all hover:text-[#0F9B73] hover:scale-110">
-                / 인생거리
+                className="group mb-1 inline-flex h-8 items-center gap-1.5 rounded-full text-gray-400 transition-all duration-200 hover:text-[#0F9B73]"
+                aria-label="인생거리로 전환">
+                <span className="inline-flex h-8 w-8 items-center justify-center">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <path d="M5 12h14" />
+                    <path d="M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+                <span className="fs-down-1 md:text-lg font-bold">
+                  인생거리
+                </span>
               </Link>
             </div>
             <p className="mt-2 text-sm md:text-base text-gray-500">
@@ -86,7 +119,7 @@ const CommunityHotplace = () => {
             </p>
           </div>
         <Link to="/showcase/hotplace/write" className="w-fit">
-          <button className="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-md active:scale-95">
+          <button className="cursor-pointer rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-md active:scale-95">
             글쓰기
           </button>
         </Link>
@@ -115,7 +148,7 @@ const CommunityHotplace = () => {
           <span>총 <strong className="text-emerald-600">{filteredPosts.length}</strong>개의 게시글</span>
           {keyword && (
             <button type="button" onClick={() => { setKeyword(""); setSearchType("all"); }}
-              className="font-semibold text-gray-400 hover:text-emerald-600">검색 초기화</button>
+              className="cursor-pointer font-semibold text-gray-400 hover:text-emerald-600">검색 초기화</button>
           )}
         </div>
       </section>
@@ -128,7 +161,7 @@ const CommunityHotplace = () => {
             return (
               <article key={post.id}
                 className="mb-5 md:mb-6 break-inside-avoid overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
-                <button type="button" onClick={() => navigate(`/showcase/hotplace/view/${post.id}`)} className="block w-full text-left">
+                <button type="button" onClick={() => navigate(`/showcase/hotplace/view/${post.id}`)} className="block w-full cursor-pointer text-left">
                   <div className={`relative w-full overflow-hidden bg-gray-100 ${getImageRatio(post.size)}`}>
                     <img src={post.img} alt={post.title}
                       className="h-full w-full object-cover block transition-transform duration-500 group-hover:scale-110" />
@@ -153,21 +186,20 @@ const CommunityHotplace = () => {
                       <span key={tag} className="fs-down-1 font-semibold text-emerald-600 hover:text-emerald-700">#{tag}</span>
                     ))}
                   </div>
-                  <div className="flex items-center justify-between gap-2 border-t border-gray-100 pt-3 fs-down-1 text-gray-500">
-                    <div className="flex items-center gap-4">
-                      <span>👁 {post.viewCnt}</span>
-                      <span>💬 {post.commentCnt}</span>
+                  <div className="flex items-center justify-between gap-2 border-t border-gray-100 pt-3 fs-down-1">
+                    <div className="flex items-center gap-4 font-bold text-gray-900">
+                      <button
+                        type="button"
+                        onClick={() => toggleLike(post.id)}
+                        className={`inline-flex min-w-[58px] cursor-pointer items-center gap-1.5 transition-colors active:scale-95 ${
+                          liked ? "text-blue-500" : "hover:text-blue-500"
+                        }`}>
+                        <LikeIcon />
+                        {likeCount}
+                      </button>
+                      <span className="inline-flex items-center gap-1.5"><CommentIcon />{post.commentCnt}</span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => toggleLike(post.id)}
-                      className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold transition-all active:scale-95 ${
-                        liked
-                          ? "bg-blue-50 text-blue-500"
-                          : "bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500"
-                      }`}>
-                      👍 {likeCount}
-                    </button>
+                    <span className="inline-flex items-center gap-1.5 text-gray-400"><EyeIcon />{post.viewCnt}</span>
                   </div>
                 </div>
               </article>

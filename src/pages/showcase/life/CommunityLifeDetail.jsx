@@ -1,20 +1,29 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { ClipButton } from "@components/modules/ActionButtons";
 import {
   getAllLifePosts,
   lifeComments,
-  TYPE_LABEL,
-  TYPE_COLOR,
 } from "./communityLifeData";
 import Swal from "sweetalert2";
+import CommentSection from "@components/modules/community/common/CommentSection";
+import LifeCourseView from "@components/modules/community/life/LifeCourseView";
+import LifeAside from "@components/modules/community/life/LifeAside";
+import LifePostHeader from "@components/modules/community/life/LifePostHeader";
+import { openReportModal } from "@components/modules/community/common/reportModal";
+import IconSVG from "@components/Icon/IconSVG";
+
+// 공통 이미지 슬라이더 컴포넌트 import
+import ImageSlider from "@components/modules/community/common/ImageSlider";
 
 const CommunityLifeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isLogin = true;
 
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(lifeComments || []);
@@ -25,9 +34,50 @@ const CommunityLifeDetail = () => {
     window.scrollTo({ top: 0 });
   }, []);
 
-  // ✅ 게시글 찾기
+  useEffect(() => {
+    api
+      .get("/auth/me")
+      .then((res) => {
+        setCurrentUserId(res.data.data.mbrId);
+      })
+      .catch((err) => {
+        console.error("로그인 사용자 조회 실패:", err);
+      });
+  }, []);
+
+  // 게시글 찾기
   const posts = getAllLifePosts ? getAllLifePosts() : [];
   const post = posts.find((p) => p.id === Number(id));
+
+  // 댓글 조회 함수
+  const fetchComments = (commNo) => {
+    axios
+      .get(`http://localhost:8080/api/comments/${commNo}`)
+      .then((res) => {
+        const mappedComments = res.data.map((comment) => ({
+          id: comment.cmntNo,
+          user: comment.mbrNickname,
+          text: comment.cmntContent,
+          date: comment.cmntRegDate?.substring(0, 10),
+          cmntNo: comment.cmntNo,
+          cmntCommNo: comment.cmntCommNo,
+          cmntMbrId: comment.cmntMbrId,
+        }));
+
+        setComments(mappedComments);
+      })
+      .catch((err) => {
+        console.error("댓글 조회 실패:", err);
+      });
+  };
+
+  useEffect(() => {
+    if (!post) return;
+
+    const commNo = post.commNo ?? post.id;
+
+    fetchComments(commNo);
+  }, [post]);
 
   if (!post) {
     return (
@@ -37,14 +87,26 @@ const CommunityLifeDetail = () => {
     );
   }
 
-  // ✅ 데이터 안전 처리
+  // 데이터 안전 처리
   const thumbnail = post.thumbnail || post.img;
   const region = post.region || post.place || "장소 정보 없음";
   const courseList = post.course || [];
   const viewCount = (post.viewCnt || 0) + 1;
   const wishCount = (post.wishCnt || 0) + (isLiked ? 1 : 0);
 
-  // ✅ 내 일정으로 가져오기
+  const scrollToComments = () => {
+    document.getElementById("life-comments")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // 내 일정으로 가져오기
+  // 기존 이미지/내용은 변경하지 않음
+  // 기존 대표 이미지(thumbnail) + 코스 이미지(course.image)를 슬라이더에 보여줌
+  // 중복 이미지는 제거
+  const slideImages = Array.from(
+    new Set([thumbnail, ...courseList.map((c) => c.image).filter(Boolean)])
+  );
+
+  // 내 일정으로 가져오기
   const handleImportSchedule = () => {
     if (!isLogin) {
       navigate("/login");
@@ -97,7 +159,7 @@ const CommunityLifeDetail = () => {
     });
   };
 
-  // ✅ 이 코스로 일정 만들기
+  // 이 코스로 일정 만들기
   const handleMakePlan = () => {
     const scheduleItems = courseList.map((c, i) => ({
       id: `life-${post.id}-${c.order || i + 1}`,
@@ -123,102 +185,82 @@ const CommunityLifeDetail = () => {
     });
   };
 
-  // ✅ 게시글 신고
-  const handleReport = async () => {
-    const result = await Swal.fire({
-      title: "신고하시겠습니까?",
-      text: "신고 접수 후 관리자 검토가 진행됩니다.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "신고하기",
-      cancelButtonText: "취소",
-      confirmButtonColor: "#f97316",
-      cancelButtonColor: "#9ca3af",
-    });
-
-    if (result.isConfirmed) {
-      Swal.fire({
-        icon: "success",
-        title: "신고 완료",
-        text: "신고가 정상적으로 완료되었습니다.",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    }
-  };
-
-  // ✅ 댓글 신고
-  const handleReportComment = async () => {
-    const result = await Swal.fire({
-      title: "댓글을 신고하시겠습니까?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "신고하기",
-      cancelButtonText: "취소",
-      confirmButtonColor: "#f97316",
-      cancelButtonColor: "#9ca3af",
-    });
-
-    if (result.isConfirmed) {
-      Swal.fire({
-        icon: "success",
-        title: "신고 완료",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    }
-  };
-
-  // ✅ 댓글 등록
+  // 댓글 등록
   const handleCommentSubmit = () => {
+    if (!currentUserId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
       return;
     }
 
-    setComments([
-      {
-        id: Date.now(),
-        user: "나",
-        text: newComment,
-        date: new Date().toLocaleDateString(),
-      },
-      ...comments,
-    ]);
-    setNewComment("");
+    const commNo = post.commNo ?? post.id;
+
+    axios
+      .post("http://localhost:8080/api/comments", {
+        cmntCommNo: commNo,
+        cmntMbrId: currentUserId,
+        cmntContent: newComment,
+      })
+      .then(() => {
+        fetchComments(commNo);
+        setNewComment("");
+      })
+      .catch((err) => {
+        console.error("댓글 등록 실패:", err);
+      });
   };
 
-  // ✅ 댓글 수정 시작
+  // 댓글 수정 시작
   const startEditing = (commentId, text) => {
     setEditingId(commentId);
     setEditText(text);
   };
 
-  // ✅ 댓글 수정 저장
+  // 댓글 수정 저장
   const handleSaveEdit = (commentId) => {
     if (!editText.trim()) {
       alert("수정할 내용을 입력해주세요.");
       return;
     }
 
-    setComments(
-      comments.map((c) =>
-        c.id === commentId ? { ...c, text: editText } : c
-      )
-    );
-    setEditingId(null);
-    setEditText("");
+    const commNo = post.commNo ?? post.id;
+
+    axios
+      .put(`http://localhost:8080/api/comments/${commentId}`, {
+        cmntContent: editText,
+      })
+      .then(() => {
+        fetchComments(commNo);
+        setEditingId(null);
+        setEditText("");
+      })
+      .catch((err) => {
+        console.error("댓글 수정 실패:", err);
+      });
   };
 
-  // ✅ 댓글 삭제
+  // 댓글 삭제
   const handleDeleteComment = (commentId) => {
-    if (window.confirm("댓글을 삭제하시겠습니까?")) {
-      setComments(comments.filter((c) => c.id !== commentId));
-    }
+    if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
+
+    const commNo = post.commNo ?? post.id;
+
+    axios
+      .delete(`http://localhost:8080/api/comments/${commentId}`)
+      .then(() => {
+        fetchComments(commNo);
+      })
+      .catch((err) => {
+        console.error("댓글 삭제 실패:", err);
+      });
   };
 
   return (
-    <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
       <Breadcrumb
         paths={[
           { label: "홈", to: "/" },
@@ -229,7 +271,7 @@ const CommunityLifeDetail = () => {
       />
 
       {/* 헤더 */}
-      <section className="mb-8 mt-6 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-center md:justify-between">
+      <section className="mb-8 mt-6 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm font-bold text-[#0F9B73] pt-2">
             Life Course Detail
@@ -245,8 +287,7 @@ const CommunityLifeDetail = () => {
         <button
           type="button"
           onClick={() => navigate("/showcase/life")}
-          className="w-fit rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-600 transition-all hover:-translate-y-0.5 hover:border-[#0F9B73] hover:text-[#0F9B73] hover:shadow-sm active:scale-95"
-        >
+          className="w-fit rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-600 transition-all hover:-translate-y-0.5 hover:border-[#0F9B73] hover:text-[#0F9B73] hover:shadow-sm active:scale-95">
           목록으로
         </button>
       </section>
@@ -256,62 +297,28 @@ const CommunityLifeDetail = () => {
         {/* 왼쪽 본문 */}
         <div className="space-y-6">
           {/* 대표 이미지 */}
-          <div className="w-full h-[400px] rounded-3xl overflow-hidden bg-gray-100">
-            <img
-              src={thumbnail}
+          <div className="relative">
+            <ImageSlider
+              images={slideImages}
               alt={post.title}
-              className="w-full h-full object-cover"
+              height="h-[400px]"
             />
+            <span className="absolute left-4 top-4 z-10 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 fs-down-1 font-semibold text-gray-900 shadow-sm">
+              <IconSVG name="location" size={16} className="shrink-0 fill-none stroke-gray-900" strokeWidth={2} />
+              {region}
+            </span>
           </div>
 
           {/* 제목 + 메타 */}
-          <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-3 flex-wrap">
-              <span className="px-3 py-1 bg-[#f0fdf9] text-[#0F9B73] text-xs font-semibold rounded-full">
-                📍 {region}
-              </span>
-
-              {(post.hashtags || []).map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs font-semibold text-[#0F9B73]"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-
-            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-3">
-              {post.title}
-            </h1>
-
-            <div className="flex flex-col gap-3 text-sm text-gray-400 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                  😊
-                </div>
-                <span className="font-semibold text-[#E8956D]">
-                  {post.author}
-                </span>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4">
-                <span>👁 {viewCount}</span>
-                <span>💬 {comments.length}</span>
-                <button
-                  type="button"
-                  onClick={() => setIsLiked(!isLiked)}
-                  className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold transition-all active:scale-95 ${
-                    isLiked
-                      ? "bg-blue-50 text-blue-500"
-                      : "bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500"
-                  }`}>
-                  👍 {wishCount}
-                </button>
-                <span>{post.regDt}</span>
-              </div>
-            </div>
-          </div>
+          <LifePostHeader
+            post={post}
+            viewCount={viewCount}
+            comments={comments}
+            wishCount={wishCount}
+            isLiked={isLiked}
+            setIsLiked={setIsLiked}
+            onCommentClick={scrollToComments}
+          />
 
           {/* 본문 */}
           <article className="bg-white rounded-3xl border border-gray-100 p-6 md:p-10 shadow-sm">
@@ -321,353 +328,64 @@ const CommunityLifeDetail = () => {
           </article>
 
           {/* 여행 코스 */}
-          <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
-            <h3 className="text-lg font-extrabold text-gray-900 mb-5 flex items-center gap-2">
-              🗺 여행 코스
-              <span className="text-sm font-normal text-gray-400">
-                {courseList.length}개 장소
-              </span>
-            </h3>
-
-            {courseList.length > 0 ? (
-            <div className="space-y-4">
-              {courseList.map((c, i) => (
-                <div key={c.order || i} className="flex gap-4">
-                  {/* 순서 + 연결선 */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-8 h-8 rounded-full bg-[#0F9B73] text-white text-sm font-bold flex items-center justify-center shrink-0">
-                      {c.order || i + 1}
-                    </div>
-
-                    {i < courseList.length - 1 && (
-                      <div className="w-0.5 h-full bg-gray-200 my-1 min-h-[20px]" />
-                    )}
-                  </div>
-
-                  {/* 장소 카드 */}
-                  <div className="flex-1 bg-gray-50 rounded-2xl p-4 flex gap-4 mb-2">
-                    {/* 장소 이미지 - 클릭 시 지역/타입별 상세 페이지로 이동 */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigate(`/${region}/${c.type}/view`, {
-                          state: {
-                            item: c,
-                            region,
-                            type: c.type,
-                          },
-                        });
-                      }}
-                      className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-200 transition hover:scale-105 active:scale-95">
-                      <img
-                        src={c.image || thumbnail}
-                        alt={c.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                            TYPE_COLOR?.[c.type] ||
-                            "bg-emerald-50 text-emerald-600"
-                          }`}>
-                          {TYPE_LABEL?.[c.type] || "여행"}
-                        </span>
-                      </div>
-
-                      <p className="text-sm font-bold text-gray-900 truncate">
-                        {c.name}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        {c.address}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">{c.desc}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="rounded-2xl bg-gray-50 p-5 text-sm text-gray-500">
-              등록된 여행 코스가 없습니다.
-            </p>
-          )}
-
-            {/* 일정 버튼 */}
-            <div className="flex flex-col gap-3 mt-6 sm:flex-row">
-              <button
-                type="button"
-                onClick={handleImportSchedule}
-                className="flex-1 py-3 bg-[#0F9B73] text-white text-sm font-bold rounded-xl hover:bg-[#0d8a66] transition flex items-center justify-center gap-2"
-              >
-                📅 내 일정으로 가져오기
-              </button>
-
-              <button
-                type="button"
-                onClick={handleMakePlan}
-                className="flex-1 py-3 border border-[#0F9B73] text-[#0F9B73] text-sm font-bold rounded-xl hover:bg-green-50 transition flex items-center justify-center gap-2"
-              >
-                🗺 이 코스로 일정 만들기
-              </button>
-            </div>
-          </div>
+          <LifeCourseView
+            courseList={courseList}
+            region={region}
+            thumbnail={thumbnail}
+            navigate={navigate}
+            handleImportSchedule={handleImportSchedule}
+            handleMakePlan={handleMakePlan}
+          />
         </div>
 
         {/* 오른쪽 사이드 정보 */}
-        <aside className="h-fit rounded-3xl border border-gray-100 bg-white p-6 shadow-sm lg:sticky lg:top-6 space-y-6">
-          {/* 공유/신고 */}
-          <div className="flex items-center gap-2">
-            <ClipButton />
-
-            <button
-              type="button"
-              onClick={handleReport}
-              className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500"
-            >
-              🚩 신고
-            </button>
-          </div>
-
-          {/* 작성자 */}
-          <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 text-xl shadow-sm">
-              😊
-            </div>
-
-            <div>
-              <p className="text-xs text-gray-400">작성자</p>
-              <h4 className="text-base font-bold text-gray-900">
-                {post.author}
-              </h4>
-            </div>
-          </div>
-
-          {/* 지역 + 작성일 */}
-          <div className="space-y-3 rounded-2xl bg-gray-50 p-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">지역</span>
-              <strong className="text-gray-700">{region}</strong>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">작성일</span>
-              <strong className="text-gray-700">{post.regDt}</strong>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">코스</span>
-              <strong className="text-gray-700">
-                {courseList.length}개 장소
-              </strong>
-            </div>
-          </div>
-
-          {/* 해시태그 */}
-          <div>
-            <p className="mb-3 text-sm font-bold text-gray-500">해시태그</p>
-
-            <div className="flex flex-wrap gap-2">
-              {(post.hashtags || []).map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-bold text-emerald-600"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* 조회/댓글/찜 */}
-          <div className="grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 text-center">
-            <div className="rounded-2xl bg-gray-50 px-3 py-4">
-              <p className="text-xs text-gray-400">조회</p>
-              <strong className="mt-1 block text-lg text-gray-900">
-                {viewCount}
-              </strong>
-            </div>
-
-            <div className="rounded-2xl bg-gray-50 px-3 py-4">
-              <p className="text-xs text-gray-400">댓글</p>
-              <strong className="mt-1 block text-lg text-gray-900">
-                {comments.length}
-              </strong>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setIsLiked(!isLiked)}
-              className={`rounded-2xl px-3 py-4 transition ${
-                isLiked ? "bg-red-50" : "bg-gray-50 hover:bg-red-50"
-              }`}
-            >
-              <p className="text-xs text-gray-400">찜</p>
-              <strong
-                className={`mt-1 block text-lg ${
-                  isLiked ? "text-red-500" : "text-gray-900"
-                }`}
-              >
-                {wishCount}
-              </strong>
-            </button>
-          </div>
-
-          {/* 수정/삭제 */}
-          {isLogin && (
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => navigate(`/showcase/life/write/${post.id}`)}
-                className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-bold text-gray-600 transition hover:border-[#0F9B73] hover:text-[#0F9B73]"
-              >
-                수정
-              </button>
-
-              <button
-                type="button"
-                onClick={() => alert("삭제 예정")}
-                className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-bold text-red-500 transition hover:bg-red-100"
-              >
-                삭제
-              </button>
-            </div>
-          )}
-
-          {/* 사이드바 일정 버튼 */}
-          <div className="border-t border-gray-100 pt-4 space-y-2">
-            <button
-              type="button"
-              onClick={handleImportSchedule}
-              className="w-full py-3 bg-[#0F9B73] text-white text-sm font-bold rounded-xl hover:bg-[#0d8a66] transition"
-            >
-              📅 내 일정으로 가져오기
-            </button>
-
-            <button
-              type="button"
-              onClick={handleMakePlan}
-              className="w-full py-3 border border-[#0F9B73] text-[#0F9B73] text-sm font-bold rounded-xl hover:bg-green-50 transition"
-            >
-              🗺 이 코스로 일정 만들기
-            </button>
-          </div>
-        </aside>
+        <LifeAside
+          post={post}
+          region={region}
+          courseList={courseList}
+          viewCount={viewCount}
+          comments={comments}
+          wishCount={wishCount}
+          isLiked={isLiked}
+          setIsLiked={setIsLiked}
+          isLogin={isLogin}
+          navigate={navigate}
+          handleImportSchedule={handleImportSchedule}
+          handleMakePlan={handleMakePlan}
+          openReportModal={() =>
+            openReportModal({
+              type: "post",
+              commNo: post.commNo ?? post.id,
+            })
+          }
+          onCommentClick={scrollToComments}
+        />
       </section>
-
       {/* 댓글 영역 */}
-      <section className="mt-12 border-t border-gray-100 pt-10">
-        <h4 className="mb-6 text-xl font-extrabold text-gray-900">
-          댓글 <span className="text-[#0F9B73]">{comments.length}</span>
-        </h4>
+      <div id="life-comments" className="scroll-mt-24">
 
-        <div className="mb-8 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm transition-all focus-within:border-[#0F9B73] focus-within:ring-2 focus-within:ring-green-100">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="h-28 w-full resize-none bg-transparent text-base text-gray-700 outline-none"
-            placeholder="이 여행 코스에 대한 감상을 남겨주세요."
-          />
-
-          <div className="mt-3 flex justify-end">
-            <button
-              type="button"
-              onClick={handleCommentSubmit}
-              className="rounded-xl bg-[#0F9B73] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#0d8a66] active:scale-95"
-            >
-              댓글 등록
-            </button>
-          </div>
-        </div>
-
-        <div className="mb-16 space-y-4">
-          {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm transition hover:shadow-md md:p-6"
-            >
-              <div className="mb-4 flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 text-sm">
-                    👤
-                  </div>
-
-                  <div>
-                    <p className="font-bold text-gray-900">{comment.user}</p>
-                    <p className="text-sm text-gray-400">{comment.date}</p>
-                  </div>
-                </div>
-
-                <div className="flex shrink-0 items-center gap-3 text-sm font-semibold">
-                  {editingId === comment.id ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => handleSaveEdit(comment.id)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        저장
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingId(null);
-                          setEditText("");
-                        }}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        취소
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => startEditing(comment.id, comment.text)}
-                        className="text-gray-400 hover:text-blue-500"
-                      >
-                        수정
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteComment(comment.id)}
-                        className="text-gray-400 hover:text-red-500"
-                      >
-                        삭제
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={handleReportComment}
-                        className="text-gray-400 hover:text-orange-500"
-                      >
-                        신고
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {editingId === comment.id ? (
-                <textarea
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                  rows="3"
-                  className="w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 p-4 text-base text-gray-700 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
-                />
-              ) : (
-                <p className="whitespace-pre-wrap text-base leading-7 text-gray-700">
-                  {comment.text}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+        <CommentSection
+          comments={comments}                        // 댓글 목록
+          newComment={newComment}                    // 입력값
+          setNewComment={setNewComment}              // 입력 변경
+          handleCommentSubmit={handleCommentSubmit}  // 등록
+          editingId={editingId}                      // 수정중 id
+          setEditingId={setEditingId}                // 수정 상태 변경
+          editText={editText}                        // 수정 내용
+          setEditText={setEditText}                  // 수정 입력
+          startEditing={startEditing}                // 수정 시작
+          handleSaveEdit={handleSaveEdit}            // 수정 저장
+          handleDeleteComment={handleDeleteComment}  // 삭제
+          openReportModal={(comment) =>
+            openReportModal({
+              type: "comment",
+              cmntNo: comment.cmntNo ?? comment.id,
+            })
+          }        // 신고
+          currentUserId={currentUserId}              // 현재 로그인 사용자
+          postAuthor={post.author}                   // 게시글 작성자
+        />
+      </div>
     </div>
   );
 };

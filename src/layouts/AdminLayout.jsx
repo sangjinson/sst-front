@@ -9,6 +9,7 @@ const AdminLayout = () => {
     area: true,
     showcase: true,
     report: true,
+    support: true,
   });
 
   const toggleMenu = (key) => {
@@ -22,44 +23,47 @@ const AdminLayout = () => {
     {
       key: 'member',
       label: '회원 관리',
-      children: [{ label: '회원 목록', path: '/admin1/members' }],
+      children: [{ label: '회원 목록', path: '/admin/members' }], 
     },
     {
       key: 'area',
       label: '사거리 관리',
       children: [
-        { label: '볼거리 관리', path: '/admin1/area/see' },
-        { label: '먹거리 관리', path: '/admin1/area/food' },
-        { label: '잘거리 관리', path: '/admin1/area/sleep' },
-        { label: '놀거리 관리', path: '/admin1/area/play' },
+        { label: '볼거리 관리', path: '/admin/area/see' },     
+        { label: '먹거리 관리', path: '/admin/area/food' },    
+        { label: '잘거리 관리', path: '/admin/area/sleep' },   
+        { label: '놀거리 관리', path: '/admin/area/play' },    
       ],
     },
     {
       key: 'showcase',
       label: '뽐낼거리 관리',
       children: [
-        { label: '핫플거리 관리', path: '/admin1/showcase/hotplace' }, 
-        { label: '인생거리 관리', path: '/admin1/showcase/life' },      
+        { label: '핫플거리 관리', path: '/admin/showcase/hotplace' }, 
+        { label: '인생거리 관리', path: '/admin/showcase/life' },    
       ],
     },
-    // 신고 관리 추가
     {
-    key: 'report',
-    label: '신고 관리',
-    children: [{ label: '신고 관리', path: '/admin1/report' }],
+      key: 'report',
+      label: '신고 관리',
+      children: [{ label: '신고 관리', path: '/admin/report' }],   
+    },
+    {
+      key: 'support',
+      label: '고객지원 관리',
+      children: [
+        { label: '공지사항 관리', path: '/admin/notices' },
+        { label: 'FAQ 관리', path: '/admin/faq' },
+      ],
     },
   ];
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-
-      {/* 사이드바 */}
       <aside className="w-[260px] bg-white border-r border-gray-200 flex flex-col shrink-0">
-
-        {/* 로고 */}
         <div
           className="px-6 py-6 cursor-pointer border-b border-gray-100"
-          onClick={() => navigate('/admin1')}
+          onClick={() => navigate('/admin')} 
         >
           <span className="font-griun text-3xl text-gray-900">거리에섯</span>
         </div>

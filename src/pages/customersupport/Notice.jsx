@@ -1,33 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const noticeData = [
-  {
-    id: 3,
-    title: "운영 시간 변경 안내",
-    date: "2026.04.15",
-    time: "14:30",
-    content: `안녕하세요. 보다 원활한 서비스 운영을 위해 운영 시간이 아래와 같이 변경될 예정입니다.\n\n변경 일정:\n- 적용일: 2026년 3월 1일 (일)\n\n변경 전:\n- 09:00 ~18:00\n\n변경 후:\n- 10:00 ~19:00\n\n감사합니다.`
-  },
-  {
-    id: 2,
-    title: "시스템 점검 안내",
-    date: "2026.03.27",
-    time: "09:00",
-    content: `안녕하세요. 보다 안정적인 서비스 제공을 위해 아래와 같이 시스템 점검이 진행될 예정입니다.\n\n일정: 2026년 4월 5일 (일) 02:00 ~ 06:00\n내용: 서버 안정화 및 기능 개선\n\n점검 시간 동안 서비스 이용이 제한될 수 있는 점 양해 부탁드립니다.`,
-  },
-  {
-    id: 1,
-    title: "신규 서비스 오픈 안내",
-    date: "2026.03.20",
-    time: "11:15",
-    content: `안녕하세요. 더 나은 서비스를 제공하기 위해 신규 서비스가 정식 오픈되었습니다.\n\n주요 변경 사항:\n- 사용자 인터페이스(UI) 개선\n- 서비스 속도 및 안정성 향상\n- 신규 기능 추가\n\n앞으로도 많은 관심 부탁드립니다.`,
-  }
-];
 
 const Notice = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [openId, setOpenId] = useState(null);
+  const [noticeList, setNoticeList] = useState([]);
   const location = useLocation();
   
   const isNotice = location.pathname.includes("notice");
@@ -43,6 +21,20 @@ const Notice = () => {
   };
 
   useEffect(() => {
+    fetch("http://localhost:8080/api/customersupport/notice")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`공지사항 조회 실패: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setNoticeList(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.error("공지사항 조회 실패", err);
+        setNoticeList([]);
+      });
     window.scrollTo({ top: 0 });
   }, [currentPage]);
 
@@ -79,7 +71,7 @@ const Notice = () => {
                     } fs-up-2 whitespace-nowrap`}
                   >
                     <span className="shrink-0">❓</span>
-                    <span className="truncate">자주 하는 질문</span>
+                    <span className="truncate">자주하는 질문</span>
                   </Link>
                 </li>
               </ul>
@@ -91,58 +83,73 @@ const Notice = () => {
               <h2 className="fs-up-5 font-bold mb-8 md:mb-12 text-gray-900 tracking-tight">공지사항</h2>
 
               <div className="border-t border-gray-200">
-                {noticeData.map((notice) => (
-                  <div key={notice.id} className="border-b border-gray-100 last:border-none">
+                {noticeList.map((notice, index) => (
+                  <div key={notice.csNo} className="border-b border-gray-100 last:border-none">
+                    
                     <div
                       className={`flex items-center gap-3 md:gap-6 py-5 md:py-8 px-2 md:px-5 cursor-pointer transition-all hover:bg-gray-50/50 ${
-                        openId === notice.id ? "bg-gray-50/80" : ""
+                        openId === notice.csNo ? "bg-gray-50/80" : ""
                       }`}
-                      onClick={() => toggleAccordion(notice.id)}>
-                      
+                      onClick={() => toggleAccordion(notice.csNo)}>
+
                       <span className="fs-down-2 text-gray-400 w-8 text-center shrink-0 font-medium">
-                        {notice.id.toString().padStart(2, '0')}
+                        {(noticeList.length - index).toString().padStart(2, "0")}
                       </span>
 
                       <div className="flex-1">
-                        <p className={`fs-up-2 leading-snug ${
-                          openId === notice.id ? "font-bold text-blue-600" : "text-gray-800 font-medium"
-                        }`}>
-                          {notice.title}
+                        <p
+                          className={`fs-up-2 leading-snug ${
+                            openId === notice.csNo
+                              ? "font-bold text-blue-600"
+                              : "text-gray-800 font-medium"
+                          }`}>
+                          {notice.csTitle}
                         </p>
                       </div>
 
-                      <span className="hidden lg:block fs-down-2 text-gray-400 w-24 text-right shrink-0">
-                        {notice.date}
+                      <span className="hidden lg:block fs-down-2 text-gray-400 w-28 text-right shrink-0">
+                        {notice.csRegDate?.substring(0, 10)}
                       </span>
 
-                      <span className={`text-gray-300 transition-transform pt-1.5 ${
-                        openId === notice.id ? "rotate-180 text-blue-400" : ""
-                      }`} style={{ fontSize: '10px' }}>
+                      <span
+                        className={`text-gray-300 transition-transform pt-1.5 ${
+                          openId === notice.csNo ? "rotate-180 text-blue-400" : ""
+                        }`}
+                        style={{ fontSize: "10px" }}>
                         ▼
                       </span>
                     </div>
 
                     {/* ✅ 아코디언 내용 영역 */}
-                    {openId === notice.id && (
+                    {openId === notice.csNo && (
                       <div className="bg-gray-50/50 px-5 md:px-16 py-8 md:py-10 border-t border-gray-100">
-                  
-                        
+
                         {/* 🔹 본문 내용 */}
                         <div className="text-gray-600 leading-relaxed whitespace-pre-line fs-up-2">
-                          {notice.content}
+                          {notice.csContent}
                         </div>
 
-                        {/* 🔹 2. 등록 정보 섹션 (오른쪽 아래 배치) */}
+                        {/* 🔹 등록 정보 */}
                         <div className="flex items-center justify-end gap-3 pt-10 fs-down-1 text-gray-400 self-end">
+
                           <div className="flex items-center gap-1.5">
-                            <span className="font-medium text-gray-400/80">등록일</span>
-                            <span>{notice.date}</span>
+                            <span className="font-medium text-gray-400/80">
+                              등록일
+                            </span>
+
+                            <span>
+                              {notice.csRegDate?.substring(0, 10)}
+                            </span>
                           </div>
+
                           <div className="w-[1px] h-2.5 bg-gray-300"></div>
+
                           <div className="flex items-center gap-1.5">
-                            {/*<span className="font-medium text-gray-400/80">등록시간</span>*/}
-                            <span>{notice.time}</span>
+                            <span>
+                              {notice.csRegDate?.substring(11, 16)}
+                            </span>
                           </div>
+
                         </div>
                       </div>
                     )}

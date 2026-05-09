@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
+import { toKorRegion } from '@utils/regionMap';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import {
   AreaDetailHero,
@@ -10,41 +11,65 @@ import {
   AreaReview,
   AreaRelated,
 } from '@components/modules/area/areaview';
+import IconSVG from '@components/Icon/IconSVG';
+import ViewSkeleton from '@components/skeleton/ViewSkeleton';
 
-// ※ 프로젝트의 실제 AuthContext import로 교체하세요
-// import { useAuth } from '@context/AuthContext';
-
-// ※ 임시 로그인 상태 (실제 AuthContext로 교체 필요)
-// const { user } = useAuth();
-// const isLoggedIn = !!user;
-
-// 리스트 페이지와 동일한 카테고리 배열 (배지 색상 순서 기준)
-const CATEGORIES = ['전체', '호텔', '리조트', '펜션', '모텔', '게스트하우스'];
+const CATEGORIES = ['전체', '호텔/모텔', '콘도', '펜션', '게스트하우스', '캠핑'];
 
 const View = () => {
   const { region } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
+  const regionKor = toKorRegion(region || '수원');
+  const isLoggedIn = true;
 
-  const isLoggedIn = true; // ※ 실제 AuthContext로 교체 필요
-
-  const [item, setItem]                = useState(null);
+  const [item, setItem] = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-
+  // ✅ 상세 데이터 조회
   useEffect(() => {
-    if (!id) return;
-    const data = getSleepDataById(id);
-    setItem(data);
-    if (data) {
-      const all = getSleepDataByRegion(data.region);
-      const related = all.filter((d) => d.id !== data.id).slice(0, 4);
-      setRelatedItems(related);
-    }
+    if (!id) { setLoading(false); return; }
+
+    const fetchDetail = async () => {
+      setLoading(true);
+      try {
+        const data = await getSleepDataById(id);
+        setItem(data);
+      } catch (err) {
+        console.error('상세 조회 실패:', err);
+        setItem(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetail();
   }, [id]);
 
-  // 데이터 없을 때
+  // ✅ 연관 추천 조회
+  useEffect(() => {
+    if (!item) return;
+
+    const fetchRelated = async () => {
+      try {
+        const all = await getSleepDataByRegion(regionKor);
+        const filtered = all
+          .filter((s) => s.id !== item.id && s.category === item.category)
+          .slice(0, 4);
+        setRelatedItems(filtered);
+      } catch (err) {
+        console.error('연관 추천 조회 실패:', err);
+        setRelatedItems([]);
+      }
+    };
+
+    fetchRelated();
+  }, [item, regionKor]);
+
+  if (loading) return <ViewSkeleton />;
+
   if (!item) {
     return (
       <div className="flex-1 flex items-center justify-center text-gray-400 py-24">
@@ -64,8 +89,6 @@ const View = () => {
 
   return (
     <div>
-
-      {/* 대표 이미지 + 공유/찜/뒤로가기 */}
       <AreaDetailHero
         image={item.image}
         name={item.name}
@@ -76,63 +99,56 @@ const View = () => {
         )}
       />
 
-      {/* 상세 설명 */}
       <AreaDescription description={item.description} />
 
-      {/* 이용 정보 */}
       <AreaInfoSection
         infoItems={[
-          { icon: '📍', label: '주소',           value: item.address },
-          { icon: '📞', label: '전화번호',        value: item.phone },
-          { icon: '🕐', label: '체크인/체크아웃', value: `체크인 ${item.checkIn} / 체크아웃 ${item.checkOut}` },
-          { icon: '💰', label: '요금',            value: item.price, highlight: true },
+          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address },
+          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || '' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '체크인', value: item.checkIn || '' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '체크아웃', value: item.checkOut || '' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '예약', value: item.reservation || '' },
         ]}
-        tags={item.facilities}
+        tags={item.facilities || []}
         tagLabel="편의시설"
       />
 
-      {/* 지도 */}
       <AreaMap lat={item.lat} lng={item.lng} address={item.address} />
 
-      {/* 평점 & 리뷰 */}
       <AreaReview
         rating={item.rating}
         reviewCount={item.reviewCount}
-        reviews={item.reviews}
+        reviews={item.reviews || []}
         isLoggedIn={isLoggedIn}
         placeholder="숙소에 대한 솔직한 리뷰를 남겨주세요."
       />
 
-      {/* 연관 추천 숙소 */}
       <AreaRelated
         title="연관 추천 숙소"
         items={relatedItems}
         onItemClick={(rel) => navigate(`/${region}/sleep/view?id=${rel.id}`)}
         nameKey="name"
+        categories={CATEGORIES}
       />
 
-      {/* 하단 버튼 영역 */}
-      <div className="flex items-center gap-3 mb-6">
-        {/* 목록으로 버튼 */}
+      <div className="flex items-center justify-between gap-3 mb-6">
         <button
           onClick={() => navigate(`/${region}/sleep/list`)}
-          className="flex-1 py-3 border border-gray-300 bg-[#E8956D] rounded-xl text-sm text-white font-medium hover:bg-[#f07e48] transition"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-white/90 backdrop-blur-md text-gray-800 rounded-xl fs-up-2 font-semibold shadow-lg shadow-black/5 border border-white/20 hover:bg-white hover:shadow-xl transition-all duration-200"
         >
-          ← 목록으로
+          <span className="mb-0.5 text-lg">←</span> 목록으로
         </button>
-
-        {/* TOP 버튼 */}
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="w-12 h-12 flex items-center justify-center border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition"
+          className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md border border-white/20 rounded-xl text-gray-800 shadow-lg shadow-black/5 hover:bg-white hover:shadow-xl transition-all duration-200"
           title="맨 위로"
         >
-          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current" strokeWidth="2">
+          <svg viewBox="0 0 24 24" className="w-6 h-6 fill-none stroke-current" strokeWidth="2.5">
             <path d="M18 15l-6-6-6 6" />
           </svg>
         </button>
       </div>
-
     </div>
   );
 };

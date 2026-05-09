@@ -1,4 +1,4 @@
-// ✅ localStorage에서 유저가 작성한 인생거리 게시글 불러오기
+// localStorage에서 유저가 작성한 인생거리 게시글 불러오기
 export const getUserLifePosts = () => {
   try {
     return JSON.parse(localStorage.getItem('lifePosts') || '[]');
@@ -22,11 +22,11 @@ export const getAllLifePosts = () => {
   return [...getUserLifePosts(), ...lifePostsDummy];
 };
 
-// ✅ 더미 데이터
+// 더미 데이터
 export const lifePostsDummy = [
   {
     id: 1,
-    title: '수원 당일치기 완벽 코스 🏯',
+    title: '수원 당일치기 완벽 코스',
     author: '경기도민',
     region: '수원시',
     regDt: '2026-04-28',
@@ -83,7 +83,7 @@ export const lifePostsDummy = [
   },
   {
     id: 2,
-    title: '가평 1박2일 힐링 여행 🌿',
+    title: '가평 1박2일 힐링 여행',
     author: '힐링러버',
     region: '가평군',
     regDt: '2026-04-25',
@@ -140,7 +140,7 @@ export const lifePostsDummy = [
   },
   {
     id: 3,
-    title: '파주 예술 기행 🎨',
+    title: '파주 예술 기행',
     author: '예술여행자',
     region: '파주시',
     regDt: '2026-04-20',
@@ -220,3 +220,11 @@ export const COMPANION_EMOJI = {
   '가족': '👨‍👩‍👧',
   '친구': '👫',
 };
+
+// 경기도 지역 목록
+export const gyeonggiRegions = [
+  "수원시", "용인시", "성남시", "부천시", "화성시", "안산시", "남양주시", "안양시", "평택시",
+  "시흥시", "파주시", "의정부시", "김포시", "광명시", "광주시", "군포시", "이천시", "오산시",
+  "하남시", "양주시", "구리시", "안성시", "포천시", "의왕시", "양평군", "여주시", "동두천시",
+  "가평군", "과천시", "연천군",
+];
