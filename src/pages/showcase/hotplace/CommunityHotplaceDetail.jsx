@@ -3,7 +3,6 @@ import axios from "axios";
 import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getAllPosts } from "./communityHotplaceData";
 
 import { openReportModal } from "@components/modules/community/common/reportModal";
 import HotplaceImageSlider from "@components/modules/community/hotplace/HotplaceImageSlider";
@@ -21,14 +20,13 @@ const CommunityHotplaceDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
+  const [currentPost, setCurrentPost] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
-  }, []);
 
-  useEffect(() => {
     api
       .get("/auth/me")
       .then((res) => {
@@ -37,10 +35,36 @@ const CommunityHotplaceDetail = () => {
       .catch((err) => {
         console.error("로그인 사용자 조회 실패:", err);
       });
-  }, []);
 
-  const posts = getAllPosts();
-  const currentPost = posts.find((post) => post.id === Number(id));
+    api
+      .get(`/community/${id}`)
+      .then((res) => {
+        const item = res.data;
+
+        setCurrentPost({
+          id: item.commNo,
+          commNo: item.commNo,
+          title: item.commTitle,
+          description: item.commContent,
+          content: item.commContent,
+          author: item.mbrNickname,
+          place: "핫플거리",
+          hashtags: [],
+          img: item.commMainImgUrl || "https://placehold.co/900x650",
+          images: [
+            item.commMainImgUrl || "https://placehold.co/900x650",
+          ],
+          regDt: item.commRegDate,
+          wishCnt: item.commLikeCnt ?? 0,
+          commentCnt: item.commCmntCnt ?? 0,
+          viewCnt: item.commInqireCnt ?? 0,
+          size: "wide",
+        });
+      })
+      .catch((err) => {
+        console.error("게시글 상세 조회 실패:", err);
+      });
+  }, [id]);
 
   // 댓글 조회 함수
   const fetchComments = (commNo) => {

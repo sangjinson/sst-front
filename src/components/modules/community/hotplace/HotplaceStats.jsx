@@ -31,18 +31,25 @@ const HotplaceStats = ({
   return (
     <>
       <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm space-y-5">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3">
         <p className="shrink-0 fs-down-2 font-bold text-gray-500">
           해시태그
         </p>
+
         <div className="flex items-center gap-2 whitespace-nowrap overflow-x-auto">
-          {currentPost.hashtags.map((tag) => (
-            <span
-              key={tag}
-              className="fs-down-2 font-semibold text-[#0F9B73] shrink-0">
-              #{tag}
+          {(currentPost?.hashtags ?? []).length > 0 ? (
+            currentPost.hashtags.map((tag) => (
+              <span
+                key={tag}
+                className="fs-down-2 font-semibold text-[#0F9B73] shrink-0">
+                #{tag}
+              </span>
+            ))
+          ) : (
+            <span className="fs-down-2 text-gray-400">
+              등록된 해시태그가 없습니다
             </span>
-          ))}
+          )}
         </div>
       </div>
 
