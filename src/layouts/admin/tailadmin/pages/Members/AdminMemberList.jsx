@@ -1,49 +1,71 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // 🚀 이동을 위한 hook 추가
+import { useNavigate } from "react-router-dom";
 import api from "@api/axios";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@themeadmin/components/ui/table";
+
+// 🚀 공통화한 훅과 컴포넌트 임포트
+import { usePagination } from "@hooks/usePagination";
+import AdminPagination from "@components/common/AdminPagination";
+
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "@themeadmin/components/ui/table";
 import Badge from "@themeadmin/components/ui/badge/Badge";
-import { 
-  PlusIcon, 
-  PencilIcon, 
-  TrashBinIcon, 
-  ChevronLeftIcon, 
-  ChevronRightIcon 
-} from "@themeadmin/icons";
+import { PlusIcon, PencilIcon, TrashBinIcon } from "@themeadmin/icons"; // Chevron 아이콘은 Pagination으로 빼서 삭제
 
 export default function AdminMemberList() {
-  const navigate = useNavigate(); // 🚀 네비게이트 함수 선언
+  const navigate = useNavigate();
   const [members, setMembers] = useState([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [selected, setSelected] = useState([]);
+  const [allChecked, setAllChecked] = useState(false);
+
+  // 🚀 1. 커스텀 훅 하나로 지저분한 페이징 상태 관리 끝!
+  const { page, size, totalCount, totalPages, setPage, setTotalCount } = usePagination(1, 10);
 
   const fetchMembers = async () => {
     try {
-      const response = await api.get(`/admin/members?page=${currentPage}&size=${itemsPerPage}`);
-      setMembers(response.data.data);
+      // 🚀 2. 백엔드에 페이징 정보를 넘겨 서버단 페이징 처리
+      const response = await api.get(`/admin/members?page=${page}&size=${size}`);
+      
+      // 백엔드에서 10개만 주므로 slice 같은 클라이언트 자르기 불필요!
+      setMembers(response.data.data.list || response.data.data); 
       setTotalCount(response.data.total || response.data.data.length);
     } catch (error) {
       console.error("회원 목록 조회 실패:", error);
     }
   };
 
+  // page가 변경될 때마다 데이터 재호출
   useEffect(() => {
     fetchMembers();
-  }, [currentPage]);
+    setAllChecked(false);
+    setSelected([]);
+  }, [page]); 
+
+  const toggleAll = () => {
+    if (allChecked) {
+      setSelected([]);
+    } else {
+      setSelected(members.map((m) => m.mbrId)); // 현재 보이는 10명만 전체 선택
+    }
+    setAllChecked(!allChecked);
+  };
+
+  const toggleOne = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    );
+  };
 
   const handleDelete = async (mbrId) => {
     if (!window.confirm("정말 이 회원을 탈퇴 처리하시겠습니까?")) return;
     try {
       await api.delete(`/admin/members/${mbrId}`);
       alert("회원이 탈퇴 처리되었습니다.");
-      fetchMembers();
+      
+      // 🚀 3. 현재 페이지에 아이템이 1개 남았을 때 삭제하면, 이전 페이지로 이동
+      if (members.length === 1 && page > 1) {
+        setPage(page - 1); 
+      } else {
+        fetchMembers(); 
+      }
     } catch (error) {
       alert("삭제 중 오류가 발생했습니다.");
     }
@@ -64,7 +86,8 @@ export default function AdminMemberList() {
           onClick={() => navigate("/admin/members/create")}
           className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition shadow-sm"
         >
-          <PlusIcon className="w-5 h-5 text-white shadow-sm" /> 회원 추가</button>
+          <PlusIcon className="w-5 h-5 text-white shadow-sm" /> 회원 추가
+        </button>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -72,6 +95,9 @@ export default function AdminMemberList() {
           <Table>
             <TableHeader className="bg-gray-50/50 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
+                <TableCell isHeader className="px-5 py-3 text-center">
+                  <input type="checkbox" checked={allChecked} onChange={toggleAll} />
+                </TableCell>
                 <TableCell isHeader className="px-5 py-3 text-center">ID</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-start">회원 정보</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-start">연락처 / 주소</TableCell>
@@ -84,6 +110,13 @@ export default function AdminMemberList() {
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {members.map((m) => (
                 <TableRow key={m.mbrId} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
+                  <TableCell className="px-5 py-4 text-center">
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(m.mbrId)}
+                      onChange={() => toggleOne(m.mbrId)}
+                    />
+                  </TableCell>
                   <TableCell className="px-5 py-4 text-center text-gray-500">{m.mbrId}</TableCell>
                   <TableCell className="px-5 py-4">
                     <div className="flex items-center gap-3">
@@ -112,7 +145,6 @@ export default function AdminMemberList() {
                   </TableCell>
                   <TableCell className="px-5 py-4">
                     <div className="flex items-center justify-center gap-2">
-                      {/* 🚀 수정 페이지로 이동하면서 해당 회원 데이터(state)를 함께 전달 */}
                       <button 
                         onClick={() => navigate("/admin/members/update", { state: { member: m } })}
                         className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition" 
@@ -136,40 +168,14 @@ export default function AdminMemberList() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between border-t border-gray-100 dark:border-white/[0.05] pt-5">
-        <p className="text-sm text-gray-500">
-          Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount} entries
-        </p>
-        <div className="flex items-center gap-2">
-          <button 
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(prev => prev - 1)}
-            className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            <ChevronLeftIcon className="w-5 h-5" />
-          </button>
-          {[...Array(Math.ceil(totalCount / itemsPerPage))].map((_, i) => (
-            <button
-              key={i + 1}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`w-10 h-10 rounded-lg text-sm font-medium transition ${
-                currentPage === i + 1 
-                ? "bg-blue-600 text-white" 
-                : "text-gray-500 hover:bg-gray-100"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button 
-            disabled={currentPage >= Math.ceil(totalCount / itemsPerPage)}
-            onClick={() => setCurrentPage(prev => prev + 1)}
-            className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            <ChevronRightIcon className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+      {/* 🚀 5. 분리한 페이지네이션 컴포넌트 하나로 UI 완벽 교체! */}
+      <AdminPagination 
+        page={page} 
+        size={size} 
+        totalCount={totalCount} 
+        totalPages={totalPages} 
+        onPageChange={setPage} 
+      />
     </div>
   );
 }
