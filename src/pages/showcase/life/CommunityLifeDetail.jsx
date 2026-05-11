@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import {
@@ -21,20 +23,61 @@ const CommunityLifeDetail = () => {
   const navigate = useNavigate();
   const isLogin = true;
 
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(lifeComments || []);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
-  const currentUser = "경기도민";
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
 
+  useEffect(() => {
+    api
+      .get("/auth/me")
+      .then((res) => {
+        setCurrentUserId(res.data.data.mbrId);
+      })
+      .catch((err) => {
+        console.error("로그인 사용자 조회 실패:", err);
+      });
+  }, []);
+
   // 게시글 찾기
   const posts = getAllLifePosts ? getAllLifePosts() : [];
   const post = posts.find((p) => p.id === Number(id));
+
+  // 댓글 조회 함수
+  const fetchComments = (commNo) => {
+    axios
+      .get(`http://localhost:8080/api/comments/${commNo}`)
+      .then((res) => {
+        const mappedComments = res.data.map((comment) => ({
+          id: comment.cmntNo,
+          user: comment.mbrNickname,
+          text: comment.cmntContent,
+          date: comment.cmntRegDate?.substring(0, 10),
+          cmntNo: comment.cmntNo,
+          cmntCommNo: comment.cmntCommNo,
+          cmntMbrId: comment.cmntMbrId,
+        }));
+
+        setComments(mappedComments);
+      })
+      .catch((err) => {
+        console.error("댓글 조회 실패:", err);
+      });
+  };
+
+  useEffect(() => {
+    if (!post) return;
+
+    const commNo = post.commNo ?? post.id;
+
+    fetchComments(commNo);
+  }, [post]);
 
   if (!post) {
     return (
@@ -55,7 +98,7 @@ const CommunityLifeDetail = () => {
     document.getElementById("life-comments")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // ✅ 내 일정으로 가져오기
+  // 내 일정으로 가져오기
   // 기존 이미지/내용은 변경하지 않음
   // 기존 대표 이미지(thumbnail) + 코스 이미지(course.image)를 슬라이더에 보여줌
   // 중복 이미지는 제거
@@ -144,21 +187,31 @@ const CommunityLifeDetail = () => {
 
   // 댓글 등록
   const handleCommentSubmit = () => {
+    if (!currentUserId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
       return;
     }
 
-    setComments([
-      {
-        id: Date.now(),
-        user: "나",
-        text: newComment,
-        date: new Date().toLocaleDateString(),
-      },
-      ...comments,
-    ]);
-    setNewComment("");
+    const commNo = post.commNo ?? post.id;
+
+    axios
+      .post("http://localhost:8080/api/comments", {
+        cmntCommNo: commNo,
+        cmntMbrId: currentUserId,
+        cmntContent: newComment,
+      })
+      .then(() => {
+        fetchComments(commNo);
+        setNewComment("");
+      })
+      .catch((err) => {
+        console.error("댓글 등록 실패:", err);
+      });
   };
 
   // 댓글 수정 시작
@@ -174,24 +227,40 @@ const CommunityLifeDetail = () => {
       return;
     }
 
-    setComments(
-      comments.map((c) =>
-        c.id === commentId ? { ...c, text: editText } : c
-      )
-    );
-    setEditingId(null);
-    setEditText("");
+    const commNo = post.commNo ?? post.id;
+
+    axios
+      .put(`http://localhost:8080/api/comments/${commentId}`, {
+        cmntContent: editText,
+      })
+      .then(() => {
+        fetchComments(commNo);
+        setEditingId(null);
+        setEditText("");
+      })
+      .catch((err) => {
+        console.error("댓글 수정 실패:", err);
+      });
   };
 
   // 댓글 삭제
   const handleDeleteComment = (commentId) => {
-    if (window.confirm("댓글을 삭제하시겠습니까?")) {
-      setComments(comments.filter((c) => c.id !== commentId));
-    }
+    if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
+
+    const commNo = post.commNo ?? post.id;
+
+    axios
+      .delete(`http://localhost:8080/api/comments/${commentId}`)
+      .then(() => {
+        fetchComments(commNo);
+      })
+      .catch((err) => {
+        console.error("댓글 삭제 실패:", err);
+      });
   };
 
   return (
-    <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
       <Breadcrumb
         paths={[
           { label: "홈", to: "/" },
@@ -283,7 +352,12 @@ const CommunityLifeDetail = () => {
           navigate={navigate}
           handleImportSchedule={handleImportSchedule}
           handleMakePlan={handleMakePlan}
-          openReportModal={openReportModal}
+          openReportModal={() =>
+            openReportModal({
+              type: "post",
+              commNo: post.commNo ?? post.id,
+            })
+          }
           onCommentClick={scrollToComments}
         />
       </section>
@@ -302,9 +376,14 @@ const CommunityLifeDetail = () => {
           startEditing={startEditing}                // 수정 시작
           handleSaveEdit={handleSaveEdit}            // 수정 저장
           handleDeleteComment={handleDeleteComment}  // 삭제
-          openReportModal={openReportModal}          // 신고
-          currentUser={currentUser}                    // 현재 로그인 사용자
-          postAuthor={post.author}                     // 게시글 작성자
+          openReportModal={(comment) =>
+            openReportModal({
+              type: "comment",
+              cmntNo: comment.cmntNo ?? comment.id,
+            })
+          }        // 신고
+          currentUserId={currentUserId}              // 현재 로그인 사용자
+          postAuthor={post.author}                   // 게시글 작성자
         />
       </div>
     </div>

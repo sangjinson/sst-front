@@ -98,12 +98,12 @@ export default function SignupPage() {
       await api.post('/auth/signup', {
         mbrEmail: form.email,
         mbrPassword: form.password,
-        mbrNm: form.name,
+        mbrName: form.name,
         mbrNickname: form.nickname,
-        telno: form.phone,
-        zip: form.zip,
-        addr: form.addr,
-        daddr: form.daddr
+        mbrTelno: form.phone,
+        mbrZip: form.zip,
+        mbrAddr: form.addr,
+        mbrDaddr: form.daddr
       });
       alert('회원가입 완료! 로그인해주세요.');
       navigate('/login'); 
