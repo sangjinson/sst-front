@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '@components/common/Breadcrumb';
 import {
@@ -7,6 +7,7 @@ import {
   AIPlanThemeGrid,
   AIPlanPeriodCard,
 } from '@components/modules/aiplan';
+import { useAIPlan } from '@pages/aiplan/AIPlanContext';
 import '@assets/css/common.css';
 
 // ────────────────────────────────────────────
@@ -39,16 +40,19 @@ const SelectionSummary = ({ selectedRegion, selectedPeriod, startDate, endDate, 
 // ────────────────────────────────────────────
 const AIPlanPage = () => {
   const navigate = useNavigate();
+  const [step, setStep] = React.useState(0);
 
-  const [step, setStep]                           = useState(0);
-  const [selectedRegion, setSelectedRegion]       = useState('');
-  const [selectedPeriod, setSelectedPeriod]       = useState('');
-  const [selectedNights, setSelectedNights]       = useState(0);
-  const [selectedThemes, setSelectedThemes]       = useState([]);
-  const [startDate, setStartDate]                 = useState('');
-  const [endDate, setEndDate]                     = useState('');
+  // Context에서 상태 가져오기
+  const {
+    selectedRegion, setSelectedRegion,
+    selectedPeriod, setSelectedPeriod,
+    selectedNights, setSelectedNights,
+    selectedDays,   setSelectedDays,
+    selectedThemes, setSelectedThemes,
+    startDate,      setStartDate,
+    endDate,        setEndDate,
+  } = useAIPlan();
 
-  // 🚀 toggleTheme을 AIPlanThemeGrid의 onToggle prop으로 그대로 전달
   const toggleTheme = (theme) => {
     setSelectedThemes(prev => {
       if (prev.includes(theme)) return prev.filter(t => t !== theme);
@@ -63,20 +67,23 @@ const AIPlanPage = () => {
   const handlePeriodSelect = (opt) => {
     setSelectedPeriod(opt.value);
     setSelectedNights(opt.nights);
+    setSelectedDays(opt.days);
     setStartDate('');
     setEndDate('');
   };
 
-  const handleSubmit = () => {
-    navigate('/plan/result', {
-      state: {
-        region: selectedRegion,
-        period: selectedPeriod,
-        themes: selectedThemes,
-        startDate,
-        endDate,
-      }
+  // FastAPI로 값 전송 후 결과 페이지로 이동
+  const handleSubmit = async () => {
+    const params = new URLSearchParams({
+      region    : selectedRegion,
+      days      : selectedDays,
+      start_date: startDate,
+      end_date  : endDate,
+      themes    : selectedThemes.join(','), // 쉼표 구분
     });
+
+    await fetch(`${import.meta.env.VITE_FASTAPI_URL}/travel/plan?${params.toString()}`);
+    navigate('/plan/result');
   };
 
   const isNextDisabled =
@@ -124,11 +131,9 @@ const AIPlanPage = () => {
             />
           )}
 
-          {/* STEP 2: 동행 유형 + 여행 테마 */}
+          {/* STEP 2: 여행 테마 */}
           {step === 2 && (
             <div>
-
-              {/* 🚀 여행 테마 - AIPlanThemeGrid 컴포넌트 */}
               <AIPlanThemeGrid
                 selectedThemes={selectedThemes}
                 onToggle={toggleTheme}
@@ -150,9 +155,11 @@ const AIPlanPage = () => {
 
           {step === 2 ? (
             <div className="flex gap-3">
-              <button onClick={handleSubmit}
+              <button
+                onClick={handleSubmit}
                 disabled={!selectedRegion || selectedThemes.length === 0}
-                className="px-6 py-2.5 bg-[#0F9B73] text-white rounded-xl text-sm font-semibold hover:bg-[#0d8a66] disabled:opacity-50 transition">
+                className="px-6 py-2.5 bg-[#0F9B73] text-white rounded-xl text-sm font-semibold hover:bg-[#0d8a66] disabled:opacity-50 transition"
+              >
                 AI 코스 추천받기 →
               </button>
             </div>

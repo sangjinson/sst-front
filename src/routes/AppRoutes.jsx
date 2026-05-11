@@ -45,6 +45,8 @@ import LifeList from '@pages/admin/LifeList';
 import NoticeManage from '@pages/admin/NoticeManage';
 import FaqManage from '@pages/admin/FaqManage';
 
+import { AIPlanProvider } from '@pages/aiplan/AIPlanContext';
+
 
 /* 관리자 */
 {/* 
@@ -131,8 +133,11 @@ const AppRoutes = () => {
           <Route path="/showcase/life/write/:id" element={<CommunityLifeWrite />} />
 
           {/* 내거리(일정 관리) */}
-          <Route path="/plan" element={<AIPlanPage />} />
-          <Route path="/plan/result" element={<AIPlanResultPage />} />
+          <Route element={<AIPlanProvider />}>
+            <Route path="/plan" element={<AIPlanPage />} />
+            <Route path="/plan/result" element={<AIPlanResultPage />} />
+          </Route>
+
           </Route>
           </Route>
 

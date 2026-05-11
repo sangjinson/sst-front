@@ -21,9 +21,9 @@ export const CITIES_NORTH = [
 // 여행 기간 옵션
 // ────────────────────────────────────────────
 export const PERIOD_OPTIONS = [
-  { value: '당일여행', label: '당일여행', desc: '하루 안에 즐기는 가벼운 여행', nights: 0 },
-  { value: '1박2일',   label: '1박 2일',  desc: '여유롭게 하루 숙박',           nights: 1 },
-  { value: '2박3일',   label: '2박 3일',  desc: '알찬 경기도 전통 일정',         nights: 2 },
+  { value: '당일여행', label: '당일여행', desc: '하루 안에 즐기는 가벼운 여행', nights: 0, days: 1 },
+  { value: '1박2일',   label: '1박 2일',  desc: '여유롭게 하루 숙박',           nights: 1, days: 2 },
+  { value: '2박3일',   label: '2박 3일',  desc: '알찬 경기도 전통 일정',         nights: 2, days: 3 },
 ];
 
 // ────────────────────────────────────────────
