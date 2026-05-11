@@ -37,6 +37,7 @@ const HotplaceAside = ({
   isLiked,
   setIsLiked,
   wishCount,
+  handleLikeClick,
   openReportModal,
 }) => {
   return (
@@ -86,7 +87,7 @@ const HotplaceAside = ({
         {/* 오른쪽: 좋아요 버튼 */}
         <button
           type="button"
-          onClick={() => setIsLiked(!isLiked)}
+          onClick={handleLikeClick}
           className={`shrink-0 inline-flex min-w-[58px] cursor-pointer items-center gap-1.5 text-sm font-bold transition-colors active:scale-95 ${isLiked ? "text-blue-500" : "text-gray-900 hover:text-blue-500"}`}>
           <LikeIcon />
           {wishCount}
