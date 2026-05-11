@@ -44,6 +44,7 @@ import HotplaceList from '@pages/admin/HotplaceList';
 import LifeList from '@pages/admin/LifeList';
 import NoticeManage from '@pages/admin/NoticeManage';
 import FaqManage from '@pages/admin/FaqManage';
+import CommonCodeList from '@pages/admin/CommonCodeList';
 
 
 /* 관리자 */
@@ -140,6 +141,7 @@ const AppRoutes = () => {
           {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
           <Route index element={<Home />} />
           <Route path="members" element={<AdinMemberList />} />
+          <Route path="common-codes" element={<CommonCodeList />} />
 
           <Route path="support">
             <Route path="notices" element={<NoticeManage />} />
