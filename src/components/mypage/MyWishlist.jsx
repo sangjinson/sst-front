@@ -1,44 +1,75 @@
-// src/components/mypage/MyWishlist.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@components/common/Pagination';
-
-// 🚀 직접 작성해주신 커스텀 훅 불러오기
-import { getWishlist, STORAGE_KEY } from '@hooks/useWishlist';
+import { getWishlist } from '@hooks/useWishlist';
+import { useAuth } from '@hooks/useAuth';
+import api from '@api/axios';
+import { toEnRegion } from '@utils/regionMap'; 
 
 const ITEMS_PER_PAGE = 8;
 
+// 컴포넌트 밖 (import 아래)에 선언
+const CAT_TYPE_MAP = {
+  'PLC001': 'see',
+  'PLC002': 'play',
+  'PLC003': 'food',
+  'PLC004': 'sleep',
+};
+
+const CAT_LABEL_MAP = {
+  'PLC001': '볼거리',
+  'PLC002': '놀거리',
+  'PLC003': '먹거리',
+  'PLC004': '잘거리',
+};
+
+
 const MyWishlist = () => {
   const navigate = useNavigate();
-  
-  // 🚀 기존 로컬스토리지 함수 대신 getWishlist() 훅 사용
-  const [likes, setLikes] = useState(() => getWishlist());
-  const [page, setPage] = useState(1);
+  const { user } = useAuth();
 
-  const totalPages = Math.ceil(likes.length / ITEMS_PER_PAGE) || 1;
+  const [likes, setLikes]   = useState([]);
+  const [page, setPage]     = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  // 찜 목록 조회
+  useEffect(() => {
+    if (!user?.mbrId) { setLoading(false); return; }
+    getWishlist(user.mbrId)
+      .then((data) => setLikes(data))
+      .catch(() => setLikes([]))
+      .finally(() => setLoading(false));
+  }, [user?.mbrId]);
+
+  const totalPages   = Math.ceil(likes.length / ITEMS_PER_PAGE) || 1;
   const currentItems = likes.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  // 🚀 직접 작성해주신 id와 type을 모두 비교하는 삭제 로직 적용
-  const handleRemove = (item) => {
-    const updated = likes.filter(
-      (w) => !(String(w.id) === String(item.id) && w.type === item.type)
-    );
-    // TODO: API 연동 시 → DELETE /api/wishlist/:id 로 교체, localStorage 줄 제거
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    setLikes(updated);
+  // 찜 해제
+  const handleRemove = async (item) => {
+    try {
+      await api.post('/wishlist/toggle', {
+        wishMbrId: user.mbrId,
+        wishPlcNo: item.wishPlcNo,
+      });
+      setLikes((prev) => prev.filter((w) => w.wishPlcNo !== item.wishPlcNo));
 
-    // 💡 참고: 마지막 아이템 지울 때 빈 페이지 남지 않게 하는 방어 코드는 유지해 두었습니다.
-    const newTotalPages = Math.ceil(updated.length / ITEMS_PER_PAGE) || 1;
-    if (page > newTotalPages) {
-      setPage(newTotalPages);
+      const newTotalPages = Math.ceil((likes.length - 1) / ITEMS_PER_PAGE) || 1;
+      if (page > newTotalPages) setPage(newTotalPages);
+    } catch {
+      alert('찜 해제에 실패했습니다. 다시 시도해주세요.');
     }
   };
+
+  if (loading) return (
+    <div className="p-4 md:p-7 text-center text-gray-400 py-16">
+      불러오는 중...
+    </div>
+  );
 
   return (
     <div className="p-4 md:p-7">
       <h3 className="fs-up-3 font-bold text-gray-700 mb-4">내 찜 목록</h3>
-      <hr className="w-full border-b border-t-0 border-gray-200 mt-2 mb-7 order-2 md:order-4" />
-
+      <hr className="w-full border-b border-t-0 border-gray-200 mt-2 mb-7" />
 
       {likes.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
@@ -48,30 +79,36 @@ const MyWishlist = () => {
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-            {currentItems.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative group"
-                // 🚀 직접 작성해주신 안전한 라우팅 경로 적용
-                onClick={() => navigate(`/${item.region}/${item.type}/view?id=${item.id}`)}
-              >
-                <img src={item.image} alt={item.name} className="w-full h-32 md:h-40 object-cover group-hover:scale-105 transition-transform duration-300" />
-                <div className="p-3 pb-8">
-                  <div className="text-sm font-semibold truncate text-gray-900">{item.name}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{item.category}</div>
-                </div>
-                <div className="absolute bottom-2 left-3 bg-black/45 text-white text-[10px] px-2 py-0.5 rounded-full">
-                  {item.address?.split(' ').slice(0, 2).join(' ')}
-                </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleRemove(item); }}
-                  className="absolute bottom-1.5 right-2 text-lg hover:scale-110 transition-transform"
-                  title="찜 해제"
+            {currentItems.map((item, idx) => {
+              const type = CAT_TYPE_MAP[item.plcCatCd] ?? 'see';
+              return (
+                <div
+                  key={idx}
+                  className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative group"
+                  onClick={() => navigate(`/${toEnRegion(item.rgnName)}/${type}/view?id=${item.wishPlcNo}`)}
                 >
-                  ❤️
-                </button>
-              </div>
-            ))}
+                  <img
+                    src={item.plcMainImgUrl}
+                    alt={item.plcName}
+                    className="w-full h-32 md:h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="p-3 pb-8">
+                    <div className="text-sm font-semibold truncate text-gray-900">{item.plcName}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{CAT_LABEL_MAP[item.plcCatCd] ?? ''}</div>
+                  </div>
+                  <div className="absolute bottom-2 left-3 bg-black/45 text-white text-[10px] px-2 py-0.5 rounded-full">
+                    {item.plcAddr?.split(' ').slice(0, 2).join(' ')}
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleRemove(item); }}
+                    className="absolute bottom-1.5 right-2 text-lg hover:scale-110 transition-transform"
+                    title="찜 해제"
+                  >
+                    ❤️
+                  </button>
+                </div>
+              );
+            })}
           </div>
           {likes.length > ITEMS_PER_PAGE && (
             <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
