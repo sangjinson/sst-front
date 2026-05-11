@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { useWishlist } from '@hooks/useWishlist';
-
+import { useAuth } from '@hooks/useAuth';
 /**
  * AreaActionButtons - 공통 공유/찜 버튼 컴포넌트
  *
@@ -130,7 +130,8 @@ export const ClipButton = () => {
 
 // 리스트 페이지용 - 찜 로직 내장 (원복: 이 컴포넌트 전체 삭제 + import 삭제)
 export const WishlistHeartButton = ({ item, itemType, region }) => {
-  const { isWished, toggleWish } = useWishlist(item?.id, itemType);
+  const { user } = useAuth();                                    // ← 추가
+  const { isWished, toggleWish } = useWishlist(item?.id, itemType, user); // ← user 추가
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -147,6 +148,7 @@ export const WishlistHeartButton = ({ item, itemType, region }) => {
 
   return <HeartButton liked={isWished} onClick={handleClick} />;
 };
+
 
 // 찜(하트) 버튼 - 순수 UI (liked, onClick을 외부에서 주입)
 export const HeartButton = ({ liked, onClick }) => (

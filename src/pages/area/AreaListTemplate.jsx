@@ -5,7 +5,7 @@ import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
 import ListSkeleton from '@components/skeleton/ListSkeleton';
 import { getSeeDataByRegion } from './see/seeData';
-import { getSleepDataByRegion } from './sleep/sleepDummyData';
+import { getSleepDataByRegion } from './sleep/sleepdata';
 import { getFoodDataByRegion } from './food/foodData';
 import { getPlayDataByRegion } from './play/playData';
   

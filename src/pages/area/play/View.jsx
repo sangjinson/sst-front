@@ -23,7 +23,6 @@ const PlayView = () => {
   const id = searchParams.get('id');
   const currentRegion = region || '';
   const currentRegionKor = toKorRegion(currentRegion);
-  const isLoggedIn = true;
 
   const [item, setItem] = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
@@ -31,7 +30,6 @@ const PlayView = () => {
 
   useEffect(() => {
     if (!id) { setLoading(false); return; }
-
     const fetchDetail = async () => {
       setLoading(true);
       try {
@@ -44,13 +42,11 @@ const PlayView = () => {
         setLoading(false);
       }
     };
-
     fetchDetail();
   }, [id]);
 
   useEffect(() => {
     if (!item) return;
-
     const fetchRelated = async () => {
       try {
         const all = await getPlayDataByRegion(currentRegionKor);
@@ -63,7 +59,6 @@ const PlayView = () => {
         setRelatedItems([]);
       }
     };
-
     fetchRelated();
   }, [item, currentRegionKor]);
 
@@ -75,10 +70,7 @@ const PlayView = () => {
         <div className="text-center">
           <p className="text-5xl mb-4">🎮</p>
           <p className="text-lg">놀거리 정보를 찾을 수 없습니다.</p>
-          <button
-            onClick={() => navigate(-1)}
-            className="mt-4 px-5 py-2 bg-[#0F9B73] text-white rounded-lg text-sm"
-          >
+          <button onClick={() => navigate(-1)} className="mt-4 px-5 py-2 bg-[#0F9B73] text-white rounded-lg text-sm">
             돌아가기
           </button>
         </div>
@@ -93,6 +85,8 @@ const PlayView = () => {
         name={item.name}
         category={item.category}
         categories={CATEGORIES}
+        plcNo={item.plcNo}
+        listPath={`/${currentRegion}/play/list`}
         renderHeart={() => (
           <WishlistHeartButton item={item} itemType="play" region={region} />
         )}
@@ -102,13 +96,12 @@ const PlayView = () => {
 
       <AreaInfoSection
         infoItems={[
-          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address },
-          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone || '' },
-          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '운영시간', value: item.hours || '' },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '' },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '휴무일', value: item.restdate || '' },
-          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '행사기간', value: item.eventStart && item.eventEnd ? `${item.eventStart} ~ ${item.eventEnd}` : '' },
-        ].filter(info => info.value)}
+          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address || '주소 정보 없음' },
+          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || '전화번호 정보 없음' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '운영시간', value: item.hours || '09:00 - 18:00' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '주차 정보 없음' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '휴무일', value: item.restdate || '연중무휴' },
+        ]}
         tags={item.tags}
         tagLabel="태그"
       />
@@ -116,10 +109,7 @@ const PlayView = () => {
       <AreaMap lat={item.lat} lng={item.lng} address={item.address} />
 
       <AreaReview
-        rating={item.rating}
-        reviewCount={item.reviewCount}
-        reviews={item.reviews || []}
-        isLoggedIn={isLoggedIn}
+        plcNo={item.plcNo}
         placeholder="놀거리에 대한 솔직한 리뷰를 남겨주세요."
       />
 
@@ -133,7 +123,7 @@ const PlayView = () => {
 
       <div className="flex items-center justify-between gap-3 mb-6">
         <button
-          onClick={() => navigate(`/${currentRegion}/play/list`)}
+          onClick={() => { window.scrollTo(0, 0); navigate(`/${currentRegion}/play/list`); }}
           className="flex items-center justify-center gap-2 px-6 py-3 bg-white/90 backdrop-blur-md text-gray-800 rounded-xl fs-up-2 font-semibold shadow-lg shadow-black/5 border border-white/20 hover:bg-white hover:shadow-xl transition-all duration-200"
         >
           <span className="mb-0.5 text-lg">←</span> 목록으로
