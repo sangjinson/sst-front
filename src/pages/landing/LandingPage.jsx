@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from '@components/common/Footer';
 import { useAuth } from '@hooks/useAuth';
+import { LogIn, LogOut } from 'lucide-react';
 
 import '@assets/css/landing.css';
 import { toEnRegion } from '@utils/regionMap';
 import { Helmet } from 'react-helmet-async';
-import api from '@api/axios'; 
+
+const authButtonClass = 'group inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-lg text-lg font-semibold text-white! bg-black border-0 transition-colors duration-200 ease-out hover:bg-[#f8f6f0] hover:text-black! active:scale-[0.97] cursor-pointer';
+const authButtonTextClass = 'text-white! transition-colors duration-200 group-hover:text-black!';
+const authButtonIconClass = 'w-4 h-4 text-white! transition-all duration-200 group-hover:text-black!';
 
 const LandingPage = () => {
   const { user, logout } = useAuth();
@@ -14,37 +18,88 @@ const LandingPage = () => {
   const [activeTab, setActiveTab] = useState('남부');
   const [searchKeyword, setSearchKeyword] = useState('');
 
-  // 🚀 핵심 수정: 무조건 false가 아니라, localStorage에 'true'라고 적혀있는지 확인해서 초기값 설정
-  const [isLogin, setIsLogin] = useState(() => localStorage.getItem('isLogin') === 'true');
+  const citiesSouth = [
+  '수원시',
+  '성남시',
+  '용인시',
+  '안양시',
+  '안산시',
+  '과천시',
+  '광명시',
+  '광주시',
+  '군포시',
+  '부천시',
+  '시흥시',
+  '안성시',
+  '오산시',
+  '의왕시',
+  '이천시',
+  '평택시',
+  '하남시',
+  '화성시',
+  '여주시',
+  '김포시'
+];
 
-  const citiesSouth = ['수원시', '성남시', '용인시', '안양시', '안산시', '과천시', '광명시', '광주시', '군포시', '부천시', '시흥시', '안성시', '오산시', '의왕시', '이천시', '평택시', '하남시', '화성시', '여주시', '양평군'];
-  const citiesNorth = ['고양시', '구리시', '남양주시', '동두천시', '양주시', '의정부시', '파주시', '포천시', '연천군', '가평군'];
+const citiesNorth = [
+  '고양시',
+  '구리시',
+  '남양주시',
+  '동두천시',
+  '양주시',
+  '의정부시',
+  '파주시',
+  '포천시',
+  '연천군',
+  '가평군'
+];
+
+  const regionCodeMap = {
+  고양시: 28,
+  구리시: 31,
+  남양주시: 36,
+  동두천시: 25,
+  양주시: 63,
+  연천군: 80,
+  의정부시: 15,
+  파주시: 48,
+  포천시: 65,
+  가평군: 82,
+  수원시: 11,
+  성남시: 13,
+  용인시: 46,
+  안양시: 17,
+  안산시: 27,
+  화성시: 59,
+  평택시: 22,
+  시흥시: 39,
+  부천시: 19,
+  광명시: 21,
+  광주시: 61,
+  이천시: 50,
+  여주시: 67,
+  하남시: 45,
+  의왕시: 43,
+  군포시: 41,
+  오산시: 37,
+  안성시: 55,
+  김포시: 57,
+  과천시: 29,
+};
 
   const currentCities = activeTab === '남부' ? citiesSouth : citiesNorth;
 
   const goToMainPage = (regionName) => {
-    navigate(`/${toEnRegion(regionName)}`);
-  };
+  const regionCode = regionCodeMap[regionName];
+
+  navigate(
+    `/${toEnRegion(regionName)}?regionCode=${regionCode}`
+  );
+};
 
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;
     navigate(searchKeyword);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await api.post('/auth/logout'); 
-      
-      // 🚀 핵심 추가: 로그아웃 성공 시 브라우저에서 꼬리표 제거
-      localStorage.removeItem('isLogin'); 
-      
-      setIsLogin(false); 
-      alert('로그아웃 되었습니다.');
-      window.location.reload(); 
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
-      alert('로그아웃 처리 중 문제가 발생했습니다.');
-    }
   };
 
   return (
@@ -56,12 +111,18 @@ const LandingPage = () => {
       <div className="page-wrapper min-h-screen bg-[#f8f6f0]">
         <header className="container-fluid flex flex-col pb-[5vw]">
           <div className="container">
-            {/* 🚀 isLogin 상태를 기준으로 조건부 렌더링 */}
+            {/* AuthContext의 user 상태를 기준으로 조건부 렌더링 */}
             <div className="flex justify-end p-5 md:py-[30px]">
               {user ? (
-                <button className='btn btn-darkgray' onClick={logout}>로그아웃</button>
+                <button className={authButtonClass} onClick={logout}>
+                  <span className={authButtonTextClass}>Logout</span>
+                  <LogOut className={`${authButtonIconClass} group-hover:translate-x-0.5`} aria-hidden="true" />
+                </button>
               ) : (
-                <Link to="/login" class="btn btn-green px-5">로그인</Link>
+                <Link to="/login" className={authButtonClass}>
+                  <span className={authButtonTextClass}>Login</span>
+                  <LogIn className={`${authButtonIconClass} rotate-180 group-hover:-translate-x-0.5`} aria-hidden="true" />
+                </Link>
               )}
             </div>
 
@@ -111,7 +172,7 @@ const LandingPage = () => {
               
               <div className="flex justify-center gap-[15px] mb-[30px] fs-up-3">
                 <button
-                  className={`py-[12px] px-[40px] font-bold rounded cursor-pointer transition-all duration-200 border-none ${
+                  className={`py-[12px] px-[40px] font-bold rounded-lg cursor-pointer transition-all duration-200 border-none ${
                     activeTab === '남부' 
                       ? 'bg-[#2B4A48] text-white' 
                       : 'bg-white/70 text-[#555]'
@@ -121,7 +182,7 @@ const LandingPage = () => {
                   경기 남부
                 </button>
                 <button
-                  className={`py-[12px] px-[40px] font-bold rounded cursor-pointer transition-all duration-200 border-none ${
+                  className={`py-[12px] px-[40px] font-bold rounded-lg cursor-pointer transition-all duration-200 border-none ${
                     activeTab === '북부' 
                       ? 'bg-[#2B4A48] text-white' 
                       : 'bg-white/70 text-[#555]'

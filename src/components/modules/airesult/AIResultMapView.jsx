@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TYPE_LABEL, TYPE_COLOR, getDetailPath } from './aiResultUtils';
 
+
+// 우측 지도
 const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, onSelectItem }) => {
   const navigate = useNavigate();
   const currentDayItems = schedule[activeDay] || [];

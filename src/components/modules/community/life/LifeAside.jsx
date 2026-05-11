@@ -2,6 +2,30 @@ import React from "react";
 import { ClipButton } from "@components/modules/ActionButtons";
 import { openReportModal } from "@components/modules/community/common/reportModal";
 
+const DownloadIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 3v12" />
+    <path d="m7 10 5 5 5-5" />
+    <path d="M5 21h14" />
+  </svg>
+);
+
+const CalendarPlanIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="4" y="5" width="16" height="16" rx="4" />
+    <path d="M8 3v4" />
+    <path d="M16 3v4" />
+    <path d="M4 10h16" />
+    <path d="M8.5 14h.01" />
+    <path d="M12 14h.01" />
+    <path d="M15.5 14h.01" />
+    <path d="M8.5 17.5h.01" />
+    <path d="M12 17.5h.01" />
+    <path d="M15.5 17.5h.01" />
+  </svg>
+);
+
+
 /**
  * LifeAside
  *
@@ -26,7 +50,6 @@ import { openReportModal } from "@components/modules/community/common/reportModa
  */
 const LifeAside = ({
   post,
-  region,
   courseList,
   viewCount,
   comments,
@@ -37,9 +60,10 @@ const LifeAside = ({
   navigate,
   handleImportSchedule,
   handleMakePlan,
+  onCommentClick,
 }) => {
   return (
-    <aside className="h-fit rounded-3xl border border-gray-100 bg-white p-6 shadow-sm lg:sticky lg:top-6 space-y-6">
+    <aside className="h-fit rounded-3xl border border-gray-100 bg-white p-6 shadow-sm lg:sticky lg:top-28 space-y-6">
       {/* 공유/신고 */}
       <div className="flex items-center gap-2">
         <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-500">
@@ -109,40 +133,39 @@ const LifeAside = ({
         </div>
       </div>
 
-      {/* 조회/댓글/찜 */}
+      {/* 좋아요/댓글/조회 */}
       <div className="grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 text-center">
+        <button
+          type="button"
+          onClick={() => setIsLiked(!isLiked)}
+          className={`rounded-2xl cursor-pointer px-3 py-4 transition ${
+            isLiked ? "bg-blue-50" : "bg-gray-50 hover:bg-blue-50"
+          }`}
+        >
+          <p className="fs-down-1 text-gray-400">좋아요</p>
+          <strong className="mt-1 block text-lg text-gray-900">
+            {wishCount}
+          </strong>
+        </button>
+
+        <button
+          type="button"
+          onClick={onCommentClick}
+          className="rounded-2xl bg-gray-50 px-3 py-4 transition hover:bg-emerald-50 cursor-pointer"
+        >
+          <p className="fs-down-1 text-gray-400">댓글</p>
+          <strong className="mt-1 block text-lg text-gray-900">
+            {comments.length}
+          </strong>
+        </button>
+
         <div className="rounded-2xl bg-gray-50 px-3 py-4">
           <p className="fs-down-1 text-gray-400">조회</p>
           <strong className="mt-1 block text-lg text-gray-900">
             {viewCount}
           </strong>
         </div>
-
-        <div className="rounded-2xl bg-gray-50 px-3 py-4">
-          <p className="fs-down-1 text-gray-400">댓글</p>
-          <strong className="mt-1 block text-lg text-gray-900">
-            {comments.length}
-          </strong>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsLiked(!isLiked)}
-          className={`rounded-2xl px-3 py-4 transition ${
-            isLiked ? "bg-red-50" : "bg-gray-50 hover:bg-red-50"
-          }`}
-        >
-          <p className="fs-down-1 text-gray-400">찜</p>
-          <strong
-            className={`mt-1 block text-lg ${
-              isLiked ? "text-red-500" : "text-gray-900"
-            }`}
-          >
-            {wishCount}
-          </strong>
-        </button>
       </div>
-
       {/* 수정/삭제 */}
       {isLogin && (
         <div className="grid grid-cols-2 gap-3">
@@ -167,15 +190,17 @@ const LifeAside = ({
         <button
           type="button"
           onClick={handleImportSchedule}
-          className="w-full py-3 bg-[#0F9B73] text-white fs-down-1 font-bold rounded-xl hover:bg-[#0d8a66] transition">
-          📅 내 일정으로 가져오기
+          className="inline-flex w-full items-center justify-center gap-2 py-3 leading-none bg-[#0F9B73] text-white fs-down-1 font-bold rounded-xl hover:bg-[#0d8a66] transition">
+          <DownloadIcon />
+          <span className="leading-none">내 일정으로 가져오기</span>
         </button>
 
         <button
           type="button"
           onClick={handleMakePlan}
-          className="w-full py-3 border border-[#0F9B73] text-[#0F9B73] fs-down-1 font-bold rounded-xl hover:bg-green-50 transition">
-          🗺 이 코스로 일정 만들기
+          className="inline-flex w-full items-center justify-center gap-2 py-3 leading-none border border-[#0F9B73] text-[#0F9B73] fs-down-1 font-bold rounded-xl hover:bg-green-50 transition">
+          <CalendarPlanIcon />
+          <span className="leading-none">이 코스로 일정 만들기</span>
         </button>
       </div>
     </aside>

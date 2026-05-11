@@ -128,7 +128,7 @@ export const hotplacePosts = [
   },
 ];
 
-// ✅ localStorage에서 유저가 작성한 게시글 불러오기
+// localStorage에서 유저가 작성한 게시글 불러오기
 export const getUserPosts = () => {
   try {
     return JSON.parse(localStorage.getItem('hotplacePosts') || '[]');
@@ -137,20 +137,20 @@ export const getUserPosts = () => {
   }
 };
 
-// ✅ localStorage에 유저 게시글 저장
+// localStorage에 유저 게시글 저장
 export const saveUserPost = (post) => {
   const posts = getUserPosts();
   posts.unshift(post);
   localStorage.setItem('hotplacePosts', JSON.stringify(posts));
 };
 
-// ✅ localStorage에서 유저 게시글 삭제
+// localStorage에서 유저 게시글 삭제
 export const deleteUserPost = (id) => {
   const posts = getUserPosts().filter(p => p.id !== id);
   localStorage.setItem('hotplacePosts', JSON.stringify(posts));
 };
 
-// ✅ 더미 + 유저 게시글 합쳐서 반환
+// 더미 + 유저 게시글 합쳐서 반환
 export const getAllPosts = () => {
   return [...getUserPosts(), ...hotplacePosts];
 };
