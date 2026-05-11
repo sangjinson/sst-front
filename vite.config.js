@@ -20,7 +20,6 @@ export default defineConfig({
       '@routes': fileURLToPath(new URL('./src/routes', import.meta.url)),
       '@layouts': fileURLToPath(new URL('./src/layouts', import.meta.url)),
       '@api': fileURLToPath(new URL('./src/api', import.meta.url)),
-
       '@themeadmin': fileURLToPath(new URL('./src/layouts/admin/tailadmin', import.meta.url)),
 
 
