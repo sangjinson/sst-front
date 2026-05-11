@@ -15,6 +15,7 @@ import GridIcon from "./grid.svg?react";
 import FileIcon from "./file.svg?react";
 import DownloadIcon from "./download.svg?react";
 import ArrowRightIcon from "./arrow-right.svg?react";
+import ArrowLeftIcon from "./arrow-left.svg?react";
 import GroupIcon from "./group.svg?react";
 import BoxIconLine from "./box-line.svg?react";
 import ShootingStarIcon from "./shooting-star.svg?react";
@@ -39,6 +40,7 @@ import EyeCloseIcon from "./eye-close.svg?react";
 import TimeIcon from "./time.svg?react";
 import CopyIcon from "./copy.svg?react";
 import ChevronLeftIcon from "./chevron-left.svg?react";
+import ChevronRightIcon from "./chevron-right.svg?react";
 import UserCircleIcon from "./user-circle.svg?react";
 import TaskIcon from "./task-icon.svg?react";
 import ListIcon from "./list.svg?react";
@@ -76,6 +78,7 @@ export {
   FolderIcon,
   ArrowDownIcon,
   ArrowRightIcon,
+  ArrowLeftIcon,
   GroupIcon,
   BoxIconLine,
   ShootingStarIcon,
@@ -97,6 +100,7 @@ export {
   TimeIcon,
   CopyIcon,
   ChevronLeftIcon,
+  ChevronRightIcon,
   UserCircleIcon,
   TaskIcon,
   ListIcon,
