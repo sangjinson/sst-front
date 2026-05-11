@@ -43,9 +43,19 @@ const CommunityHotplaceWrite = () => {
             : `http://localhost:8080${post.commMainImgUrl}`
           : "";
 
+        const imageUrls = post.images?.length
+          ? post.images.map((img) =>
+              img.startsWith("http")
+                ? img
+                : `http://localhost:8080${img}`
+            )
+          : imageUrl
+            ? [imageUrl]
+            : [];
+
         setTitle(post.commTitle || "");
         setContent(post.commContent || "");
-        setImagePreviews(imageUrl ? [imageUrl] : []);
+        setImagePreviews(imageUrls);
 
         // 아직 DB에 지역/장소/해시태그 컬럼이 없어서 임시 기본값
         setPlaceName("");
@@ -58,6 +68,7 @@ const CommunityHotplaceWrite = () => {
         setLoading(false);
       }
     };
+
     fetchPost();
   }, [isEditMode, id]);
 

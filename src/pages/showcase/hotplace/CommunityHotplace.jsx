@@ -7,6 +7,12 @@ import api from "@api/axios";
 const CommunityHotplace = () => {
   const navigate = useNavigate();
 
+  const getImageUrl = (url) => {
+    if (!url) return "https://placehold.co/600x400";
+    if (url.startsWith("http")) return url;
+    return `http://localhost:8080${url}`;
+  };
+
   useEffect(() => {
   api.get("/community?catCd=CMM002")
     .then((res) => {
@@ -17,11 +23,7 @@ const CommunityHotplace = () => {
         author: item.mbrNickname,
         place: "핫플거리",
         hashtags: [],
-        img: item.commMainImgUrl
-          ? item.commMainImgUrl.startsWith("http")
-            ? item.commMainImgUrl
-            : `http://localhost:8080${item.commMainImgUrl}`
-          : "https://placehold.co/600x400",
+        img: getImageUrl(item.commMainImgUrl),
         regDt: item.commRegDate,
         wishCnt: item.commLikeCnt,
         commentCnt: item.commCmntCnt,
