@@ -17,7 +17,11 @@ const CommunityHotplace = () => {
         author: item.mbrNickname,
         place: "핫플거리",
         hashtags: [],
-        img: item.commMainImgUrl || "https://placehold.co/600x400",
+        img: item.commMainImgUrl
+          ? item.commMainImgUrl.startsWith("http")
+            ? item.commMainImgUrl
+            : `http://localhost:8080${item.commMainImgUrl}`
+          : "https://placehold.co/600x400",
         regDt: item.commRegDate,
         wishCnt: item.commLikeCnt,
         commentCnt: item.commCmntCnt,

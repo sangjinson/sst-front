@@ -52,6 +52,13 @@ const CommunityHotplaceDetail = () => {
         // 게시글 상세 조회
         const res = await api.get(`/community/${id}`);
         const item = res.data;
+
+        const imageUrl = item.commMainImgUrl
+          ? item.commMainImgUrl.startsWith("http")
+            ? item.commMainImgUrl
+            : `http://localhost:8080${item.commMainImgUrl}`
+          : "https://placehold.co/900x650";
+
         setCurrentPost({
           id: item.commNo,
           commNo: item.commNo,
@@ -61,10 +68,13 @@ const CommunityHotplaceDetail = () => {
           author: item.mbrNickname,
           place: "핫플거리",
           hashtags: item.hashtagText ? item.hashtagText.split(",") : [],
-          img: item.commMainImgUrl || "https://placehold.co/900x650",
-          images: [
-            item.commMainImgUrl || "https://placehold.co/900x650",
-          ],
+          img: imageUrl,
+          images:
+            item.images?.map((img) =>
+              img.startsWith("http")
+                ? img
+                : `http://localhost:8080${img}`
+            ) || [imageUrl],
           regDt: item.commRegDate,
           wishCnt: item.commLikeCnt ?? 0,
           commentCnt: item.commCmntCnt ?? 0,

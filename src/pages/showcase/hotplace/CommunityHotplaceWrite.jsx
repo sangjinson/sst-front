@@ -37,9 +37,15 @@ const CommunityHotplaceWrite = () => {
         const res = await api.get(`/community/${id}`);
         const post = res.data;
 
+        const imageUrl = post.commMainImgUrl
+          ? post.commMainImgUrl.startsWith("http")
+            ? post.commMainImgUrl
+            : `http://localhost:8080${post.commMainImgUrl}`
+          : "";
+
         setTitle(post.commTitle || "");
         setContent(post.commContent || "");
-        setImagePreviews(post.commMainImgUrl ? [post.commMainImgUrl] : []);
+        setImagePreviews(imageUrl ? [imageUrl] : []);
 
         // 아직 DB에 지역/장소/해시태그 컬럼이 없어서 임시 기본값
         setPlaceName("");
@@ -78,14 +84,34 @@ const CommunityHotplaceWrite = () => {
             "Content-Type": "multipart/form-data",
           },
         });
+
         uploadedUrls.push(`http://localhost:8080${res.data}`);
       }
+     
       setImagePreviews((prev) => [...prev, ...uploadedUrls]);
     } catch (error) {
-      console.error("이미지 업로드 실패:", error);
       alert("이미지 업로드에 실패했습니다.");
     } finally {
       e.target.value = "";
+    }
+  };
+
+  const handleRemoveImage = async (removeIndex) => {
+    const imageUrl = imagePreviews[removeIndex];
+
+    try {
+      await api.delete("/community/image", {
+        params: {
+          imageUrl: imageUrl.replace("http://localhost:8080", ""),
+        },
+      });
+
+      setImagePreviews((prev) =>
+        prev.filter((_, index) => index !== removeIndex)
+      );
+    } catch (error) {
+      console.error("이미지 삭제 실패:", error);
+      alert("이미지 삭제에 실패했습니다.");
     }
   };
 
@@ -121,10 +147,27 @@ const CommunityHotplaceWrite = () => {
 
     if (isEditMode) {
       const payload = {
-        commTitle: title, // 게시글 제목
-        commContent: content, // 게시글 내용
-        commMainImgUrl: imagePreviews[0] || "", // 대표 이미지
+        commTitle: title,
+        commContent: content,
+        commMainImgUrl: imagePreviews[0]
+          ? imagePreviews[0].replace("http://localhost:8080", "")
+          : "",
         hashtags: finalTags,
+
+        files: imagePreviews.map((url, index) => {
+          const path = url.replace("http://localhost:8080", "");
+          const saveName = path.split("/").pop();
+
+          return {
+            fileOrgNm: saveName,
+            fileSaveNm: saveName,
+            filePath: path,
+            fileExt: saveName.split(".").pop(),
+            fileSize: 0,
+            fileMimeType: "image/png",
+            fileType: "IMAGE",
+          };
+        }),
       };
 
       try {
@@ -146,12 +189,29 @@ const CommunityHotplaceWrite = () => {
       }
 
       const payload = {
-        commMbrId: user.mbrId, // 로그인한 회원 번호
-        commCatCd: "CMM002", // 핫플거리 카테고리
-        commTitle: title, // 제목
-        commContent: content, // 내용
-        commMainImgUrl: imagePreviews[0] || "",
+        commMbrId: user.mbrId,
+        commCatCd: "CMM002",
+        commTitle: title,
+        commContent: content,
+        commMainImgUrl: imagePreviews[0]
+          ? imagePreviews[0].replace("http://localhost:8080", "")
+          : "",
         hashtags: finalTags,
+
+        files: imagePreviews.map((url, index) => {
+          const path = url.replace("http://localhost:8080", "");
+          const saveName = path.split("/").pop();
+
+          return {
+            fileOrgNm: saveName,
+            fileSaveNm: saveName,
+            filePath: path,
+            fileExt: saveName.split(".").pop(),
+            fileSize: 0,
+            fileMimeType: "image/png",
+            fileType: "IMAGE",
+          };
+        }),
       };
 
       try {
@@ -212,8 +272,8 @@ const CommunityHotplaceWrite = () => {
       {/* 사진 등록 */}
       <ImageUpload
         imagePreviews={imagePreviews}
-        setImagePreviews={setImagePreviews}
         handleImageChange={handleImageChange}
+        handleRemoveImage={handleRemoveImage} 
       />
 
       {/* 내용 */}
