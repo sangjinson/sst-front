@@ -25,22 +25,33 @@ const CommunityHotplaceDetail = () => {
   const [editText, setEditText] = useState("");
 
   useEffect(() => {
-    window.scrollTo({ top: 0 });
 
-    api
-      .get("/auth/me")
-      .then((res) => {
-        setCurrentUserId(res.data.data.mbrId);
-      })
-      .catch((err) => {
-        console.error("로그인 사용자 조회 실패:", err);
-      });
+  window.scrollTo({ top: 0 });
 
-    api
-      .get(`/community/${id}`)
-      .then((res) => {
+  // 로그인 사용자 조회
+  api
+    .get("/auth/me")
+    .then((res) => {
+      setCurrentUserId(res.data.data.mbrId);
+    })
+    .catch((err) => {
+      console.error("로그인 사용자 조회 실패:", err);
+    });
+
+  // 게시글 조회 함수
+  const fetchPost = async () => {
+      try {
+        const viewedKey = `hotplace_viewed_${id}`;
+        // 처음 조회 시에만 조회수 증가
+        if (!localStorage.getItem(viewedKey)) {
+
+          await api.put(`/community/${id}/view`);
+
+          localStorage.setItem(viewedKey, "true");
+        }
+        // 게시글 상세 조회
+        const res = await api.get(`/community/${id}`);
         const item = res.data;
-
         setCurrentPost({
           id: item.commNo,
           commNo: item.commNo,
@@ -49,7 +60,7 @@ const CommunityHotplaceDetail = () => {
           content: item.commContent,
           author: item.mbrNickname,
           place: "핫플거리",
-          hashtags: [],
+          hashtags: item.hashtagText ? item.hashtagText.split(",") : [],
           img: item.commMainImgUrl || "https://placehold.co/900x650",
           images: [
             item.commMainImgUrl || "https://placehold.co/900x650",
@@ -60,10 +71,11 @@ const CommunityHotplaceDetail = () => {
           viewCnt: item.commInqireCnt ?? 0,
           size: "wide",
         });
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("게시글 상세 조회 실패:", err);
-      });
+      }
+    };
+    fetchPost();
   }, [id]);
 
   // 댓글 조회 함수
@@ -90,9 +102,7 @@ const CommunityHotplaceDetail = () => {
 
   useEffect(() => {
     if (!currentPost) return;
-
     const commNo = currentPost.commNo ?? currentPost.id;
-
     fetchComments(commNo);
   }, [currentPost]);
 
@@ -120,8 +130,8 @@ const CommunityHotplaceDetail = () => {
       prev === slideImages.length - 1 ? 0 : prev + 1
     );
 
-  const viewCount = currentPost.viewCnt + 1;
-  const wishCount = currentPost.wishCnt + (isLiked ? 1 : 0);
+  const viewCount = currentPost.viewCnt;
+  const wishCount = currentPost.wishCnt;
 
   // 댓글 등록
   const handleCommentSubmit = () => {
@@ -184,9 +194,7 @@ const CommunityHotplaceDetail = () => {
   // 댓글 삭제
   const handleDeleteComment = (commentId) => {
     if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
-
     const commNo = currentPost.commNo ?? currentPost.id;
-
     axios
       .delete(`http://localhost:8080/api/comments/${commentId}`)
       .then(() => {
@@ -195,6 +203,42 @@ const CommunityHotplaceDetail = () => {
       .catch((err) => {
         console.error("댓글 삭제 실패:", err);
       });
+  };
+
+  // 게시글 삭제
+  const handleDeletePost = async () => {
+    if (!window.confirm("게시글을 삭제하시겠습니까?")) return;
+    try {
+      await api.delete(`/community/${id}`);
+      alert("게시글이 삭제되었습니다.");
+      navigate("/showcase/hotplace");
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+      alert("게시글 삭제에 실패했습니다.");
+    }
+  };
+
+  // 좋아요 처리
+  const handleLikeClick = async () => {
+    if (!currentUserId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    try {
+      const res = await api.post(
+        `/community/${currentPost.commNo}/like?mbrId=${currentUserId}`
+      );
+      const liked = res.data;
+      setIsLiked(liked);
+
+      setCurrentPost((prev) => ({
+        ...prev,
+        wishCnt: liked ? prev.wishCnt + 1 : Math.max(prev.wishCnt - 1, 0),
+      }));
+    } catch (error) {
+      console.error("좋아요 처리 실패:", error);
+      alert("좋아요 처리에 실패했습니다.");
+    }
   };
 
   return (
@@ -247,6 +291,7 @@ const CommunityHotplaceDetail = () => {
             wishCount={wishCount}
             isLogin={isLogin}
             navigate={navigate}
+            handleDeletePost={handleDeletePost}
           />
         </div>
 
@@ -255,6 +300,7 @@ const CommunityHotplaceDetail = () => {
           isLiked={isLiked}
           setIsLiked={setIsLiked}
           wishCount={wishCount}
+          handleLikeClick={handleLikeClick}
           openReportModal={() =>
             openReportModal({
               type: "post",

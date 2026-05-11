@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TextInput from "@modules/form/TextInput";
-import { getAllPosts, saveUserPost, gyeonggiRegions } from "./communityHotplaceData"; // DB 저장 방식으로 바꾸면 나중에 지울 후보
+import { gyeonggiRegions } from "./communityHotplaceData";
 import RegionSelect from "@components/modules/community/hotplace/RegionSelect";
 import TagInput from "@components/modules/community/write/TagInput";
 import ImageUpload from "@components/modules/community/write/ImageUpload";
@@ -16,7 +16,8 @@ const CommunityHotplaceWrite = () => {
   const { id } = useParams();
   const isEditMode = !!id;
   const { user } = useAuth();
-  const currentPost = isEditMode ? getAllPosts().find((post) => post.id === Number(id)) : null;
+  const [loading, setLoading] = useState(isEditMode);
+  const [notFound, setNotFound] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -25,33 +26,67 @@ const CommunityHotplaceWrite = () => {
   const [selectedRegion, setSelectedRegion] = useState("");
   const [isRegionOpen, setIsRegionOpen] = useState(false);
   const [placeName, setPlaceName] = useState("");
-  const [selectedFiles, setSelectedFiles] = useState([]);
 
   useEffect(() => { window.scrollTo({ top: 0 }); }, []);
 
   useEffect(() => {
-    if (!isEditMode || !currentPost) return;
-    setTitle(currentPost.title);
-    setContent(currentPost.description);
-    setPlaceName(currentPost.place);
-    setTags(currentPost.hashtags || []);
-    setImagePreviews(currentPost.images || [currentPost.img]);
-    setSelectedRegion(currentPost.region || "");
-  }, [isEditMode, currentPost]);
+    if (!isEditMode) return;
 
-  if (isEditMode && !currentPost) {
+    const fetchPost = async () => {
+      try {
+        const res = await api.get(`/community/${id}`);
+        const post = res.data;
+
+        setTitle(post.commTitle || "");
+        setContent(post.commContent || "");
+        setImagePreviews(post.commMainImgUrl ? [post.commMainImgUrl] : []);
+
+        // 아직 DB에 지역/장소/해시태그 컬럼이 없어서 임시 기본값
+        setPlaceName("");
+        setSelectedRegion("");
+        setTags(post.hashtagText ? post.hashtagText.split(",") : []);
+      } catch (error) {
+        console.error("수정 게시글 조회 실패:", error);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+  }, [isEditMode, id]);
+
+  if (loading) {
+    return <div className="py-20 text-center font-bold text-gray-500">게시글을 불러오는 중입니다.</div>;
+  }
+
+  if (notFound) {
     return <div className="py-20 text-center font-bold text-gray-500">수정할 게시글이 존재하지 않습니다.</div>;
   }
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
-    setSelectedFiles((prev) => [...prev, ...files]);
 
-    const previewUrls = files.map((file) =>
-      URL.createObjectURL(file)
-    );
-    setImagePreviews((prev) => [...prev, ...previewUrls]);
-    e.target.value = "";
+    if (!files.length) return;
+
+    try {
+      const uploadedUrls = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await api.post("/community/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        uploadedUrls.push(`http://localhost:8080${res.data}`);
+      }
+      setImagePreviews((prev) => [...prev, ...uploadedUrls]);
+    } catch (error) {
+      console.error("이미지 업로드 실패:", error);
+      alert("이미지 업로드에 실패했습니다.");
+    } finally {
+      e.target.value = "";
+    }
   };
 
   const handleTagKeyDown = (e) => {
@@ -85,25 +120,25 @@ const CommunityHotplaceWrite = () => {
     if (!finalTags.length) { alert("해시태그를 입력해주세요."); return; }
 
     if (isEditMode) {
-      const saved = JSON.parse(localStorage.getItem("hotplacePosts") || "[]");
-      const updated = saved.map((p) =>
-        p.id === Number(id)
-          ? {
-              ...p,
-              title,
-              description: content,
-              place: placeName,
-              region: selectedRegion,
-              hashtags: finalTags,
-              img: imagePreviews[0] || p.img,
-              images: imagePreviews,
-            }
-          : p
-      );
-      localStorage.setItem("hotplacePosts", JSON.stringify(updated));
-      alert("글이 수정되었습니다!");
-      navigate(`/showcase/hotplace/view/${id}`);
+      const payload = {
+        commTitle: title, // 게시글 제목
+        commContent: content, // 게시글 내용
+        commMainImgUrl: imagePreviews[0] || "", // 대표 이미지
+        hashtags: finalTags,
+      };
+
+      try {
+        // 게시글 수정 요청
+        await api.put(`/community/${id}`, payload);
+        alert("글이 수정되었습니다!");
+        // 수정 완료 후 상세페이지 이동
+        navigate(`/showcase/hotplace/view/${id}`);
+      } catch (error) {
+        console.error("글 수정 실패:", error);
+        alert("글 수정에 실패했습니다.");
+      }
     } else {
+      // 로그인 여부 확인
       if (!user?.mbrId) {
         alert("로그인이 필요합니다.");
         navigate("/login");
@@ -115,7 +150,8 @@ const CommunityHotplaceWrite = () => {
         commCatCd: "CMM002", // 핫플거리 카테고리
         commTitle: title, // 제목
         commContent: content, // 내용
-        commMainImgUrl: `https://picsum.photos/seed/${Date.now()}/720/720`, // 대표 이미지
+        commMainImgUrl: imagePreviews[0] || "",
+        hashtags: finalTags,
       };
 
       try {
