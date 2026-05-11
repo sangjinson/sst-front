@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import capybaraImage from '@assets/images/not-found-capybara.png';
 import flashlightImage from '@assets/images/not-found-flashlight.png';
@@ -6,10 +7,33 @@ const notFoundStyles = "\n.not-found-capybara .light-beam {\n  animation: notFou
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
+  const [cursorPoint, setCursorPoint] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (event) => {
+    setCursorPoint({
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#0B1F33] text-white">
+    <main className="min-h-screen overflow-hidden bg-[#0B1F33] text-white" onMouseMove={handleMouseMove}>
       <style>{notFoundStyles}</style>
+
+      {/* 개발용 마우스 좌표 표시 */}
+      <div className="pointer-events-none fixed left-0 top-0 z-[9999] h-screen w-screen">
+        <div
+          className="absolute top-0 h-screen border-l border-dashed border-[#8ED0FF]/90"
+          style={{ left: cursorPoint.x }}
+        />
+        <div
+          className="absolute left-0 w-screen border-t border-dashed border-[#8ED0FF]/90"
+          style={{ top: cursorPoint.y }}
+        />
+        <div className="absolute left-3 top-3 rounded-lg bg-slate-950/75 px-3 py-2 text-sm font-bold text-white shadow-sm">
+          x: {cursorPoint.x} / y: {cursorPoint.y}
+        </div>
+      </div>
 
       <div className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col items-center justify-center px-5 py-16 text-center">
         <p className="mb-3 text-sm font-bold uppercase tracking-[0.28em] text-[#8ED0FF]">
@@ -60,24 +84,27 @@ const NotFoundPage = () => {
                 404
               </text>
             </g>
-            <g filter="url(#softShadow)">
-              <image
-                href={capybaraImage}
-                x="38"
-                y="28"
-                width="292"
-                height="389"
-                preserveAspectRatio="xMidYMin meet"
-                transform="translate(368 0) scale(-1 1)"
-              />
-            </g>
+            {/* 카피바라 위치/크기 조정 */}
+            <g transform="translate(22 72) scale(1.055)">
+              <g filter="url(#softShadow)">
+                <image
+                  href={capybaraImage}
+                  x="38"
+                  y="28"
+                  width="292"
+                  height="389"
+                  preserveAspectRatio="xMidYMin meet"
+                  transform="translate(368 0) scale(-1 1)"
+                />
+              </g>
 
-            <g className="surprised-face">
-              <circle cx="169" cy="127" r="9" fill="#2B1A10" />
-              <circle cx="228" cy="127" r="9" fill="#2B1A10" />
-              <circle cx="165" cy="123" r="3" fill="#FFFFFF" />
-              <circle cx="224" cy="123" r="3" fill="#FFFFFF" />
-              <circle cx="211" cy="194" r="10" fill="#2B1A10" />
+              <g className="surprised-face">
+                <circle cx="169" cy="127" r="9" fill="#2B1A10" />
+                <circle cx="228" cy="127" r="9" fill="#2B1A10" />
+                <circle cx="165" cy="123" r="3" fill="#FFFFFF" />
+                <circle cx="224" cy="123" r="3" fill="#FFFFFF" />
+                <circle cx="211" cy="194" r="10" fill="#2B1A10" />
+              </g>
             </g>
             <g transform="translate(158 292) rotate(-7)">
               <image
