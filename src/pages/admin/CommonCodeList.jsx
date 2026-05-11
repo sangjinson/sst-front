@@ -2,26 +2,31 @@ import { useEffect, useState } from 'react';
 import api from '@api/axios';
 
 const CommonCodeList = () => {
+  // 공통코드 목록, 검색 조건, 로딩 상태
   const [codes, setCodes] = useState([]);
   const [groupCode, setGroupCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [groupCodes, setGroupCodes] = useState([]);
 
+  // 페이지네이션과 정렬 조건
   const [page, setPage] = useState(1);
   const [size] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [sortBy, setSortBy] = useState('groupCode');
   const [sortDir, setSortDir] = useState('asc');
 
+  // 등록/수정 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
+  // 처리 결과를 잠깐 보여주는 토스트 메시지 상태
   const [toast, setToast] = useState({
     show: false,
     message: '',
     type: 'success',
   });
 
+  // 등록/수정 폼 입력값
   const [formData, setFormData] = useState({
     code: '',
     codeName: '',
@@ -31,6 +36,7 @@ const CommonCodeList = () => {
     useYn: 'Y',
   });
 
+  // 성공/실패 메시지를 화면 오른쪽 아래에 2초 동안 표시한다.
   const showToast = (message, type = 'success') => {
     setToast({
       show: true,
@@ -47,6 +53,7 @@ const CommonCodeList = () => {
     }, 2000);
   };
 
+  // 모달을 새로 열거나 닫을 때 폼을 초기 상태로 되돌린다.
   const resetFormData = () => {
     setFormData({
       code: '',
@@ -58,6 +65,8 @@ const CommonCodeList = () => {
     });
   };
 
+  // 공통코드 목록을 페이지 단위로 조회한다.
+  // 검색, 페이지 이동, 정렬 변경 시에도 같은 함수를 재사용한다.
   const fetchCommonCodes = async (
   searchGroupCode = groupCode,
   searchPage = page,
@@ -89,6 +98,7 @@ const CommonCodeList = () => {
   }
 };
 
+  // 검색/등록 폼에서 선택할 수 있는 그룹코드 목록을 불러온다.
   const fetchGroupCodes = async () => {
     try {
       const response = await api.get('/admin/common-codes/groups');
@@ -100,22 +110,26 @@ const CommonCodeList = () => {
     }
   };
 
+  // 페이지 번호나 정렬 조건이 바뀌면 목록을 다시 조회한다.
   useEffect(() => {
   fetchCommonCodes(groupCode, page, sortBy, sortDir);
   fetchGroupCodes();
 }, [page, sortBy, sortDir]);
 
+  // 선택한 그룹코드로 검색하고 첫 페이지로 이동한다.
   const handleSearch = () => {
   setPage(1);
   fetchCommonCodes(groupCode, 1, sortBy, sortDir);
 };
 
+// 검색 조건을 초기화하고 전체 목록을 다시 조회한다.
 const handleResetSearch = () => {
   setGroupCode('');
   setPage(1);
   fetchCommonCodes('', 1, sortBy, sortDir);
 };
 
+// 같은 컬럼을 다시 누르면 정렬 방향을 바꾸고, 다른 컬럼이면 오름차순으로 시작한다.
 const handleSort = (field) => {
   if (sortBy === field) {
     setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
@@ -127,12 +141,14 @@ const handleSort = (field) => {
   setPage(1);
 };
 
+  // 등록 모달을 열기 전에 수정 모드를 끄고 빈 폼을 준비한다.
   const handleOpenAddModal = () => {
     setIsEditMode(false);
     resetFormData();
     setIsModalOpen(true);
   };
 
+  // 선택한 행의 값을 폼에 채워 수정 모달을 연다.
   const handleEditClick = (code) => {
     setIsEditMode(true);
 
@@ -148,12 +164,14 @@ const handleSort = (field) => {
     setIsModalOpen(true);
   };
 
+  // 모달을 닫으면서 등록/수정 상태와 입력값을 초기화한다.
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setIsEditMode(false);
     resetFormData();
   };
 
+  // 폼 input/select의 name에 맞춰 formData 값을 갱신한다.
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -163,6 +181,7 @@ const handleSort = (field) => {
     }));
   };
 
+  // 필수 입력값을 확인하고 부족한 값은 토스트로 알려준다.
   const validateForm = () => {
     if (!formData.code.trim()) {
       showToast('코드를 입력해주세요.', 'error');
@@ -187,6 +206,7 @@ const handleSort = (field) => {
     return true;
   };
 
+  // 등록/수정 버튼 클릭 시 폼 검증 후 API를 호출한다.
   const handleSubmitCode = async () => {
     if (!validateForm()) return;
 
@@ -237,6 +257,7 @@ if (!isEditMode) {
     }
   };
 
+  // 사용/미사용 버튼 클릭 시 상태를 반대로 바꾼다.
   const handleToggleUseYn = async (code) => {
     const nextUseYn = code.useYn === 'Y' ? 'N' : 'Y';
     const message = nextUseYn === 'Y' ? '사용 처리하시겠습니까?' : '미사용 처리하시겠습니까?';
@@ -262,6 +283,7 @@ if (!isEditMode) {
 
   return (
     <div className="p-6">
+      {/* 페이지 제목과 등록 버튼 */}
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">공통코드 관리</h1>
@@ -279,6 +301,7 @@ if (!isEditMode) {
         </button>
       </div>
 
+      {/* 그룹코드 검색 영역 */}
       <div className="mb-4 rounded-xl border border-gray-200 bg-white p-4">
         <div className="flex gap-2">
           <select
@@ -313,8 +336,10 @@ if (!isEditMode) {
         </div>
       </div>
 
+      {/* 공통코드 목록 테이블 */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <table className="w-full table-auto text-left text-sm">
+          {/* 클릭 가능한 헤더는 정렬 기준을 변경한다. */}
           <thead className="bg-gray-50 text-gray-600">
   <tr>
     <th
@@ -373,6 +398,7 @@ if (!isEditMode) {
 </thead>
 
           <tbody className="divide-y divide-gray-100">
+            {/* 로딩, 빈 목록, 목록 표시 상태를 나누어 렌더링한다. */}
             {loading ? (
               <tr>
                 <td colSpan="7" className="px-4 py-10 text-center text-gray-500">
@@ -422,6 +448,7 @@ if (!isEditMode) {
         </table>
       </div>
 
+      {/* 페이지 이동 버튼 */}
       <div className="mt-4 flex items-center justify-center gap-2">
   <button
     type="button"
@@ -469,6 +496,7 @@ if (!isEditMode) {
   </button>
 </div>
 
+      {/* 공통코드 등록/수정 모달 */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
@@ -570,6 +598,7 @@ if (!isEditMode) {
         </div>
       )}
 
+      {/* 등록, 수정, 조회 실패 등의 결과 메시지 */}
       {toast.show && (
         <div
           className={`fixed bottom-6 right-6 z-[9999] rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-lg ${
