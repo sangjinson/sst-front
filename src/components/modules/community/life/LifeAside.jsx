@@ -63,7 +63,7 @@ const LifeAside = ({
   onCommentClick,
 }) => {
   return (
-    <aside className="h-fit rounded-3xl border border-gray-100 bg-white p-6 shadow-sm lg:sticky lg:top-6 space-y-6">
+    <aside className="h-fit rounded-3xl border border-gray-100 bg-white p-6 shadow-sm lg:sticky lg:top-28 space-y-6">
       {/* 공유/신고 */}
       <div className="flex items-center gap-2">
         <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-500">

@@ -7,7 +7,6 @@ import CategorySection from '@components/card/CategorySection';
 import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
 import MainSkeleton from '@components/skeleton/MainSkeleton';
-import regionData from '@pages/main/regionData.json';
 
 // ----------------------------------------------------
 // 1. 배너 이미지 설정
@@ -32,7 +31,6 @@ const bannerImages = {
   하남시: '/banners/하남시.png',
   화성시: '/banners/화성시.png',
   여주시: '/banners/여주시.png',
-  양평군: '/banners/양평시.png',
   고양시: '/banners/고양시.png',
   구리시: '/banners/구리시.png',
   남양주시: '/banners/남양주시.png',
@@ -71,7 +69,6 @@ const regionSubtitles = {
   하남시: '한강의 물결과 미사의 젊음이 만나는 도시',
   화성시: '전통과 현대가 공존하는 도시',
   여주시: '은빛 물결과 세종대왕의 지혜가 흐르는, 역사 문화 도시',
-  양평군: '두 강이 만나는 설렘과 천년의 숲이 맞이하는 쉼표의 도시',
   고양시: '호수와 문화가 공존하는 도시',
   구리시: '조선의 숨결이 머무는 작지만 풍요로운 도시',
   남양주시: '다산의 지혜와 한강의 숨결이 어우러진 인문·생태 도시',
@@ -94,34 +91,98 @@ const getRandomItems = (arr, num) => {
   return shuffled.slice(0, num);
 };
 
+const convertPlaceToCardItem = (place) => {
+  const categoryMap = {
+    PLC001: { tag: '볼거리', type: 'see', group: 'attractions' },
+    PLC002: { tag: '놀거리', type: 'play', group: 'plays' },
+    PLC003: { tag: '잘거리', type: 'sleep', group: 'sleeps' },
+    PLC004: { tag: '먹거리', type: 'food', group: 'foods' },
+  };
+
+  const category = categoryMap[place.plcCatCd] || {
+    tag: '볼거리',
+    type: 'see',
+    group: 'attractions',
+  };
+
+  return {
+    id: place.plcNo,
+    plcId: place.plcId,
+    tag: category.tag,
+    type: category.type,
+    group: category.group,
+    title: place.plcName,
+    desc: place.plcOverview,
+    img: place.plcMainImgUrl || null,
+  };
+};
+
 const MainPage = () => {
   const { region } = useParams();
   const regionKor = toKorRegion(region);
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+
+  const { pathname, search } = useLocation();
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const [placeList, setPlaceList] = useState([]);
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-    const timer = setTimeout(() => {
+  window.scrollTo(0, 0);
+
+  const fetchPlaces = async () => {
+    try {
+      setIsLoading(true);
+
+      const params = new URLSearchParams(search);
+      const regionCode = Number(params.get('regionCode')) || 11;
+
+      const response = await fetch(
+        `/api/home/places?regionCode=${regionCode}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`API 요청 실패: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const convertedData = Array.isArray(data)
+      ? data.map(convertPlaceToCardItem)
+      : [];
+
+      setPlaceList(convertedData);
+    } catch (error) {
+      console.error('메인 페이지 장소 데이터 조회 실패:', error);
+      setPlaceList([]);
+    } finally {
       setIsLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [pathname, region]);
+    }
+  };
+
+  fetchPlaces();
+}, [pathname, search, region]);
 
   const currentRegion = regionKor || '수원시';
   const currentBannerImage = bannerImages[currentRegion] || defaultBanner;
   const currentSubtitle = regionSubtitles[currentRegion] || '경기도의 매력을 발견하세요';
 
-  const currentData = regionData[currentRegion] || regionData['수원시'];
+  const attractions = placeList.filter(
+  (item) => item.group === 'attractions'
+);
 
-  const {
-    attractions = [],
-    plays = [],
-    sleeps = [],
-    foods = []
-  } = currentData || {};
+const plays = placeList.filter(
+  (item) => item.group === 'plays'
+);
+
+const sleeps = placeList.filter(
+  (item) => item.group === 'sleeps'
+);
+
+const foods = placeList.filter(
+  (item) => item.group === 'foods'
+);
 
   const topPicks = useMemo(() => {
     const seeItem = getRandomItems(attractions, 1)[0];

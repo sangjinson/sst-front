@@ -82,7 +82,7 @@ const CommunityHotplace = () => {
   );
 
   return (
-    <div className="w-full max-w-[1280px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
+    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
       <Breadcrumb paths={[{ label: "홈", to: "/" }, { label: "핫플거리", to: "/showcase" }]} className="mb-4" />
 
       <section className="mt-8 mb-8 flex flex-col gap-6 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">

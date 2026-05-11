@@ -1,7 +1,6 @@
-// src/pages/area/food/View.jsx
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getFoodDataByRegion } from './foodData';
+import { getFoodDataByRegion, getFoodDataById } from './foodData';
 import { toKorRegion } from '@utils/regionMap';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import {
@@ -13,14 +12,9 @@ import {
   AreaRelated,
 } from '@components/modules/area/areaview';
 import IconSVG from '@components/Icon/IconSVG';
+import ViewSkeleton from '@components/skeleton/ViewSkeleton';
 
-const CATEGORIES = ['전체', '한식', '중식', '일식', '양식'];
-
-const generateReviews = (foodName) => [
-  { user: '미식가' + foodName.slice(0, 1) + '123', rating: 5, comment: `${foodName} 진짜 맛있어요! 강력 추천합니다.` },
-  { user: '여행중인밥', rating: 4, comment: '분위기도 좋고 음식도 맛있었어요. 또 오고 싶네요.' },
-  { user: '동네주민', rating: 5, comment: `${foodName} 단골입니다. 항상 맛이 일정하고 서비스도 좋아요.` },
-];
+const CATEGORIES = ['전체', '한식', '일식', '양식', '중식', '카페'];
 
 const FoodView = () => {
   const { region } = useParams();
@@ -32,23 +26,51 @@ const FoodView = () => {
   const currentRegionKor = toKorRegion(currentRegion);
   const isLoggedIn = true;
 
-  const allItems = useMemo(
-    () => getFoodDataByRegion(currentRegionKor),
-    [currentRegionKor]
-  );
+  const [item, setItem] = useState(null);
+  const [relatedItems, setRelatedItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const item = useMemo(() => {
-    if (!id) return null;
-    return allItems.find((entry) => String(entry.id) === String(id)) || null;
-  }, [allItems, id]);
+  // ✅ 상세 데이터 조회
+  useEffect(() => {
+    if (!id) { setLoading(false); return; }
 
-  const relatedItems = useMemo(() => {
-    if (!item) return [];
+    const fetchDetail = async () => {
+      setLoading(true);
+      try {
+        const data = await getFoodDataById(id);
+        setItem(data);
+      } catch (err) {
+        console.error('먹거리 상세 조회 실패:', err);
+        setItem(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return allItems
-      .filter((entry) => entry.id !== item.id && entry.category === item.category)
-      .slice(0, 4);
-  }, [allItems, item]);
+    fetchDetail();
+  }, [id]);
+
+  // ✅ 연관 추천 조회
+  useEffect(() => {
+    if (!item) return;
+
+    const fetchRelated = async () => {
+      try {
+        const all = await getFoodDataByRegion(currentRegionKor);
+        const filtered = all
+          .filter((s) => s.id !== item.id && s.category === item.category)
+          .slice(0, 4);
+        setRelatedItems(filtered);
+      } catch (err) {
+        console.error('연관 추천 조회 실패:', err);
+        setRelatedItems([]);
+      }
+    };
+
+    fetchRelated();
+  }, [item, currentRegionKor]);
+
+  if (loading) return <ViewSkeleton />;
 
   if (!item) {
     return (
@@ -83,10 +105,11 @@ const FoodView = () => {
 
       <AreaInfoSection
         infoItems={[
-          { icon: <IconSVG name="location" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '주소', value: item.address },
-          { icon: <IconSVG name="phone" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2} />, label: '전화번호', value: item.phone || '031-000-0000' },
-          { icon: <IconSVG name="time" size={18} className=" shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '영업시간', value: item.hours || '11:00 - 21:00' },
-          { icon: <IconSVG name="circleprice" size={18} className=" shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '가격대', value: item.price || '10,000원 ~ 30,000원', highlight: true },
+          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '주소', value: item.address },
+          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2} />, label: '전화번호', value: item.phone || '' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '영업시간', value: item.hours || '' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '주차', value: item.parking || '' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '메뉴', value: item.menu || '' },
         ]}
         tags={item.tags}
         tagLabel="태그"
@@ -96,8 +119,8 @@ const FoodView = () => {
 
       <AreaReview
         rating={item.rating}
-        reviewCount={item.reviewCount || item.reviews}
-        reviews={item.reviewList || generateReviews(item.name)}
+        reviewCount={item.reviewCount}
+        reviews={item.reviews || []}
         isLoggedIn={isLoggedIn}
         placeholder="음식점에 대한 솔직한 리뷰를 남겨주세요."
       />
