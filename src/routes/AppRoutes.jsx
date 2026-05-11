@@ -36,7 +36,7 @@ import SignupPage from '@pages/auth/SignupPage';
 import OAuthRedirectHandler from '@pages/auth/OAuthRedirectHandler';
 
 import AdminHome from '@pages/user/Home';
-import MemberList from '@pages/admin/MemberList';
+
 import AreaPostList from '@pages/admin/AreaPostList';
 import ReportList from '@pages/admin/ReportList';
 import ReportDetail from '@pages/admin/ReportDetail';
@@ -69,7 +69,14 @@ import AppLayout from '@layouts/admin/tailadmin/layout/layout/AppLayout';
 import { ScrollToTop } from '@layouts/admin/tailadmin/layout/components/common/ScrollToTop';
 */}
 import Home from '@themeadmin/pages/Dashboard/Home';
-import AdinMemberList from '@themeadmin/pages/Members/MemberList';
+{/* 관리자 - 회원 관리 */}
+import AdinMemberList from '@themeadmin/pages/Members/AdminMemberList';
+import AdminMemberInfoForm from '@themeadmin/pages/Members/AdminMemberInfoForm';
+
+{/* 관리자 - 놀거리, 먹거리, 잘거리, 볼거리 */}
+import AdminStreetListPage from '@themeadmin/pages/Streets/AdminStreetListPage';
+import AdminStreetForm from '@themeadmin/pages/Streets/AdminStreetForm';
+
 
 
 
@@ -142,6 +149,25 @@ const AppRoutes = () => {
           <Route index element={<Home />} />
           <Route path="members" element={<AdinMemberList />} />
           <Route path="common-codes" element={<CommonCodeList />} />
+
+          {/* 회원 관리 */}
+          <Route path="members">
+            <Route index element={<AdinMemberList />} />
+            <Route path="create" element={<AdminMemberInfoForm />} />
+            <Route path="update" element={<AdminMemberInfoForm />} />
+          </Route>
+
+          {/* 사거리 관리 */}
+          <Route path="area">
+            {/* /admin/street/:type 경로로 들어오면 StreetListPage를 보여줌 */}
+            <Route path=":type" element={<AdminStreetListPage />} />
+            
+            {/* 필요한 경우 추가 경로 설정 */}
+            <Route path=":type/create" element={<AdminStreetForm />} />
+            <Route path=":type/update" element={<AdminStreetForm />} />
+            
+          </Route>
+          
 
           <Route path="support">
             <Route path="notices" element={<NoticeManage />} />

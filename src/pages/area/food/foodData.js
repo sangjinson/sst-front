@@ -13,12 +13,11 @@ const REGION_CODE_MAP = {
   '포천시': 65, '가평군': 82, '용인시': 46,
 };
 
-// ✅ FLT 코드 → 한글 이름 매핑 (먹거리 카테고리)
 const FLT_LABEL_MAP = {
   'FLT006': '한식',
   'FLT007': '일식',
   'FLT008': '양식',
-  'FLT009': '중식', 
+  'FLT009': '중식',
   'FLT010': '카페',
   'FLT021': '간이음식',
 };
@@ -27,13 +26,16 @@ const stripHtml = (str) => str?.replace(/<[^>]*>/g, ' ').trim() || '';
 
 const normalizeApiItem = (item) => ({
   id: item.plcNo,
+  plcNo: item.plcNo,                        // ← 추가
   name: item.plcName,
   title: item.plcName,
   category: FLT_LABEL_MAP[item.plcFltCd] || '한식',
   tag: FLT_LABEL_MAP[item.plcFltCd] || '한식',
-  rating: item.rating ?? 0,
-  reviews: item.reviewCount ?? 0,
-  reviewCount: item.reviewCount ?? 0,
+  plcAvgRating: item.plcAvgRating ?? 0,     // ← 추가
+  plcReviewCnt: item.plcReviewCnt ?? 0,     // ← 추가
+  rating: item.plcAvgRating ?? 0,        // ← 추가 (AreaListCard용)
+  reviewCount: item.plcReviewCnt ?? 0,   // ← 추가 (AreaListCard용)
+  reviews: [],                              // ← 빈 배열
   description: stripHtml(item.plcOverview) || '',
   desc: stripHtml(item.plcOverview) || '',
   address: item.plcAddr || '',
@@ -50,7 +52,6 @@ const normalizeApiItem = (item) => ({
   infocenter: stripHtml(item.foodInfocenter) || '',
 });
 
-// ✅ 지역별 먹거리 목록 조회
 export const getFoodDataByRegion = async (regionName) => {
   try {
     const rgnCd = REGION_CODE_MAP[regionName];
@@ -64,7 +65,6 @@ export const getFoodDataByRegion = async (regionName) => {
   }
 };
 
-// ✅ 먹거리 상세 조회
 export const getFoodDataById = async (id) => {
   try {
     const res = await axios.get(`${BASE_URL}/api/food/${id}`);

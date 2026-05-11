@@ -25,12 +25,15 @@ const stripHtml = (str) => str?.replace(/<[^>]*>/g, ' ').trim() || '';
 
 const normalizeApiItem = (item) => ({
   id: item.plcNo,
+  plcNo: item.plcNo,                        // ← 추가
   name: item.plcName,
   title: item.plcName,
   category: FLT_LABEL_MAP[item.plcFltCd] || '액티비티',
   tag: FLT_LABEL_MAP[item.plcFltCd] || '액티비티',
-  rating: item.rating ?? 0,
-  reviewCount: item.reviewCount ?? 0,
+  plcAvgRating: item.plcAvgRating ?? 0,     // ← 추가
+  plcReviewCnt: item.plcReviewCnt ?? 0,     // ← 추가
+  rating: item.plcAvgRating ?? 0,        // ← 추가 (AreaListCard용)
+  reviewCount: item.plcReviewCnt ?? 0,   // ← 추가 (AreaListCard용)
   reviews: [],
   description: stripHtml(item.plcOverview) || '',
   desc: stripHtml(item.plcOverview) || '',

@@ -28,14 +28,18 @@ const stripHtml = (str) => str?.replace(/<[^>]*>/g, ' ').trim() || '';
 
 const normalizeApiItem = (item) => ({
   id: item.plcNo,
+  plcNo: item.plcNo,                        // ← 추가
   title: item.plcName,
   name: item.plcName,
   tag: FLT_LABEL_MAP[item.plcFltCd] || '기타',
   category: FLT_LABEL_MAP[item.plcFltCd] || '기타',
   hashtags: [],
   likes: 0,
-  rating: item.rating ?? 0,
-  reviewCount: item.reviewCount ?? 0,
+  plcAvgRating: item.plcAvgRating ?? 0,     // ← 추가
+  plcReviewCnt: item.plcReviewCnt ?? 0,     // ← 추가
+  rating: item.plcAvgRating ?? 0,        // ← 추가 (AreaListCard용)
+  reviewCount: item.plcReviewCnt ?? 0,   // ← 추가 (AreaListCard용)
+  reviews: [],
   image: item.plcMainImgUrl || item.plcThumImgUrl || 'https://picsum.photos/id/1011/800/600',
   desc: stripHtml(item.plcOverview) || '',
   description: stripHtml(item.plcOverview) || '',
@@ -47,7 +51,6 @@ const normalizeApiItem = (item) => ({
   lng: item.plcLot ? Number(item.plcLot) : 127.0286,
   region: item.plcRgnCd || '',
   tags: [],
-  reviews: [],
   parking: stripHtml(item.seeParking) || '',
   restdate: stripHtml(item.seeRestdate) || '',
   infocenter: stripHtml(item.seeInfocenter) || '',
