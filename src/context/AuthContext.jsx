@@ -45,8 +45,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const localLogout = () => {
+    localStorage.removeItem('isLogin');
+    setUser(null);
+    window.location.href = '/';
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout,localLogout }}>
       {/* 🚀 검증 중일 때는 빈 화면이나 로딩 바를 보여주어 잘못된 라우트 튕김을 막습니다. */}
       {loading ? <div className="h-screen flex items-center justify-center font-bold text-gray-500">인증 정보를 확인 중입니다...</div> : children}
     </AuthContext.Provider>
