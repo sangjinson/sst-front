@@ -1,213 +1,298 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import api from '@api/axios';
+import AreaListCard from '@components/modules/area/arealist/AreaListCard';
+import Pagination from '@components/common/Pagination';
+import ListSkeleton from '@components/skeleton/ListSkeleton';
 
-// ─────────────────────────────────────────
-// 더미 데이터 세팅
-// ─────────────────────────────────────────
-const DUMMY_RESULTS = [
-  { id: 1, regionEn: 'suwon',category: '볼거리', title: '수원화성', desc: '유네스코 세계문화유산, 조선시대 성곽 건축의 꽃', image: 'https://images.unsplash.com/photo-1590393275627-0c46bc8ea23c?w=600&q=80' },
-  { id: 2, regionEn: 'suwon',category: '볼거리', title: '화성행궁', desc: '정조대왕이 머물던 아름답고 웅장한 행궁', image: 'https://images.unsplash.com/photo-1605833989399-52e8548a3dae?w=600&q=80' },
-  { id: 3, regionEn: 'suwon',category: '볼거리', title: '플라잉수원', desc: '열기구를 타고 하늘에서 내려다보는 수원의 파노라마', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80' },
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
+
+const PLACE_CATEGORIES = [
+  { code: 'ALL', name: '전체' },
+  { code: 'PLC001', name: '볼거리' },
+  { code: 'PLC003', name: '먹거리' },
+  { code: 'PLC004', name: '잘거리' },
+  { code: 'PLC002', name: '놀거리' },
 ];
 
-const BOARD_DATA = {
-  showcase: [
-    { title: '수원 행궁동 카페 투어 다녀왔어요!', date: '03.23' },
-    { title: '화성행궁 야간개장 사진 공유합니다', date: '03.22' },
-    { title: '수원 통닭거리 진짜 맛집 추천', date: '03.20' },
-  ],
-  notice: [
-    { title: '[안내] 사이트 점검 안내 (03.28)', date: '03.28' },
-    { title: '[이벤트] 봄맞이 여행 코스 추천 이벤트', date: '03.15' },
-    { title: '[필독] 게시판 이용 수칙 안내', date: '03.01' },
-  ],
-  faq: [
-    { title: '🔒 일정 추가 기능에 오류가 있습니다.', date: '03.24' },
-    { title: '🔒 AI 추천 코스 지역 변경 가능한가요?', date: '03.23' },
-    { title: '🔒 회원가입 시 이메일 인증 문제', date: '03.21' },
-  ],
-};
-
-const TABS = ['전체', '볼거리', '먹거리', '놀거리', '잘거리'];
-
-// 카테고리별 라우팅 경로 매핑 객체
-const CATEGORY_PATH = {
-  '볼거리': 'see',
-  '먹거리': 'food',
-  '놀거리': 'play',
-  '잘거리': 'sleep',
+// 🚀 1. 카테고리 한글명을 URL 영문명으로 변환하는 헬퍼 함수
+const getCategoryPath = (catName) => {
+  if (catName === '볼거리') return 'see';
+  if (catName === '먹거리') return 'food';
+  if (catName === '잘거리') return 'sleep';
+  if (catName === '놀거리') return 'play';
+  return 'see'; // 기본값
 };
 
 const SearchPage = () => {
-  const { keyword } = useParams();
+  const { keyword: pathKeyword } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('전체');
+  
+  const keyword = pathKeyword || searchParams.get('keyword') || '';
+  const currentTab = searchParams.get('tab') || 'all'; 
+  const currentCategory = searchParams.get('category') || 'ALL'; 
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
-  const filteredResults = activeTab === '전체' 
-    ? DUMMY_RESULTS 
-    : DUMMY_RESULTS.filter(item => item.category === activeTab);
+  const [loading, setLoading] = useState(true);
+  
+  const [placeData, setPlaceData] = useState({ list: [], totalCount: 0, totalPages: 1 });
+  const [communityData, setCommunityData] = useState({ list: [], totalCount: 0, totalPages: 1 });
 
-  return (
-    <div className="min-h-screen bg-[#f8f6f0] pb-20 font-paperlogy">
-      <div className="max-w-[1200px] mx-auto px-5 pt-12 md:pt-16">
-        
-        {/* 1. 타이틀 영역 */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-            “{keyword}” 검색결과
-          </h1>
-          <p className="text-sm text-gray-600">
-            총 <strong className="text-gray-900">{filteredResults.length}</strong>건의 결과가 검색되었습니다.
-          </p>
-        </div>
+  const [integratedData, setIntegratedData] = useState({
+    see: { list: [], totalCount: 0 },
+    food: { list: [], totalCount: 0 },
+    sleep: { list: [], totalCount: 0 },
+    play: { list: [], totalCount: 0 },
+    community: { list: [], totalCount: 0 }
+  });
 
-        {/* 2. 탭 필터 */}
-        <div className="flex gap-2.5 mb-10 overflow-x-auto pb-2 scrollbar-hide">
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-5 py-2 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                activeTab === tab
-                  ? 'bg-gray-900 text-white border-gray-900'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
-              }`}
-            >
-              {tab}
-            </button>
+  // 🚀 2. 현재 지역 가져오기 (상세 페이지 이동 시 URL 구성용)
+  const currentRegion = localStorage.getItem('lastVisitedRegion') || '수원시';
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (!keyword.trim()) {
+        setLoading(false);
+        return;
+      }
+      
+      setLoading(true);
+      try {
+        if (currentTab === 'all') {
+          const [seeRes, foodRes, sleepRes, playRes, commRes] = await Promise.all([
+            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC001&page=1&size=4`),
+            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC003&page=1&size=4`),
+            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC004&page=1&size=4`),
+            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC002&page=1&size=4`),
+            api.get(`/search/communities?keyword=${encodeURIComponent(keyword)}&page=1&size=4`)
+          ]);
+
+          setIntegratedData({
+            see: seeRes?.data?.data || { list: [], totalCount: 0 },
+            food: foodRes?.data?.data || { list: [], totalCount: 0 },
+            sleep: sleepRes?.data?.data || { list: [], totalCount: 0 },
+            play: playRes?.data?.data || { list: [], totalCount: 0 },
+            community: commRes?.data?.data || { list: [], totalCount: 0 }
+          });
+        } else if (currentTab === 'places') {
+          const res = await api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=${currentCategory}&page=${currentPage}&size=12`);
+          setPlaceData(res?.data?.data || { list: [], totalCount: 0, totalPages: 1 });
+        } else if (currentTab === 'communities') {
+          const res = await api.get(`/search/communities?keyword=${encodeURIComponent(keyword)}&page=${currentPage}&size=12`);
+          setCommunityData(res?.data?.data || { list: [], totalCount: 0, totalPages: 1 });
+        }
+      } catch (error) {
+        console.error('검색 중 오류 발생:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResults();
+  }, [keyword, currentTab, currentCategory, currentPage]);
+
+  const handleTabChange = (tabName) => {
+    setSearchParams({ tab: tabName, category: 'ALL', page: 1 });
+  };
+
+  const handleCategoryChange = (catCode) => {
+    setSearchParams({ tab: currentTab, category: catCode, page: 1 });
+  };
+
+  const handlePageChange = (page) => {
+    setSearchParams({ tab: currentTab, category: currentCategory, page });
+  };
+
+  if (loading) return <ListSkeleton />;
+
+  const totalIntegratedCount = 
+    (integratedData.see.totalCount) + (integratedData.food.totalCount) + 
+    (integratedData.sleep.totalCount) + (integratedData.play.totalCount) + 
+    (integratedData.community.totalCount);
+
+  // 🚀 3. 렌더링 헬퍼 함수 개선: 새로운 데이터 매핑 및 동적 URL 적용
+  const renderIntegratedSection = (title, dataObj, targetCategoryCode, isCommunity = false) => (
+    <section className="mb-10">
+      <div className="flex justify-between items-end mb-4 border-b pb-2 border-gray-100">
+        <h3 className="text-xl font-bold text-gray-800">{title} <span className="text-sm font-normal text-[#0F9B73]">({dataObj.totalCount})</span></h3>
+        {dataObj.totalCount > 4 && (
+          <button 
+            onClick={() => isCommunity ? handleTabChange('communities') : setSearchParams({ tab: 'places', category: targetCategoryCode, page: 1 })} 
+            className="text-sm text-gray-500 hover:text-[#0F9B73] transition-colors"
+          >
+            더보기 →
+          </button>
+        )}
+      </div>
+      
+      {dataObj.list?.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {dataObj.list.map((item) => (
+            isCommunity ? (
+              // 커뮤니티 카드는 기존 유지
+              <div key={item.commNo} onClick={() => navigate(`/showcase/view/${item.commNo}`)} className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md cursor-pointer">
+                <img src={item.commMainImgUrl || 'https://via.placeholder.com/400x300'} alt={item.commTitle} className="w-full h-40 object-cover" />
+                <div className="p-3">
+                  <div className="font-bold text-gray-900 truncate">{item.commTitle}</div>
+                  <div className="text-xs text-gray-500 mt-1 flex justify-between">
+                    <span>{item.mbrNickname}</span>
+                    <span>♥ {item.commLikeCnt}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <AreaListCard 
+                key={item.plcNo} 
+                item={{ 
+                  id: item.plcNo, 
+                  name: item.plcName, 
+                  image: item.plcMainImgUrl, 
+                  desc: item.plcOverview, 
+                  category: item.plcCatCd,
+                  address: item.plcAddr,       
+                  rating: item.plcAvgRating,   
+                  reviewCount: item.plcReviewCnt 
+                }} 
+                onClick={() => navigate(`/${currentRegion}/${getCategoryPath(item.plcCatCd)}/view?id=${item.plcNo}`)}
+                // 🚀 핵심: 찜하기 컴포넌트를 AreaListCard 내부에 주입
+                renderHeart={() => (
+                  <WishlistHeartButton 
+                    item={{
+                      id: item.plcNo,
+                      name: item.plcName,
+                      image: item.plcMainImgUrl,
+                      category: item.plcCatCd,
+                      address: item.plcAddr
+                    }} 
+                    itemType={getCategoryPath(item.plcCatCd)} 
+                    region={currentRegion} 
+                  />
+                )}
+              />
+            )
           ))}
         </div>
+      ) : (
+        <div className="py-12 text-center text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+          <span className="text-3xl mb-2 block opacity-50">🔍</span>
+          <p className="text-sm">'{keyword}'에 대한 {title} 검색 결과가 없습니다.</p>
+        </div>
+      )}
+    </section>
+  );
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-[1200px]">
+      <h2 className="text-2xl font-bold mb-8 text-gray-800 text-center">
+        <span className="text-[#0F9B73]">'{keyword}'</span> 검색 결과 
+        {currentTab === 'all' && ` (${totalIntegratedCount}건)`}
+      </h2>
 
-        {/* 3. 검색 결과 그리드 영역 */}
-        <div className="mb-20">
-         <div className="flex justify-end mb-4 min-h-[30px]">
-            {activeTab !== '전체' && filteredResults.length > 0 && (
-                <button 
-                /* 🚀 수정됨: 검색 결과 중 첫 번째 아이템의 지역으로 이동합니다. */
-                onClick={() => {
-                    const firstItemRegion = filteredResults[0].regionEn;
-                    navigate(`/${firstItemRegion}/${CATEGORY_PATH[activeTab]}/list`);
-                }}
-                className="flex items-center gap-1 px-3 py-1.5 bg-gray-50 text-gray-600 text-xs rounded-md hover:bg-gray-100 transition-colors border border-gray-100"
-                >
-                더보기 <span className="text-[10px]">→</span>
-                </button>
-            )}
+      {/* 탭 네비게이션 */}
+      <div className="flex justify-center mb-8 border-b border-gray-200">
+        {[
+          { key: 'all', label: '통합 검색' },
+          { key: 'places', label: `장소` },
+          { key: 'communities', label: `뽐낼거리` }
+        ].map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => handleTabChange(tab.key)}
+            className={`px-6 py-3 font-semibold text-sm transition-colors ${
+              currentTab === tab.key 
+              ? 'text-[#0F9B73] border-b-2 border-[#0F9B73]' 
+              : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 카테고리 필터 (장소 탭 한정) */}
+      {currentTab === 'all' && (
+        <div className="space-y-4">
+          {renderIntegratedSection('볼거리', integratedData.see, 'PLC001')}
+          {renderIntegratedSection('먹거리', integratedData.food, 'PLC003')}
+          {renderIntegratedSection('잘거리', integratedData.sleep, 'PLC004')}
+          {renderIntegratedSection('놀거리', integratedData.play, 'PLC002')}
+          {renderIntegratedSection('뽐낼거리', integratedData.community, null, true)}
+        </div>
+      )}
+
+      {/* 🚀 3. 장소 탭 렌더링 (이곳도 찜하기 버튼 주입) */}
+      {currentTab === 'places' && (
+        <>
+          {placeData?.list?.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {placeData.list.map(place => (
+                <AreaListCard 
+                  key={place.plcNo} 
+                  item={{ 
+                    id: place.plcNo, 
+                    name: place.plcName, 
+                    image: place.plcMainImgUrl, 
+                    desc: place.plcOverview, 
+                    category: place.plcCatCd,
+                    address: place.plcAddr,       
+                    rating: place.plcAvgRating,   
+                    reviewCount: place.plcReviewCnt 
+                  }} 
+                  onClick={() => navigate(`/${currentRegion}/${getCategoryPath(place.plcCatCd)}/view?id=${place.plcNo}`)} 
+                  // 🚀 핵심: 찜하기 컴포넌트 주입
+                  renderHeart={() => (
+                    <WishlistHeartButton 
+                      item={{
+                        id: place.plcNo,
+                        name: place.plcName,
+                        image: place.plcMainImgUrl,
+                        category: place.plcCatCd,
+                        address: place.plcAddr
+                      }} 
+                      itemType={getCategoryPath(place.plcCatCd)} 
+                      region={currentRegion} 
+                    />
+                  )}
+                />
+              ))}
             </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {filteredResults.map((item) => (
-              <div 
-                key={item.id} 
-                className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] transition-all cursor-pointer"
-                onClick={() => navigate(`/${item.regionEn}/${CATEGORY_PATH[item.category]}/view?id=${item.id}`)}
-                >
-                <div className="h-48 md:h-52 overflow-hidden bg-gray-100">
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                </div>
-                <div className="p-5">
-                  <span className="inline-block px-2 py-0.5 bg-orange-50 text-orange-600 text-[11px] font-semibold rounded mb-3">
-                    {item.category}
-                  </span>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2 truncate">{item.title}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-2">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {filteredResults.length === 0 && (
-            <div className="text-center py-20 text-gray-400">
-              검색 결과가 없습니다.
+          ) : (
+            <div className="py-20 text-center text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+              <span className="text-4xl mb-3 block opacity-50">🔍</span>
+              선택한 카테고리에 일치하는 장소가 없습니다.
             </div>
           )}
-        </div>
+          <Pagination page={currentPage} totalPages={placeData?.totalPages || 1} onPageChange={handlePageChange} />
+        </>
+      )}
 
-        {/* 4. 사거리 교차로 (게시판 영역) */}
-        <section>
-          {/* 섹션 전체 더보기 버튼은 삭제 유지 */}
-          <div className="flex items-end mb-6">
-            <h2 className="text-2xl md:text-[26px] font-bold text-gray-900 flex items-center gap-3">
-              <span className="w-1.5 h-6 bg-[#E85C0D] rounded-sm"></span>
-              사거리 교차로
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            
-            {/* 뽐낼거리 게시판 */}
-            <div className="rounded-xl p-5 md:p-6 bg-white">
-              {/* 🚀 카드 내부 제목 영역: flex justify-between으로 더보기 배치 */}
-              <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
-                <h3 className="text-[17px] font-bold text-gray-900">뽐낼거리 게시판</h3>
-                {/* 🚀 카드 내부 더보기 링크 추가 */}
-                <button 
-                  onClick={() => navigate('/showcase')}
-                  className="text-gray-400 text-xs hover:text-gray-700 flex items-center gap-0.5"
-                >
-                  더보기 <span className="text-[9px]">→</span>
-                </button>
-              </div>
-              <ul className="flex flex-col gap-3">
-                {BOARD_DATA.showcase.map((item, idx) => (
-                  <li key={idx} className="flex justify-between items-center group cursor-pointer" onClick={() => navigate('/showcase')}>
-                    <span className="text-[13px] md:text-[14px] text-gray-700 truncate pr-4 group-hover:underline">{item.title}</span>
-                    <span className="text-[12px] text-gray-400 shrink-0">{item.date}</span>
-                  </li>
-                ))}
-              </ul>
+      {/* 뽐낼거리 탭 렌더링 */}
+      {currentTab === 'communities' && (
+        <>
+          {communityData?.list?.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {communityData.list.map((post) => (
+                <div key={post.commNo} onClick={() => navigate(`/showcase/view/${post.commNo}`)} className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md cursor-pointer">
+                  <img src={post.commMainImgUrl || 'https://via.placeholder.com/400x300'} alt={post.commTitle} className="w-full h-48 object-cover" />
+                  <div className="p-4">
+                    <div className="font-bold text-gray-900 line-clamp-1">{post.commTitle}</div>
+                    <div className="text-xs text-gray-500 mt-2 flex justify-between items-center">
+                      <span>👤 {post.mbrNickname}</span>
+                      <span className="text-red-500">♥ {post.commLikeCnt}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            {/* 공지사항 */}
-            <div className="rounded-xl p-5 md:p-6 bg-white">
-              {/* 🚀 카드 내부 제목 영역: flex justify-between으로 더보기 배치 */}
-              <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
-                <h3 className="text-[17px] font-bold text-gray-900">공지사항</h3>
-                {/* 🚀 카드 내부 더보기 링크 추가 */}
-                <button 
-                  onClick={() => navigate('/customersupport/notice')}
-                  className="text-gray-400 text-xs hover:text-gray-700 flex items-center gap-0.5"
-                >
-                  더보기 <span className="text-[9px]">→</span>
-                </button>
-              </div>
-              <ul className="flex flex-col gap-3">
-                {BOARD_DATA.notice.map((item, idx) => (
-                  <li key={idx} className="flex justify-between items-center group cursor-pointer" onClick={() => navigate('/customersupport/notice')}>
-                    <span className="text-[13px] md:text-[14px] text-gray-700 truncate pr-4 group-hover:underline">{item.title}</span>
-                    <span className="text-[12px] text-gray-400 shrink-0">{item.date}</span>
-                  </li>
-                ))}
-              </ul>
+          ) : (
+            <div className="py-20 text-center text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+              <span className="text-4xl mb-3 block opacity-50">🔍</span>
+              일치하는 뽐낼거리가 없습니다.
             </div>
-
-            {/* 자주 하는 질문 */}
-            <div className="rounded-xl p-5 md:p-6 bg-white">
-              {/* 🚀 카드 내부 제목 영역: flex justify-between으로 더보기 배치 */}
-              <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
-                <h3 className="text-[17px] font-bold text-gray-900">자주 하는 질문</h3>
-                {/* 🚀 카드 내부 더보기 링크 추가 */}
-                <button 
-                  onClick={() => navigate('/customersupport/faq')}
-                  className="text-gray-400 text-xs hover:text-gray-700 flex items-center gap-0.5"
-                >
-                  더보기 <span className="text-[9px]">→</span>
-                </button>
-              </div>
-              <ul className="flex flex-col gap-3">
-                {BOARD_DATA.faq.map((item, idx) => (
-                  <li key={idx} className="flex justify-between items-center group cursor-pointer" onClick={() => navigate('/customersupport/faq')}>
-                    <span className="text-[13px] md:text-[14px] text-gray-700 truncate pr-4 group-hover:underline">{item.title}</span>
-                    <span className="text-[12px] text-gray-400 shrink-0">{item.date}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-          </div>
-        </section>
-
-      </div>
+          )}
+          <Pagination page={currentPage} totalPages={communityData?.totalPages || 1} onPageChange={handlePageChange} />
+        </>
+      )}
     </div>
   );
 };
