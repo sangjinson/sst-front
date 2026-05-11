@@ -13,7 +13,6 @@ const REGION_CODE_MAP = {
   '포천시': 65, '가평군': 82, '용인시': 46,
 };
 
-// ✅ FLT 코드 → 한글 이름 매핑 (잘거리 카테고리)
 const FLT_LABEL_MAP = {
   'FLT011': '호텔/모텔',
   'FLT012': '콘도',
@@ -24,33 +23,35 @@ const FLT_LABEL_MAP = {
 
 const stripHtml = (str) => str?.replace(/<[^>]*>/g, ' ').trim() || '';
 
-// ✅ 부대시설 목록 생성
 const getFacilities = (item) => {
   const facilities = [];
-  if (item.sleepBarbecu)   facilities.push('바베큐');
-  if (item.sleepBeauty)    facilities.push('미용실');
-  if (item.sleepBeverage)  facilities.push('음료');
-  if (item.sleepBicycle)   facilities.push('자전거');
-  if (item.sleepCampfire)  facilities.push('캠프파이어');
-  if (item.sleepFitness)   facilities.push('피트니스');
-  if (item.sleepKaraoke)   facilities.push('노래방');
+  if (item.sleepBarbecu)    facilities.push('바베큐');
+  if (item.sleepBeauty)     facilities.push('미용실');
+  if (item.sleepBeverage)   facilities.push('음료');
+  if (item.sleepBicycle)    facilities.push('자전거');
+  if (item.sleepCampfire)   facilities.push('캠프파이어');
+  if (item.sleepFitness)    facilities.push('피트니스');
+  if (item.sleepKaraoke)    facilities.push('노래방');
   if (item.sleepPublicBath) facilities.push('공용욕실');
-  if (item.sleepPublicPc)  facilities.push('PC');
-  if (item.sleepSauna)     facilities.push('사우나');
-  if (item.sleepSeminar)   facilities.push('세미나실');
-  if (item.sleepSports)    facilities.push('스포츠');
-  if (item.sleepParking)   facilities.push('주차가능');
+  if (item.sleepPublicPc)   facilities.push('PC');
+  if (item.sleepSauna)      facilities.push('사우나');
+  if (item.sleepSeminar)    facilities.push('세미나실');
+  if (item.sleepSports)     facilities.push('스포츠');
+  if (item.sleepParking)    facilities.push('주차가능');
   return facilities;
 };
 
 const normalizeApiItem = (item) => ({
   id: item.plcNo,
+  plcNo: item.plcNo,                        // ← 추가
   name: item.plcName,
   title: item.plcName,
   category: FLT_LABEL_MAP[item.plcFltCd] || '호텔/모텔',
   tag: FLT_LABEL_MAP[item.plcFltCd] || '호텔/모텔',
-  rating: item.rating ?? 0,
-  reviewCount: item.reviewCount ?? 0,
+  plcAvgRating: item.plcAvgRating ?? 0,     // ← 추가
+  plcReviewCnt: item.plcReviewCnt ?? 0,     // ← 추가
+  rating: item.plcAvgRating ?? 0,        // ← 추가 (AreaListCard용)
+  reviewCount: item.plcReviewCnt ?? 0,   // ← 추가 (AreaListCard용)
   reviews: [],
   description: stripHtml(item.plcOverview) || '',
   desc: stripHtml(item.plcOverview) || '',
@@ -70,7 +71,6 @@ const normalizeApiItem = (item) => ({
   subFacility: stripHtml(item.sleepSubFacility) || '',
 });
 
-// ✅ 지역별 잘거리 목록 조회
 export const getSleepDataByRegion = async (region) => {
   try {
     const rgnCd = REGION_CODE_MAP[region];
@@ -84,7 +84,6 @@ export const getSleepDataByRegion = async (region) => {
   }
 };
 
-// ✅ 잘거리 상세 조회
 export const getSleepDataById = async (id) => {
   try {
     const res = await axios.get(`${BASE_URL}/api/sleep/${id}`);

@@ -11,7 +11,7 @@ import {
   AreaRelated,
   AreaReview,
 } from '@components/modules/area/areaview';
-import IconSVG from "@components/Icon/IconSVG";
+import IconSVG from '@components/Icon/IconSVG';
 import ViewSkeleton from '@components/skeleton/ViewSkeleton';
 
 const CATEGORIES = ['전체', '역사', '자연', '랜드마크', '도시공원', '전시장'];
@@ -22,7 +22,6 @@ const View = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
   const regionKor = toKorRegion(region || '수원');
-  const isLoggedIn = true;
 
   const [item, setItem] = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
@@ -30,7 +29,6 @@ const View = () => {
 
   useEffect(() => {
     if (!id) { setLoading(false); return; }
-
     const fetchDetail = async () => {
       setLoading(true);
       try {
@@ -43,13 +41,11 @@ const View = () => {
         setLoading(false);
       }
     };
-
     fetchDetail();
   }, [id]);
 
   useEffect(() => {
     if (!item) return;
-
     const fetchRelated = async () => {
       try {
         const all = await getSeeDataByRegion(regionKor);
@@ -62,7 +58,6 @@ const View = () => {
         setRelatedItems([]);
       }
     };
-
     fetchRelated();
   }, [item, regionKor]);
 
@@ -74,10 +69,7 @@ const View = () => {
         <div className="text-center">
           <p className="text-5xl mb-4">👀</p>
           <p className="text-lg">볼거리 정보를 찾을 수 없습니다.</p>
-          <button
-            onClick={() => navigate(-1)}
-            className="mt-4 px-5 py-2 bg-[#0F9B73] text-white rounded-lg text-sm"
-          >
+          <button onClick={() => navigate(-1)} className="mt-4 px-5 py-2 bg-[#0F9B73] text-white rounded-lg text-sm">
             돌아가기
           </button>
         </div>
@@ -92,6 +84,8 @@ const View = () => {
         name={item.name}
         category={item.category}
         categories={CATEGORIES}
+        plcNo={item.plcNo}
+        listPath={`/${region}/see/list`}
         renderHeart={() => (
           <WishlistHeartButton item={item} itemType="see" region={region} />
         )}
@@ -101,12 +95,11 @@ const View = () => {
 
       <AreaInfoSection
         infoItems={[
-          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address },
-          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '이용시간', value: item.hours },
-          // ✅ trim()으로 빈 문자열 처리
-          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || item.infocenter?.trim() || '' },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '휴무일', value: item.restdate },
+          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address || '주소 정보 없음' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '이용시간', value: item.hours || '09:00 - 18:00' },
+          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || item.infocenter?.trim() || '전화번호 정보 없음' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '주차 정보 없음' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '휴무일', value: item.restdate || '연중무휴' },
         ]}
         tags={item.tags}
         tagLabel="해시태그"
@@ -115,10 +108,7 @@ const View = () => {
       <AreaMap lat={item.lat} lng={item.lng} address={item.address} />
 
       <AreaReview
-        rating={item.rating}
-        reviewCount={item.reviewCount}
-        reviews={item.reviews}
-        isLoggedIn={isLoggedIn}
+        plcNo={item.plcNo}
         placeholder="볼거리에 대한 솔직한 리뷰를 남겨주세요."
       />
 
@@ -132,7 +122,7 @@ const View = () => {
 
       <div className="flex items-center justify-between gap-3 mb-6">
         <button
-          onClick={() => navigate(`/${region}/see/list`)}
+          onClick={() => { window.scrollTo(0, 0); navigate(`/${region}/see/list`); }}
           className="flex items-center justify-center gap-2 px-6 py-3 bg-white/90 backdrop-blur-md text-gray-800 rounded-xl fs-up-2 font-semibold shadow-lg shadow-black/5 border border-white/20 hover:bg-white hover:shadow-xl transition-all duration-200"
         >
           <span className="mb-0.5 text-lg">←</span> 목록으로

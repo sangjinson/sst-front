@@ -34,6 +34,7 @@ const navItems = [
     icon: <BoxCubeIcon />,
     name: "사거리 관리",
     subItems: [
+      { name: "공통코드 관리", path: "/admin/common-codes" },
       { name: "볼거리 관리", path: "/admin/area/see" },
       { name: "먹거리 관리", path: "/admin/area/food" },
       { name: "잘거리 관리", path: "/admin/area/sleep" },
