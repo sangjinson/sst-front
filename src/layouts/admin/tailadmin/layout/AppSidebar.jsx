@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom"; // react-router-dom 사용 권장
+import { Link, useLocation } from "react-router-dom";
 
 // 아이콘 및 컴포넌트 임포트
 import {
@@ -18,69 +18,56 @@ import {
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
 
-// 메뉴 데이터 구성
+// --- 메뉴 데이터 구성 (거리에섯 관리자 맞춤) ---
 const navItems = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    path: "/admin", // 단일 메뉴로 구성
   },
   {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
-  },
-
-  { icon: <UserCircleIcon />, name: "회원 관리", path: "/admin/members", },
-
-  {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    icon: <UserCircleIcon />,
+    name: "회원 관리",
+    path: "/admin/members",
   },
   {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-  },
-  {
-    name: "Pages",
-    icon: <PageIcon />,
+    icon: <BoxCubeIcon />,
+    name: "사거리 관리",
     subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
+      { name: "볼거리 관리", path: "/admin/area/see" },
+      { name: "먹거리 관리", path: "/admin/area/food" },
+      { name: "잘거리 관리", path: "/admin/area/sleep" },
+      { name: "놀거리 관리", path: "/admin/area/play" },
+    ],
+  },
+  {
+    icon: <PageIcon />,
+    name: "뽐낼거리 관리",
+    subItems: [
+      { name: "핫플거리 관리", path: "/admin/showcase/hotplace" },
+      { name: "인생거리 관리", path: "/admin/showcase/life" },
     ],
   },
 ];
 
 const othersItems = [
   {
-    icon: <PieChartIcon />,
-    name: "Charts",
-    subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
-    ],
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "UI Elements",
-    subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
-    ],
+    icon: <ListIcon />,
+    name: "신고 관리",
+    path: "/admin/report",
   },
   {
     icon: <PlugInIcon />,
-    name: "Authentication",
+    name: "고객지원 관리",
     subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
+      { name: "공지사항", path: "/admin/support/notices" },
+      { name: "FAQ", path: "/admin/support/faq" },
     ],
+  },
+  {
+    icon: <PieChartIcon />,
+    name: "메인으로 이동",
+    path: "/",
   },
 ];
 
@@ -241,30 +228,6 @@ const AppSidebar = () => {
                       }`}
                     >
                       {subItem.name}
-                      <span className="flex items-center gap-1 ml-auto">
-                        {subItem.new && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge`}
-                          >
-                            new
-                          </span>
-                        )}
-                        {subItem.pro && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge`}
-                          >
-                            pro
-                          </span>
-                        )}
-                      </span>
                     </Link>
                   </li>
                 ))}
@@ -296,7 +259,7 @@ const AppSidebar = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link to="/">
+        <Link to="/admin">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img
@@ -336,7 +299,7 @@ const AppSidebar = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                  "Management"
                 ) : (
                   <HorizontaLDots className="size-6" />
                 )}
@@ -352,7 +315,7 @@ const AppSidebar = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
+                  "Support"
                 ) : (
                   <HorizontaLDots />
                 )}
@@ -361,7 +324,6 @@ const AppSidebar = () => {
             </div>
           </div>
         </nav>
-        {/* 사이드바 하단 위젯 */}
         {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>

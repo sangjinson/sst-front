@@ -12,7 +12,7 @@ import BasicTableOne from '@themeadmin/components/tables/BasicTables/BasicTableO
 
 import PageMeta from '@themeadmin/components/common/PageMeta';
 
-export default function MemberList() {
+export default function BoardList() {
   return (
     <>
       {/* 페이지 SEO 및 메타 정보 설정 */}
