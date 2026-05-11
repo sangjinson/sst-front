@@ -83,6 +83,7 @@ const AIPlanPage = () => {
     });
 
     await fetch(`${import.meta.env.VITE_FASTAPI_URL}/travel/plan?${params.toString()}`);
+    sessionStorage.removeItem('currentSchedule');
     navigate('/plan/result');
   };
 

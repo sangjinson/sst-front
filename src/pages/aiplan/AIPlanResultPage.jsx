@@ -13,6 +13,7 @@ import {
 import AIResultMapView from '@components/modules/airesult/AIResultMapView';
 import { useAIPlan } from '@pages/aiplan/AIPlanContext';
 import '@assets/css/common.css';
+import api from '@api/axios';
 
 const AIPlanResultPage = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const AIPlanResultPage = () => {
     selectedThemes,
     startDate,
     endDate,
+    resetPlan,
   } = useAIPlan();
 
   const [activeDay, setActiveDay]             = useState(0);
@@ -42,6 +44,15 @@ const AIPlanResultPage = () => {
   const dragOverIndex = useRef(null);
 
   // ────────────────────────────────────────────
+  // 다시 선택하기
+  // ────────────────────────────────────────────
+  const handleRestart = () => {
+    sessionStorage.removeItem('currentSchedule');
+    resetPlan();
+    navigate('/plan');
+  };
+
+  // ────────────────────────────────────────────
   // schedule 변경될 때마다 sessionStorage에 저장
   // ────────────────────────────────────────────
   useEffect(() => {
@@ -55,10 +66,16 @@ const AIPlanResultPage = () => {
   // ────────────────────────────────────────────
   useEffect(() => {
 
-    // sessionStorage에 저장된 일정 있으면 복원 (상세페이지 갔다 돌아온 경우)
+    // sessionStorage에 저장된 일정 있으면 복원 (새로고침 or 상세페이지 갔다 돌아온 경우)
     const saved = sessionStorage.getItem('currentSchedule');
     if (saved) {
       setSchedule(JSON.parse(saved));
+      return;
+    }
+
+    // Context 값 없으면 /plan으로 리다이렉트
+    if (!selectedRegion) {
+      navigate('/plan');
       return;
     }
 
@@ -78,7 +95,6 @@ const AIPlanResultPage = () => {
         const json = await res.json();
 
         if (json.success) {
-          // GPT 응답 schedule -> 상태 저장
           setSchedule(json.data.schedule);
         } else {
           console.error('일정 생성 실패:', json.message);
@@ -94,6 +110,13 @@ const AIPlanResultPage = () => {
 
     fetchSchedule();
   }, []);
+
+  // sessionStorage에 region도 저장
+  useEffect(() => {
+    if (selectedRegion) {
+      sessionStorage.setItem('selectedRegion', selectedRegion);
+    }
+  }, [selectedRegion]);
 
   // ────────────────────────────────────────────
   // 장소 검색
@@ -155,33 +178,33 @@ const AIPlanResultPage = () => {
     });
 
     if (isConfirmed && tripName) {
-      // TODO: 3번 작업에서 DB 저장으로 변경
-      const savedTrips = JSON.parse(localStorage.getItem('savedTrips') || '[]');
-      const newTrip = {
-        id: Date.now(),
-        name: tripName.trim(),
-        region: selectedRegion,
-        period: selectedPeriod,
-        startDate,
-        endDate,
-        themes: selectedThemes,
-        schedule,
-        createdAt: new Date().toISOString(),
-      };
-      savedTrips.push(newTrip);
-      localStorage.setItem('savedTrips', JSON.stringify(savedTrips));
+      try {
+        await api.post('/ai/schedule/save', {
+          scheduleName: tripName.trim(),
+          startDate,
+          endDate,
+          totalDays: selectedDays,
+          rgnName: selectedRegion,
+          themes: selectedThemes,
+          schedule,
+        });
 
-      sessionStorage.removeItem('currentSchedule');
+        sessionStorage.removeItem('currentSchedule');
 
-      await Swal.fire({
-        icon: 'success',
-        title: '저장되었습니다!',
-        text: `"${tripName}" 일정이 마이페이지에 저장되었어요.`,
-        timer: 1500,
-        showConfirmButton: false,
-      });
+        await Swal.fire({
+          icon: 'success',
+          title: '저장되었습니다!',
+          text: `"${tripName}" 일정이 마이페이지에 저장되었어요.`,
+          timer: 1500,
+          showConfirmButton: false,
+        });
 
-      navigate('/user/mypage', { state: { tab: 'schedule' } });
+        navigate('/user/mypage', { state: { tab: 'schedule' } });
+
+      } catch (err) {
+        console.error('저장 실패:', err);
+        Swal.fire({ icon: 'error', title: '저장 실패', text: '다시 시도해주세요.' });
+      }
     }
   };
 
@@ -212,7 +235,7 @@ const AIPlanResultPage = () => {
         <AIResultBreadcrumb />
 
         {/* 상단 헤더 */}
-        <AIResultHeader onSave={handleSave} />
+        <AIResultHeader onSave={handleSave} onRestart={handleRestart} />
 
         {/* 선택 조건 태그 */}
         <AIResultTags

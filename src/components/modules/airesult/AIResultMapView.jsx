@@ -6,15 +6,15 @@ import { TYPE_LABEL, TYPE_COLOR, getDetailPath } from './aiResultUtils';
 // 우측 지도
 const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, onSelectItem }) => {
   const navigate = useNavigate();
-  const currentDayItems = schedule[activeDay] || [];
+  const currentDayItems = schedule[activeDay]?.plans || [];
 
   const handlePrev = () => {
-    const idx = currentDayItems.findIndex(i => i.id === selectedItem?.id);
+    const idx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
     if (idx > 0) onSelectItem(currentDayItems[idx - 1]);
   };
 
   const handleNext = () => {
-    const idx = currentDayItems.findIndex(i => i.id === selectedItem?.id);
+    const idx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
     if (idx < currentDayItems.length - 1) onSelectItem(currentDayItems[idx + 1]);
   };
 
@@ -23,7 +23,9 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     navigate(getDetailPath(selectedItem, selectedRegion));
   };
 
-  const currentIdx = currentDayItems.findIndex(i => i.id === selectedItem?.id);
+  const currentIdx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
+
+  const region = selectedRegion || sessionStorage.getItem('selectedRegion') || '';
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
@@ -31,13 +33,14 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
       {/* 지도 */}
       <div className="w-full flex-1 bg-gray-100 relative" style={{ minHeight: '400px' }}>
         <iframe
+          key="map"
           title="지도"
           width="100%"
           height="100%"
           style={{ border: 0, position: 'absolute', inset: 0 }}
           loading="lazy"
           allowFullScreen
-          src={`https://maps.google.com/maps?q=${encodeURIComponent(selectedRegion)}&z=12&output=embed`}
+          src={`https://maps.google.com/maps?q=${encodeURIComponent(region)}&z=12&output=embed`}
         />
         <a
           href={`https://maps.google.com/maps?q=${encodeURIComponent(selectedRegion)}`}
@@ -72,11 +75,15 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
             onClick={handleGoDetail}
             className="w-16 h-16 rounded-xl overflow-hidden shrink-0 cursor-pointer hover:opacity-80 transition"
           >
-            <img
-              src={selectedItem.image}
-              alt={selectedItem.name}
-              className="w-full h-full object-cover"
-            />
+            {selectedItem.imgUrl ? (
+              <img
+                src={selectedItem.imgUrl}
+                alt={selectedItem.placeName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200" />
+            )}
           </div>
 
           {/* 정보 - 클릭 시 상세페이지 이동 */}
@@ -90,14 +97,10 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
               </span>
             </div>
             <p className="text-sm font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
-              {selectedItem.name}
+              {selectedItem.placeName}
             </p>
             <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1 truncate">
-              <svg viewBox="0 0 24 24" className="w-3 h-3 fill-none stroke-current shrink-0" strokeWidth="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              {selectedItem.desc}
+              {selectedItem.overview}
             </p>
           </div>
 

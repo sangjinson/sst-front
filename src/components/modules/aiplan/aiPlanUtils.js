@@ -30,12 +30,12 @@ export const PERIOD_OPTIONS = [
 // 여행 테마 옵션
 // ────────────────────────────────────────────
 export const THEME_OPTIONS = [
-  { value: '테마파크', label: '테마파크', emoji: '🎡' },
-  { value: '문화·역사', label: '문화·역사', emoji: '🏯' },
-  { value: '레저',     label: '레저',     emoji: '🌊' },
-  { value: '체험',     label: '체험',     emoji: '⛺' },
-  { value: '축제/행사',     label: '축제/행사',     emoji: '🎉' },
-  { value: '식도락',   label: '식도락',   emoji: '🍽' },
+  { value: '축제/행사', label: '축제/행사', emoji: '🎉' },
+  { value: '체험',      label: '체험',      emoji: '⛺' },
+  { value: '식도락',    label: '식도락',    emoji: '🍽' },
+  { value: '역사',      label: '역사',      emoji: '🏯' },
+  { value: '레저',      label: '레저',      emoji: '🌊' },
+  { value: '테마파크',  label: '테마파크',  emoji: '🎡' },
 ];
 
 // ────────────────────────────────────────────
