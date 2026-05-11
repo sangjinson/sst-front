@@ -2,10 +2,11 @@ import { fileURLToPath, URL } from 'url';
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import svgr from "vite-plugin-svgr";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), svgr()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -19,6 +20,9 @@ export default defineConfig({
       '@routes': fileURLToPath(new URL('./src/routes', import.meta.url)),
       '@layouts': fileURLToPath(new URL('./src/layouts', import.meta.url)),
       '@api': fileURLToPath(new URL('./src/api', import.meta.url)),
+      '@themeadmin': fileURLToPath(new URL('./src/layouts/admin/tailadmin', import.meta.url)),
+
+
     },
   },
 
