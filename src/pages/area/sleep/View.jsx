@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { getSleepDataById, getSleepDataByRegion } from './sleepDummyData';
+import { getSleepDataById, getSleepDataByRegion } from './Sleepdata';
 import { toKorRegion } from '@utils/regionMap';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import {
@@ -22,7 +22,6 @@ const View = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
   const regionKor = toKorRegion(region || '수원');
-  const isLoggedIn = true;
 
   const [item, setItem] = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
@@ -94,6 +93,8 @@ const View = () => {
         name={item.name}
         category={item.category}
         categories={CATEGORIES}
+        plcNo={item.plcNo}
+        listPath={`/${region}/sleep/list`}
         renderHeart={() => (
           <WishlistHeartButton item={item} itemType="sleep" region={region} />
         )}
@@ -103,12 +104,19 @@ const View = () => {
 
       <AreaInfoSection
         infoItems={[
-          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address },
-          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || '' },
-          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '체크인', value: item.checkIn || '' },
-          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '체크아웃', value: item.checkOut || '' },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '' },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '예약', value: item.reservation || '' },
+          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address || '주소 정보 없음' },
+          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || '전화번호 정보 없음' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '체크인', value: item.checkIn || '15:00' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '체크아웃', value: item.checkOut || '10:00' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '주차 정보 없음' },
+          { 
+            icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, 
+            label: '예약', 
+            value: item.reservationUrl 
+              ? <a href={item.reservationUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-700">🔗 온라인 예약</a>
+              : (item.reservation || '전화 예약 가능합니다.') 
+          },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '부대시설', value: item.subFacility || '정보 없음' },
         ]}
         tags={item.facilities || []}
         tagLabel="편의시설"
@@ -117,10 +125,7 @@ const View = () => {
       <AreaMap lat={item.lat} lng={item.lng} address={item.address} />
 
       <AreaReview
-        rating={item.rating}
-        reviewCount={item.reviewCount}
-        reviews={item.reviews || []}
-        isLoggedIn={isLoggedIn}
+        plcNo={item.plcNo}
         placeholder="숙소에 대한 솔직한 리뷰를 남겨주세요."
       />
 

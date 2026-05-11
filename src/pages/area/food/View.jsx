@@ -24,7 +24,6 @@ const FoodView = () => {
 
   const currentRegion = region || '';
   const currentRegionKor = toKorRegion(currentRegion);
-  const isLoggedIn = true;
 
   const [item, setItem] = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
@@ -96,6 +95,8 @@ const FoodView = () => {
         name={item.name}
         category={item.category}
         categories={CATEGORIES}
+        plcNo={item.plcNo}
+        listPath={`/${currentRegion}/food/list`}
         renderHeart={() => (
           <WishlistHeartButton item={item} itemType="food" region={region} />
         )}
@@ -105,11 +106,11 @@ const FoodView = () => {
 
       <AreaInfoSection
         infoItems={[
-          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '주소', value: item.address },
-          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2} />, label: '전화번호', value: item.phone || '' },
-          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '영업시간', value: item.hours || '' },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '주차', value: item.parking || '' },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '메뉴', value: item.menu || '' },
+          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '주소', value: item.address || '주소 정보 없음' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4} />, label: '영업시간', value: item.hours || '09:00 - 18:00' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '메뉴', value: item.menu || '메뉴 정보 없음' },
+          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2} />, label: '전화번호', value: item.phone?.trim() || '전화번호 정보 없음' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '주차', value: item.parking || '주차 정보 없음' },
         ]}
         tags={item.tags}
         tagLabel="태그"
@@ -118,13 +119,9 @@ const FoodView = () => {
       <AreaMap lat={item.lat} lng={item.lng} address={item.address} />
 
       <AreaReview
-        rating={item.rating}
-        reviewCount={item.reviewCount}
-        reviews={item.reviews || []}
-        isLoggedIn={isLoggedIn}
+        plcNo={item.plcNo}
         placeholder="음식점에 대한 솔직한 리뷰를 남겨주세요."
       />
-
       <AreaRelated
         title={`${currentRegionKor} 비슷한 음식점`}
         items={relatedItems}

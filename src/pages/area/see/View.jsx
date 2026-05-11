@@ -22,7 +22,6 @@ const View = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
   const regionKor = toKorRegion(region || '수원');
-  const isLoggedIn = true;
 
   const [item, setItem] = useState(null);
   const [relatedItems, setRelatedItems] = useState([]);
@@ -92,6 +91,8 @@ const View = () => {
         name={item.name}
         category={item.category}
         categories={CATEGORIES}
+        plcNo={item.plcNo}
+        listPath={`/${region}/see/list`}
         renderHeart={() => (
           <WishlistHeartButton item={item} itemType="see" region={region} />
         )}
@@ -101,25 +102,20 @@ const View = () => {
 
       <AreaInfoSection
         infoItems={[
-          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address },
-          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '이용시간', value: item.hours },
-          // ✅ trim()으로 빈 문자열 처리
-          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || item.infocenter?.trim() || '' },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking },
-          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '휴무일', value: item.restdate },
+          { icon: <IconSVG name="location" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '주소', value: item.address || '주소 정보 없음' },
+          { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || '전화번호 정보 없음' },
+          { icon: <IconSVG name="time" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={4}/>, label: '운영시간', value: item.hours || '09:00 - 18:00' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '주차 정보 없음' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '휴무일', value: item.restdate || '연중무휴' },
         ]}
         tags={item.tags}
-        tagLabel="해시태그"
+        tagLabel="태그"
       />
-
       <AreaMap lat={item.lat} lng={item.lng} address={item.address} />
 
       <AreaReview
-        rating={item.rating}
-        reviewCount={item.reviewCount}
-        reviews={item.reviews}
-        isLoggedIn={isLoggedIn}
-        placeholder="볼거리에 대한 솔직한 리뷰를 남겨주세요."
+        plcNo={item.plcNo}
+        placeholder="놀거리에 대한 솔직한 리뷰를 남겨주세요."
       />
 
       <AreaRelated
