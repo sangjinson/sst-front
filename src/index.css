@@ -38,7 +38,6 @@
 /* 5. 기본 배경색 등 전체 초기화 설정 (선택사항) */
 @layer base {
   body {
-    background-color: #ffffff;
     color: #333333;
     margin: 0;
   }
