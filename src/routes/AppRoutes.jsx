@@ -44,7 +44,6 @@ import HotplaceList from '@pages/admin/HotplaceList';
 import LifeList from '@pages/admin/LifeList';
 import NoticeManage from '@pages/admin/NoticeManage';
 import FaqManage from '@pages/admin/FaqManage';
-<<<<<<< HEAD
 
 
 /* 관리자 */
@@ -74,8 +73,6 @@ import AdinMemberList from '@themeadmin/pages/Members/MemberList';
 
 
 
-=======
->>>>>>> develop
 
 const AppRoutes = () => {
   return (
@@ -138,12 +135,8 @@ const AppRoutes = () => {
           {/* 
           <Route index element={<AdminDashboard />} />
           <Route path="members" element={<MemberList />} />
-<<<<<<< HEAD
-          */}
-=======
           <Route path="notices" element={<NoticeManage />} />
           <Route path="faq" element={<FaqManage />} />
->>>>>>> develop
           {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
           <Route index element={<Home />} />
           <Route path="members" element={<AdinMemberList />} />
