@@ -6,7 +6,7 @@ import PasswordChange from './PasswordChange';
 
 const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
   const imgRef = useRef(null);
-  
+  const { localLogout } = useAuth();
   // 🚀 전역 유저 정보 가져오기 (providerCd 확인용)
   const { user } = useAuth();
   
@@ -160,6 +160,26 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
     }
   };
 
+  const handleWithdraw = async () => {
+    // 1차 방어: 실수로 누르는 것 방지
+    if (!window.confirm('정말로 탈퇴하시겠습니까?\n탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.')) {
+      return;
+    }
+
+    try {
+      // 🚀 백엔드 탈퇴 API 호출 (쿠키는 withCredentials를 통해 자동 전송, 응답으로 만료 쿠키가 내려옴)
+      await api.delete('/member/me');
+      
+      alert('회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.');
+      
+      // 🚀 클라이언트 사이드의 인증 상태(Context API, localStorage) 완전히 초기화 후 메인 이동
+      localLogout();
+      
+    } catch (error) {
+      console.error('회원 탈퇴 에러:', error);
+      alert('탈퇴 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+  };
   return (
     <div className="p-4 md:p-7 relative">
       <h3 className="fs-up-3 font-bold text-gray-700 mb-4">회원 정보 수정</h3>
@@ -237,6 +257,16 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
         <button onClick={handleSave} className="mt-6 w-full py-3 bg-[#0F9B73] hover:bg-[#0d8a66] text-white rounded-xl font-bold transition-colors">
           저장하기
         </button>
+        {/* 🚀 텍스트 형태의 은은한 탈퇴 버튼 추가 */}
+        <div className="mt-4 text-right">
+          <button 
+            type="button" 
+            onClick={handleWithdraw}
+            className="text-xs text-gray-400 hover:text-red-500 underline transition-colors"
+          >
+            회원 탈퇴
+          </button>
+          </div>
       </div>
 
       {/* 🚀 조건부 렌더링: isPwdModalOpen이 true일 때만 비밀번호 변경 모달 컴포넌트 노출! */}
