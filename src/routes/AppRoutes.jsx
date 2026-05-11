@@ -45,6 +45,35 @@ import LifeList from '@pages/admin/LifeList';
 import NoticeManage from '@pages/admin/NoticeManage';
 import FaqManage from '@pages/admin/FaqManage';
 
+
+/* 관리자 */
+{/* 
+import SignIn from '@layouts/admin/tailadmin/layout/pages/AuthPages/SignIn';
+import SignUp from '@layouts/admin/tailadmin/layout/pages/AuthPages/SignUp';
+import NotFound from '@layouts/admin/tailadmin/layout/pages/OtherPage/NotFound';
+import UserProfiles from '@layouts/admin/tailadmin/layout/pages/UserProfiles';
+import Videos from '@layouts/admin/tailadmin/layout/pages/UiElements/Videos';
+import Images from '@layouts/admin/tailadmin/layout/pages/UiElements/Images';
+import Alerts from '@layouts/admin/tailadmin/layout/pages/UiElements/Alerts';
+import Badges from '@layouts/admin/tailadmin/layout/pages/UiElements/Badges';
+import Avatars from '@layouts/admin/tailadmin/layout/pages/UiElements/Avatars';
+import Buttons from '@layouts/admin/tailadmin/layout/pages/UiElements/Buttons';
+import LineChart from '@layouts/admin/tailadmin/layout/pages/Charts/LineChart';
+import BarChart from '@layouts/admin/tailadmin/layout/pages/Charts/BarChart';
+import Calendar from '@layouts/admin/tailadmin/layout/pages/Calendar';
+import BasicTables from '@layouts/admin/tailadmin/layout/pages/Tables/BasicTables';
+import FormElements from '@layouts/admin/tailadmin/layout/pages/Forms/FormElements';
+import Blank from '@layouts/admin/tailadmin/layout/pages/Blank';
+import AppLayout from '@layouts/admin/tailadmin/layout/layout/AppLayout';
+import { ScrollToTop } from '@layouts/admin/tailadmin/layout/components/common/ScrollToTop';
+*/}
+import Home from '@themeadmin/pages/Dashboard/Home';
+import AdinMemberList from '@themeadmin/pages/Members/MemberList';
+
+
+
+
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -103,11 +132,19 @@ const AppRoutes = () => {
       {/* 4. 관리자 전용 권한 (ROLE_ 접두사 확인 주의!) */}
       <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
         <Route path="/admin" element={<AdminLayout />}>
+          {/* 
           <Route index element={<AdminDashboard />} />
           <Route path="members" element={<MemberList />} />
           <Route path="notices" element={<NoticeManage />} />
           <Route path="faq" element={<FaqManage />} />
           {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
+          <Route index element={<Home />} />
+          <Route path="members" element={<AdinMemberList />} />
+
+          <Route path="support">
+            <Route path="notices" element={<NoticeManage />} />
+            <Route path="faq" element={<FaqManage />} />
+          </Route>
         </Route>
       </Route> 
 
