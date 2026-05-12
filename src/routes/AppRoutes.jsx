@@ -46,6 +46,8 @@ import NoticeManage from '@pages/admin/NoticeManage';
 import FaqManage from '@pages/admin/FaqManage';
 import CommonCodeList from '@pages/admin/CommonCodeList';
 
+import { AIPlanProvider } from '@pages/aiplan/AIPlanContext';
+
 
 /* 관리자 */
 {/* 
@@ -77,10 +79,9 @@ import AdminMemberInfoForm from '@themeadmin/pages/Members/AdminMemberInfoForm';
 import AdminStreetListPage from '@themeadmin/pages/Streets/AdminStreetListPage';
 import AdminStreetForm from '@themeadmin/pages/Streets/AdminStreetForm';
 
-
-
-
-
+import AdminMemberEdit from '@pages/admin/AdminMemberEdit';
+import AdminReport from '@pages/admin/AdminReport';
+import AdminSeeModify from '@pages/admin/area/AdminSeeModify';
 
 const AppRoutes = () => {
   return (
@@ -132,8 +133,11 @@ const AppRoutes = () => {
           <Route path="/showcase/life/write/:id" element={<CommunityLifeWrite />} />
 
           {/* 내거리(일정 관리) */}
-          <Route path="/plan" element={<AIPlanPage />} />
-          <Route path="/plan/result" element={<AIPlanResultPage />} />
+          <Route element={<AIPlanProvider />}>
+            <Route path="/plan" element={<AIPlanPage />} />
+            <Route path="/plan/result" element={<AIPlanResultPage />} />
+          </Route>
+
           </Route>
           </Route>
 
@@ -155,6 +159,7 @@ const AppRoutes = () => {
             <Route index element={<AdinMemberList />} />
             <Route path="create" element={<AdminMemberInfoForm />} />
             <Route path="update" element={<AdminMemberInfoForm />} />
+            <Route path="edit/:id" element={<AdminMemberEdit />} />
           </Route>
 
           {/* 사거리 관리 */}
@@ -165,9 +170,10 @@ const AppRoutes = () => {
             {/* 필요한 경우 추가 경로 설정 */}
             <Route path=":type/create" element={<AdminStreetForm />} />
             <Route path=":type/update" element={<AdminStreetForm />} />
-            
+            <Route path="see/:plcNo" element={<AdminSeeModify />} />
           </Route>
           
+          <Route path="report" element={<AdminReport />} />
 
           <Route path="support">
             <Route path="notices" element={<NoticeManage />} />

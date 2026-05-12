@@ -53,7 +53,7 @@ const AreaDetailHero = ({
 
   return (
     <div className="relative rounded-lg overflow-hidden mb-6
-                    aspect-[3/4] md:aspect-[16/4]
+                    aspect-[3/4] md:aspect-[16/7]
                     w-full h-auto">
 
       {/* 이미지 */}

@@ -1,20 +1,132 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TYPE_LABEL, TYPE_COLOR, getDetailPath } from './aiResultUtils';
+import { TYPE_LABEL, TYPE_COLOR, CAT_LABEL_MAP, CAT_COLOR_MAP, getDetailPath } from './aiResultUtils';
 
+const KAKAO_APP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
-// 우측 지도
+const DAY_COLORS = [
+  '#0F9B73',
+  '#E8956D',
+  '#5B8DEF',
+  '#F5A623',
+  '#9B59B6',
+];
+
 const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, onSelectItem }) => {
-  const navigate = useNavigate();
-  const currentDayItems = schedule[activeDay] || [];
+  const navigate     = useNavigate();
+  const mapRef       = useRef(null);
+  const mapObj       = useRef(null);
+  const overlaysRef  = useRef([]);
+  const polylinesRef = useRef([]);
+
+  const currentDayItems = schedule[activeDay]?.plans || [];
+
+  const clearMap = () => {
+    overlaysRef.current.forEach(o => o.setMap && o.setMap(null));
+    overlaysRef.current = [];
+    polylinesRef.current.forEach(p => p.setMap && p.setMap(null));
+    polylinesRef.current = [];
+  };
+
+  const drawRoute = (map, items, dayIdx = 0) => {
+    const color      = DAY_COLORS[dayIdx % DAY_COLORS.length];
+    const validItems = items.filter(i => i.lat && i.lng);
+
+    const bounds   = new window.kakao.maps.LatLngBounds();
+    const linePath = [];
+
+    validItems.forEach((item, idx) => {
+      const pos = new window.kakao.maps.LatLng(
+        parseFloat(item.lat),
+        parseFloat(item.lng)
+      );
+      linePath.push(pos);
+      bounds.extend(pos);
+    });
+
+    clearMap();
+
+    validItems.forEach((item, idx) => {
+      const pos = linePath[idx];
+      const content = `
+        <div style="
+          width:28px; height:28px; border-radius:50%;
+          background:${color}; color:white;
+          font-size:13px; font-weight:bold;
+          display:flex; align-items:center; justify-content:center;
+          border:2px solid white;
+          box-shadow:0 2px 6px rgba(0,0,0,0.3);
+        ">${idx + 1}</div>
+      `;
+      const overlay = new window.kakao.maps.CustomOverlay({
+        map,
+        position: pos,
+        content,
+        yAnchor: 1,
+      });
+      overlaysRef.current.push(overlay);
+    });
+
+    if (linePath.length > 1) {
+      const polyline = new window.kakao.maps.Polyline({
+        map,
+        path         : linePath,
+        strokeWeight : 4,
+        strokeColor  : color,
+        strokeOpacity: 0.9,
+        strokeStyle  : 'solid',
+      });
+      polylinesRef.current.push(polyline);
+    }
+
+    if (validItems.length > 0) map.setBounds(bounds);
+  };
+
+  useEffect(() => {
+    const initMap = () => {
+      if (!window.kakao?.maps || !mapRef.current) return;
+      window.kakao.maps.load(() => {
+        const map = new window.kakao.maps.Map(mapRef.current, {
+          center: new window.kakao.maps.LatLng(37.5665, 126.9780),
+          level : 8,
+        });
+        mapObj.current = map;
+        window.__testMap = map;
+        map.relayout();
+        setTimeout(() => {
+          drawRoute(map, currentDayItems, activeDay);
+        }, 500);
+      });
+    };
+
+    if (window.kakao?.maps) { initMap(); return; }
+
+    const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
+    if (existing) { existing.addEventListener('load', initMap); return; }
+
+    const script = document.createElement('script');
+    script.src   = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&libraries=services,drawing&autoload=false`;
+    script.async = true;
+    script.onload = initMap;
+    document.head.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    if (!mapObj.current) return;
+    if (window.kakao?.maps) {
+      window.kakao.maps.load(() => {
+        drawRoute(mapObj.current, currentDayItems, activeDay);
+      });
+    }
+  }, [activeDay, schedule]);
 
   const handlePrev = () => {
-    const idx = currentDayItems.findIndex(i => i.id === selectedItem?.id);
+    const idx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
     if (idx > 0) onSelectItem(currentDayItems[idx - 1]);
   };
 
   const handleNext = () => {
-    const idx = currentDayItems.findIndex(i => i.id === selectedItem?.id);
+    const idx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
     if (idx < currentDayItems.length - 1) onSelectItem(currentDayItems[idx + 1]);
   };
 
@@ -23,42 +135,28 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     navigate(getDetailPath(selectedItem, selectedRegion));
   };
 
-  const currentIdx = currentDayItems.findIndex(i => i.id === selectedItem?.id);
+  const currentIdx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
 
-      {/* 지도 */}
-      <div className="w-full flex-1 bg-gray-100 relative" style={{ minHeight: '400px' }}>
-        <iframe
-          title="지도"
-          width="100%"
-          height="100%"
-          style={{ border: 0, position: 'absolute', inset: 0 }}
-          loading="lazy"
-          allowFullScreen
-          src={`https://maps.google.com/maps?q=${encodeURIComponent(selectedRegion)}&z=12&output=embed`}
-        />
-        <a
-          href={`https://maps.google.com/maps?q=${encodeURIComponent(selectedRegion)}`}
-          target="_blank"
-          rel="noreferrer"
-          className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-xs text-gray-600 shadow hover:bg-white transition z-10"
-        >
-          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current" strokeWidth="2">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-            <polyline points="15 3 21 3 21 9"/>
-            <line x1="10" y1="14" x2="21" y2="3"/>
-          </svg>
-          큰 지도로 보기
-        </a>
+      <div style={{ width: '100%', height: '500px', position: 'relative' }}>
+        <div
+        ref={mapRef}
+        id="ai-result-map"
+        style={{
+          width   : '100%',
+          height  : '100%',
+          position: 'absolute',
+          top     : 0,
+          left    : 0,
+        }}
+        />  
       </div>
 
-      {/* 미니 상세 카드 */}
       {selectedItem ? (
         <div className="border-t border-gray-100 bg-white px-3 py-3 flex items-center gap-3">
 
-          {/* 이전 버튼 */}
           <button
             onClick={handlePrev}
             disabled={currentIdx === 0}
@@ -67,46 +165,35 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
             ‹
           </button>
 
-          {/* 이미지 - 클릭 시 상세페이지 이동 */}
           <div
             onClick={handleGoDetail}
             className="w-16 h-16 rounded-xl overflow-hidden shrink-0 cursor-pointer hover:opacity-80 transition"
           >
-            <img
-              src={selectedItem.image}
-              alt={selectedItem.name}
-              className="w-full h-full object-cover"
-            />
+            {selectedItem.imgUrl ? (
+              <img src={selectedItem.imgUrl} alt={selectedItem.placeName} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gray-200" />
+            )}
           </div>
 
-          {/* 정보 - 클릭 시 상세페이지 이동 */}
-          <div
-            onClick={handleGoDetail}
-            className="flex-1 min-w-0 cursor-pointer"
-          >
+          <div onClick={handleGoDetail} className="flex-1 min-w-0 cursor-pointer">
             <div className="flex items-center gap-2 mb-1">
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${TYPE_COLOR[selectedItem.type]}`}>
-                {TYPE_LABEL[selectedItem.type]}
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                CAT_COLOR_MAP[selectedItem.category] ?? TYPE_COLOR[selectedItem.type] ?? 'bg-gray-100 text-gray-600'
+              }`}>
+                {CAT_LABEL_MAP[selectedItem.category] ?? TYPE_LABEL[selectedItem.type] ?? selectedItem.category}
               </span>
             </div>
             <p className="text-sm font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
-              {selectedItem.name}
+              {selectedItem.placeName}
             </p>
-            <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1 truncate">
-              <svg viewBox="0 0 24 24" className="w-3 h-3 fill-none stroke-current shrink-0" strokeWidth="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              {selectedItem.desc}
+            <p className="text-xs text-gray-400 mt-0.5 truncate">
+              {selectedItem.overview}
             </p>
           </div>
 
-          {/* 찜 버튼 */}
-          <button className="text-red-400 hover:text-red-500 transition text-xl shrink-0">
-            ♥
-          </button>
+          <button className="text-red-400 hover:text-red-500 transition text-xl shrink-0">♥</button>
 
-          {/* 다음 버튼 */}
           <button
             onClick={handleNext}
             disabled={currentIdx === currentDayItems.length - 1}

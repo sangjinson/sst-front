@@ -4,7 +4,7 @@ import AIResultShareButton from './AIResultShareButton';
 
 
 // 상단 버튼 (뒤로/공유/인쇄/저장)
-const AIResultHeader = ({ existingId, onSave }) => {
+const AIResultHeader = ({ existingId, onSave, onRestart }) => {
   const navigate = useNavigate();
 
   return (
@@ -12,7 +12,7 @@ const AIResultHeader = ({ existingId, onSave }) => {
       <button
         onClick={() => existingId
           ? navigate('/user/mypage', { state: { tab: 'schedule' } })
-          : navigate('/plan')
+          : onRestart()
         }
         className="text-sm text-gray-500 hover:text-gray-800 transition flex items-center gap-1"
       >

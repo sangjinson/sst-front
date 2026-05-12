@@ -1,8 +1,6 @@
 import React from 'react';
-import { TYPE_LABEL, TYPE_COLOR } from './aiResultUtils';
+import { TYPE_LABEL, TYPE_COLOR, CAT_LABEL_MAP, CAT_COLOR_MAP } from './aiResultUtils';
 
-
-// 일정 아이템 카드 1개
 const AIResultScheduleItem = ({
   item,
   idx,
@@ -37,21 +35,27 @@ const AIResultScheduleItem = ({
 
       {/* 이미지 */}
       <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0">
-        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+        {item.imgUrl ? (
+          <img src={item.imgUrl} alt={item.placeName} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-gray-200" />
+        )}
       </div>
 
       {/* 정보 */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1 mb-0.5">
-          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${TYPE_COLOR[item.type]}`}>
-            {TYPE_LABEL[item.type]}
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+            CAT_COLOR_MAP[item.category] ?? TYPE_COLOR[item.type] ?? 'bg-green-100 text-[#0F9B73]'
+          }`}>
+            {CAT_LABEL_MAP[item.category] ?? TYPE_LABEL[item.type] ?? item.category ?? item.type}
           </span>
         </div>
-        <p className="text-sm font-semibold text-gray-800 truncate">{item.name}</p>
-        <p className="text-xs text-gray-400 truncate">{item.desc}</p>
+        <p className="text-sm font-semibold text-gray-800 truncate">{item.placeName}</p>
+        <p className="text-xs text-gray-400 truncate">{item.overview}</p>
       </div>
 
-      {/* 액션 버튼 - 상세보기 + 삭제만 */}
+      {/* 액션 버튼 */}
       <div className="flex items-center gap-1 shrink-0">
         {/* 상세보기 */}
         <button
