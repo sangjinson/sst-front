@@ -27,22 +27,30 @@ const HotplaceStats = ({
   wishCount,
   isLogin,
   navigate,
+  handleDeletePost,
 }) => {
   return (
     <>
       <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm space-y-5">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3">
         <p className="shrink-0 fs-down-2 font-bold text-gray-500">
           해시태그
         </p>
+
         <div className="flex items-center gap-2 whitespace-nowrap overflow-x-auto">
-          {currentPost.hashtags.map((tag) => (
-            <span
-              key={tag}
-              className="fs-down-2 font-semibold text-[#0F9B73] shrink-0">
-              #{tag}
+          {(currentPost?.hashtags ?? []).length > 0 ? (
+            currentPost.hashtags.map((tag) => (
+              <span
+                key={tag}
+                className="fs-down-2 font-semibold text-[#0F9B73] shrink-0">
+                #{tag}
+              </span>
+            ))
+          ) : (
+            <span className="fs-down-2 text-gray-400">
+              등록된 해시태그가 없습니다
             </span>
-          ))}
+          )}
         </div>
       </div>
 
@@ -66,7 +74,9 @@ const HotplaceStats = ({
             <button type="button" onClick={() => navigate(`/showcase/hotplace/write/${currentPost.id}`)}
               className="rounded-xl border border-gray-200 px-4 py-3 fs-down-1 font-bold text-gray-600 transition hover:border-emerald-300 hover:text-emerald-600">수정</button>
 
-            <button type="button" onClick={() => alert("삭제 컴포넌트 연결 예정입니다.")}
+            <button
+              type="button"
+              onClick={handleDeletePost}
               className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 fs-down-1 font-bold text-red-500 transition hover:bg-red-100">삭제</button>
           </div>
         )}

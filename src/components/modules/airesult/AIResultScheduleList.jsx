@@ -7,7 +7,6 @@ const AIResultScheduleList = ({
   schedule,
   activeDay,
   dragIndex,
-  dragOverIndex,
   onDayChange,
   onDragStart,
   onDragOver,
@@ -20,7 +19,7 @@ const AIResultScheduleList = ({
   onItemClick,
   selectedItem,
 }) => {
-  const currentDayItems = schedule[activeDay] || [];
+  const currentDayItems = schedule[activeDay]?.plans || [];
 
   return (
     <div className="w-[300px] md:w-[320px] shrink-0 border-r border-gray-100 flex flex-col">
@@ -49,7 +48,7 @@ const AIResultScheduleList = ({
         ) : (
           currentDayItems.map((item, idx) => (
             <AIResultScheduleItem
-              key={item.id}
+              key={item.placeId}
               item={item}
               idx={idx}
               dragIndex={dragIndex}

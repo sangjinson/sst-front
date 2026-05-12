@@ -2,13 +2,42 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import { getAllPosts } from "./communityHotplaceData";
+import api from "@api/axios";
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
 
+  const getImageUrl = (url) => {
+    if (!url) return "https://placehold.co/600x400";
+    if (url.startsWith("http")) return url;
+    return `http://localhost:8080${url}`;
+  };
+
   useEffect(() => {
-    window.scrollTo(0, 0); // 페이지 진입 시 맨 위로 이동
-  }, []);
+  api.get("/community?catCd=CMM002")
+    .then((res) => {
+      const mappedData = res.data.map((item) => ({
+        id: item.commNo,
+        title: item.commTitle,
+        description: item.commContent,
+        author: item.mbrNickname,
+        place: "핫플거리",
+        hashtags: [],
+        img: getImageUrl(item.commMainImgUrl),
+        regDt: item.commRegDate,
+        wishCnt: item.commLikeCnt,
+        commentCnt: item.commCmntCnt,
+        viewCnt: item.commInqireCnt,
+        size: "wide",
+      }));
+      setPosts(mappedData);
+    })
+    .catch((err) => {
+      console.log("커뮤니티 조회 실패", err);
+    });
+
+  window.scrollTo(0, 0);
+}, []);
 
   // 사용자가 좋아요를 눌렀는지 저장하는 상태
   const [likedPosts, setLikedPosts] = useState({});
@@ -16,8 +45,11 @@ const CommunityHotplace = () => {
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
 
-  // 더미 + 유저 게시글 합쳐서 사용
-  const posts = getAllPosts();
+  const [posts, setPosts] = useState([]);
+
+  // // 더미 + 유저 게시글 합쳐서 사용
+  // const posts = getAllPosts();
+  
 
   const filteredPosts = useMemo(() => {
     const trimmedKeyword = keyword.trim().toLowerCase();
