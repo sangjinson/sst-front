@@ -1,7 +1,13 @@
 import React from 'react';
 
-// 선택 조건 태그 (지역/기간/테마)
-
+const THM_LABEL_MAP = {
+  'THM001': '축제/행사',
+  'THM002': '체험',
+  'THM003': '식도락',
+  'THM004': '역사',
+  'THM005': '레저',
+  'THM006': '테마파크',
+};
 
 const AIResultTags = ({
   selectedRegion,
@@ -34,12 +40,12 @@ const AIResultTags = ({
       )}
       {selectedCompanion && (
         <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
-          {COMPANION_EMOJI[selectedCompanion] || '👤'} {selectedCompanion}
+          👤 {selectedCompanion}
         </span>
       )}
       {(selectedThemes || []).map(t => (
         <span key={t} className="px-3 py-1 bg-[#0F9B73] text-white text-xs rounded-full font-medium">
-          {t}
+          {THM_LABEL_MAP[t] ?? t}
         </span>
       ))}
       {existingId && savedName && (

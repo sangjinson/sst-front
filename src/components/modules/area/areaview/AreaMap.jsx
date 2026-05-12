@@ -1,15 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
-const KAKAO_APP_KEY = '44ca77103cfef539e22b73750e2dc760';
+const KAKAO_APP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
-/**
- * AreaMap - 카카오 지도 섹션
- *
- * props:
- * - lat     : 위도 (선택)
- * - lng     : 경도 (선택)
- * - address : 주소 (lat/lng 없을 때 주소로 검색)
- */
 const AreaMap = ({ lat, lng, address }) => {
   const mapRef = useRef(null);
 
@@ -21,7 +13,6 @@ const AreaMap = ({ lat, lng, address }) => {
         if (!container) return;
 
         if (lat && lng) {
-          // 좌표로 지도 표시
           const coords = new window.kakao.maps.LatLng(lat, lng);
           const map = new window.kakao.maps.Map(container, {
             center: coords,
@@ -29,7 +20,6 @@ const AreaMap = ({ lat, lng, address }) => {
           });
           new window.kakao.maps.Marker({ map, position: coords });
         } else if (address) {
-          // 주소로 좌표 변환 후 지도 표시
           const geocoder = new window.kakao.maps.services.Geocoder();
           const defaultCoords = new window.kakao.maps.LatLng(37.2636, 127.0286);
           const map = new window.kakao.maps.Map(container, {
@@ -47,22 +37,22 @@ const AreaMap = ({ lat, lng, address }) => {
       });
     };
 
-    // 이미 로드된 경우
     if (window.kakao && window.kakao.maps) {
       loadMap();
       return;
     }
 
-    // 스크립트 동적 로드
+    const existing = document.querySelector('script[src*="dapi.kakao.com"]');
+    if (existing) {
+      existing.addEventListener('load', loadMap);
+      return;
+    }
+
     const script = document.createElement('script');
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&libraries=services&autoload=false`;
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&libraries=services,drawing&autoload=false`;
     script.async = true;
     script.onload = loadMap;
     document.head.appendChild(script);
-
-    return () => {
-      // 클린업: 같은 스크립트 중복 방지
-    };
   }, [lat, lng, address]);
 
   return (

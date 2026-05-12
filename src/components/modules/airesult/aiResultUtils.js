@@ -3,6 +3,7 @@ import { getSeeDataByRegion } from '@pages/area/see/seeData';
 import { getSleepDataByRegion } from '@pages/area/sleep/sleepdata';
 import { getPlayDataByRegion } from '@pages/area/play/playData';
 import { toEnRegion } from '@utils/regionMap';
+
 // ────────────────────────────────────────────
 // 카테고리 타입 한글/색상
 // ────────────────────────────────────────────
@@ -20,10 +21,34 @@ export const TYPE_COLOR = {
   play:  'bg-purple-100 text-purple-700',
 };
 
+// PLC 코드 → 한글
+export const CAT_LABEL_MAP = {
+  'PLC001': '볼거리',
+  'PLC002': '놀거리',
+  'PLC003': '먹거리',
+  'PLC004': '잘거리',
+};
+
+// PLC 코드 → 색상
+export const CAT_COLOR_MAP = {
+  'PLC001': 'bg-blue-100 text-blue-700',
+  'PLC002': 'bg-purple-100 text-purple-700',
+  'PLC003': 'bg-orange-100 text-orange-700',
+  'PLC004': 'bg-green-100 text-green-700',
+};
+
+// PLC 코드 → type
+const CAT_TYPE_MAP = {
+  'PLC001': 'see',
+  'PLC002': 'play',
+  'PLC003': 'food',
+  'PLC004': 'sleep',
+};
+
 export const SEARCH_CATEGORIES = ['전체', '볼거리', '먹거리', '잘거리', '놀거리'];
 
 // ────────────────────────────────────────────
-// ✅ 일정 생성 함수 - 전부 async API 호출
+// 일정 생성 함수
 // ────────────────────────────────────────────
 export const generateSchedule = async (region, days) => {
   const regionKor = region || '수원시';
@@ -90,7 +115,7 @@ export const generateSchedule = async (region, days) => {
 };
 
 // ────────────────────────────────────────────
-// ✅ 검색 결과 생성 함수 - 전부 async API 호출
+// 검색 결과 생성 함수
 // ────────────────────────────────────────────
 export const getSearchResults = async (selectedRegion, searchKeyword, searchCategory) => {
   const kw = searchKeyword.trim().toLowerCase();
@@ -126,8 +151,9 @@ export const getSearchResults = async (selectedRegion, searchKeyword, searchCate
 // 상세 페이지 이동 경로 생성
 // ────────────────────────────────────────────
 export const getDetailPath = (item, selectedRegion) => {
-  const type = item.type;
-  const rawId = String(item.id).replace(`${type}-`, '');
+  const placeId  = item.placeId || String(item.id || '').replace(`${item.type}-`, '');
+  const type     = item.type || CAT_TYPE_MAP[item.category] || 'see';
   const regionEn = toEnRegion(selectedRegion);
-  return `/${regionEn}/${type}/view?id=${rawId}`;
+
+  return `/${regionEn}/${type}/view?id=${placeId}`;
 };
