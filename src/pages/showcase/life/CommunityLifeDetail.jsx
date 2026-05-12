@@ -3,10 +3,6 @@ import axios from "axios";
 import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import {
-  getAllLifePosts,
-  lifeComments,
-} from "./communityLifeData";
 import Swal from "sweetalert2";
 import CommentSection from "@components/modules/community/common/CommentSection";
 import LifeCourseView from "@components/modules/community/life/LifeCourseView";
@@ -26,10 +22,12 @@ const CommunityLifeDetail = () => {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState(lifeComments || []);
+  const [comments, setComments] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
-
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
@@ -45,9 +43,68 @@ const CommunityLifeDetail = () => {
       });
   }, []);
 
-  // 게시글 찾기
-  const posts = getAllLifePosts ? getAllLifePosts() : [];
-  const post = posts.find((p) => p.id === Number(id));
+  useEffect(() => {
+    const fetchPostDetail = async () => {
+      try {
+        // 조회수 증가
+        await api.put(`/community/${id}/view`);
+
+        // 상세 조회
+        const res = await api.get(`/community/${id}`);
+        const item = res.data;
+
+        let course = [];
+
+        if (item.commAisNo) {
+          const placeRes = await api.get(
+            `/community/life/schedules/${item.commAisNo}/places`
+          );
+
+          course = placeRes.data.map((place, index) => ({
+            order: index + 1,
+            name: place.name || place.plcName || "",
+            address: place.address || place.plcAddress || "",
+            type: place.type || place.plcType || "see",
+            image: place.image || place.plcImgUrl || "",
+            desc: place.desc || place.description || "",
+            dayNo: place.dayNo,
+          }));
+        }
+
+        const imageUrl = item.commMainImgUrl
+          ? item.commMainImgUrl.startsWith("http")
+            ? item.commMainImgUrl
+            : `http://localhost:8080${item.commMainImgUrl}`
+          : "https://placehold.co/800x400";
+
+        const mappedPost = {
+          id: item.commNo,
+          commNo: item.commNo,
+          title: item.commTitle,
+          description: item.commContent,
+          author: item.mbrNickname,
+          region: item.rgnName || item.plcName || "장소 정보 없음",
+          hashtags: item.hashtagText ? item.hashtagText.split(",") : [],
+          thumbnail: imageUrl,
+          images: item.images || [],
+          regDt: item.commRegDate,
+          viewCnt: item.commInqireCnt,
+          wishCnt: item.commLikeCnt,
+          commentCnt: item.commCmntCnt,
+          commAisNo: item.commAisNo,
+          course,
+        };
+
+        setPost(mappedPost);
+      } catch (err) {
+        console.error("인생거리 상세 조회 실패:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPostDetail();
+  }, [id]);
 
   // 댓글 조회 함수
   const fetchComments = (commNo) => {
@@ -79,6 +136,14 @@ const CommunityLifeDetail = () => {
     fetchComments(commNo);
   }, [post]);
 
+  if (loading) {
+    return (
+      <div className="py-20 text-center font-bold text-gray-500">
+        게시글을 불러오는 중입니다.
+      </div>
+    );
+  }
+
   if (!post) {
     return (
       <div className="py-20 text-center font-bold text-gray-500">
@@ -91,22 +156,37 @@ const CommunityLifeDetail = () => {
   const thumbnail = post.thumbnail || post.img;
   const region = post.region || post.place || "장소 정보 없음";
   const courseList = post.course || [];
-  const viewCount = (post.viewCnt || 0) + 1;
-  const wishCount = (post.wishCnt || 0) + (isLiked ? 1 : 0);
+  const viewCount = post.viewCnt || 0;
+  const wishCount = post.wishCnt || 0;
 
   const scrollToComments = () => {
     document.getElementById("life-comments")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // 내 일정으로 가져오기
-  // 기존 이미지/내용은 변경하지 않음
-  // 기존 대표 이미지(thumbnail) + 코스 이미지(course.image)를 슬라이더에 보여줌
-  // 중복 이미지는 제거
-  const slideImages = Array.from(
-    new Set([thumbnail, ...courseList.map((c) => c.image).filter(Boolean)])
-  );
 
-  // 내 일정으로 가져오기
+  const normalizeImageUrl = (url) => {
+    if (!url) return null;
+
+    if (url.startsWith("http")) {
+      return url;
+    }
+
+    if (url.startsWith("/uploads")) {
+      return `http://localhost:8080${url}`;
+    }
+
+    if (url.startsWith("uploads")) {
+      return `http://localhost:8080/${url}`;
+    }
+
+    return `http://localhost:8080/uploads/${url}`;
+  };
+
+  const slideImages =
+    post.images?.length > 0
+      ? post.images.map(normalizeImageUrl).filter(Boolean)
+      : [thumbnail];
+
   const handleImportSchedule = () => {
     if (!isLogin) {
       navigate("/login");
@@ -259,8 +339,49 @@ const CommunityLifeDetail = () => {
       });
   };
 
+  const handleDeletePost = async () => {
+    if (!window.confirm("게시글을 삭제하시겠습니까?")) return;
+
+    try {
+      await api.delete(`/community/${post.commNo}`);
+
+      alert("게시글이 삭제되었습니다.");
+      navigate("/showcase/life");
+    } catch (err) {
+      console.error("게시글 삭제 실패:", err);
+      alert("게시글 삭제에 실패했습니다.");
+    }
+  };
+
+  // 좋아요 처리
+  const handleLikeClick = async () => {
+    if (!currentUserId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const res = await api.post(
+        `/community/${post.commNo}/like?mbrId=${currentUserId}`
+      );
+
+      const liked = res.data;
+      setIsLiked(liked);
+
+      setPost((prev) => ({
+        ...prev,
+        wishCnt: liked
+          ? (prev.wishCnt || 0) + 1
+          : Math.max((prev.wishCnt || 0) - 1, 0),
+      }));
+    } catch (error) {
+      console.error("좋아요 처리 실패:", error);
+      alert("좋아요 처리에 실패했습니다.");
+    }
+  };
+
   return (
-    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 font-sans">
       <Breadcrumb
         paths={[
           { label: "홈", to: "/" },
@@ -316,7 +437,7 @@ const CommunityLifeDetail = () => {
             comments={comments}
             wishCount={wishCount}
             isLiked={isLiked}
-            setIsLiked={setIsLiked}
+            handleLikeClick={handleLikeClick}
             onCommentClick={scrollToComments}
           />
 
@@ -348,10 +469,12 @@ const CommunityLifeDetail = () => {
           wishCount={wishCount}
           isLiked={isLiked}
           setIsLiked={setIsLiked}
+          handleLikeClick={handleLikeClick}
           isLogin={isLogin}
           navigate={navigate}
           handleImportSchedule={handleImportSchedule}
           handleMakePlan={handleMakePlan}
+          handleDeletePost={handleDeletePost}
           openReportModal={() =>
             openReportModal({
               type: "post",
