@@ -35,7 +35,7 @@ const AreaViewTemplate = () => {
         </div>
       ) : (
         <div className="bg-[#f8f6f0] min-h-screen">
-          <div className="container px-2 sm:px-4 md:px-6 lg:px-0 m-auto py-6 max-w-[900px]">
+          <div className="px-4 sm:px-6 md:px-8 lg:px-12 m-auto py-6 max-w-[1400px]">
             <Breadcrumb
               paths={[
                 { label: '홈', to: '/' },
