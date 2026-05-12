@@ -1,67 +1,127 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import api from "@api/axios";
+import { useAuth } from "@hooks/useAuth";
 
 import TextInput from "@modules/form/TextInput";
-import RegionSelect from "@components/modules/community/hotplace/RegionSelect";
+import RegionSelect from "@components/modules/community/write/RegionSelect";
 import TagInput from "@components/modules/community/write/TagInput";
 import ImageUpload from "@components/modules/community/write/ImageUpload";
 import WriteForm from "@components/modules/community/write/WriteForm";
 import SchedulePickerModal from "@components/modules/community/life/SchedulePickerModal";
 import CourseSection from "@components/modules/community/life/CourseSection";
 
-import {
-  getAllLifePosts,
-  saveUserLifePost,
-  gyeonggiRegions,
-} from "./communityLifeData";
-
 const CommunityLifeWrite = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
-
-  const currentPost = isEditMode
-    ? getAllLifePosts().find((post) => post.id === Number(id))
-    : null;
+  const { user } = useAuth();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
-  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState(null);
+  const [importedSchedule, setImportedSchedule] = useState(null);
   const [isRegionOpen, setIsRegionOpen] = useState(false);
   const [course, setCourse] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [schedules, setSchedules] = useState([]);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [regions, setRegions] = useState([]);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
 
   useEffect(() => {
-    if (!isEditMode || !currentPost) return;
+    api
+      .get("/regions")
+      .then((res) => {
+        setRegions(res.data);
+      })
+      .catch((err) => {
+        console.error("지역 목록 조회 실패:", err);
+      });
+  }, []);
 
-    setTitle(currentPost.title || "");
-    setContent(currentPost.description || "");
-    setTags(currentPost.hashtags || []);
-    setSelectedRegion(currentPost.region || "");
-    setCourse(currentPost.course || []);
-    setImagePreviews(
-      currentPost.images ||
-        (currentPost.thumbnail ? [currentPost.thumbnail] : [])
-    );
-  }, [isEditMode, currentPost]);
+  useEffect(() => {
+    if (!user?.mbrId) return;
 
-  if (isEditMode && !currentPost) {
-    return (
-      <div className="py-20 text-center font-bold text-gray-500">
-        수정할 게시글이 존재하지 않습니다.
-      </div>
-    );
-  }
+    api
+      .get("/community/life/schedules", {
+        params: {
+          mbrId: user.mbrId,
+        },
+      })
+      .then((res) => {
+        setSchedules(res.data);
+      })
+      .catch((err) => {
+        console.error("내 AI 일정 목록 조회 실패:", err);
+      });
+  }, [user]);
+
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    const fetchEditPost = async () => {
+      try {
+        const res = await api.get(`/community/${id}`);
+        const item = res.data;
+
+        setTitle(item.commTitle || "");
+        setContent(item.commContent || "");
+        setTags(item.hashtagText ? item.hashtagText.split(",") : []);
+        setSelectedSchedule({ aisNo: item.commAisNo });
+
+        if (item.commAisNo) {
+          setImportedSchedule({ aisNo: item.commAisNo });
+
+          const placeRes = await api.get(
+            `/community/life/schedules/${item.commAisNo}/places`
+          );
+
+          const firstAddress =
+            placeRes.data?.[0]?.address ||
+            placeRes.data?.[0]?.plcAddress ||
+            "";
+
+          setSelectedRegion({
+            rgnCd: item.rgnCd,
+            rgnName:
+              item.rgnName ||
+              firstAddress.split(" ")?.[1] ||
+              firstAddress.split(" ")?.[0] ||
+              "지역 정보 없음",
+          });
+
+          const mappedCourse = placeRes.data.map((place, index) => ({
+            order: index + 1,
+            name: place.name || place.plcName || "",
+            address: place.address || place.plcAddress || "",
+            type: place.type || place.plcType || "see",
+            image: place.image || place.plcImgUrl || "",
+            desc: place.desc || place.description || "",
+            dayNo: place.dayNo,
+          }));
+
+          setCourse(mappedCourse);
+        }
+      } catch (err) {
+        console.error("인생거리 수정 데이터 조회 실패:", err);
+      }
+    };
+
+    fetchEditPost();
+  }, [isEditMode, id]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
+
+    setImageFiles((prev) => [...prev, ...files]);
 
     files.forEach((file) => {
       const reader = new FileReader();
@@ -73,20 +133,54 @@ const CommunityLifeWrite = () => {
     e.target.value = "";
   };
 
-  const handleSelectPlaces = (allPlaces, region) => {
+  const handleRemoveImage = (index) => {
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSelectPlaces = (allPlaces, schedule) => {
+    setImportedSchedule(schedule);
+
+    const scheduleRegionName =
+      schedule?.rgnName ||
+      schedule?.region ||
+      schedule?.aisRgnName ||
+      allPlaces?.[0]?.rgnName ||
+      allPlaces?.[0]?.region ||
+      allPlaces?.[0]?.address?.split(" ")?.[1] ||
+      "";
+
+    const scheduleRegionCd =
+      schedule?.rgnCd ||
+      schedule?.rgnNo ||
+      allPlaces?.[0]?.rgnCd ||
+      allPlaces?.[0]?.rgnNo ||
+      "";
+
+    const matchedRegion = regions.find(
+      (region) => region.rgnName === scheduleRegionName
+    );
+
+    setSelectedRegion({
+      rgnCd: matchedRegion?.rgnCd || scheduleRegionCd,
+      rgnName: scheduleRegionName,
+    });
+
     const newCourse = allPlaces.map((item, i) => ({
-      order: course.length + i + 1,
+      order: i + 1,
       name: item.name || "",
       address: item.address || "",
       type: item.type || "see",
       image: item.image || "",
-      desc: item.desc || item.description || "",
+      desc: item.desc || "",
+      dayNo: item.dayNo,
     }));
 
-    setCourse((prev) => [...prev, ...newCourse]);
+    setCourse(newCourse);
+    setSelectedSchedule(schedule);
 
-    if (!selectedRegion && region) {
-      setSelectedRegion(region);
+    if (schedule?.aisSchdulName && !title) {
+      setTitle(schedule.aisSchdulName);
     }
   };
 
@@ -119,7 +213,7 @@ const CommunityLifeWrite = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const trimmedTag = tagInput.trim();
@@ -128,7 +222,7 @@ const CommunityLifeWrite = () => {
         ? [...tags, trimmedTag]
         : tags;
 
-    if (!selectedRegion || selectedRegion.trim() === "") {
+    if (!selectedRegion?.rgnCd && !selectedRegion?.rgnName) {
       alert("지역을 선택해주세요.");
       return;
     }
@@ -154,50 +248,84 @@ const CommunityLifeWrite = () => {
     }
 
     if (isEditMode) {
-      const saved = JSON.parse(localStorage.getItem("lifePosts") || "[]");
+      try {
+        const data = {
+          commTitle: title,
+          commContent: content,
+          commCatCd: "CMM001",
+          commAisNo: selectedSchedule?.aisNo,
+          commPlcNo: null,
+          commMainImgUrl: null,
+          commMbrId: user.mbrId,
+          hashtags: finalTags,
+        };
 
-      const updated = saved.map((p) =>
-        p.id === Number(id)
-          ? {
-              ...p,
-              title,
-              description: content,
-              region: selectedRegion,
-              hashtags: finalTags,
-              thumbnail: imagePreviews[0] || p.thumbnail,
-              images: imagePreviews,
-              course,
-            }
-          : p
-      );
+        const formData = new FormData();
+        formData.append(
+          "community",
+          new Blob([JSON.stringify(data)], {
+            type: "application/json",
+          })
+        );
 
-      localStorage.setItem("lifePosts", JSON.stringify(updated));
-      alert("글이 수정되었습니다!");
-      navigate(`/showcase/life/view/${id}`);
+        imageFiles.forEach((file) => {
+          formData.append("images", file);
+        });
+
+        await api.put(`/community/${id}/with-images`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        alert("글이 수정되었습니다!");
+        navigate(`/showcase/life/view/${id}`);
+      } catch (err) {
+        console.error("인생거리 수정 실패:", err);
+        alert("글 수정에 실패했습니다.");
+      }
+
       return;
     }
 
-    const newPost = {
-      id: Date.now(),
-      title,
-      description: content,
-      author: "나",
-      region: selectedRegion,
-      regDt: new Date().toISOString().slice(0, 10),
-      viewCnt: 0,
-      wishCnt: 0,
-      commentCnt: 0,
-      hashtags: finalTags,
-      thumbnail:
-        imagePreviews[0] || `https://picsum.photos/seed/${Date.now()}/800/400`,
-      images: imagePreviews,
-      course,
-    };
+    try {
+      const data = {
+        commTitle: title,
+        commContent: content,
+        commCatCd: "CMM001",
+        commAisNo: selectedSchedule?.aisNo,
+        commPlcNo: null,
+        commMainImgUrl: null,
+        commMbrId: user.mbrId,
+        hashtags: finalTags,
+      };
+      console.log("인생거리 등록 데이터:", data);
 
-    saveUserLifePost(newPost);
+      const formData = new FormData();
 
-    alert("글이 등록되었습니다!");
-    navigate("/showcase/life");
+      formData.append(
+        "community",
+        new Blob([JSON.stringify(data)], {
+          type: "application/json",
+        })
+      );
+
+      imageFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      await api.post("/community/with-images", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert("글이 등록되었습니다!");
+      navigate("/showcase/life");
+    } catch (err) {
+      console.error("인생거리 등록 실패:", err);
+      alert("글 등록에 실패했습니다.");
+    }
   };
 
   return (
@@ -206,6 +334,7 @@ const CommunityLifeWrite = () => {
         <SchedulePickerModal
           onClose={() => setShowModal(false)}
           onSelect={handleSelectPlaces}
+          schedules={schedules}
         />
       )}
 
@@ -225,7 +354,8 @@ const CommunityLifeWrite = () => {
             setSelectedRegion={setSelectedRegion}
             isRegionOpen={isRegionOpen}
             setIsRegionOpen={setIsRegionOpen}
-            regions={gyeonggiRegions}
+            regions={regions}
+            disabled={!!importedSchedule}
           />
 
           <div>
@@ -248,8 +378,8 @@ const CommunityLifeWrite = () => {
 
         <ImageUpload
           imagePreviews={imagePreviews}
-          setImagePreviews={setImagePreviews}
           handleImageChange={handleImageChange}
+          handleRemoveImage={handleRemoveImage}
         />
 
         <div>
@@ -264,7 +394,6 @@ const CommunityLifeWrite = () => {
               rows="15"
               placeholder="여행의 이야기를 자유롭게 적어주세요."
               className="w-full px-4 py-4 outline-none resize-none text-gray-700 leading-relaxed"
-              // required
             />
           </div>
         </div>

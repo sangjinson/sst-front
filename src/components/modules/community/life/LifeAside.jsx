@@ -56,11 +56,13 @@ const LifeAside = ({
   wishCount,
   isLiked,
   setIsLiked,
+  handleLikeClick,
   isLogin,
   navigate,
   handleImportSchedule,
   handleMakePlan,
   onCommentClick,
+  handleDeletePost,
 }) => {
   return (
     <aside className="h-fit rounded-3xl border border-gray-100 bg-white p-6 shadow-sm lg:sticky lg:top-28 space-y-6">
@@ -137,11 +139,10 @@ const LifeAside = ({
       <div className="grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 text-center">
         <button
           type="button"
-          onClick={() => setIsLiked(!isLiked)}
+          onClick={handleLikeClick}
           className={`rounded-2xl cursor-pointer px-3 py-4 transition ${
             isLiked ? "bg-blue-50" : "bg-gray-50 hover:bg-blue-50"
-          }`}
-        >
+          }`}>
           <p className="fs-down-1 text-gray-400">좋아요</p>
           <strong className="mt-1 block text-lg text-gray-900">
             {wishCount}
@@ -178,7 +179,7 @@ const LifeAside = ({
 
           <button
             type="button"
-            onClick={() => alert("삭제 예정")}
+            onClick={handleDeletePost}
             className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 fs-down-1 font-bold text-red-500 transition hover:bg-red-100">
             삭제
           </button>
