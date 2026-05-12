@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TextInput from "@modules/form/TextInput";
-import { getAllPosts, saveUserPost, gyeonggiRegions } from "./communityHotplaceData";
+import { gyeonggiRegions } from "./communityHotplaceData";
 import RegionSelect from "@components/modules/community/hotplace/RegionSelect";
 import TagInput from "@components/modules/community/write/TagInput";
 import ImageUpload from "@components/modules/community/write/ImageUpload";
+import api from "@api/axios";
+import { useAuth } from "@hooks/useAuth";
 
 // 공통 글쓰기 폼
 import WriteForm from "@components/modules/community/write/WriteForm";
@@ -13,9 +15,9 @@ const CommunityHotplaceWrite = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
-
-  const currentPost = isEditMode ? getAllPosts().find((post) => post.id === Number(id)) : null;
-
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(isEditMode);
+  const [notFound, setNotFound] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -28,27 +30,100 @@ const CommunityHotplaceWrite = () => {
   useEffect(() => { window.scrollTo({ top: 0 }); }, []);
 
   useEffect(() => {
-    if (!isEditMode || !currentPost) return;
-    setTitle(currentPost.title);
-    setContent(currentPost.description);
-    setPlaceName(currentPost.place);
-    setTags(currentPost.hashtags || []);
-    setImagePreviews(currentPost.images || [currentPost.img]);
-    setSelectedRegion(currentPost.region || "");
-  }, [isEditMode, currentPost]);
+    if (!isEditMode) return;
 
-  if (isEditMode && !currentPost) {
+    const fetchPost = async () => {
+      try {
+        const res = await api.get(`/community/${id}`);
+        const post = res.data;
+
+        const imageUrl = post.commMainImgUrl
+          ? post.commMainImgUrl.startsWith("http")
+            ? post.commMainImgUrl
+            : `http://localhost:8080${post.commMainImgUrl}`
+          : "";
+
+        const imageUrls = post.images?.length
+          ? post.images.map((img) =>
+              img.startsWith("http")
+                ? img
+                : `http://localhost:8080${img}`
+            )
+          : imageUrl
+            ? [imageUrl]
+            : [];
+
+        setTitle(post.commTitle || "");
+        setContent(post.commContent || "");
+        setImagePreviews(imageUrls);
+
+        // 아직 DB에 지역/장소/해시태그 컬럼이 없어서 임시 기본값
+        setPlaceName("");
+        setSelectedRegion("");
+        setTags(post.hashtagText ? post.hashtagText.split(",") : []);
+      } catch (error) {
+        console.error("수정 게시글 조회 실패:", error);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [isEditMode, id]);
+
+  if (loading) {
+    return <div className="py-20 text-center font-bold text-gray-500">게시글을 불러오는 중입니다.</div>;
+  }
+
+  if (notFound) {
     return <div className="py-20 text-center font-bold text-gray-500">수정할 게시글이 존재하지 않습니다.</div>;
   }
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreviews((prev) => [...prev, reader.result]);
-      reader.readAsDataURL(file);
-    });
-    e.target.value = "";
+
+    if (!files.length) return;
+
+    try {
+      const uploadedUrls = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await api.post("/community/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        uploadedUrls.push(`http://localhost:8080${res.data}`);
+      }
+     
+      setImagePreviews((prev) => [...prev, ...uploadedUrls]);
+    } catch (error) {
+      alert("이미지 업로드에 실패했습니다.");
+    } finally {
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveImage = async (removeIndex) => {
+    const imageUrl = imagePreviews[removeIndex];
+
+    try {
+      await api.delete("/community/image", {
+        params: {
+          imageUrl: imageUrl.replace("http://localhost:8080", ""),
+        },
+      });
+
+      setImagePreviews((prev) =>
+        prev.filter((_, index) => index !== removeIndex)
+      );
+    } catch (error) {
+      console.error("이미지 삭제 실패:", error);
+      alert("이미지 삭제에 실패했습니다.");
+    }
   };
 
   const handleTagKeyDown = (e) => {
@@ -64,7 +139,7 @@ const CommunityHotplaceWrite = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
     const trimmedTag = tagInput.trim();
@@ -82,44 +157,83 @@ const CommunityHotplaceWrite = () => {
     if (!finalTags.length) { alert("해시태그를 입력해주세요."); return; }
 
     if (isEditMode) {
-      const saved = JSON.parse(localStorage.getItem("hotplacePosts") || "[]");
-      const updated = saved.map((p) =>
-        p.id === Number(id)
-          ? {
-              ...p,
-              title,
-              description: content,
-              place: placeName,
-              region: selectedRegion,
-              hashtags: finalTags,
-              img: imagePreviews[0] || p.img,
-              images: imagePreviews,
-            }
-          : p
-      );
-      localStorage.setItem("hotplacePosts", JSON.stringify(updated));
-      alert("글이 수정되었습니다!");
-      navigate(`/showcase/hotplace/view/${id}`);
-    } else {
-      const newPost = {
-        id: Date.now(),
-        title,
-        description: content,
-        author: "나",
-        place: placeName,
-        region: selectedRegion,
-        regDt: new Date().toISOString().slice(0, 10),
-        viewCnt: 0,
-        wishCnt: 0,
-        commentCnt: 0,
+      const payload = {
+        commTitle: title,
+        commContent: content,
+        commMainImgUrl: imagePreviews[0]
+          ? imagePreviews[0].replace("http://localhost:8080", "")
+          : "",
         hashtags: finalTags,
-        img: imagePreviews[0] || `https://picsum.photos/seed/${Date.now()}/720/720`,
-        images: imagePreviews,
-        size: "square",
+
+        files: imagePreviews.map((url, index) => {
+          const path = url.replace("http://localhost:8080", "");
+          const saveName = path.split("/").pop();
+
+          return {
+            fileOrgNm: saveName,
+            fileSaveNm: saveName,
+            filePath: path,
+            fileExt: saveName.split(".").pop(),
+            fileSize: 0,
+            fileMimeType: "image/png",
+            fileType: "IMAGE",
+          };
+        }),
       };
-      saveUserPost(newPost);
-      alert("글이 등록되었습니다!");
-      navigate("/showcase/hotplace");
+
+      try {
+        // 게시글 수정 요청
+        await api.put(`/community/${id}`, payload);
+        alert("글이 수정되었습니다!");
+        // 수정 완료 후 상세페이지 이동
+        navigate(`/showcase/hotplace/view/${id}`);
+      } catch (error) {
+        console.error("글 수정 실패:", error);
+        alert("글 수정에 실패했습니다.");
+      }
+    } else {
+      // 로그인 여부 확인
+      if (!user?.mbrId) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
+      const payload = {
+        commMbrId: user.mbrId,
+        commCatCd: "CMM002",
+        commTitle: title,
+        commContent: content,
+        commMainImgUrl: imagePreviews[0]
+          ? imagePreviews[0].replace("http://localhost:8080", "")
+          : "",
+        hashtags: finalTags,
+
+        files: imagePreviews.map((url, index) => {
+          const path = url.replace("http://localhost:8080", "");
+          const saveName = path.split("/").pop();
+
+          return {
+            fileOrgNm: saveName,
+            fileSaveNm: saveName,
+            filePath: path,
+            fileExt: saveName.split(".").pop(),
+            fileSize: 0,
+            fileMimeType: "image/png",
+            fileType: "IMAGE",
+          };
+        }),
+      };
+
+      try {
+        await api.post("/community", payload);
+
+        alert("글이 등록되었습니다!");
+        navigate("/showcase/hotplace");
+      } catch (error) {
+        console.error("글 등록 실패:", error);
+        alert("글 등록에 실패했습니다.");
+      }
     }
   };
 
@@ -169,8 +283,8 @@ const CommunityHotplaceWrite = () => {
       {/* 사진 등록 */}
       <ImageUpload
         imagePreviews={imagePreviews}
-        setImagePreviews={setImagePreviews}
         handleImageChange={handleImageChange}
+        handleRemoveImage={handleRemoveImage} 
       />
 
       {/* 내용 */}
