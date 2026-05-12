@@ -1,8 +1,7 @@
-
 const ImageUpload = ({
   imagePreviews,
-  setImagePreviews,
   handleImageChange,
+  handleRemoveImage,
 }) => {
   return (
     <div>
@@ -35,8 +34,7 @@ const ImageUpload = ({
           {imagePreviews.map((preview, index) => (
             <div
               key={index}
-              className="relative aspect-[4/3] rounded-lg overflow-hidden border"
-            >
+              className="relative aspect-[4/3] rounded-lg overflow-hidden border">
               <img
                 src={preview}
                 alt={`미리보기 ${index + 1}`}
@@ -45,11 +43,8 @@ const ImageUpload = ({
 
               <button
                 type="button"
-                onClick={() =>
-                  setImagePreviews(imagePreviews.filter((_, i) => i !== index))
-                }
-                className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center"
-              >
+                onClick={() => handleRemoveImage(index)}
+                className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center">
                 ✕
               </button>
             </div>
