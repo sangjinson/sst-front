@@ -8,7 +8,6 @@ export default function AdminMemberInfoForm() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // 수정 모드 여부 판단 (경로에 'update'가 포함되어 있거나 state로 데이터가 넘어온 경우)
   const isUpdate = location.pathname.includes("update");
   const memberData = location.state?.member;
 
@@ -27,13 +26,34 @@ export default function AdminMemberInfoForm() {
 
   useEffect(() => {
     if (isUpdate && memberData) {
-      setFormData({ ...memberData, mbrPassword: "" }); // 수정 시 비밀번호는 초기화
+      setFormData({ ...memberData, mbrPassword: "" }); 
     }
   }, [isUpdate, memberData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // 🚀 카카오(Daum) 우편번호 API 연동 함수
+  const handleAddressSearch = () => {
+    // index.html에 스크립트가 로드되지 않았을 경우를 대비한 방어 로직
+    if (!window.daum) { 
+      alert('주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.'); 
+      return; 
+    }
+    
+    new window.daum.Postcode({
+      oncomplete: (data) => {
+        // 🚀 검색 완료 시 formData의 우편번호와 기본 주소를 업데이트
+        setFormData((prev) => ({
+          ...prev,
+          mbrZip: data.zonecode,
+          mbrAddr: data.roadAddress || data.jibunAddress,
+          mbrDaddr: '', // 주소가 바뀌면 상세 주소는 초기화
+        }));
+      },
+    }).open();
   };
 
   const handleSubmit = async (e) => {
@@ -49,7 +69,8 @@ export default function AdminMemberInfoForm() {
       navigate("/admin/members");
     } catch (error) {
       console.error("저장 실패:", error);
-      alert("처리 중 오류가 발생했습니다.");
+      // 🚀 백엔드에서 내려주는 에러 메시지가 있다면 표출
+      alert(error.response?.data?.message || "처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -86,7 +107,7 @@ export default function AdminMemberInfoForm() {
                   />
                 </div>
 
-                {/* 비밀번호 - 수정 시에는 입력 시에만 변경되도록 처리 권장 */}
+                {/* 비밀번호 */}
                 <div>
                   <label className="mb-3 block text-sm font-medium text-gray-800 dark:text-white">
                     비밀번호 {!isUpdate && <span className="text-red-500">*</span>}
@@ -103,7 +124,6 @@ export default function AdminMemberInfoForm() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  {/* 이름 */}
                   <div>
                     <label className="mb-3 block text-sm font-medium text-gray-800 dark:text-white">이름</label>
                     <input
@@ -114,7 +134,6 @@ export default function AdminMemberInfoForm() {
                       className="w-full rounded-lg border-[1.5px] border-gray-200 bg-transparent px-5 py-3 outline-none focus:border-blue-600 dark:border-gray-700 dark:bg-white/[0.05]"
                     />
                   </div>
-                  {/* 닉네임 */}
                   <div>
                     <label className="mb-3 block text-sm font-medium text-gray-800 dark:text-white">닉네임</label>
                     <input
@@ -127,7 +146,6 @@ export default function AdminMemberInfoForm() {
                   </div>
                 </div>
 
-                {/* 연락처 */}
                 <div>
                   <label className="mb-3 block text-sm font-medium text-gray-800 dark:text-white">연락처</label>
                   <input
@@ -148,26 +166,33 @@ export default function AdminMemberInfoForm() {
                       type="text"
                       name="mbrZip"
                       value={formData.mbrZip}
-                      onChange={handleChange}
+                      readOnly // 🚀 사용자가 직접 수정 못하도록 readOnly 적용
                       placeholder="우편번호"
-                      className="w-32 rounded-lg border-[1.5px] border-gray-200 bg-transparent px-5 py-3 outline-none focus:border-blue-600 dark:border-gray-700 dark:bg-white/[0.05]"
+                      className="w-32 rounded-lg border-[1.5px] border-gray-200 bg-gray-50 px-5 py-3 outline-none focus:border-blue-600 dark:border-gray-700 dark:bg-white/[0.05] cursor-not-allowed"
                     />
-                    <button type="button" className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-300 dark:bg-white/10 dark:hover:bg-white/20">주소 검색</button>
+                    {/* 🚀 검색 버튼에 onClick 이벤트 연결 */}
+                    <button 
+                      type="button" 
+                      onClick={handleAddressSearch}
+                      className="rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-300 transition-colors"
+                    >
+                      주소 검색
+                    </button>
                   </div>
                   <input
                     type="text"
                     name="mbrAddr"
                     value={formData.mbrAddr}
-                    onChange={handleChange}
+                    readOnly // 🚀 도로명/지번 주소도 API 결과로만 세팅
                     placeholder="기본 주소"
-                    className="w-full rounded-lg border-[1.5px] border-gray-200 bg-transparent px-5 py-3 outline-none focus:border-blue-600 dark:border-gray-700 dark:bg-white/[0.05]"
+                    className="w-full rounded-lg border-[1.5px] border-gray-200 bg-gray-50 px-5 py-3 outline-none focus:border-blue-600 dark:border-gray-700 dark:bg-white/[0.05] cursor-not-allowed"
                   />
                   <input
                     type="text"
                     name="mbrDaddr"
                     value={formData.mbrDaddr}
                     onChange={handleChange}
-                    placeholder="상세 주소"
+                    placeholder="상세 주소 (직접 입력)"
                     className="w-full rounded-lg border-[1.5px] border-gray-200 bg-transparent px-5 py-3 outline-none focus:border-blue-600 dark:border-gray-700 dark:bg-white/[0.05]"
                   />
                 </div>
@@ -200,7 +225,6 @@ export default function AdminMemberInfoForm() {
                   </div>
                 </div>
 
-                {/* 버튼 영역 */}
                 <div className="flex justify-end gap-4 pt-6">
                   <button
                     type="button"
