@@ -62,7 +62,7 @@ export const getFoodDataByRegion = async (regionName) => {
   } catch (err) {
     console.error('먹거리 목록 조회 실패:', err);
     return [];
-  }
+  }       
 };
 
 export const getFoodDataById = async (id) => {
