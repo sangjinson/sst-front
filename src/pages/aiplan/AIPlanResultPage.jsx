@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import {
   AIResultBreadcrumb,
@@ -17,10 +17,9 @@ import api from '@api/axios';
 
 const AIPlanResultPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const aisNo = location.state?.aisNo;
 
-  // ────────────────────────────────────────────
-  // Context에서 값 가져오기
-  // ────────────────────────────────────────────
   const {
     selectedRegion,
     selectedPeriod,
@@ -41,35 +40,82 @@ const AIPlanResultPage = () => {
   const [selectedItem, setSelectedItem]       = useState(null);
   const [scheduleLoading, setScheduleLoading] = useState(false);
 
+  const [savedRegion, setSavedRegion]         = useState(null);
+  const [savedThemes, setSavedThemes]         = useState([]);
+  const [savedStartDate, setSavedStartDate]   = useState(null);
+  const [savedEndDate, setSavedEndDate]       = useState(null);
+  const [savedTotalDays, setSavedTotalDays]   = useState(null);
+
   const dragOverIndex = useRef(null);
 
-  // ────────────────────────────────────────────
-  // 다시 선택하기
-  // ────────────────────────────────────────────
+  const currentRegion    = savedRegion    || selectedRegion;
+  const currentThemes    = savedThemes.length > 0 ? savedThemes : selectedThemes;
+  const currentStartDate = savedStartDate || startDate;
+  const currentEndDate   = savedEndDate   || endDate;
+  const currentTotalDays = savedTotalDays || selectedDays;
+
   const handleRestart = () => {
     sessionStorage.removeItem('currentSchedule');
+    sessionStorage.removeItem('scheduleMetaData');
     resetPlan();
     navigate('/plan');
   };
 
-  // ────────────────────────────────────────────
-  // schedule 변경될 때마다 sessionStorage에 저장
-  // ────────────────────────────────────────────
   useEffect(() => {
     if (schedule.length > 0) {
       sessionStorage.setItem('currentSchedule', JSON.stringify(schedule));
     }
   }, [schedule]);
 
-  // ────────────────────────────────────────────
-  // FastAPI 호출로 일정 생성
-  // ────────────────────────────────────────────
   useEffect(() => {
-
-    // sessionStorage에 저장된 일정 있으면 복원 (새로고침 or 상세페이지 갔다 돌아온 경우)
     const saved = sessionStorage.getItem('currentSchedule');
+
+    // aisNo 있고 sessionStorage 없을 때만 DB에서 불러오기
+    if (aisNo && !saved) {
+      const fetchSavedSchedule = async () => {
+        setScheduleLoading(true);
+        try {
+          const res = await api.get('/ai/schedule/detail', { params: { aisNo } });
+          const data = res.data;
+          setSchedule(data.schedule ?? []);
+          setSavedRegion(data.rgnName);
+          setSavedThemes(data.themes ?? []);
+          setSavedStartDate(data.aisBeginDate);
+          setSavedEndDate(data.aisEndDate);
+          setSavedTotalDays(data.aisTotDays);
+          // sessionStorage에 저장
+          sessionStorage.setItem('currentSchedule', JSON.stringify(data.schedule ?? []));
+          sessionStorage.setItem('scheduleMetaData', JSON.stringify({
+            rgnName     : data.rgnName,
+            themes      : data.themes,
+            aisBeginDate: data.aisBeginDate,
+            aisEndDate  : data.aisEndDate,
+            aisTotDays  : data.aisTotDays,
+          }));
+        } catch (err) {
+          console.error('일정 불러오기 실패:', err);
+          setSchedule([]);
+        } finally {
+          setScheduleLoading(false);
+        }
+      };
+      fetchSavedSchedule();
+      return;
+    }
+
+    // sessionStorage에 데이터 있으면 복원
     if (saved) {
       setSchedule(JSON.parse(saved));
+      // 메타 정보도 복원
+      const meta = sessionStorage.getItem('scheduleMetaData');
+      if (meta) {
+        const m = JSON.parse(meta);
+        setSavedRegion(m.rgnName);
+        setSavedThemes(m.themes ?? []);
+        setSavedStartDate(m.aisBeginDate);
+        setSavedEndDate(m.aisEndDate);
+        setSavedTotalDays(m.aisTotDays);
+      }
       return;
     }
 
@@ -111,22 +157,18 @@ const AIPlanResultPage = () => {
     fetchSchedule();
   }, []);
 
-  // sessionStorage에 region도 저장
   useEffect(() => {
     if (selectedRegion) {
       sessionStorage.setItem('selectedRegion', selectedRegion);
     }
   }, [selectedRegion]);
 
-  // ────────────────────────────────────────────
-  // 장소 검색
-  // ────────────────────────────────────────────
   useEffect(() => {
     if (!showSearch) return;
 
     const fetchSearch = async () => {
       try {
-        const results = await getSearchResults(selectedRegion, searchKeyword, searchCategory);
+        const results = await getSearchResults(currentRegion, searchKeyword, searchCategory);
         setSearchResults(results);
       } catch (err) {
         console.error('장소 검색 실패:', err);
@@ -135,7 +177,7 @@ const AIPlanResultPage = () => {
     };
 
     fetchSearch();
-  }, [showSearch, searchKeyword, searchCategory, selectedRegion]);
+  }, [showSearch, searchKeyword, searchCategory, currentRegion]);
 
   const handleDelete = (idx) => {
     setSchedule(prev => {
@@ -162,12 +204,12 @@ const AIPlanResultPage = () => {
 
   const handleSave = async () => {
     const { value: tripName, isConfirmed } = await Swal.fire({
-      title: '여행 이름을 지어주세요',
+      title: aisNo ? '일정 이름을 수정하세요' : '여행 이름을 지어주세요',
       input: 'text',
       inputPlaceholder: '예) 수원 가족 여행',
       inputAttributes: { maxlength: 14 },
       showCancelButton: true,
-      confirmButtonText: '저장',
+      confirmButtonText: aisNo ? '수정' : '저장',
       cancelButtonText: '취소',
       confirmButtonColor: '#0F9B73',
       cancelButtonColor: '#9ca3af',
@@ -179,22 +221,29 @@ const AIPlanResultPage = () => {
 
     if (isConfirmed && tripName) {
       try {
-        await api.post('/ai/schedule/save', {
+        const requestBody = {
           scheduleName: tripName.trim(),
-          startDate,
-          endDate,
-          totalDays: selectedDays,
-          rgnName: selectedRegion,
-          themes: selectedThemes,
+          startDate   : currentStartDate ?? '',
+          endDate     : currentEndDate   ?? '',
+          totalDays   : currentTotalDays ?? schedule.length,
+          rgnName     : currentRegion    ?? '',
+          themes      : currentThemes    ?? [],
           schedule,
-        });
+        };
+
+        if (aisNo) {
+          await api.put('/ai/schedule/update', requestBody, { params: { aisNo } });
+        } else {
+          await api.post('/ai/schedule/save', requestBody);
+        }
 
         sessionStorage.removeItem('currentSchedule');
+        sessionStorage.removeItem('scheduleMetaData');
 
         await Swal.fire({
-          icon: 'success',
-          title: '저장되었습니다!',
-          text: `"${tripName}" 일정이 마이페이지에 저장되었어요.`,
+          icon : 'success',
+          title: aisNo ? '수정되었습니다!' : '저장되었습니다!',
+          text : `"${tripName}" 일정이 마이페이지에 저장되었어요.`,
           timer: 1500,
           showConfirmButton: false,
         });
@@ -208,22 +257,38 @@ const AIPlanResultPage = () => {
     }
   };
 
+  const TYPE_TO_CAT = {
+    'see'  : 'PLC001',
+    'play' : 'PLC002',
+    'food' : 'PLC003',
+    'sleep': 'PLC004',
+  };
+
   const handleAddPlace = (item) => {
+    const rawId = String(item.id || '');
+    const placeId = rawId.includes('-')
+      ? Number(rawId.split('-')[1])
+      : Number(rawId);
+
     const newItem = {
-      placeId : item.id,
+      placeId  : placeId,
       placeName: item.name,
-      category: item.type,
-      overview: item.description || '',
+      category : TYPE_TO_CAT[item.type] ?? item.type,
+      overview : item.description || item.desc || '',
+      imgUrl   : item.image || '',
+      lat      : item.lat ? String(item.lat) : null,
+      lng      : item.lng ? String(item.lng) : null,
     };
     setSchedule(prev => {
       const next = prev.map(day => ({ ...day, plans: [...day.plans] }));
       next[activeDay].plans.push(newItem);
+      sessionStorage.setItem('currentSchedule', JSON.stringify(next));
       return next;
     });
     Swal.fire({ icon: 'success', title: '추가되었습니다', timer: 1000, showConfirmButton: false });
   };
 
-  const handleGoDetail  = (item) => navigate(getDetailPath(item, selectedRegion));
+  const handleGoDetail  = (item) => navigate(getDetailPath(item, currentRegion));
   const handleDayChange = (i) => { setActiveDay(i); setSelectedItem(null); };
   const currentDayItems = schedule[activeDay]?.plans || [];
 
@@ -231,22 +296,18 @@ const AIPlanResultPage = () => {
     <div className="min-h-screen bg-[#f7f8fa]">
       <div className="container mx-auto py-6 px-4 max-w-[1200px]">
 
-        {/* 브레드크럼 */}
         <AIResultBreadcrumb />
 
-        {/* 상단 헤더 */}
         <AIResultHeader onSave={handleSave} onRestart={handleRestart} />
 
-        {/* 선택 조건 태그 */}
         <AIResultTags
-          selectedRegion={selectedRegion}
+          selectedRegion={currentRegion}
           selectedPeriod={selectedPeriod}
-          startDate={startDate}
-          endDate={endDate}
-          selectedThemes={selectedThemes}
+          startDate={currentStartDate}
+          endDate={currentEndDate}
+          selectedThemes={currentThemes}
         />
 
-        {/* 일정 로딩 중 표시 */}
         {scheduleLoading ? (
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center text-gray-400">
             <div className="text-4xl mb-3">🗺</div>
@@ -256,7 +317,6 @@ const AIPlanResultPage = () => {
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             <div className="flex flex-col md:flex-row">
 
-              {/* 좌측: 일정 목록 */}
               <AIResultScheduleList
                 schedule={schedule}
                 activeDay={activeDay}
@@ -275,9 +335,8 @@ const AIPlanResultPage = () => {
                 selectedItem={selectedItem}
               />
 
-              {/* 우측: 지도 */}
               <AIResultMapView
-                selectedRegion={selectedRegion}
+                selectedRegion={currentRegion}
                 schedule={schedule}
                 activeDay={activeDay}
                 selectedItem={selectedItem}
@@ -286,7 +345,6 @@ const AIPlanResultPage = () => {
 
             </div>
 
-            {/* 장소 검색 패널 */}
             {showSearch && (
               <AIResultSearchPanel
                 searchKeyword={searchKeyword}

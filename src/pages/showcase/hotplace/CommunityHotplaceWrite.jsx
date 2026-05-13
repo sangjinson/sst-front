@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TextInput from "@modules/form/TextInput";
-import { gyeonggiRegions } from "./communityHotplaceData";
-import RegionSelect from "@components/modules/community/hotplace/RegionSelect";
+import RegionSelect from "@components/modules/community/write/RegionSelect";
+import CategorySelect from "@components/modules/community/write/CategorySelect";
+import PlaceAutocomplete from "@components/modules/community/write/PlaceAutocomplete";
 import TagInput from "@components/modules/community/write/TagInput";
 import ImageUpload from "@components/modules/community/write/ImageUpload";
 import api from "@api/axios";
@@ -23,54 +24,113 @@ const CommunityHotplaceWrite = () => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
-  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState(null);
   const [isRegionOpen, setIsRegionOpen] = useState(false);
+  const [regions, setRegions] = useState([]);
+
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+
   const [placeName, setPlaceName] = useState("");
+  const [places, setPlaces] = useState([]);
+  const [selectedPlace, setSelectedPlace] = useState(null);
 
-  useEffect(() => { window.scrollTo({ top: 0 }); }, []);
-
+  // 1. 페이지 처음 열릴 때: 지역, 카테고리, 수정 데이터 조회
   useEffect(() => {
-    if (!isEditMode) return;
+    window.scrollTo({ top: 0 });
 
-    const fetchPost = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get(`/community/${id}`);
-        const post = res.data;
 
-        const imageUrl = post.commMainImgUrl
-          ? post.commMainImgUrl.startsWith("http")
-            ? post.commMainImgUrl
-            : `http://localhost:8080${post.commMainImgUrl}`
-          : "";
+        // 지역 목록 조회
+        const regionRes = await api.get("/regions");
+        setRegions(regionRes.data);
 
-        const imageUrls = post.images?.length
-          ? post.images.map((img) =>
-              img.startsWith("http")
-                ? img
-                : `http://localhost:8080${img}`
-            )
-          : imageUrl
-            ? [imageUrl]
-            : [];
+        // 카테고리 목록 조회
+        const categoryRes = await api.get("/place-categories");
+        setCategories(categoryRes.data);
 
-        setTitle(post.commTitle || "");
-        setContent(post.commContent || "");
-        setImagePreviews(imageUrls);
+        // 수정 모드 게시글 조회
+        if (isEditMode) {
+          const res = await api.get(`/community/${id}`);
+          const post = res.data;
 
-        // 아직 DB에 지역/장소/해시태그 컬럼이 없어서 임시 기본값
-        setPlaceName("");
-        setSelectedRegion("");
-        setTags(post.hashtagText ? post.hashtagText.split(",") : []);
+          const imageUrl = post.commMainImgUrl
+            ? post.commMainImgUrl.startsWith("http")
+              ? post.commMainImgUrl
+              : `http://localhost:8080${post.commMainImgUrl}`
+            : "";
+
+          const imageUrls = post.images?.length
+            ? post.images.map((img) =>
+                img.startsWith("http")
+                  ? img
+                  : `http://localhost:8080${img}`
+              )
+            : imageUrl
+              ? [imageUrl]
+              : [];
+
+          setTitle(post.commTitle || "");
+          setContent(post.commContent || "");
+          setImagePreviews(imageUrls);
+
+          setSelectedRegion({
+            rgnCd: post.rgnCd,
+            rgnName: post.rgnName,
+          });
+
+          setSelectedCategory({
+            cmmCd: post.plcCatCd,
+            cmmCdName: post.plcCatName,
+          });
+
+          setSelectedPlace({
+            plcNo: post.commPlcNo,
+            plcName: post.plcName,
+          });
+
+          setPlaceName(post.plcName || "");
+
+          setTags(post.hashtagText ? post.hashtagText.split(",") : []);
+        }
+
       } catch (error) {
-        console.error("수정 게시글 조회 실패:", error);
-        setNotFound(true);
+        console.error("데이터 조회 실패:", error);
+
+        if (isEditMode) {
+          setNotFound(true);
+        }
       } finally {
         setLoading(false);
       }
     };
-
-    fetchPost();
+    fetchData();
   }, [isEditMode, id]);
+
+  // 2. 지역/카테고리가 바뀔 때마다 장소 목록 조회
+  useEffect(() => {
+    if (!selectedRegion || !selectedCategory) {
+      setPlaces([]);
+      return;
+    }
+
+    api
+      .get("/places", {
+        params: {
+          rgnCd: selectedRegion.rgnCd,
+          catCd: selectedCategory.cmmCd,
+        },
+      })
+      .then((res) => {
+        setPlaces(res.data);
+      })
+      .catch((err) => {
+        console.error("장소 목록 조회 실패:", err);
+      });
+
+  }, [selectedRegion, selectedCategory]);
 
   if (loading) {
     return <div className="py-20 text-center font-bold text-gray-500">게시글을 불러오는 중입니다.</div>;
@@ -147,7 +207,7 @@ const CommunityHotplaceWrite = () => {
       ? [...tags, trimmedTag]
       : tags;
 
-    if (!selectedRegion || selectedRegion.trim() === "") {
+    if (!selectedRegion) {
       alert("지역을 선택해주세요.");
       return;
     }
@@ -158,6 +218,7 @@ const CommunityHotplaceWrite = () => {
 
     if (isEditMode) {
       const payload = {
+        commPlcNo: selectedPlace?.plcNo,
         commTitle: title,
         commContent: content,
         commMainImgUrl: imagePreviews[0]
@@ -202,6 +263,7 @@ const CommunityHotplaceWrite = () => {
       const payload = {
         commMbrId: user.mbrId,
         commCatCd: "CMM002",
+        commPlcNo: selectedPlace?.plcNo,
         commTitle: title,
         commContent: content,
         commMainImgUrl: imagePreviews[0]
@@ -251,21 +313,28 @@ const CommunityHotplaceWrite = () => {
           setSelectedRegion={setSelectedRegion}
           isRegionOpen={isRegionOpen}
           setIsRegionOpen={setIsRegionOpen}
-          regions={gyeonggiRegions}
+          regions={regions}
         />
-
-        <div>
-          <label htmlFor="placeName" className="block fs-down-2 font-bold text-gray-700 mb-3">구체적인 장소</label>
-          <TextInput
-            id="placeName"
-            value={placeName}
-            onChange={(e) => setPlaceName(e.target.value)}
-            placeholder="예: 화성행궁, 두물머리"
-            required
-            size="lg"
-          />
-        </div>
+        {/* 장소 카테고리 */}
+        <CategorySelect
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          isCategoryOpen={isCategoryOpen}
+          setIsCategoryOpen={setIsCategoryOpen}
+          categories={categories}
+        />
       </div>
+
+      {/* 구체적인 장소 */}
+      <PlaceAutocomplete
+        placeName={placeName}
+        setPlaceName={setPlaceName}
+        places={places}
+        selectedPlace={selectedPlace}
+        setSelectedPlace={setSelectedPlace}
+        selectedRegion={selectedRegion}
+        selectedCategory={selectedCategory}
+      />
 
       {/* 제목 */}
       <div>
@@ -274,7 +343,7 @@ const CommunityHotplaceWrite = () => {
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="제목을 입력해주세요"
+          placeholder="예: 화성행궁, 두물머리"
           required
           inputClassName="fs-down-1"
         />
