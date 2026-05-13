@@ -23,7 +23,9 @@ const AdminLayout = () => {
     {
       key: 'member',
       label: '회원 관리',
-      children: [{ label: '회원 목록', path: '/admin/members' }], 
+      children: [{ label: '회원 목록', path: '/admin/members' },
+          { label: '관리자 계정 관리', path: '/admin/managers' }
+      ], 
     },
     {
       key: 'area',
@@ -43,6 +45,14 @@ const AdminLayout = () => {
         { label: '인생거리 관리', path: '/admin/showcase/life' },    
       ],
     },
+    {
+    key: 'contents', // 새로 추가
+    label: '반응 관리',
+    children: [
+      { label: '리뷰 관리', path: '/admin/reviews' },
+      { label: '댓글 관리', path: '/admin/comments' },
+    ],
+  },
     {
       key: 'report',
       label: '신고 관리',

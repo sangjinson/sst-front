@@ -108,7 +108,6 @@ const MyPage = () => {
           {!loading && profile && (
             <Sidebar profile={profile} profileImg={profileImg} />
           )}
-          <Sidebar profile={profile} profileImg={profileImg} />
 
           {/* 메인 컨텐츠 */}
           <section className="flex-1 min-w-0 flex flex-col gap-4 w-full">
