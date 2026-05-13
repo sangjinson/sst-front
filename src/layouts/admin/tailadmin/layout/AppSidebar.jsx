@@ -31,6 +31,11 @@ const navItems = [
     path: "/admin/members",
   },
   {
+    icon: <UserCircleIcon />,
+    name: "관리자 관리",
+    path: "/admin/managers",
+  },
+  {
     icon: <BoxCubeIcon />,
     name: "사거리 관리",
     subItems: [
@@ -46,6 +51,14 @@ const navItems = [
     subItems: [
       { name: "핫플거리 관리", path: "/admin/showcase/hotplace" },
       { name: "인생거리 관리", path: "/admin/showcase/life" },
+    ],
+  },
+  {
+    icon: <PageIcon />,
+    name: "댓글 관리",
+    subItems: [
+      { name: "리뷰 관리", path: "/admin/reviews" },
+      { name: "댓글 관리", path: "/admin/comments" },
     ],
   },
   {

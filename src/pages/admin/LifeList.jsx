@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '@api/axios';
 
-// 🚀 공통 훅 및 UI 컴포넌트 임포트
 import { usePagination } from '@hooks/usePagination';
 import AdminPagination from '@components/common/AdminPagination';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@themeadmin/components/ui/table';
@@ -10,24 +9,24 @@ import { TrashBinIcon } from '@themeadmin/icons';
 
 export default function LifeList() {
   const navigate = useNavigate();
-  
-  // 🚀 인생거리 고정 카테고리 코드 (CMM_CODE 테이블 참조)
   const LIFE_CAT_CD = "CMM001"; 
 
   const [posts, setPosts] = useState([]);
   const [selected, setSelected] = useState([]);
   const [allChecked, setAllChecked] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
+  
+  // 🚀 1. 운영/휴지통 상태 관리
+  const [useYn, setUseYn] = useState('Y');
 
-  // 🚀 페이징 커스텀 훅 사용
   const { page, size, totalCount, totalPages, setPage, setTotalCount } = usePagination(1, 10);
 
-  // 🚀 데이터 불러오기 함수
   const fetchPosts = async () => {
     try {
       const response = await api.get('/admin/community/list', {
         params: {
           catCd: LIFE_CAT_CD,
+          useYn, // 🚀 2. 백엔드로 상태값 전달
           page,
           size,
           keyword: searchKeyword,
@@ -40,12 +39,13 @@ export default function LifeList() {
     }
   };
 
+  // 🚀 3. useYn 추가
   useEffect(() => {
     fetchPosts();
     setAllChecked(false);
     setSelected([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [page, useYn]);
 
   const handleSearch = () => {
     if (page === 1) fetchPosts();
@@ -68,35 +68,44 @@ export default function LifeList() {
     setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
   };
 
-  // 🚀 단일 게시글 삭제
-  const handleDelete = async (commNo) => {
-    if (!window.confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
+  // 🚀 4. 삭제/복구 토글 로직
+  const handleToggleStatus = async (commNo) => {
+    const isDeleting = useYn === 'Y';
+    const newStatus = isDeleting ? 'N' : 'Y';
+    const actionText = isDeleting ? '휴지통으로 이동' : '복구';
+
+    if (!window.confirm(`정말 이 게시글을 ${actionText} 하시겠습니까?`)) return;
     try {
-      await api.delete(`/admin/community/${commNo}`);
-      alert("삭제가 완료되었습니다.");
+      await api.patch(`/admin/community/${commNo}/status`, null, { params: { useYn: newStatus } });
+      alert(`${actionText}가 완료되었습니다.`);
       
       if (posts.length === 1 && page > 1) setPage(page - 1); 
       else fetchPosts(); 
     } catch (error) {
-      alert("삭제 중 오류가 발생했습니다.");
+      alert("처리 중 오류가 발생했습니다.");
     }
   };
 
-  // 🚀 다중 게시글 삭제 (선택 삭제)
-  const handleBulkDelete = async () => {
-    if (selected.length === 0) { alert('삭제할 게시글을 선택해주세요.'); return; }
-    if (!window.confirm(`선택한 ${selected.length}개의 게시글을 삭제하시겠습니까?`)) return;
+  // 🚀 5. 다중 선택 토글 로직
+  const handleBulkToggle = async () => {
+    if (selected.length === 0) { alert('게시글을 선택해주세요.'); return; }
+    
+    const isDeleting = useYn === 'Y';
+    const newStatus = isDeleting ? 'N' : 'Y';
+    const actionText = isDeleting ? '삭제' : '복구';
+
+    if (!window.confirm(`선택한 ${selected.length}개의 게시글을 ${actionText} 하시겠습니까?`)) return;
     
     try {
-      await Promise.all(selected.map((commNo) => api.delete(`/admin/community/${commNo}`)));
-      alert("선택한 게시글이 삭제되었습니다.");
+      await Promise.all(selected.map((commNo) => api.patch(`/admin/community/${commNo}/status`, null, { params: { useYn: newStatus } })));
+      alert(`선택한 게시글이 처리되었습니다.`);
       setSelected([]);
       setAllChecked(false);
       
       if (posts.length === selected.length && page > 1) setPage(page - 1);
       else fetchPosts();
     } catch (error) {
-      alert("다중 삭제 중 일부 오류가 발생했습니다.");
+      alert("다중 처리 중 일부 오류가 발생했습니다.");
       fetchPosts(); 
     }
   };
@@ -114,9 +123,9 @@ export default function LifeList() {
         </div>
         <div className="flex gap-2">
           {selected.length > 0 && (
-            <button onClick={handleBulkDelete}
-              className="px-4 py-2 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition shadow-sm">
-              선택 삭제 ({selected.length})
+            <button onClick={handleBulkToggle}
+              className={`px-4 py-2 text-white text-sm rounded-lg transition shadow-sm ${useYn === 'Y' ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-500 hover:bg-emerald-600'}`}>
+              선택 {useYn === 'Y' ? '삭제' : '복구'} ({selected.length})
             </button>
           )}
           <button onClick={() => navigate('/showcase/life')}
@@ -124,6 +133,26 @@ export default function LifeList() {
             사용자 화면 바로가기
           </button>
         </div>
+      </div>
+
+      {/* 🚀 6. 탭 UI */}
+      <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
+        <button
+          onClick={() => { setUseYn('Y'); setPage(1); }}
+          className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+            useYn === 'Y' ? 'bg-gray-900 text-white shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+          }`}
+        >
+          운영 중 목록
+        </button>
+        <button
+          onClick={() => { setUseYn('N'); setPage(1); }}
+          className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+            useYn === 'N' ? 'bg-red-50 text-red-600 border border-red-200 shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+          }`}
+        >
+          🗑️ 휴지통
+        </button>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 p-4 bg-white border border-gray-200 rounded-xl dark:bg-white/[0.03] dark:border-white/[0.05]">
@@ -164,11 +193,11 @@ export default function LifeList() {
               {posts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} className="px-5 py-10 text-center text-gray-500">
-                    등록된 인생거리 게시글이 없습니다.
+                    {useYn === 'Y' ? '등록된 인생거리 게시글이 없습니다.' : '휴지통이 비어있습니다.'}
                   </TableCell>
                 </TableRow>
               ) : (
-                posts.map((post, idx) => (
+                posts.map((post) => (
                   <TableRow key={post.commNo} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
                     <TableCell className="px-5 py-4 text-center">
                       <input type="checkbox" checked={selected.includes(post.commNo)} onChange={() => toggleOne(post.commNo)} className="rounded border-gray-300"/>
@@ -189,12 +218,22 @@ export default function LifeList() {
                     <TableCell className="px-5 py-4 text-center text-gray-500 whitespace-nowrap">{post.commRegDate}</TableCell>
                     <TableCell className="px-5 py-4">
                       <div className="flex gap-2 justify-center">
-                        <button
-                          onClick={() => handleDelete(post.commNo)}
-                          className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition" title="삭제"
-                        >
-                          <TrashBinIcon className="w-5 h-5" />
-                        </button>
+                        {/* 🚀 7. 조건부 렌더링 */}
+                        {useYn === 'Y' ? (
+                          <button
+                            onClick={() => handleToggleStatus(post.commNo)}
+                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition" title="휴지통 이동"
+                          >
+                            <TrashBinIcon className="w-5 h-5" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleToggleStatus(post.commNo)}
+                            className="px-3 py-1.5 text-sm font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:hover:bg-emerald-900/20 rounded-lg transition" title="복구하기"
+                          >
+                            복구
+                          </button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
