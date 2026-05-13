@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
 import { getAllPosts } from "./communityHotplaceData";
+import AreaPagination from "@components/modules/area/arealist/AreaPagination";
 import api from "@api/axios";
 
 const CommunityHotplace = () => {
@@ -21,7 +22,7 @@ const CommunityHotplace = () => {
         title: item.commTitle,
         description: item.commContent,
         author: item.mbrNickname,
-        place: "핫플거리",
+        place: item.plcName || "장소 미등록",
         hashtags: [],
         img: getImageUrl(item.commMainImgUrl),
         regDt: item.commRegDate,
@@ -44,6 +45,8 @@ const CommunityHotplace = () => {
   const [keyword, setKeyword] = useState("");
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 15;
 
   const [posts, setPosts] = useState([]);
 
@@ -52,6 +55,7 @@ const CommunityHotplace = () => {
   
 
   const filteredPosts = useMemo(() => {
+
     const trimmedKeyword = keyword.trim().toLowerCase();
 
     let result = posts.filter((post) => {
@@ -82,6 +86,12 @@ const CommunityHotplace = () => {
 
     return result;
   }, [posts, keyword, searchType, sortType]);
+
+  const totalPages = Math.ceil(filteredPosts.length / ITEMS_PER_PAGE);
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   const toggleLike = (postId) => {
     setLikedPosts((prev) => ({ ...prev, [postId]: !prev[postId] }));
@@ -114,7 +124,7 @@ const CommunityHotplace = () => {
   );
 
   return (
-    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
+    <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
       <Breadcrumb paths={[{ label: "홈", to: "/" }, { label: "핫플거리", to: "/showcase" }]} className="mb-4" />
 
       <section className="mt-8 mb-8 flex flex-col gap-6 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
@@ -186,13 +196,13 @@ const CommunityHotplace = () => {
       </section>
 
       {filteredPosts.length > 0 ? (
-        <div className="columns-1 md:columns-2 xl:columns-3 gap-5 md:gap-6">
-          {filteredPosts.map((post) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
+          {paginatedPosts.map((post) => {
             const liked = !!likedPosts[post.id];
             const likeCount = post.wishCnt + (liked ? 1 : 0);
             return (
               <article key={post.id}
-                className="mb-5 md:mb-6 break-inside-avoid overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
+                className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
                 <button type="button" onClick={() => navigate(`/showcase/hotplace/view/${post.id}`)} className="block w-full cursor-pointer text-left">
                   <div className={`relative w-full overflow-hidden bg-gray-100 ${getImageRatio(post.size)}`}>
                     <img src={post.img} alt={post.title}
@@ -242,6 +252,13 @@ const CommunityHotplace = () => {
         <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
           검색 결과가 없습니다.
         </div>
+      )}
+      {totalPages > 1 && (
+        <AreaPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       )}
     </div>
   );

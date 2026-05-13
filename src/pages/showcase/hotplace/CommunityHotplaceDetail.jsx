@@ -252,7 +252,7 @@ const CommunityHotplaceDetail = () => {
   };
 
   return (
-    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 font-sans">
       <Breadcrumb
         paths={[
           { label: "홈", to: "/" },

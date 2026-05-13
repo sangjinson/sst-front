@@ -1,70 +1,77 @@
 import React from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from "@themeadmin/icons";
 
-const AdminPagination = ({ page, size, totalCount, totalPages, onPageChange }) => {
-  // 'Showing X to Y' 계산 로직
-  const startItem = totalCount === 0 ? 0 : ((page - 1) * size) + 1;
-  const endItem = Math.min(page * size, totalCount);
+const Pagination = ({ page, totalPages, onPageChange }) => {
+  if (totalPages <= 1) return null; // 1페이지 이하면 숨김 처리
 
-  // 🚀 1. 화면에 한 번에 보여줄 페이지 버튼의 개수 (예: 5개 단위로 끊어서 보여줌)
-  const PAGE_BTN_LIMIT = 5;
+  // 🚀 1. 한 번에 화면에 보여줄 최대 페이지 버튼 개수 (홀수 권장)
+  const MAX_VISIBLE = 5;
 
-  // 🚀 2. 현재 페이지가 속한 블록 계산
-  // 예: page가 3이면 1블록(1~5), page가 7이면 2블록(6~10)
-  const currentBlock = Math.ceil(page / PAGE_BTN_LIMIT);
+  // 🚀 2. 현재 페이지가 항상 중앙에 오도록 계산
+  let startPage = Math.max(1, page - Math.floor(MAX_VISIBLE / 2));
+  let endPage = startPage + MAX_VISIBLE - 1;
 
-  // 🚀 3. 화면에 그릴 시작 페이지와 끝 페이지 번호 계산
-  const startPage = (currentBlock - 1) * PAGE_BTN_LIMIT + 1;
-  const endPage = Math.min(startPage + PAGE_BTN_LIMIT - 1, totalPages);
+  // 🚀 3. 끝 페이지가 실제 전체 페이지 수를 넘어가면 보정
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(1, endPage - MAX_VISIBLE + 1);
+  }
 
-  // 🚀 4. startPage부터 endPage까지의 배열 생성
+  // 🚀 4. 계산된 범위로 렌더링할 배열 생성
   const pageNumbers = [];
   for (let i = startPage; i <= endPage; i++) {
     pageNumbers.push(i);
   }
 
   return (
-    <div className="flex items-center justify-between border-t border-gray-100 dark:border-white/[0.05] pt-5 mt-5">
-      <p className="text-sm text-gray-500">
-        Showing {startItem} to {endItem} of {totalCount} entries
-      </p>
+    // 🚀 멘티님이 요청하신 컨테이너 스타일 적용
+    <div className="mt-4 flex items-center justify-center gap-2">
       
-      <div className="flex items-center gap-2">
-        {/* 이전 페이지로 이동 */}
-        <button 
-          disabled={page === 1}
-          onClick={() => onPageChange(page - 1)}
-          className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-        >
-          <ChevronLeftIcon className="w-5 h-5" />
-        </button>
+      {/* 🚀 이전 버튼: 요청하신 스타일 100% 반영 */}
+      <button
+        type="button"
+        disabled={page === 1}
+        onClick={() => onPageChange(page - 1)}
+        className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+          page === 1
+            ? 'cursor-not-allowed bg-gray-100 text-gray-400'
+            : 'bg-gray-900 text-white hover:bg-gray-800'
+        }`}
+      >
+        이전
+      </button>
 
-        {/* 🚀 5. 기존의 전체 totalPages 배열 대신, 계산된 블록(pageNumbers)만 렌더링 */}
-        {pageNumbers.map((num) => (
-          <button
-            key={num}
-            onClick={() => onPageChange(num)}
-            className={`w-10 h-10 rounded-lg text-sm font-medium transition ${
-              page === num 
-              ? "bg-blue-600 text-white" 
-              : "text-gray-500 hover:bg-gray-100"
-            }`}
-          >
-            {num}
-          </button>
-        ))}
-
-        {/* 다음 페이지로 이동 */}
-        <button 
-          disabled={page === totalPages || totalPages === 0}
-          onClick={() => onPageChange(page + 1)}
-          className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+      {/* 🚀 페이지 번호 버튼: 이전/다음 버튼의 디자인 톤앤매너에 맞춤 */}
+      {pageNumbers.map((p) => (
+        <button
+          key={p}
+          type="button"
+          onClick={() => onPageChange(p)}
+          className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+            p === page
+              ? 'bg-gray-900 text-white cursor-default' // 현재 페이지는 어두운 색으로 강조
+              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50' // 비활성 페이지는 테두리만 있는 밝은 색
+          }`}
         >
-          <ChevronRightIcon className="w-5 h-5" />
+          {p}
         </button>
-      </div>
+      ))}
+
+      {/* 🚀 다음 버튼: 이전 버튼과 동일한 규격으로 대칭 적용 */}
+      <button
+        type="button"
+        disabled={page === totalPages}
+        onClick={() => onPageChange(page + 1)}
+        className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+          page === totalPages
+            ? 'cursor-not-allowed bg-gray-100 text-gray-400'
+            : 'bg-gray-900 text-white hover:bg-gray-800'
+        }`}
+      >
+        다음
+      </button>
+      
     </div>
   );
 };
 
-export default AdminPagination;
+export default Pagination;
