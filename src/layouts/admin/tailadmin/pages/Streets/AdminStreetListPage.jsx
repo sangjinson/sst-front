@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom"; // 🚀 useParams 추가
+import { useNavigate, useParams } from "react-router-dom";
 import api from "@api/axios";
 
 import { usePagination } from "@hooks/usePagination";
@@ -10,18 +10,18 @@ import { PlusIcon, PencilIcon, TrashBinIcon } from "@themeadmin/icons";
 
 export default function AdminPlaceList() {
   const navigate = useNavigate();
-  
-  // 🚀 1. URL 파라미터에서 현재 카테고리 타입을 가져옵니다 (see, food, sleep, play)
   const { type } = useParams(); 
 
   const [places, setPlaces] = useState([]);
   const [selected, setSelected] = useState([]);
   const [allChecked, setAllChecked] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
+  
+  // 🚀 1. 상태 필터 기본값을 'Y'(운영 중)로 세팅. 'N'이면 휴지통!
+  const [useYnFilter, setUseYnFilter] = useState('Y');
 
   const { page, size, totalCount, totalPages, setPage, setTotalCount } = usePagination(1, 10);
 
-  // 🚀 2. 타입에 따라 화면에 보여줄 텍스트 매핑 객체
   const typeConfig = {
     see: { title: "볼거리", placeholder: "볼거리 장소명을 입력하세요" },
     food: { title: "먹거리", placeholder: "식당, 카페명을 입력하세요" },
@@ -33,12 +33,12 @@ export default function AdminPlaceList() {
 
   const fetchPlaces = async () => {
     try {
-      // 🚀 3. API 요청 URL을 동적으로 생성합니다. (/api/admin/food/list 등)
       const response = await api.get(`/admin/${type}/list`, {
         params: {
           page,
           size,
           keyword: searchKeyword,
+          useYn: useYnFilter // 🚀 2. 백엔드로 현재 탭의 상태값 전달
         }
       });
       
@@ -49,23 +49,19 @@ export default function AdminPlaceList() {
     }
   };
 
-  // 🚀 1. 카테고리(type)가 바뀔 때만! 상태를 초기화합니다.
   useEffect(() => {
-    setSearchKeyword(''); // 카테고리 이동 시 검색어 초기화
-    if (page !== 1) {
-      setPage(1); // 🚀 현재 1페이지가 아닐 때만 1로 변경하여 불필요한 렌더링을 막습니다.
-    }
+    setSearchKeyword('');
+    setUseYnFilter('Y'); // 🚀 카테고리(type)가 바뀔 때 무조건 정상 탭으로 초기화
+    if (page !== 1) setPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
-  // 🚀 2. 실제 데이터 패칭은 page나 type이 확정된 이후에만 실행합니다.
   useEffect(() => {
-    // 💡 여기서 setPage(1)을 절대 호출하면 안 됩니다!
     fetchPlaces();
     setAllChecked(false);
     setSelected([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, type]);
+  }, [page, type, useYnFilter]); // 🚀 3. useYnFilter가 바뀔 때도 데이터 갱신
 
   const handleSearch = () => {
     if (page === 1) fetchPlaces();
@@ -88,17 +84,24 @@ export default function AdminPlaceList() {
     setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
   };
 
-  const handleDelete = async (plcNo) => {
-    if (!window.confirm("정말 이 장소를 삭제하시겠습니까?")) return;
+  // 🚀 4. 물리 삭제 대신 '상태 토글(휴지통 이동 및 복구)' 로직으로 변경
+  const handleToggleStatus = async (plcNo, currentStatus) => {
+    const nextStatus = currentStatus === 'Y' ? 'N' : 'Y';
+    const actionText = currentStatus === 'Y' ? '휴지통으로 이동' : '복구';
+
+    if (!window.confirm(`정말 이 장소를 ${actionText} 하시겠습니까?`)) return;
+
     try {
-      // 🚀 5. 삭제 API도 동적으로 호출
-      await api.delete(`/admin/${type}/${plcNo}`);
-      alert("삭제 완료되었습니다.");
+      // 🚀 PATCH 메서드를 사용하여 상태값만 부분 업데이트
+      await api.patch(`/admin/${type}/${plcNo}/status`, null, {
+        params: { useYn: nextStatus }
+      });
       
+      alert(`성공적으로 ${actionText} 되었습니다.`);
       if (places.length === 1 && page > 1) setPage(page - 1); 
       else fetchPlaces(); 
     } catch (error) {
-      alert("삭제 중 오류가 발생했습니다.");
+      alert("상태 변경 중 오류가 발생했습니다.");
     }
   };
   
@@ -106,7 +109,6 @@ export default function AdminPlaceList() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          {/* 🚀 동적 텍스트 적용 */}
           <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">
             {currentConfig.title} 관리
           </h2>
@@ -119,6 +121,30 @@ export default function AdminPlaceList() {
           className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition shadow-sm"
         >
           <PlusIcon className="w-5 h-5 text-white shadow-sm" /> {currentConfig.title} 추가
+        </button>
+      </div>
+
+      {/* 🚀 5. 정상 목록 / 휴지통 탭 UI 추가 */}
+      <div className="flex gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+        <button
+          onClick={() => { setUseYnFilter('Y'); setPage(1); }}
+          className={`px-4 py-2 text-sm font-bold rounded-t-lg transition-colors ${
+            useYnFilter === 'Y' 
+              ? 'bg-blue-600 text-white' 
+              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+          }`}
+        >
+          운영 중인 장소
+        </button>
+        <button
+          onClick={() => { setUseYnFilter('N'); setPage(1); }}
+          className={`px-4 py-2 text-sm font-bold rounded-t-lg transition-colors ${
+            useYnFilter === 'N' 
+              ? 'bg-red-500 text-white' 
+              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+          }`}
+        >
+          휴지통 🗑️
         </button>
       </div>
 
@@ -148,7 +174,7 @@ export default function AdminPlaceList() {
                 <TableCell isHeader className="px-5 py-3 text-center">No</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-start">장소명</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-start">주소</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-center">평점</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-center">상태</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-center">관리</TableCell>
               </TableRow>
             </TableHeader>
@@ -157,7 +183,7 @@ export default function AdminPlaceList() {
               {places.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="px-5 py-10 text-center text-gray-500">
-                    검색 결과가 없습니다.
+                    {useYnFilter === 'N' ? "휴지통이 비어 있습니다." : "검색 결과가 없습니다."}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -172,22 +198,38 @@ export default function AdminPlaceList() {
                       <span className="block text-sm text-gray-800 dark:text-white/90 truncate max-w-[200px]" title={p.plcAddr}>{p.plcAddr}</span>
                     </TableCell>
                     <TableCell className="px-5 py-4 text-center">
-                      <Badge color="warning">★ {p.plcAvgRating ? p.plcAvgRating.toFixed(1) : "0.0"}</Badge>
+                      <Badge color={useYnFilter === 'Y' ? "success" : "error"}>
+                        {useYnFilter === 'Y' ? "운영 중" : "삭제됨"}
+                      </Badge>
                     </TableCell>
                     <TableCell className="px-5 py-4">
                       <div className="flex items-center justify-center gap-2">
-                        {/* 🚀 6. 수정 페이지 이동 라우팅도 동적으로 처리 */}
-                        <button 
-                          onClick={() => navigate(`/admin/area/${type}/${p.plcNo}`)}
-                          className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition" 
-                          title="수정"
-                        >
-                          <PencilIcon className="w-5 h-5" />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(p.plcNo)}
-                          className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition" title="삭제"
-                        ><TrashBinIcon className="w-5 h-5" /></button>
+                        {/* 🚀 6. 정상 탭에서는 [수정], [삭제] 버튼 / 휴지통 탭에서는 [복구] 버튼 렌더링 */}
+                        {useYnFilter === 'Y' ? (
+                          <>
+                            <button 
+                              onClick={() => navigate(`/admin/area/${type}/${p.plcNo}`)}
+                              className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition" 
+                              title="수정"
+                            >
+                              <PencilIcon className="w-5 h-5" />
+                            </button>
+                            <button 
+                              onClick={() => handleToggleStatus(p.plcNo, 'Y')}
+                              className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition" 
+                              title="휴지통으로 이동"
+                            >
+                              <TrashBinIcon className="w-5 h-5" />
+                            </button>
+                          </>
+                        ) : (
+                          <button 
+                            onClick={() => handleToggleStatus(p.plcNo, 'N')}
+                            className="px-3 py-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition"
+                          >
+                            복구하기
+                          </button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

@@ -8,7 +8,7 @@ export default function AdminSeeModify() {
   const { plcNo } = useParams();
   const location = useLocation();
 
-  // 🚀 2. 전체 필드를 포괄하는 초기 상태
+  // 🚀 2. 전체 필드를 포괄하는 초기 상태 (상태 변수에는 값을 남겨두어 에러 방지)
   const [formData, setFormData] = useState({
     plcName: "",
     plcAddr: "",
@@ -30,10 +30,8 @@ export default function AdminSeeModify() {
     const fetchDetail = async () => {
       try {
         if (location.state?.place) {
-          // 리스트 페이지에서 navigate state로 넘겨준 데이터 세팅
           fillFormData(location.state.place);
         } else {
-          // 새로고침이나 URL 직접 입력 시 API로 다시 가져오기
           const response = await api.get(`/admin/see/${plcNo}`);
           fillFormData(response.data.data);
         }
@@ -76,6 +74,7 @@ export default function AdminSeeModify() {
     if (!window.confirm("수정하시겠습니까?")) return;
 
     try {
+      // 🚀 백엔드 SeeUpdateRequestDto가 받는 정보만 자동으로 매핑되어 전송됩니다.
       await api.put(`/admin/see/${plcNo}`, formData);
       alert("성공적으로 수정되었습니다.");
       navigate("/admin/area/see"); // 목록으로 복귀
@@ -117,25 +116,14 @@ export default function AdminSeeModify() {
             <input type="text" name="plcTelno" value={formData.plcTelno} onChange={handleChange} className="w-full px-4 py-2 border rounded-md outline-none focus:border-blue-500" />
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">필터 코드</label>
-            <input type="text" name="plcFltCd" value={formData.plcFltCd} onChange={handleChange} placeholder="예: FLT001" className="w-full px-4 py-2 border rounded-md outline-none focus:border-blue-500" />
-          </div>
+          {/* 🚀 삭제 완료: 필터코드 입력란 제거 */}
 
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-1">홈페이지</label>
             <input type="text" name="plcHomepage" value={formData.plcHomepage} onChange={handleChange} className="w-full px-4 py-2 border rounded-md outline-none focus:border-blue-500" />
           </div>
 
-          {/* 🚀 멘티 요청: 위경도 리드온리 처리 */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">위도 (직접 수정 불가)</label>
-            <input type="text" name="plcLat" value={formData.plcLat} readOnly className="w-full px-4 py-2 border rounded-md bg-gray-200 text-gray-500 cursor-not-allowed outline-none" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">경도 (직접 수정 불가)</label>
-            <input type="text" name="plcLot" value={formData.plcLot} readOnly className="w-full px-4 py-2 border rounded-md bg-gray-200 text-gray-500 cursor-not-allowed outline-none" />
-          </div>
+          {/* 🚀 삭제 완료: 멘티 요청으로 위도, 경도 입력란 제거 */}
 
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-1">장소 개요 (설명)</label>
