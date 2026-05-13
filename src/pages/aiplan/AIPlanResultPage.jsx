@@ -14,6 +14,7 @@ import AIResultMapView from '@components/modules/airesult/AIResultMapView';
 import { useAIPlan } from '@pages/aiplan/AIPlanContext';
 import '@assets/css/common.css';
 import api from '@api/axios';
+import { CAT_LABEL_MAP } from '@components/modules/airesult/aiResultUtils';
 
 const AIPlanResultPage = () => {
   const navigate = useNavigate();
@@ -64,13 +65,15 @@ const AIPlanResultPage = () => {
   useEffect(() => {
     if (schedule.length > 0) {
       sessionStorage.setItem('currentSchedule', JSON.stringify(schedule));
+      if (schedule[activeDay]?.plans?.length > 0) {
+        setSelectedItem(schedule[activeDay].plans[0]);
+      }
     }
   }, [schedule]);
 
   useEffect(() => {
     const saved = sessionStorage.getItem('currentSchedule');
 
-    // aisNo 있고 sessionStorage 없을 때만 DB에서 불러오기
     if (aisNo && !saved) {
       const fetchSavedSchedule = async () => {
         setScheduleLoading(true);
@@ -83,7 +86,6 @@ const AIPlanResultPage = () => {
           setSavedStartDate(data.aisBeginDate);
           setSavedEndDate(data.aisEndDate);
           setSavedTotalDays(data.aisTotDays);
-          // sessionStorage에 저장
           sessionStorage.setItem('currentSchedule', JSON.stringify(data.schedule ?? []));
           sessionStorage.setItem('scheduleMetaData', JSON.stringify({
             rgnName     : data.rgnName,
@@ -103,10 +105,8 @@ const AIPlanResultPage = () => {
       return;
     }
 
-    // sessionStorage에 데이터 있으면 복원
     if (saved) {
       setSchedule(JSON.parse(saved));
-      // 메타 정보도 복원
       const meta = sessionStorage.getItem('scheduleMetaData');
       if (meta) {
         const m = JSON.parse(meta);
@@ -119,13 +119,11 @@ const AIPlanResultPage = () => {
       return;
     }
 
-    // Context 값 없으면 /plan으로 리다이렉트
     if (!selectedRegion) {
       navigate('/plan');
       return;
     }
 
-    // FastAPI 호출
     const fetchSchedule = async () => {
       setScheduleLoading(true);
       try {
@@ -257,23 +255,12 @@ const AIPlanResultPage = () => {
     }
   };
 
-  const TYPE_TO_CAT = {
-    'see'  : 'PLC001',
-    'play' : 'PLC002',
-    'food' : 'PLC003',
-    'sleep': 'PLC004',
-  };
-
   const handleAddPlace = (item) => {
-    const rawId = String(item.id || '');
-    const placeId = rawId.includes('-')
-      ? Number(rawId.split('-')[1])
-      : Number(rawId);
-
+    const placeId = item.placeId || item.id;
     const newItem = {
       placeId  : placeId,
       placeName: item.name,
-      category : TYPE_TO_CAT[item.type] ?? item.type,
+      category : CAT_LABEL_MAP[item.category] ?? item.category,
       overview : item.description || item.desc || '',
       imgUrl   : item.image || '',
       lat      : item.lat ? String(item.lat) : null,
@@ -289,8 +276,16 @@ const AIPlanResultPage = () => {
   };
 
   const handleGoDetail  = (item) => navigate(getDetailPath(item, currentRegion));
-  const handleDayChange = (i) => { setActiveDay(i); setSelectedItem(null); };
   const currentDayItems = schedule[activeDay]?.plans || [];
+
+  const handleDayChange = (i) => {
+    setActiveDay(i);
+    if (schedule[i]?.plans?.length > 0) {
+      setSelectedItem(schedule[i].plans[0]);
+    } else {
+      setSelectedItem(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f7f8fa]">

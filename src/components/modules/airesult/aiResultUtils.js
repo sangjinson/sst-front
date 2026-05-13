@@ -45,6 +45,14 @@ const CAT_TYPE_MAP = {
   'PLC004': 'sleep',
 };
 
+// 한글 카테고리 → 색상
+export const CAT_KOR_COLOR_MAP = {
+  '볼거리': 'bg-blue-100 text-blue-700',
+  '놀거리': 'bg-purple-100 text-purple-700',
+  '먹거리': 'bg-orange-100 text-orange-700',
+  '잘거리': 'bg-green-100 text-green-700',
+};
+
 export const SEARCH_CATEGORIES = ['전체', '볼거리', '먹거리', '잘거리', '놀거리'];
 
 // ────────────────────────────────────────────

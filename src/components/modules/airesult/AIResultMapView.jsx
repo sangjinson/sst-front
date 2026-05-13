@@ -29,7 +29,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     polylinesRef.current = [];
   };
 
-  const drawRoute = (map, items, dayIdx = 0) => {
+  const drawRoute = (map, items, dayIdx = 0, onSelect) => {
     const color      = DAY_COLORS[dayIdx % DAY_COLORS.length];
     const validItems = items.filter(i => i.lat && i.lng);
 
@@ -57,7 +57,8 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           display:flex; align-items:center; justify-content:center;
           border:2px solid white;
           box-shadow:0 2px 6px rgba(0,0,0,0.3);
-        ">${idx + 1}</div>
+          cursor:pointer;
+        " id="overlay-${item.placeId}">${idx + 1}</div>
       `;
       const overlay = new window.kakao.maps.CustomOverlay({
         map,
@@ -66,6 +67,16 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
         yAnchor: 1,
       });
       overlaysRef.current.push(overlay);
+
+      // 오버레이 클릭 이벤트
+      setTimeout(() => {
+        const el = document.getElementById(`overlay-${item.placeId}`);
+        if (el) {
+          el.addEventListener('click', () => {
+            onSelect(item);
+          });
+        }
+      }, 100);
     });
 
     if (linePath.length > 1) {
@@ -117,7 +128,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     if (!currentDayItems.length) return;
     if (window.kakao?.maps) {
       window.kakao.maps.load(() => {
-        drawRoute(mapObj.current, currentDayItems, activeDay);
+        drawRoute(mapObj.current, currentDayItems, activeDay, onSelectItem);
       });
     }
   }, [mapReady, activeDay, schedule]);
@@ -157,19 +168,19 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
       </div>
 
       {selectedItem ? (
-        <div className="border-t border-gray-100 bg-white px-3 py-3 flex items-center gap-3">
+        <div className="border-t border-gray-100 bg-white px-4 py-4 flex items-center gap-4 min-h-[140px]">
 
           <button
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="text-gray-400 hover:text-gray-600 text-2xl shrink-0 disabled:opacity-30 transition"
+            className="text-gray-400 hover:text-gray-600 text-4xl shrink-0 disabled:opacity-30 transition"
           >
             ‹
           </button>
 
           <div
             onClick={handleGoDetail}
-            className="w-16 h-16 rounded-xl overflow-hidden shrink-0 cursor-pointer hover:opacity-80 transition"
+            className="w-28 h-28 rounded-xl overflow-hidden shrink-0 cursor-pointer hover:opacity-80 transition"
           >
             {selectedItem.imgUrl ? (
               <img src={selectedItem.imgUrl} alt={selectedItem.placeName} className="w-full h-full object-cover" />
@@ -179,29 +190,27 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           </div>
 
           <div onClick={handleGoDetail} className="flex-1 min-w-0 cursor-pointer">
-            <div className="flex items-center gap-2 mb-1">
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                 CAT_COLOR_MAP[selectedItem.category] ?? TYPE_COLOR[selectedItem.type] ?? 'bg-gray-100 text-gray-600'
               }`}>
                 {CAT_LABEL_MAP[selectedItem.category] ?? TYPE_LABEL[selectedItem.type] ?? selectedItem.category}
               </span>
             </div>
-            <p className="text-sm font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
+            <p className="text-lg font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
               {selectedItem.placeName}
             </p>
-            <p className="text-xs text-gray-400 mt-0.5 truncate">
+            <p className="text-sm text-gray-400 mt-1.5 line-clamp-3">
               {selectedItem.overview}
             </p>
           </div>
 
-          <button className="text-red-400 hover:text-red-500 transition text-xl shrink-0">
-            ♥
-          </button>
+          <button className="text-red-400 hover:text-red-500 transition text-2xl shrink-0">♥</button>
 
           <button
             onClick={handleNext}
             disabled={currentIdx === currentDayItems.length - 1}
-            className="text-gray-400 hover:text-gray-600 text-2xl shrink-0 disabled:opacity-30 transition"
+            className="text-gray-400 hover:text-gray-600 text-4xl shrink-0 disabled:opacity-30 transition"
           >
             ›
           </button>
