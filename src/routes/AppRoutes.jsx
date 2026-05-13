@@ -82,6 +82,9 @@ import AdminStreetForm from '@themeadmin/pages/Streets/AdminStreetForm';
 import AdminMemberEdit from '@pages/admin/AdminMemberEdit';
 import AdminReport from '@pages/admin/AdminReport';
 import AdminSeeModify from '@pages/admin/area/AdminSeeModify';
+import AdminFoodModify from '@pages/admin/area/AdminFoodModify';
+import AdminPlayModify from '@pages/admin/area/AdminPlayModify';
+import AdminSleepModify from '@pages/admin/area/AdminSleepModify';
 
 const AppRoutes = () => {
   return (
@@ -171,6 +174,9 @@ const AppRoutes = () => {
             <Route path=":type/create" element={<AdminStreetForm />} />
             <Route path=":type/update" element={<AdminStreetForm />} />
             <Route path="see/:plcNo" element={<AdminSeeModify />} />
+            <Route path="food/:plcNo" element={<AdminFoodModify />} />
+            <Route path="play/:plcNo" element={<AdminPlayModify />} />
+            <Route path="sleep/:plcNo" element={<AdminSleepModify />} />
           </Route>
           
           <Route path="report" element={<AdminReport />} />
@@ -178,6 +184,14 @@ const AppRoutes = () => {
           <Route path="support">
             <Route path="notices" element={<NoticeManage />} />
             <Route path="faq" element={<FaqManage />} />
+          </Route>
+
+          {/* 🚀 뽐낼거리(커뮤니티) 관리 라우터 추가 */}
+          <Route path="showcase">
+            {/* /admin/showcase/hotplace 로 접속 시 HotplaceList 렌더링 */}
+            <Route path="hotplace" element={<HotplaceList />} />
+            {/* 💡 추후 인생거리를 작업하면 아래에 추가하세요 */}
+            <Route path="life" element={<LifeList />} /> 
           </Route>
         </Route>
       </Route> 
