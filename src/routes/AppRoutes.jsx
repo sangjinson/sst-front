@@ -70,9 +70,10 @@ import Blank from '@layouts/admin/tailadmin/layout/pages/Blank';
 import AppLayout from '@layouts/admin/tailadmin/layout/layout/AppLayout';
 import { ScrollToTop } from '@layouts/admin/tailadmin/layout/components/common/ScrollToTop';
 */}
-import Home from '@themeadmin/pages/Dashboard/Home';
+import Home from '@pages/admin/Dashboard.jsx';
 {/* 관리자 - 회원 관리 */}
 import AdinMemberList from '@themeadmin/pages/Members/AdminMemberList';
+import AdminManagerList from '@themeadmin/pages/Members/AdminManagerList';
 import AdminMemberInfoForm from '@themeadmin/pages/Members/AdminMemberInfoForm';
 
 {/* 관리자 - 놀거리, 먹거리, 잘거리, 볼거리 */}
@@ -82,6 +83,12 @@ import AdminStreetForm from '@themeadmin/pages/Streets/AdminStreetForm';
 import AdminMemberEdit from '@pages/admin/AdminMemberEdit';
 import AdminReport from '@pages/admin/AdminReport';
 import AdminSeeModify from '@pages/admin/area/AdminSeeModify';
+import AdminFoodModify from '@pages/admin/area/AdminFoodModify';
+import AdminPlayModify from '@pages/admin/area/AdminPlayModify';
+import AdminSleepModify from '@pages/admin/area/AdminSleepModify';
+import AdminManagerCreate from '@pages/admin/AdminManagerCreate';
+import AdminReviewList from '@pages/admin/comments/AdminReviewList';
+import AdminComment from '@pages/admin/comments/AdminComment';
 
 const AppRoutes = () => {
   return (
@@ -161,7 +168,10 @@ const AppRoutes = () => {
             <Route path="update" element={<AdminMemberInfoForm />} />
             <Route path="edit/:id" element={<AdminMemberEdit />} />
           </Route>
-
+            <Route path="managers">
+            <Route index element={<AdminManagerList />} />
+            <Route path="create" element={<AdminManagerCreate />} />
+          </Route>
           {/* 사거리 관리 */}
           <Route path="area">
             {/* /admin/street/:type 경로로 들어오면 StreetListPage를 보여줌 */}
@@ -171,6 +181,9 @@ const AppRoutes = () => {
             <Route path=":type/create" element={<AdminStreetForm />} />
             <Route path=":type/update" element={<AdminStreetForm />} />
             <Route path="see/:plcNo" element={<AdminSeeModify />} />
+            <Route path="food/:plcNo" element={<AdminFoodModify />} />
+            <Route path="play/:plcNo" element={<AdminPlayModify />} />
+            <Route path="sleep/:plcNo" element={<AdminSleepModify />} />
           </Route>
           
           <Route path="report" element={<AdminReport />} />
@@ -179,6 +192,16 @@ const AppRoutes = () => {
             <Route path="notices" element={<NoticeManage />} />
             <Route path="faq" element={<FaqManage />} />
           </Route>
+
+          {/* 🚀 뽐낼거리(커뮤니티) 관리 라우터 추가 */}
+          <Route path="showcase">
+            {/* /admin/showcase/hotplace 로 접속 시 HotplaceList 렌더링 */}
+            <Route path="hotplace" element={<HotplaceList />} />
+            {/* 💡 추후 인생거리를 작업하면 아래에 추가하세요 */}
+            <Route path="life" element={<LifeList />} /> 
+          </Route>
+          <Route path="reviews" element={<AdminReviewList />} />
+          <Route path="comments" element={<AdminComment />} />
         </Route>
       </Route> 
 

@@ -31,10 +31,14 @@ const navItems = [
     path: "/admin/members",
   },
   {
+    icon: <UserCircleIcon />,
+    name: "관리자 관리",
+    path: "/admin/managers",
+  },
+  {
     icon: <BoxCubeIcon />,
     name: "사거리 관리",
     subItems: [
-      { name: "공통코드 관리", path: "/admin/common-codes" },
       { name: "볼거리 관리", path: "/admin/area/see" },
       { name: "먹거리 관리", path: "/admin/area/food" },
       { name: "잘거리 관리", path: "/admin/area/sleep" },
@@ -48,6 +52,19 @@ const navItems = [
       { name: "핫플거리 관리", path: "/admin/showcase/hotplace" },
       { name: "인생거리 관리", path: "/admin/showcase/life" },
     ],
+  },
+  {
+    icon: <PageIcon />,
+    name: "댓글 관리",
+    subItems: [
+      { name: "리뷰 관리", path: "/admin/reviews" },
+      { name: "댓글 관리", path: "/admin/comments" },
+    ],
+  },
+  {
+    icon: <TableIcon />, // 적절한 아이콘 지정
+    name: "공통코드 관리",
+    path: "/admin/common-codes", 
   },
 ];
 
