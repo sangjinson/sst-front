@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from '@components/common/Footer';
+import ExpandingSearch from '@components/common/ExpandingSearch';
 import { useAuth } from '@hooks/useAuth';
 import { LogIn, LogOut } from 'lucide-react';
 
@@ -17,6 +18,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('남부');
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [hoveredCity, setHoveredCity] = useState(null);
 
   const citiesSouth = [
   '수원시',
@@ -98,8 +100,9 @@ const citiesNorth = [
 };
 
   const handleSearch = () => {
-    if (!searchKeyword.trim()) return;
-    navigate(searchKeyword);
+    const keyword = searchKeyword.trim();
+    if (!keyword) return;
+    navigate(`/search/${keyword}`);
   };
 
   return (
@@ -109,7 +112,7 @@ const citiesNorth = [
       </Helmet>
       
       <div className="page-wrapper min-h-screen bg-[#f8f6f0]">
-        <header className="container-fluid flex flex-col pb-[5vw]">
+        <header className="container-fluid flex flex-col pb-0">
           <div className="container">
             {/* AuthContext의 user 상태를 기준으로 조건부 렌더링 */}
             <div className="flex justify-end p-5 md:py-[30px]">
@@ -126,8 +129,8 @@ const citiesNorth = [
               )}
             </div>
 
-            <div className="flex justify-center md:block md:text-center">
-              <h1 className="landing-logo text-[60px] md:text-[80px] font-griun text-[#222]">
+            <div className="mt-[12px] flex justify-center md:mt-[-4px] md:block md:text-center">
+              <h1 className="landing-logo text-[184px] md:text-[248px] tracking-[0.19em] font-griun text-[#222]">
                 거리에섯
               </h1>
             </div>
@@ -135,35 +138,14 @@ const citiesNorth = [
           </div>
         </header>
         
-        <main className="container-fluid flex flex-col mt-10 pb-[5vw]">
+        <main className="container-fluid flex flex-col mt-8 pb-[5vw] md:mt-12">
           <div className='container fs-up-3'>
-              <div className='w-full md:w-8/12 mx-auto'>
-                <div className="flex flex-col md:flex-row items-center bg-white rounded-[20px] md:rounded-[50px] p-4 md:py-[10px] md:px-[20px] w-full shadow-[0_4px_15px_rgba(0,0,0,0.05)] mb-10 md:mb-[50px] gap-3 md:gap-0">
-                  
-                  <select 
-                    id="category"
-                    name="category"
-                    className="w-full md:w-auto border-b md:border-b-0 md:border-r border-[#ddd] bg-transparent text-[#333] py-2 md:py-[10px] px-[20px] outline-none cursor-pointer text-center md:text-left">
-                    <option>지역 선택</option>
-                  </select>
-                  
-                  <input 
-                    type="text" 
-                    placeholder="떠나고 싶은 지역이나 테마를 입력하세요" 
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="flex-1 border-none px-[20px] outline-none w-full text-center md:text-left bg-transparent"
-                  />
-                  
-                  <button 
-                    onClick={handleSearch} 
-                    className="w-full md:w-auto bg-[#333] text-white border-none py-3 md:py-[15px] px-[35px] rounded-[30px] cursor-pointer transition-colors duration-200 hover:bg-[#0F9B73]"
-                  >
-                    검색
-                  </button>
-                </div>
-
+              <div className='w-full mx-auto mt-[23px] mb-12 md:mt-[27px] md:mb-16'>
+                <ExpandingSearch
+                  value={searchKeyword}
+                  onChange={setSearchKeyword}
+                  onSubmit={handleSearch}
+                />
               </div>
           </div>
 
@@ -194,13 +176,22 @@ const citiesNorth = [
               </div>
 
               <div className="grid grid-cols-3 md:grid-cols-5 gap-[15px] fs-up-3">
-                {currentCities.map((city, index) => (
+                {currentCities.map((city) => (
                   <button 
-                    key={index} 
+                    key={city} 
+                    type="button"
                     onClick={() => goToMainPage(city)}
-                    className="bg-white/90 border-none py-[18px] px-[10px] rounded-lg font-medium cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.03)] transition-all duration-200 hover:bg-[#0F9B73] hover:text-white hover:-translate-y-[2px]"
+                    onMouseEnter={() => setHoveredCity(city)}
+                    onMouseLeave={() => setHoveredCity(null)}
+                    onFocus={() => setHoveredCity(city)}
+                    onBlur={() => setHoveredCity(null)}
+                    className={`group relative overflow-hidden rounded-lg border-none bg-white/90 px-[10px] py-[18px] font-medium text-[#333] shadow-[0_2px_8px_rgba(0,0,0,0.03)] ring-1 ring-transparent transition-all duration-300 ease-out hover:-translate-y-[2px] hover:scale-[1.04] hover:bg-white hover:text-[#0D7F60] hover:shadow-[0_12px_28px_rgba(15,23,42,0.08)] hover:ring-black/5 focus:-translate-y-[2px] focus:scale-[1.04] focus:bg-white focus:text-[#0D7F60] focus:shadow-[0_12px_28px_rgba(15,23,42,0.08)] focus:ring-black/5 active:translate-y-0 active:scale-[0.98] ${
+                      hoveredCity && hoveredCity !== city
+                        ? 'opacity-45 blur-[1px] scale-[0.98]'
+                        : 'opacity-100 blur-0 scale-100'
+                    }`}
                   >
-                    {city}
+                    <span className="relative z-10">{city}</span>
                   </button>
                 ))}
               </div>

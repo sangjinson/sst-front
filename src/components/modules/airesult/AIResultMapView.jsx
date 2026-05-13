@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TYPE_LABEL, TYPE_COLOR, CAT_LABEL_MAP, CAT_COLOR_MAP, getDetailPath } from './aiResultUtils';
 
@@ -18,6 +18,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
   const mapObj       = useRef(null);
   const overlaysRef  = useRef([]);
   const polylinesRef = useRef([]);
+  const [mapReady, setMapReady] = useState(false);
 
   const currentDayItems = schedule[activeDay]?.plans || [];
 
@@ -35,7 +36,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     const bounds   = new window.kakao.maps.LatLngBounds();
     const linePath = [];
 
-    validItems.forEach((item, idx) => {
+    validItems.forEach((item) => {
       const pos = new window.kakao.maps.LatLng(
         parseFloat(item.lat),
         parseFloat(item.lng)
@@ -82,6 +83,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     if (validItems.length > 0) map.setBounds(bounds);
   };
 
+  // 지도 초기화
   useEffect(() => {
     const initMap = () => {
       if (!window.kakao?.maps || !mapRef.current) return;
@@ -93,9 +95,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
         mapObj.current = map;
         window.__testMap = map;
         map.relayout();
-        setTimeout(() => {
-          drawRoute(map, currentDayItems, activeDay);
-        }, 500);
+        setMapReady(true);
       });
     };
 
@@ -111,14 +111,16 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     document.head.appendChild(script);
   }, []);
 
+  // 지도 그리기
   useEffect(() => {
-    if (!mapObj.current) return;
+    if (!mapReady || !mapObj.current) return;
+    if (!currentDayItems.length) return;
     if (window.kakao?.maps) {
       window.kakao.maps.load(() => {
         drawRoute(mapObj.current, currentDayItems, activeDay);
       });
     }
-  }, [activeDay, schedule]);
+  }, [mapReady, activeDay, schedule]);
 
   const handlePrev = () => {
     const idx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
@@ -142,16 +144,16 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
 
       <div style={{ width: '100%', height: '500px', position: 'relative' }}>
         <div
-        ref={mapRef}
-        id="ai-result-map"
-        style={{
-          width   : '100%',
-          height  : '100%',
-          position: 'absolute',
-          top     : 0,
-          left    : 0,
-        }}
-        />  
+          ref={mapRef}
+          id="ai-result-map"
+          style={{
+            width   : '100%',
+            height  : '100%',
+            position: 'absolute',
+            top     : 0,
+            left    : 0,
+          }}
+        />
       </div>
 
       {selectedItem ? (
@@ -192,7 +194,9 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
             </p>
           </div>
 
-          <button className="text-red-400 hover:text-red-500 transition text-xl shrink-0">♥</button>
+          <button className="text-red-400 hover:text-red-500 transition text-xl shrink-0">
+            ♥
+          </button>
 
           <button
             onClick={handleNext}
