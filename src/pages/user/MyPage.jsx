@@ -105,9 +105,8 @@ const MyPage = () => {
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           
           {/* 사이드바 */}
-          {!loading && profile && (
-            <Sidebar profile={profile} profileImg={profileImg} />
-          )}
+          {/* !loading && profile && () */} 
+          <Sidebar profile={profile} profileImg={profileImg} />
 
           {/* 메인 컨텐츠 */}
           <section className="flex-1 min-w-0 flex flex-col gap-4 w-full">

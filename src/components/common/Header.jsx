@@ -19,6 +19,8 @@ const Header = () => {
   // 🚀 추가: AuthContext에서 user 상태와 logout 함수 추출
   const { user, logout } = useAuth();
 
+  // console.log(user) //회원정보
+
   const { region } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -190,12 +192,26 @@ const Header = () => {
           {/* 수정: user 상태에 따른 조건부 렌더링 적용 */}
           {user ? (
             <div className="flex items-center gap-3">
+              {/* 프로필 이미지 */}
               <Link to="/user/mypage" className="shrink-0 block">
-                <img 
-                  src="https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png" 
-                  alt="프로필" 
-                  className="w-[38px] h-[38px] md:w-[42px] md:h-[42px] rounded-full object-cover border-2 border-gray-100 hover:border-[#0F9B73] transition-colors cursor-pointer"
-                />
+                {user.mbrProfileInfo?.filePath ? (
+                  <img 
+                    src={user.mbrProfileInfo.filePath} 
+                    alt="프로필" 
+                    className="w-[38px] h-[38px] md:w-[42px] md:h-[42px] rounded-full object-cover border-2 border-gray-100 hover:border-[#0F9B73] transition-colors cursor-pointer"
+                    onError={(e) => {
+                      // 이미지 로드 실패 시 기본 이미지로 교체하는 방어 코드
+                      //e.target.src = "https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png";
+                    }}
+                  />
+                ) : (
+                  /* 🚀 이미지가 없을 때 보여줄 기본 UI (아이콘 혹은 기본 이미지) */
+                  <div className="w-[38px] h-[38px] md:w-[42px] md:h-[42px] rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-100 hover:border-[#0F9B73] transition-colors cursor-pointer">
+                    <span className="text-gray-500 text-xs font-bold">
+                      {user.mbrNickname?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                )}
               </Link>
               <button className={authButtonClass} onClick={logout}>
                 <span className={authButtonTextClass}>Logout</span>
