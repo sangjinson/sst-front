@@ -97,23 +97,30 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
   // 지도 초기화
   useEffect(() => {
     const initMap = () => {
-      if (!window.kakao?.maps || !mapRef.current) return;
+      if (!mapRef.current) return;
       window.kakao.maps.load(() => {
-        const map = new window.kakao.maps.Map(mapRef.current, {
-          center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-          level : 8,
-        });
-        mapObj.current = map;
-        window.__testMap = map;
-        map.relayout();
-        setMapReady(true);
+        if (!mapRef.current) return; // load 콜백 안에서도 체크
+        try {
+          const map = new window.kakao.maps.Map(mapRef.current, {
+            center: new window.kakao.maps.LatLng(37.5665, 126.9780),
+            level : 8,
+          });
+          mapObj.current = map;
+          map.relayout();
+          setMapReady(true);
+        } catch (e) {
+          console.warn("카카오맵 초기화 실패:", e);
+        }
       });
     };
 
     if (window.kakao?.maps) { initMap(); return; }
 
     const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
-    if (existing) { existing.addEventListener('load', initMap); return; }
+    if (existing) {
+      existing.addEventListener('load', initMap);
+      return () => existing.removeEventListener('load', initMap); // cleanup 추가
+    }
 
     const script = document.createElement('script');
     script.src   = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&libraries=services,drawing&autoload=false`;
