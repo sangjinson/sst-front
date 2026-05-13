@@ -79,10 +79,12 @@ import AdminMemberInfoForm from '@themeadmin/pages/Members/AdminMemberInfoForm';
 import AdminStreetListPage from '@themeadmin/pages/Streets/AdminStreetListPage';
 import AdminStreetForm from '@themeadmin/pages/Streets/AdminStreetForm';
 
-
-
-
-
+import AdminMemberEdit from '@pages/admin/AdminMemberEdit';
+import AdminReport from '@pages/admin/AdminReport';
+import AdminSeeModify from '@pages/admin/area/AdminSeeModify';
+import AdminFoodModify from '@pages/admin/area/AdminFoodModify';
+import AdminPlayModify from '@pages/admin/area/AdminPlayModify';
+import AdminSleepModify from '@pages/admin/area/AdminSleepModify';
 
 const AppRoutes = () => {
   return (
@@ -160,6 +162,7 @@ const AppRoutes = () => {
             <Route index element={<AdinMemberList />} />
             <Route path="create" element={<AdminMemberInfoForm />} />
             <Route path="update" element={<AdminMemberInfoForm />} />
+            <Route path="edit/:id" element={<AdminMemberEdit />} />
           </Route>
 
           {/* 사거리 관리 */}
@@ -170,13 +173,25 @@ const AppRoutes = () => {
             {/* 필요한 경우 추가 경로 설정 */}
             <Route path=":type/create" element={<AdminStreetForm />} />
             <Route path=":type/update" element={<AdminStreetForm />} />
-            
+            <Route path="see/:plcNo" element={<AdminSeeModify />} />
+            <Route path="food/:plcNo" element={<AdminFoodModify />} />
+            <Route path="play/:plcNo" element={<AdminPlayModify />} />
+            <Route path="sleep/:plcNo" element={<AdminSleepModify />} />
           </Route>
           
+          <Route path="report" element={<AdminReport />} />
 
           <Route path="support">
             <Route path="notices" element={<NoticeManage />} />
             <Route path="faq" element={<FaqManage />} />
+          </Route>
+
+          {/* 🚀 뽐낼거리(커뮤니티) 관리 라우터 추가 */}
+          <Route path="showcase">
+            {/* /admin/showcase/hotplace 로 접속 시 HotplaceList 렌더링 */}
+            <Route path="hotplace" element={<HotplaceList />} />
+            {/* 💡 추후 인생거리를 작업하면 아래에 추가하세요 */}
+            <Route path="life" element={<LifeList />} /> 
           </Route>
         </Route>
       </Route> 

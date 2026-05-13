@@ -31,12 +31,12 @@ const LikeIcon = () => (
  *
  * <LifePostHeader
  *   post={post}
- *   region={region}
  *   viewCount={viewCount}
  *   comments={comments}
  *   wishCount={wishCount}
  *   isLiked={isLiked}
- *   setIsLiked={setIsLiked}
+ *   handleLikeClick={handleLikeClick}
+ *   onCommentClick={onCommentClick}
  * />
  */
 const LifePostHeader = ({
@@ -45,7 +45,7 @@ const LifePostHeader = ({
   comments,
   wishCount,
   isLiked,
-  setIsLiked,
+  handleLikeClick,
   onCommentClick,
 }) => {
   return (
@@ -83,17 +83,17 @@ const LifePostHeader = ({
         <div className="absolute bottom-5 left-6 flex flex-wrap items-center gap-4 fs-down-1">
           <button
             type="button"
-            onClick={() => setIsLiked(!isLiked)}
-            className={`shrink-0 inline-flex cursor-pointer items-center gap-1.5 text-sm font-bold transition-colors active:scale-95 ${isLiked ? "text-blue-500" : "text-gray-900 hover:text-blue-500"}`}
-          >
+            onClick={handleLikeClick}
+            className={`shrink-0 inline-flex cursor-pointer items-center gap-1.5 text-sm font-bold transition-colors active:scale-95 ${
+              isLiked ? "text-blue-500" : "text-gray-900 hover:text-blue-500"
+            }`}>
             <LikeIcon />
             {wishCount}
           </button>
           <button
             type="button"
             onClick={onCommentClick}
-            className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-bold text-gray-900 transition-colors hover:text-[#0F9B73]"
-          >
+            className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-bold text-gray-900 transition-colors hover:text-[#0F9B73]">
             <CommentIcon />
             {comments.length}
           </button>

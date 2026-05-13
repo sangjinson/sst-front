@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import api from "@api/axios";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getAllLifePosts } from "./communityLifeData";
 import CommunityLifeCard from "@components/modules/community/life/CommunityLifeCard";
 
 
@@ -11,9 +11,40 @@ const CommunityLife = () => {
   const [keyword, setKeyword] = useState("");
   const [searchType, setSearchType] = useState("all");
   const [sortType, setSortType] = useState("latest");
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
+    api
+      .get("/community", {
+        params: {
+          catCd: "CMM001",
+        },
+      })
+      .then((res) => {
+        const mappedData = res.data.map((item) => ({
+          id: item.commNo,
+          title: item.commTitle,
+          description: item.commContent,
+          author: item.mbrNickname,
+          region: item.rgnName || "지역 미정",
+          hashtags: [],
+          thumbnail: item.commMainImgUrl || "https://placehold.co/800x400",
+          images: item.commMainImgUrl ? [item.commMainImgUrl] : [],
+          regDt: item.commRegDate,
+          viewCnt: item.commInqireCnt,
+          wishCnt: item.commLikeCnt,
+          commentCnt: item.commCmntCnt,
+        }));
+
+        setPosts(mappedData);
+      })
+      .catch((err) => {
+        console.error("인생거리 목록 조회 실패:", err);
+      });
   }, []);
 
   //  좋아요 상태 관리 (핵심 추가)
@@ -27,8 +58,6 @@ const CommunityLife = () => {
       [postId]: !prev[postId],
     }));
   };
-
-  const posts = getAllLifePosts();
 
   const filteredPosts = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
@@ -80,7 +109,7 @@ const CommunityLife = () => {
   }, [posts, keyword, searchType, sortType]);
 
   return (
-    <div className="paperlogy max-w-[1280px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
+    <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
       <Breadcrumb
         paths={[
           { label: "홈", to: "/" },
