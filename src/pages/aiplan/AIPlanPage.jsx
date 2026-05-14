@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '@components/common/Breadcrumb';
 import {
@@ -51,7 +51,12 @@ const AIPlanPage = () => {
     selectedThemes, setSelectedThemes,
     startDate,      setStartDate,
     endDate,        setEndDate,
+    resetPlan
   } = useAIPlan();
+
+  useEffect(() => {
+    resetPlan();
+  }, []);
 
   const toggleTheme = (theme) => {
     setSelectedThemes(prev => {
@@ -73,16 +78,7 @@ const AIPlanPage = () => {
   };
 
   // FastAPI로 값 전송 후 결과 페이지로 이동
-  const handleSubmit = async () => {
-    const params = new URLSearchParams({
-      region    : selectedRegion,
-      days      : selectedDays,
-      start_date: startDate,
-      end_date  : endDate,
-      themes    : selectedThemes.join(','), // 쉼표 구분
-    });
-
-    await fetch(`${import.meta.env.VITE_FASTAPI_URL}/travel/plan?${params.toString()}`);
+  const handleSubmit = () => {
     sessionStorage.removeItem('currentSchedule');
     navigate('/plan/result');
   };

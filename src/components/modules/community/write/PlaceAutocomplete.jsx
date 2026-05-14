@@ -23,8 +23,7 @@ const PlaceAutocomplete = ({
     <div className="relative">
       <label
         htmlFor="placeName"
-        className="block fs-down-2 font-bold text-gray-700 mb-3"
-      >
+        className="block fs-down-2 font-bold text-gray-700 mb-3">
         구체적인 장소
       </label>
 
@@ -61,8 +60,7 @@ const PlaceAutocomplete = ({
                 setSelectedPlace(place);
                 setIsOpen(false);
               }}
-              className="w-full px-4 py-3 text-left text-gray-700 hover:bg-[#f0f9f7] hover:text-[#009277] transition-colors"
-            >
+              className="w-full px-4 py-3 text-left text-gray-700 hover:bg-[#f0f9f7] hover:text-[#009277] transition-colors">
               {place.plcName}
             </button>
           ))}

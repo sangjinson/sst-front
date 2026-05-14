@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from '@components/common/Footer';
+import ExpandingSearch from '@components/common/ExpandingSearch';
 import { useAuth } from '@hooks/useAuth';
 import { LogIn, LogOut } from 'lucide-react';
 
@@ -17,6 +18,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab]         = useState('남부');
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [hoveredCity, setHoveredCity] = useState(null);
 
   const citiesSouth = [
     '수원시', '성남시', '용인시', '안양시', '안산시',
@@ -60,7 +62,7 @@ const LandingPage = () => {
       </Helmet>
 
       <div className="page-wrapper min-h-screen bg-[#f8f6f0]">
-        <header className="container-fluid flex flex-col pb-[5vw]">
+        <header className="container-fluid flex flex-col pb-0">
           <div className="container">
             <div className="flex justify-end p-5 md:py-[30px]">
               {user ? (
@@ -76,8 +78,8 @@ const LandingPage = () => {
               )}
             </div>
 
-            <div className="flex justify-center md:block md:text-center">
-              <h1 className="landing-logo text-[60px] md:text-[80px] font-griun text-[#222]">
+            <div className="mt-[12px] flex justify-center md:mt-[-4px] md:block md:text-center">
+              <h1 className="landing-logo text-[184px] md:text-[248px] tracking-[0.19em] font-griun text-[#222]">
                 거리에섯
               </h1>
             </div>
@@ -135,9 +137,17 @@ const LandingPage = () => {
                   <button
                     key={index}
                     onClick={() => goToMainPage(city)}
-                    className="bg-white/90 border-none py-[18px] px-[10px] rounded-lg font-medium cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.03)] transition-all duration-200 hover:bg-[#0F9B73] hover:text-white hover:-translate-y-[2px]"
+                    onMouseEnter={() => setHoveredCity(city)}
+                    onMouseLeave={() => setHoveredCity(null)}
+                    onFocus={() => setHoveredCity(city)}
+                    onBlur={() => setHoveredCity(null)}
+                    className={`group relative overflow-hidden rounded-lg border-none bg-white/90 px-[10px] py-[18px] font-medium text-[#333] shadow-[0_2px_8px_rgba(0,0,0,0.03)] ring-1 ring-transparent transition-[transform,opacity,background-color,color,box-shadow] duration-200 ease-out hover:-translate-y-[2px] hover:scale-[1.04] hover:bg-white hover:text-[#0D7F60] hover:shadow-[0_12px_28px_rgba(15,23,42,0.08)] hover:ring-black/5 focus:-translate-y-[2px] focus:scale-[1.04] focus:bg-white focus:text-[#0D7F60] focus:shadow-[0_12px_28px_rgba(15,23,42,0.08)] focus:ring-black/5 active:translate-y-0 active:scale-[0.98] ${
+  hoveredCity && hoveredCity !== city
+    ? 'opacity-45'
+    : 'opacity-100'
+}`}
                   >
-                    {city}
+                    <span className="relative z-10">{city}</span>
                   </button>
                 ))}
               </div>

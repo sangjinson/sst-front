@@ -8,7 +8,6 @@ import CommentSection from "@components/modules/community/common/CommentSection"
 import LifeCourseView from "@components/modules/community/life/LifeCourseView";
 import LifeAside from "@components/modules/community/life/LifeAside";
 import LifePostHeader from "@components/modules/community/life/LifePostHeader";
-import { openReportModal } from "@components/modules/community/common/reportModal";
 import IconSVG from "@components/Icon/IconSVG";
 
 // 공통 이미지 슬라이더 컴포넌트 import
@@ -17,9 +16,9 @@ import ImageSlider from "@components/modules/community/common/ImageSlider";
 const CommunityLifeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const isLogin = true;
 
   const [currentUserId, setCurrentUserId] = useState(null);
+  const isLogin = !!currentUserId;
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
@@ -46,8 +45,13 @@ const CommunityLifeDetail = () => {
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
-        // 조회수 증가
-        await api.put(`/community/${id}/view`);
+        const viewedKey = `life_viewed_${id}`;
+
+        // 처음 조회 시에만 조회수 증가
+        if (!localStorage.getItem(viewedKey)) {
+          localStorage.setItem(viewedKey, "true");
+          await api.put(`/community/${id}/view`);
+        }
 
         // 상세 조회
         const res = await api.get(`/community/${id}`);
@@ -80,6 +84,7 @@ const CommunityLifeDetail = () => {
         const mappedPost = {
           id: item.commNo,
           commNo: item.commNo,
+          mbrId: item.commMbrId,
           title: item.commTitle,
           description: item.commContent,
           author: item.mbrNickname,
@@ -398,6 +403,11 @@ const CommunityLifeDetail = () => {
     }
   };
 
+  const isOwner =
+  currentUserId !== null &&
+  post.mbrId !== null &&
+  Number(currentUserId) === Number(post.mbrId);
+
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 font-sans">
       <Breadcrumb
@@ -479,28 +489,29 @@ const CommunityLifeDetail = () => {
 
         {/* 오른쪽 사이드 정보 */}
         <LifeAside
-          post={post}
-          region={region}
-          courseList={courseList}
-          viewCount={viewCount}
-          comments={comments}
-          wishCount={wishCount}
-          isLiked={isLiked}
-          setIsLiked={setIsLiked}
-          handleLikeClick={handleLikeClick}
-          isLogin={isLogin}
-          navigate={navigate}
-          handleImportSchedule={handleImportSchedule}
-          handleMakePlan={handleMakePlan}
-          handleDeletePost={handleDeletePost}
-          openReportModal={() =>
-            openReportModal({
-              type: "post",
-              commNo: post.commNo ?? post.id,
-            })
-          }
-          onCommentClick={scrollToComments}
-        />
+            post={post}
+            region={region}
+            courseList={courseList}
+            viewCount={viewCount}
+            comments={comments}
+            wishCount={wishCount}
+            isLiked={isLiked}
+            setIsLiked={setIsLiked}
+            handleLikeClick={handleLikeClick}
+            isLogin={isLogin}
+            isOwner={isOwner}
+            navigate={navigate}
+            handleImportSchedule={handleImportSchedule}
+            handleMakePlan={handleMakePlan}
+            handleDeletePost={handleDeletePost}
+            openReportModal={() =>
+              openReportModal({
+                type: "post",
+                commNo: post.commNo ?? post.id,
+              })
+            }
+            onCommentClick={scrollToComments}
+          />
       </section>
       {/* 댓글 영역 */}
       <div id="life-comments" className="scroll-mt-24">
