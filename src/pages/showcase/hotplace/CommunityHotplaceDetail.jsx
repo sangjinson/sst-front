@@ -323,12 +323,17 @@ const CommunityHotplaceDetail = () => {
           setIsLiked={setIsLiked}
           wishCount={wishCount}
           handleLikeClick={handleLikeClick}
-          openReportModal={() =>
-            openReportModal({
-              type: "post",
-              commNo: currentPost.commNo ?? currentPost.id,
-            })
+          openReportModal={async () => {
+
+          const result = await openReportModal({
+            type: "post",
+            commNo: currentPost.commNo ?? currentPost.id,
+          });
+
+          if (result?.blinded) {
+            navigate("/showcase/hotplace");
           }
+        }}
         />
       </section>
 
