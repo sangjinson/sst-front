@@ -2,9 +2,11 @@ import React, { useEffect, useRef } from 'react';
 
 const KAKAO_APP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
+
+
 const AreaMap = ({ lat, lng, address }) => {
   const mapRef = useRef(null);
-
+  
   useEffect(() => {
     const loadMap = () => {
       if (!window.kakao || !window.kakao.maps) return;
