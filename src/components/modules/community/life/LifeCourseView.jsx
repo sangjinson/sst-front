@@ -1,5 +1,16 @@
 import React from "react";
-import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
+
+const TYPE_LABEL = {
+  food: "맛집",
+  play: "관광",
+  sleep: "숙소",
+};
+
+const TYPE_COLOR = {
+  food: "bg-orange-100 text-orange-700",
+  play: "bg-sky-100 text-sky-700",
+  sleep: "bg-violet-100 text-violet-700",
+};
 
 const DownloadIcon = () => (
   <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
