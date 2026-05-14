@@ -8,18 +8,28 @@ const categorySlots = {
   play: 'right',
   sleep: 'far-right',
 };
+const tagStyles = {
+  볼거리: 'bg-[#E8F7EE] text-[#0F9B73]',
+  먹거리: 'bg-[#FFF2E8] text-[#E26338]',
+  놀거리: 'bg-[#EEF4FF] text-[#3B82F6]',
+  잘거리: 'bg-[#F3E8FF] text-[#8B5CF6]',
+};
 
 const slotPositions = {
   'far-left':
-    'md:-translate-x-[calc(50%+520px)] md:-translate-y-1/2 md:-rotate-[8deg] md:scale-[0.9]',
-  left:
-    'md:-translate-x-[calc(50%+260px)] md:-translate-y-1/2 md:-rotate-[4deg] md:scale-95',
-  center:
-    'md:-translate-x-1/2 md:-translate-y-1/2 md:rotate-0 md:scale-[1.08]',
-  right:
-    'md:translate-x-[calc(-50%+260px)] md:-translate-y-1/2 md:rotate-[4deg] md:scale-95',
-  'far-right':
-    'md:translate-x-[calc(-50%+520px)] md:-translate-y-1/2 md:rotate-[8deg] md:scale-[0.9]',
+  'md:-translate-x-[calc(50%+560px)] md:-translate-y-1/2 md:-rotate-[8deg] md:scale-[0.92]',
+
+left:
+  'md:-translate-x-[calc(50%+280px)] md:-translate-y-1/2 md:-rotate-[4deg] md:scale-[0.97]',
+
+center:
+  'md:-translate-x-1/2 md:-translate-y-1/2 md:rotate-0 md:scale-[1.1]',
+
+right:
+  'md:translate-x-[calc(-50%+280px)] md:-translate-y-1/2 md:rotate-[4deg] md:scale-[0.97]',
+
+'far-right':
+  'md:translate-x-[calc(-50%+560px)] md:-translate-y-1/2 md:rotate-[8deg] md:scale-[0.92]',
 };
 
 const collapsedPosition =
@@ -142,7 +152,7 @@ const TopPickDeck = ({ items, onDetailClick }) => {
       }}
     >
       <div className="hidden md:block">
-        <div className="relative mx-auto h-[390px] max-w-[1500px]">
+        <div className="relative mx-auto h-[430px] max-w-[1700px]">
           {displayItems.map(({ item, key, slot, isSelected, isFiller }) => {
             const positionClass = shouldExpand
   ? `${slotPositions[slot]} opacity-100`
@@ -167,7 +177,7 @@ const TopPickDeck = ({ items, onDetailClick }) => {
                     selectItem(key, isFiller);
                   }
                 }}
-                className={`group absolute left-1/2 top-1/2 h-[330px] w-[230px] transform-gpu overflow-hidden rounded-2xl border border-black/5 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.16)] transition-[translate,rotate,scale,opacity,box-shadow,border-color,filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${shouldExpand ? delayBySlot[slot] : 'delay-0'} will-change-transform focus:outline-none ${isFiller ? 'pointer-events-none cursor-default grayscale-[55%] brightness-[0.58] opacity-65 saturate-50' : 'cursor-pointer'} ${layerBySlot[slot]} ${positionClass} ${
+                className={`group absolute left-1/2 top-1/2 h-[360px] w-[250px] transform-gpu overflow-hidden rounded-2xl border border-black/5 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.16)] transition-[translate,rotate,scale,opacity,box-shadow,border-color,filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${shouldExpand ? delayBySlot[slot] : 'delay-0'} will-change-transform focus:outline-none ${isFiller ? 'pointer-events-none cursor-default grayscale-[55%] brightness-[0.58] opacity-65 saturate-50' : 'cursor-pointer'} ${layerBySlot[slot]} ${positionClass} ${
                   isSelected
                     ? `border-[#0F9B73] ${isSelectedMotion ? "ring-[#0F9B73]/55" : "ring-[#0F9B73]/40"} ring-4 shadow-[0_30px_82px_rgba(15,23,42,0.26),0_0_0_1px_rgba(15,155,115,0.3)]`
                     : `${isFiller ? "shadow-[0_12px_32px_rgba(15,23,42,0.1)]" : "hover:scale-100 hover:shadow-[0_22px_54px_rgba(15,23,42,0.16)]"}`
@@ -203,13 +213,17 @@ const TopPickDeck = ({ items, onDetailClick }) => {
 )}
 
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-4 pb-4 pt-16 text-white">
-                  <span className="mb-2 inline-block rounded bg-[#0F9B73] px-2 py-0.5 text-xs font-semibold">
-                    {item.tag}
-                  </span>
-                  <h4 className="line-clamp-1 text-lg font-bold transition-colors duration-300 group-hover:text-[#52D0A6]">
+                  <span
+  className={`mb-2 inline-block rounded px-2.5 py-1 text-sm font-semibold ${
+    tagStyles[item.tag] || 'bg-gray-100 text-gray-700'
+  }`}
+>
+  {item.tag}
+</span>
+                  <h4 className="line-clamp-1 text-[1.45rem] font-bold transition-colors duration-300 group-hover:text-[#52D0A6]">
                     {item.title}
                   </h4>
-                  <p className="mt-1 line-clamp-1 text-sm text-white/75">
+                  <p className="mt-1 line-clamp-1 text-base text-white/80">
                     {item.desc}
                   </p>
                 </div>
@@ -228,10 +242,13 @@ const TopPickDeck = ({ items, onDetailClick }) => {
 
             return (
               <article
-                key={key}
-                onClick={() => selectItem(key)}
-                className="group relative h-[310px] min-w-[78%] snap-center cursor-pointer overflow-hidden rounded-2xl border border-black/5 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.14)] transition-[transform,box-shadow] duration-300"
-              >
+  key={key}
+  onClick={() => {
+    selectItem(key);
+    onDetailClick(item.type, item);
+  }}
+  className="group relative h-[310px] min-w-[78%] snap-center cursor-pointer overflow-hidden rounded-2xl border border-black/5 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.14)] transition-[transform,box-shadow] duration-300"
+>
                 {imageSrc ? (
                   <img
                     src={imageSrc}
@@ -245,9 +262,13 @@ const TopPickDeck = ({ items, onDetailClick }) => {
                 )}
 
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-4 pb-4 pt-16 text-white">
-                  <span className="mb-2 inline-block rounded bg-[#0F9B73] px-2 py-0.5 text-xs font-semibold">
-                    {item.tag}
-                  </span>
+                  <span
+  className={`mb-2 inline-block rounded px-2.5 py-1 text-sm font-semibold ${
+    tagStyles[item.tag] || 'bg-gray-100 text-gray-700'
+  }`}
+>
+  {item.tag}
+</span>
                   <h4 className="line-clamp-1 text-lg font-bold">
                     {item.title}
                   </h4>

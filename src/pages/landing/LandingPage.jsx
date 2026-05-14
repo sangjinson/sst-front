@@ -185,11 +185,11 @@ const citiesNorth = [
                     onMouseLeave={() => setHoveredCity(null)}
                     onFocus={() => setHoveredCity(city)}
                     onBlur={() => setHoveredCity(null)}
-                    className={`group relative overflow-hidden rounded-lg border-none bg-white/90 px-[10px] py-[18px] font-medium text-[#333] shadow-[0_2px_8px_rgba(0,0,0,0.03)] ring-1 ring-transparent transition-all duration-300 ease-out hover:-translate-y-[2px] hover:scale-[1.04] hover:bg-white hover:text-[#0D7F60] hover:shadow-[0_12px_28px_rgba(15,23,42,0.08)] hover:ring-black/5 focus:-translate-y-[2px] focus:scale-[1.04] focus:bg-white focus:text-[#0D7F60] focus:shadow-[0_12px_28px_rgba(15,23,42,0.08)] focus:ring-black/5 active:translate-y-0 active:scale-[0.98] ${
-                      hoveredCity && hoveredCity !== city
-                        ? 'opacity-45 blur-[1px] scale-[0.98]'
-                        : 'opacity-100 blur-0 scale-100'
-                    }`}
+                    className={`group relative overflow-hidden rounded-lg border-none bg-white/90 px-[10px] py-[18px] font-medium text-[#333] shadow-[0_2px_8px_rgba(0,0,0,0.03)] ring-1 ring-transparent transition-[transform,opacity,background-color,color,box-shadow] duration-200 ease-out hover:-translate-y-[2px] hover:scale-[1.04] hover:bg-white hover:text-[#0D7F60] hover:shadow-[0_12px_28px_rgba(15,23,42,0.08)] hover:ring-black/5 focus:-translate-y-[2px] focus:scale-[1.04] focus:bg-white focus:text-[#0D7F60] focus:shadow-[0_12px_28px_rgba(15,23,42,0.08)] focus:ring-black/5 active:translate-y-0 active:scale-[0.98] ${
+  hoveredCity && hoveredCity !== city
+    ? 'opacity-45'
+    : 'opacity-100'
+}`}
                   >
                     <span className="relative z-10">{city}</span>
                   </button>
