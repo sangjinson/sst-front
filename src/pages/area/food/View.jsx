@@ -21,7 +21,6 @@ const FoodView = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
-
   const currentRegion = region || '';
   const currentRegionKor = toKorRegion(currentRegion);
 
@@ -102,6 +101,9 @@ const FoodView = () => {
           { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '메뉴', value: item.menu || '메뉴 정보 없음' },
           { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2} />, label: '전화번호', value: item.phone?.trim() || '전화번호 정보 없음' },
           { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '주차', value: item.parking || '주차 정보 없음' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4} />, label: '홈페이지', value: item.homepage
+            ? <a href={item.homepage} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-700 break-all">🔗 홈페이지 방문</a>
+            : '전화로 문의바랍니다.' },
         ]}
         tags={item.tags}
         tagLabel="태그"
@@ -109,10 +111,7 @@ const FoodView = () => {
 
       <AreaMap lat={item.lat} lng={item.lng} address={item.address} />
 
-      <AreaReview
-        plcNo={item.plcNo}
-        placeholder="음식점에 대한 솔직한 리뷰를 남겨주세요."
-      />
+      <AreaReview plcNo={item.plcNo} placeholder="음식점에 대한 솔직한 리뷰를 남겨주세요." />
 
       <AreaRelated
         title={`${currentRegionKor} 비슷한 음식점`}

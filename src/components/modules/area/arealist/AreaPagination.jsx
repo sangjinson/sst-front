@@ -1,39 +1,16 @@
 import React from 'react';
 
-/**
- * AreaPagination - 볼거리/먹거리/잘거리/놀거리 공통 페이지네이션
- *
- * ────────────────────────────────────────────────
- * 사용 예시:
- *
- * // 1. import
- * import AreaPagination from '@components/modules/AreaPagination';
- *
- * // 2. 페이지 상태 선언
- * const [currentPage, setCurrentPage] = useState(1);
- * const ITEMS_PER_PAGE = 6;
- *
- * // 3. 페이지 계산
- * const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
- * const paginated = filtered.slice(
- *   (currentPage - 1) * ITEMS_PER_PAGE,
- *   currentPage * ITEMS_PER_PAGE
- * );
- *
- * // 4. JSX에서 사용
- * <AreaPagination
- *   currentPage={currentPage}
- *   totalPages={totalPages}
- *   onPageChange={(page) => setCurrentPage(page)}
- * />
- * ────────────────────────────────────────────────
- *
- * props:
- * - currentPage  : 현재 페이지 번호 (1부터 시작)
- * - totalPages   : 전체 페이지 수
- * - onPageChange : 페이지 변경 콜백 (page: number) => void
- */
 const AreaPagination = ({ currentPage, totalPages, onPageChange }) => {
+  const PAGES_PER_GROUP = 10;
+
+  const currentGroup  = Math.ceil(currentPage / PAGES_PER_GROUP);
+  const startPage     = (currentGroup - 1) * PAGES_PER_GROUP + 1;
+  const endPage       = Math.min(startPage + PAGES_PER_GROUP - 1, totalPages);
+
+  const pages       = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+  const hasPrevGroup = currentGroup > 1;
+  const hasNextGroup = endPage < totalPages;
+
   return (
     <div className="flex justify-center items-center gap-2 mt-10">
 
@@ -46,8 +23,18 @@ const AreaPagination = ({ currentPage, totalPages, onPageChange }) => {
         이전
       </button>
 
+      {/* 이전 그룹 */}
+      {hasPrevGroup && (
+        <button
+          onClick={() => onPageChange(startPage - 1)}
+          className="w-9 h-9 rounded-lg text-sm font-medium border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+        >
+          ...
+        </button>
+      )}
+
       {/* 페이지 번호 버튼 */}
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+      {pages.map((page) => (
         <button
           key={page}
           onClick={() => onPageChange(page)}
@@ -60,6 +47,16 @@ const AreaPagination = ({ currentPage, totalPages, onPageChange }) => {
           {page}
         </button>
       ))}
+
+      {/* 다음 그룹 */}
+      {hasNextGroup && (
+        <button
+          onClick={() => onPageChange(endPage + 1)}
+          className="w-9 h-9 rounded-lg text-sm font-medium border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+        >
+          ...
+        </button>
+      )}
 
       {/* 다음 버튼 */}
       <button
