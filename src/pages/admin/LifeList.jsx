@@ -16,7 +16,7 @@ export default function LifeList() {
   const [allChecked, setAllChecked] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   
-  // 🚀 1. 운영/휴지통 상태 관리
+  // 🚀 1. 운영(Y) / 휴지통(N) / 신고누적(B) 상태 관리
   const [useYn, setUseYn] = useState('Y');
 
   const { page, size, totalCount, totalPages, setPage, setTotalCount } = usePagination(1, 10);
@@ -26,7 +26,7 @@ export default function LifeList() {
       const response = await api.get('/admin/community/list', {
         params: {
           catCd: LIFE_CAT_CD,
-          useYn, // 🚀 2. 백엔드로 상태값 전달
+          useYn, // 🚀 2. 백엔드로 'Y', 'N', 'B' 상태값 전달
           page,
           size,
           keyword: searchKeyword,
@@ -39,7 +39,6 @@ export default function LifeList() {
     }
   };
 
-  // 🚀 3. useYn 추가
   useEffect(() => {
     fetchPosts();
     setAllChecked(false);
@@ -68,10 +67,10 @@ export default function LifeList() {
     setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
   };
 
-  // 🚀 4. 삭제/복구 토글 로직
+  // 🚀 3. 삭제/복구 토글 로직 (B 상태에서도 복구 가능하도록 처리)
   const handleToggleStatus = async (commNo) => {
     const isDeleting = useYn === 'Y';
-    const newStatus = isDeleting ? 'N' : 'Y';
+    const newStatus = isDeleting ? 'N' : 'Y'; // 'N'이나 'B' 탭에서는 복구 시 'Y'로 변경
     const actionText = isDeleting ? '휴지통으로 이동' : '복구';
 
     if (!window.confirm(`정말 이 게시글을 ${actionText} 하시겠습니까?`)) return;
@@ -86,7 +85,7 @@ export default function LifeList() {
     }
   };
 
-  // 🚀 5. 다중 선택 토글 로직
+  // 🚀 4. 다중 선택 토글 로직
   const handleBulkToggle = async () => {
     if (selected.length === 0) { alert('게시글을 선택해주세요.'); return; }
     
@@ -135,8 +134,8 @@ export default function LifeList() {
         </div>
       </div>
 
-      {/* 🚀 6. 탭 UI */}
-      <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
+      {/* 🚀 5. 3가지 탭 UI 구성 (운영 중 / 휴지통 / 신고 누적) */}
+      <div className="flex items-center gap-3 border-b border-gray-200 pb-4 flex-wrap">
         <button
           onClick={() => { setUseYn('Y'); setPage(1); }}
           className={`px-4 py-2 rounded-lg font-semibold transition-all ${
@@ -148,10 +147,18 @@ export default function LifeList() {
         <button
           onClick={() => { setUseYn('N'); setPage(1); }}
           className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
-            useYn === 'N' ? 'bg-red-50 text-red-600 border border-red-200 shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            useYn === 'N' ? 'bg-gray-900 text-white shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
           }`}
         >
           🗑️ 휴지통
+        </button>
+        <button
+          onClick={() => { setUseYn('B'); setPage(1); }}
+          className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+            useYn === 'B' ? 'bg-red-50 text-red-600 border border-red-200 shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+          }`}
+        >
+          🚨 블라인드 (신고 누적)
         </button>
       </div>
 
@@ -193,7 +200,10 @@ export default function LifeList() {
               {posts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} className="px-5 py-10 text-center text-gray-500">
-                    {useYn === 'Y' ? '등록된 인생거리 게시글이 없습니다.' : '휴지통이 비어있습니다.'}
+                    {/* 🚀 6. 빈 목록 메시지를 상태별로 분기 처리 */}
+                    {useYn === 'Y' && '등록된 인생거리 게시글이 없습니다.'}
+                    {useYn === 'N' && '휴지통이 비어있습니다.'}
+                    {useYn === 'B' && '신고 누적으로 블라인드된 게시글이 없습니다.'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -218,7 +228,6 @@ export default function LifeList() {
                     <TableCell className="px-5 py-4 text-center text-gray-500 whitespace-nowrap">{post.commRegDate}</TableCell>
                     <TableCell className="px-5 py-4">
                       <div className="flex gap-2 justify-center">
-                        {/* 🚀 7. 조건부 렌더링 */}
                         {useYn === 'Y' ? (
                           <button
                             onClick={() => handleToggleStatus(post.commNo)}

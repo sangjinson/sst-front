@@ -6,6 +6,7 @@ import { usePagination } from '@hooks/usePagination';
 import AdminPagination from '@components/common/AdminPagination';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@themeadmin/components/ui/table';
 import { TrashBinIcon } from '@themeadmin/icons';
+import Badge from '@themeadmin/components/ui/badge/Badge';
 
 export default function HotplaceList() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function HotplaceList() {
   const [allChecked, setAllChecked] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   
-  // 🚀 1. 운영/휴지통 상태 관리를 위한 state 추가
+  // 🚀 1. 상태 관리: 'Y'(운영 중), 'N'(일반 휴지통), 'B'(신고 누적 블라인드)
   const [useYn, setUseYn] = useState('Y'); 
 
   const { page, size, totalCount, totalPages, setPage, setTotalCount } = usePagination(1, 10);
@@ -26,7 +27,7 @@ export default function HotplaceList() {
       const response = await api.get('/admin/community/list', {
         params: {
           catCd: HOTPLACE_CAT_CD,
-          useYn, // 🚀 2. 백엔드 API로 현재 탭의 상태값(Y 또는 N) 전달
+          useYn, // 🚀 백엔드로 Y, N, B 중 하나가 전달됩니다.
           page,
           size,
           keyword: searchKeyword,
@@ -39,7 +40,6 @@ export default function HotplaceList() {
     }
   };
 
-  // 🚀 3. useYn(탭)이 변경될 때도 데이터를 다시 불러오도록 의존성 배열에 추가
   useEffect(() => {
     fetchPosts();
     setAllChecked(false);
@@ -68,7 +68,7 @@ export default function HotplaceList() {
     setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
   };
 
-  // 🚀 4. 기존 물리 삭제(DELETE) 로직을 논리 삭제/복구(PATCH) 로직으로 변경
+  // 단일 상태 변경
   const handleToggleStatus = async (commNo) => {
     const isDeleting = useYn === 'Y';
     const newStatus = isDeleting ? 'N' : 'Y';
@@ -76,7 +76,6 @@ export default function HotplaceList() {
 
     if (!window.confirm(`정말 이 게시글을 ${actionText} 하시겠습니까?`)) return;
     try {
-      // 🚀 백엔드에 만들어둔 상태 변경 API 호출
       await api.patch(`/admin/community/${commNo}/status`, null, { params: { useYn: newStatus } });
       alert(`${actionText}가 완료되었습니다.`);
       
@@ -87,7 +86,7 @@ export default function HotplaceList() {
     }
   };
 
-  // 🚀 5. 다중 선택 처리도 PATCH 토글 방식으로 변경
+  // 다중 상태 변경
   const handleBulkToggle = async () => {
     if (selected.length === 0) { alert('게시글을 선택해주세요.'); return; }
     
@@ -136,7 +135,7 @@ export default function HotplaceList() {
         </div>
       </div>
 
-      {/* 🚀 6. 운영 중 / 휴지통 탭 UI 추가 */}
+      {/* 🚀 2. 3단 탭 UI (운영 중 / 휴지통 / 블라인드) */}
       <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
         <button
           onClick={() => { setUseYn('Y'); setPage(1); }}
@@ -149,10 +148,18 @@ export default function HotplaceList() {
         <button
           onClick={() => { setUseYn('N'); setPage(1); }}
           className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
-            useYn === 'N' ? 'bg-red-50 text-red-600 border border-red-200 shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            useYn === 'N' ? 'bg-gray-600 text-white shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
           }`}
         >
           🗑️ 휴지통
+        </button>
+        <button
+          onClick={() => { setUseYn('B'); setPage(1); }}
+          className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+            useYn === 'B' ? 'bg-red-50 text-red-600 border border-red-200 shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500'
+          }`}
+        >
+          🚨 블라인드 (신고 누적)
         </button>
       </div>
 
@@ -193,17 +200,22 @@ export default function HotplaceList() {
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {posts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="px-5 py-10 text-center text-gray-500">
-                    {useYn === 'Y' ? '등록된 핫플거리 게시글이 없습니다.' : '휴지통이 비어있습니다.'}
-                  </TableCell>
+                  {/* 🚀 3. 빈 데이터 처리 시 colSpan=9 적용 */}
+                  <td colSpan={9} className="px-5 py-16 text-center text-gray-500 font-medium bg-white">
+                    {useYn === 'Y' ? '등록된 핫플거리 게시글이 없습니다.' : 
+                     useYn === 'N' ? '휴지통이 비어있습니다.' : 
+                     '신고 누적으로 블라인드 처리된 게시글이 없습니다.'}
+                  </td>
                 </TableRow>
               ) : (
-                posts.map((post) => (
+                posts.map((post, idx) => (
                   <TableRow key={post.commNo} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
                     <TableCell className="px-5 py-4 text-center">
                       <input type="checkbox" checked={selected.includes(post.commNo)} onChange={() => toggleOne(post.commNo)} className="rounded border-gray-300"/>
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-center text-gray-500">{post.commNo}</TableCell>
+                    <TableCell className="px-5 py-4 text-center text-gray-500">
+                      {(page - 1) * size + idx + 1}
+                    </TableCell>
                     <TableCell className="px-5 py-4 text-start">
                       <button
                         onClick={() => navigate(`/showcase/hotplace/view/${post.commNo}`)}
@@ -219,7 +231,7 @@ export default function HotplaceList() {
                     <TableCell className="px-5 py-4 text-center text-gray-500 whitespace-nowrap">{post.commRegDate}</TableCell>
                     <TableCell className="px-5 py-4">
                       <div className="flex gap-2 justify-center">
-                        {/* 🚀 7. 탭 상태에 따라 아이콘/버튼 분기 처리 */}
+                        {/* 🚀 4. 상태에 따른 버튼 동적 렌더링 (블라인드 탭에서도 복구 가능하게 지원) */}
                         {useYn === 'Y' ? (
                           <button
                             onClick={() => handleToggleStatus(post.commNo)}
