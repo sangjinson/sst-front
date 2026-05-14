@@ -1,5 +1,4 @@
 import React from "react";
-import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
 
 /*
  인생거리 글쓰기에서 여행 코스를 보여주고 수정하는 컴포넌트입니다.
@@ -24,6 +23,18 @@ import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
  *   onRemoveCourseItem={removeCourseItem}
  *   onUpdateCourseItem={updateCourseItem}
 */
+
+const TYPE_LABEL = {
+  food: "맛집",
+  play: "관광",
+  sleep: "숙소",
+};
+
+const TYPE_COLOR = {
+  food: "bg-orange-100 text-orange-700",
+  play: "bg-sky-100 text-sky-700",
+  sleep: "bg-violet-100 text-violet-700",
+};
 
 const CourseSection = ({
   course,

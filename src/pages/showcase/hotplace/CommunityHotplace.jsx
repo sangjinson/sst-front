@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getAllPosts } from "./communityHotplaceData";
 import AreaPagination from "@components/modules/area/arealist/AreaPagination";
 import CommunitySearchBar from "@components/modules/community/common/CommunitySearchBar";
 import api from "@api/axios";
+import CommunityHotplaceSkeleton from "@components/skeleton/CommunityHotplaceSkeleton";
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const getImageUrl = (url) => {
@@ -23,13 +24,11 @@ const CommunityHotplace = () => {
   const [sortType, setSortType] = useState(searchParams.get("sortType") || "latest");
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
   const ITEMS_PER_PAGE = 15;
+  const [loading, setLoading] = useState(true);
 
   const [posts, setPosts] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-
-  // // 더미 + 유저 게시글 합쳐서 사용
-  // const posts = getAllPosts();
 
   const fetchPosts = () => {
     api
@@ -68,11 +67,14 @@ const CommunityHotplace = () => {
       })
       .catch((err) => {
         console.log("커뮤니티 조회 실패", err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
+  // 로그인 사용자 조회: 처음 한 번만
   useEffect(() => {
-    window.scrollTo(0, 0);
 
     api
       .get("/auth/me")
@@ -85,15 +87,14 @@ const CommunityHotplace = () => {
   }, []);
 
   useEffect(() => {
-    setSearchParams(
-      {
-        page: currentPage,
-        searchType,
-        keyword,
-        sortType,
-      },
-      { replace: true }
-    );
+    const nextParams = {};
+
+    if (currentPage !== 1) nextParams.page = currentPage;
+    if (searchType !== "all") nextParams.searchType = searchType;
+    if (keyword.trim() !== "") nextParams.keyword = keyword;
+    if (sortType !== "latest") nextParams.sortType = sortType;
+
+    setSearchParams(nextParams, { replace: true });
   }, [currentPage, searchType, keyword, sortType, setSearchParams]);
 
   useEffect(() => {
@@ -103,6 +104,27 @@ const CommunityHotplace = () => {
 
     return () => clearTimeout(timer);
   }, [keyword, searchType, sortType, currentPage]);
+
+  // 페이지 변경 시 맨 위로 이동
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [currentPage]);
+
+  // 페이지 이동 시 검색 상태 초기화
+  useEffect(() => {
+    const nextKeyword = searchParams.get("keyword") || "";
+    const nextSearchType = searchParams.get("searchType") || "all";
+    const nextSortType = searchParams.get("sortType") || "latest";
+    const nextPage = Number(searchParams.get("page")) || 1;
+
+    setKeyword(nextKeyword);
+    setSearchType(nextSearchType);
+    setSortType(nextSortType);
+    setCurrentPage(nextPage);
+  }, [searchParams]);
 
   const toggleLike = (postId) => {
     if (!currentUserId) {
@@ -167,6 +189,10 @@ const CommunityHotplace = () => {
       <path d="M7 11l4.4-7.1A2 2 0 0 1 15 5v4h4a2 2 0 0 1 2 2.3l-1.2 8A2 2 0 0 1 17.8 21H7V11z" />
     </svg>
   );
+
+  if (loading) {
+    return <CommunityHotplaceSkeleton />;
+  }
 
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
@@ -236,6 +262,7 @@ const CommunityHotplace = () => {
           setSearchType("all");
           setCurrentPage(1);
         }}
+        popularTags={["성수카페", "제주맛집", "부산야경", "혼자여행", "데이트코스"]}
         searchOptions={[
           { value: "all", label: "전체 검색" },
           { value: "title", label: "제목 검색" },
