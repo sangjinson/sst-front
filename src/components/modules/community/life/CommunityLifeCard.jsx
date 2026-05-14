@@ -61,10 +61,10 @@ const CommunityLifeCard = ({
 
   // 좋아요 버튼 클릭 시 실행될 함수
   onToggleLike,
-}) => {
+  }) => {
   // 화면에 보여줄 좋아요 수
   // liked가 true면 기존 wishCnt에서 +1 해서 보여줌
-  const likeCount = liked ? post.wishCnt + 1 : post.wishCnt;
+  const likeCount = post.wishCnt;
 
   return (
     <article

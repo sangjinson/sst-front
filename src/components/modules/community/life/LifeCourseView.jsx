@@ -1,5 +1,16 @@
 import React from "react";
-import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
+
+const TYPE_LABEL = {
+  food: "맛집",
+  play: "관광",
+  sleep: "숙소",
+};
+
+const TYPE_COLOR = {
+  food: "bg-orange-100 text-orange-700",
+  play: "bg-sky-100 text-sky-700",
+  sleep: "bg-violet-100 text-violet-700",
+};
 
 const KOR_TYPE_COLOR = {
   '볼거리': 'bg-blue-100 text-blue-700',
