@@ -1,6 +1,13 @@
 import React from "react";
 import { TYPE_LABEL, TYPE_COLOR } from "@pages/showcase/life/communityLifeData";
 
+const KOR_TYPE_COLOR = {
+  '볼거리': 'bg-blue-100 text-blue-700',
+  '먹거리': 'bg-orange-100 text-orange-700',
+  '잘거리': 'bg-green-100 text-green-700',
+  '놀거리': 'bg-purple-100 text-purple-700',
+};
+
 const DownloadIcon = () => (
   <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M12 3v12" />
@@ -32,26 +39,6 @@ const CalendarPlanIcon = () => (
   </svg>
 );
 
-/**
- * LifeCourseView
- *
- * 인생거리 상세페이지에서 여행 코스 목록과
- * "내 일정으로 가져오기", "이 코스로 일정 만들기" 버튼을 보여주는 컴포넌트입니다.
- *
- * 사용 예시:
- * 
- * import LifeCourseView from "@components/modules/community/life/LifeCourseView";
- *
- * <LifeCourseView
- *   courseList={courseList}
- *   region={region}
- *   thumbnail={thumbnail}
- *   navigate={navigate}
- *   handleImportSchedule={handleImportSchedule}
- *   handleMakePlan={handleMakePlan}
- * />
- */
-
 const LifeCourseView = ({
   courseList,
   region,
@@ -78,56 +65,31 @@ const LifeCourseView = ({
                 <div className="w-8 h-8 rounded-full bg-[#0F9B73] text-white text-sm font-bold flex items-center justify-center shrink-0">
                   {c.order || i + 1}
                 </div>
-
                 {i < courseList.length - 1 && (
                   <div className="w-0.5 h-full bg-gray-200 my-1 min-h-[20px]" />
                 )}
               </div>
 
               <div className="flex-1 bg-gray-50 rounded-2xl p-4 flex gap-4 mb-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigate(`/${region}/${c.type}/view`, {
-                      state: {
-                        item: c,
-                        region,
-                        type: c.type,
-                      },
-                    });
-                  }}
-                  className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-200 transition hover:scale-105 active:scale-95"
-                >
+                <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-200">
                   <img
                     src={c.image || thumbnail}
                     alt={c.name}
                     className="w-full h-full object-cover"
                   />
-                </button>
+                </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span
-                      className={`fs-down-1 px-2 py-0.5 rounded-full font-bold ${
-                        TYPE_COLOR?.[c.type] ||
-                        "bg-emerald-50 text-emerald-600"
-                      }`}
-                    >
-                      {TYPE_LABEL?.[c.type] || "여행"}
+                    <span className={`fs-down-1 px-2 py-0.5 rounded-full font-bold ${
+                      KOR_TYPE_COLOR[c.type] ?? TYPE_COLOR?.[c.type] ?? 'bg-emerald-50 text-emerald-600'
+                    }`}>
+                      {c.type || TYPE_LABEL?.[c.type] || '여행'}
                     </span>
                   </div>
-
-                  <p className="fs-down-1 font-bold text-gray-900 truncate">
-                    {c.name}
-                  </p>
-
-                  <p className="fs-down-1 text-gray-400 mt-0.5">
-                    {c.address}
-                  </p>
-
-                  <p className="fs-down-1 text-gray-500 mt-1">
-                    {c.desc}
-                  </p>
+                  <p className="fs-down-1 font-bold text-gray-900 truncate">{c.name}</p>
+                  <p className="fs-down-1 text-gray-400 mt-0.5">{c.address}</p>
+                  <p className="fs-down-1 text-gray-500 mt-1">{c.desc}</p>
                 </div>
               </div>
             </div>
