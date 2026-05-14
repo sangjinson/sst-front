@@ -18,7 +18,9 @@ const CARDS = [
 
 const MyPage = () => {
   const location = useLocation();
-  const [activeSection, setActiveSection] = useState(location.state?.tab || 'member');
+  const [activeSection, setActiveSection] = useState(
+    location.state?.tab || sessionStorage.getItem("mypageTab") || "member"
+  );
   
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,6 +28,10 @@ const MyPage = () => {
   const [profileImg, setProfileImg] = useState(
     'https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png'
   );
+
+  useEffect(() => {
+    sessionStorage.setItem("mypageTab", activeSection);
+  }, [activeSection]);
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -105,9 +111,8 @@ const MyPage = () => {
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           
           {/* 사이드바 */}
-          {!loading && profile && (
-            <Sidebar profile={profile} profileImg={profileImg} />
-          )}
+          {/* !loading && profile && () */} 
+          <Sidebar profile={profile} profileImg={profileImg} />
 
           {/* 메인 컨텐츠 */}
           <section className="flex-1 min-w-0 flex flex-col gap-4 w-full">

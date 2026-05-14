@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import TopPickCard from '@components/card/TopPickCard';
+import TopPickDeck from '@components/card/TopPickDeck';
 import HeroBanner from '@components/common/HeroBanner';
 import CategorySection from '@components/card/CategorySection';
 import Breadcrumb from '@components/common/Breadcrumb';
@@ -251,16 +251,7 @@ const foods = placeList.filter(
                   방방곳곳 숨어있는 추천을 찾다
                 </h2>
               </div>
-  
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-                {topPicks.map((item) => (
-                  <TopPickCard
-                    key={`${item.type}-${item.id}`}
-                    item={item}
-                    onClick={() => handleCardClick(item.type, item)}
-                  />
-                ))}
-              </div>
+              <TopPickDeck items={topPicks} onDetailClick={handleCardClick} />
             </section>
           )}
 

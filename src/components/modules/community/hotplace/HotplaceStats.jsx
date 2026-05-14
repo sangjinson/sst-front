@@ -26,6 +26,7 @@ const HotplaceStats = ({
   comments,
   wishCount,
   isLogin,
+  isOwner,
   navigate,
   handleDeletePost,
 }) => {
@@ -69,15 +70,21 @@ const HotplaceStats = ({
           </div>
         </div>
 
-        {isLogin && (
+        {isLogin && isOwner && (
           <div className="grid grid-cols-2 gap-3">
-            <button type="button" onClick={() => navigate(`/showcase/hotplace/write/${currentPost.id}`)}
-              className="rounded-xl border border-gray-200 px-4 py-3 fs-down-1 font-bold text-gray-600 transition hover:border-emerald-300 hover:text-emerald-600">수정</button>
+            <button
+              type="button"
+              onClick={() => navigate(`/showcase/hotplace/write/${currentPost.id}`)}
+              className="rounded-xl border border-gray-200 px-4 py-3 fs-down-1 font-bold text-gray-600 transition hover:border-emerald-300 hover:text-emerald-600">
+              수정
+            </button>
 
             <button
               type="button"
               onClick={handleDeletePost}
-              className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 fs-down-1 font-bold text-red-500 transition hover:bg-red-100">삭제</button>
+              className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 fs-down-1 font-bold text-red-500 transition hover:bg-red-100">
+              삭제
+            </button>
           </div>
         )}
       </div>
