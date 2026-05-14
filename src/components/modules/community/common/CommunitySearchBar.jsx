@@ -9,10 +9,11 @@ const CommunitySearchBar = ({
   onSearch,
   onReset,
   searchOptions = [],
+  popularTags = [],
 }) => {
   return (
     <section className="mb-10 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-[160px_minmax(0,1fr)_160px_auto]">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-[160px_minmax(0,1fr)_160px]">
 
         {/* 검색 타입 */}
         <select
@@ -49,22 +50,44 @@ const CommunitySearchBar = ({
       </div>
 
       {/* 하단 영역 */}
-      <div className="mt-3 flex items-center justify-between fs-down-1 text-gray-400">
-        <span>
+      <div className="mt-4 flex items-center justify-between fs-down-1 text-gray-400">
+        <span className="pl-2">
           총{" "}
           <strong className="text-emerald-600">
             {totalCount}
           </strong>
           개의 게시글
         </span>
+      </div>
+
+      {/* 인기 해시태그 + 검색 초기화 */}
+      <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_160px]">
+        {popularTags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {popularTags.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => {
+                  setSearchType("hashtag");
+                  setKeyword(tag);
+                }}
+                className="rounded-full bg-emerald-50 px-3 py-1 fs-down-1 font-semibold text-emerald-600 transition hover:bg-emerald-100 hover:text-emerald-700">
+                #{tag}
+              </button>
+            ))}
+          </div>
+        )}
 
         {keyword && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="font-semibold text-gray-400 hover:text-emerald-600">
-            검색 초기화
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onReset}
+              className="rounded-full border border-gray-200 px-3 py-1 fs-down-1 font-semibold text-gray-400 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-600">
+              검색 초기화
+            </button>
+          </div>
         )}
       </div>
     </section>

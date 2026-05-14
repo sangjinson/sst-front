@@ -5,6 +5,7 @@ import Breadcrumb from "@components/common/Breadcrumb";
 import CommunityLifeCard from "@components/modules/community/life/CommunityLifeCard";
 import Pagination from "@components/common/Pagination";
 import CommunitySearchBar from "@components/modules/community/common/CommunitySearchBar";
+import CommunityLifeSkeleton from "@components/skeleton/CommunityLifeSkeleton";
 
 
 const CommunityLife = () => {
@@ -21,6 +22,7 @@ const CommunityLife = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 5;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -36,16 +38,27 @@ const CommunityLife = () => {
   }, []);
 
   useEffect(() => {
-    setSearchParams(
-      {
-        page,
-        searchType,
-        keyword,
-        sortType,
-      },
-      { replace: true }
-    );
+    const nextParams = {};
+
+    if (page !== 1) nextParams.page = page;
+    if (searchType !== "all") nextParams.searchType = searchType;
+    if (keyword.trim() !== "") nextParams.keyword = keyword;
+    if (sortType !== "latest") nextParams.sortType = sortType;
+
+    setSearchParams(nextParams, { replace: true });
   }, [page, searchType, keyword, sortType, setSearchParams]);
+
+  useEffect(() => {
+    const nextKeyword = searchParams.get("keyword") || "";
+    const nextSearchType = searchParams.get("searchType") || "all";
+    const nextSortType = searchParams.get("sortType") || "latest";
+    const nextPage = Number(searchParams.get("page")) || 1;
+
+    setKeyword(nextKeyword);
+    setSearchType(nextSearchType);
+    setSortType(nextSortType);
+    setPage(nextPage);
+  }, [searchParams]);
 
   const getImageUrl = (url) => {
     if (!url) return "https://placehold.co/600x400";
@@ -54,6 +67,7 @@ const CommunityLife = () => {
   };
 
   const fetchPosts = () => {
+    setLoading(true);
     api
       .get("/community", {
         params: {
@@ -100,6 +114,9 @@ const CommunityLife = () => {
       })
       .catch((err) => {
         console.error("인생거리 목록 조회 실패:", err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -149,6 +166,10 @@ const CommunityLife = () => {
         console.error("좋아요 처리 실패:", err);
       });
   };
+
+  if (loading) {
+    return <CommunityLifeSkeleton />;
+  }
 
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
@@ -228,6 +249,7 @@ const CommunityLife = () => {
           setSearchType("all");
           setPage(1);
         }}
+        popularTags={["제주코스", "부산여행", "혼자여행", "데이트코스", "뚜벅이여행"]}
         searchOptions={[
           { value: "all", label: "전체 검색" },
           { value: "title", label: "제목 검색" },
