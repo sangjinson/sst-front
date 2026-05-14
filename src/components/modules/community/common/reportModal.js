@@ -102,16 +102,39 @@ export const openReportModal = async ({
   if (!result.isConfirmed) return;
 
   try {
-    console.log("신고 전송 데이터:", result.value);
-    await api.post("/reports", result.value);
+  console.log("신고 전송 데이터:", result.value);
+
+    const res = await api.post("/reports", result.value);
+
+    const blinded = res.data;
+
+    if (blinded) {
+
+      await Swal.fire({
+        icon: "success",
+        title: "블라인드 처리 완료",
+        text: "신고 누적으로 블라인드 처리되었습니다.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      return {
+        blinded: true,
+      };
+    }
 
     await Swal.fire({
       icon: "success",
       title: "신고 완료",
-      text: "신고가 정상적으로 완료되었습니다.",
+      text: "신고가 정상적으로 접수되었습니다.",
       timer: 1500,
       showConfirmButton: false,
     });
+
+    return {
+      blinded: false,
+    };
+
   } catch (err) {
     console.error("신고 실패:", err);
 
