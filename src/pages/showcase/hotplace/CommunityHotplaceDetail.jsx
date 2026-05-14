@@ -13,9 +13,9 @@ import CommentSection from "@components/modules/community/common/CommentSection"
 const CommunityHotplaceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const isLogin = true;
 
   const [currentUserId, setCurrentUserId] = useState(null);
+  const isLogin = !!currentUserId;
   const [isLiked, setIsLiked] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [newComment, setNewComment] = useState("");
@@ -44,14 +44,14 @@ const CommunityHotplaceDetail = () => {
         const viewedKey = `hotplace_viewed_${id}`;
         // 처음 조회 시에만 조회수 증가
         if (!localStorage.getItem(viewedKey)) {
-
-          await api.put(`/community/${id}/view`);
-
           localStorage.setItem(viewedKey, "true");
+          await api.put(`/community/${id}/view`);
         }
         // 게시글 상세 조회
         const res = await api.get(`/community/${id}`);
         const item = res.data;
+
+        console.log(item);
 
         const imageUrl = item.commMainImgUrl
           ? item.commMainImgUrl.startsWith("http")
@@ -62,19 +62,23 @@ const CommunityHotplaceDetail = () => {
         setCurrentPost({
           id: item.commNo,
           commNo: item.commNo,
+          mbrId: item.commMbrId, // 작성자 회원번호 추가
           title: item.commTitle,
           description: item.commContent,
           content: item.commContent,
           author: item.mbrNickname,
-          place: "핫플거리",
+          place: item.plcName || "장소 미등록",
+          region: item.rgnName || "지역 미정",
           hashtags: item.hashtagText ? item.hashtagText.split(",") : [],
           img: imageUrl,
           images:
-            item.images?.map((img) =>
-              img.startsWith("http")
-                ? img
-                : `http://localhost:8080${img}`
-            ) || [imageUrl],
+            item.images?.length > 0
+              ? item.images.map((img) =>
+                  img.startsWith("http")
+                    ? img
+                    : `http://localhost:8080${img}`
+                )
+              : [imageUrl],
           regDt: item.commRegDate,
           wishCnt: item.commLikeCnt ?? 0,
           commentCnt: item.commCmntCnt ?? 0,
@@ -251,6 +255,11 @@ const CommunityHotplaceDetail = () => {
     }
   };
 
+  const isOwner =
+  currentUserId !== null &&
+  currentPost.mbrId !== null &&
+  Number(currentUserId) === Number(currentPost.mbrId);
+
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 font-sans">
       <Breadcrumb
@@ -300,6 +309,7 @@ const CommunityHotplaceDetail = () => {
             comments={comments}
             wishCount={wishCount}
             isLogin={isLogin}
+            isOwner={isOwner}
             navigate={navigate}
             handleDeletePost={handleDeletePost}
           />
@@ -307,6 +317,8 @@ const CommunityHotplaceDetail = () => {
 
         <HotplaceAside
           currentPost={currentPost}
+          isLogin={isLogin}
+          isOwner={isOwner}
           isLiked={isLiked}
           setIsLiked={setIsLiked}
           wishCount={wishCount}
