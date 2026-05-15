@@ -115,24 +115,15 @@ const CourseSection = ({
                     </span>
                   </div>
 
-                  <p className="text-sm font-bold text-gray-900">
+                  <p className="fs-down-1 font-bold text-gray-900">
                     {c.name}
                   </p>
 
                   {c.address && (
-                    <p className="text-xs text-gray-400 mt-0.5 truncate">
+                    <p className="fs-down-1 text-gray-400 mt-0.5 truncate">
                       {c.address}
                     </p>
                   )}
-
-                  <input
-                    value={c.desc || ""}
-                    onChange={(e) =>
-                      onUpdateCourseItem(idx, "desc", e.target.value)
-                    }
-                    placeholder="장소 설명을 입력해주세요 (선택)"
-                    className="mt-1.5 w-full px-2 py-1 border border-gray-200 rounded-lg text-xs outline-none focus:border-[#0F9B73] bg-white transition"
-                  />
                 </div>
 
                 <button
@@ -149,9 +140,8 @@ const CourseSection = ({
           <button
             type="button"
             onClick={onOpenModal}
-            className="w-full py-2.5 border border-dashed border-gray-200 rounded-xl text-xs text-gray-400 hover:border-[#0F9B73] hover:text-[#0F9B73] transition"
-          >
-            + 다른 일정에서 더 가져오기
+            className="w-full py-2.5 border border-dashed border-gray-200 rounded-xl fs-down-1 text-gray-400 hover:border-[#0F9B73] hover:text-[#0F9B73] transition">
+            + 다른 일정으로 변경하기
           </button>
         </div>
       )}

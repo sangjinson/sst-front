@@ -115,7 +115,6 @@ const CommunityLifeWrite = () => {
             address: place.address || place.plcAddress || "",
             type: place.type || place.plcType || "see",
             image: place.image || place.plcImgUrl || "",
-            desc: place.desc || place.description || "",
             dayNo: place.dayNo,
           }));
 
@@ -212,7 +211,6 @@ const CommunityLifeWrite = () => {
       address: item.address || "",
       type: item.type || "see",
       image: item.image || "",
-      desc: item.desc || "",
       dayNo: item.dayNo,
     }));
 

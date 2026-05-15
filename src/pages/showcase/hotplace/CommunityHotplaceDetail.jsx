@@ -328,6 +328,7 @@ const CommunityHotplaceDetail = () => {
             wishCount={wishCount}
             isLogin={isLogin}
             isOwner={isOwner}
+            handleLikeClick={handleLikeClick}
             navigate={navigate}
             handleDeletePost={handleDeletePost}
           />
