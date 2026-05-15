@@ -14,7 +14,7 @@ import AIResultMapView from '@components/modules/airesult/AIResultMapView';
 import { useAIPlan } from '@pages/aiplan/AIPlanContext';
 import '@assets/css/common.css';
 import api from '@api/axios';
-import { CAT_LABEL_MAP } from '@components/modules/airesult/aiResultUtils';
+import { CAT_LABEL_MAP, TYPE_LABEL } from '@components/modules/airesult/aiResultUtils';
 
 const AIPlanResultPage = () => {
   const navigate = useNavigate();
@@ -270,7 +270,7 @@ const AIPlanResultPage = () => {
     const newItem = {
       placeId  : placeId,
       placeName: item.name,
-      category : CAT_LABEL_MAP[item.category] ?? item.category,
+      category : CAT_LABEL_MAP[item.category] ?? TYPE_LABEL[item.type] ?? item.category,
       overview : item.description || item.desc || '',
       imgUrl   : item.image || '',
       lat      : item.lat ? String(item.lat) : null,
