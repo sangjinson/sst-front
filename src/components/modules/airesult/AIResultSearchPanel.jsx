@@ -1,5 +1,5 @@
 import React from 'react';
-import { SEARCH_CATEGORIES, CAT_KOR_COLOR_MAP, TYPE_LABEL, CAT_LABEL_MAP } from './aiResultUtils';
+import { SEARCH_CATEGORIES, CAT_KOR_COLOR_MAP, TYPE_LABEL, CAT_LABEL_MAP, TYPE_COLOR } from './aiResultUtils';
 
 const AIResultSearchPanel = ({
   searchKeyword,
@@ -87,7 +87,7 @@ const AIResultSearchPanel = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1 mb-1.5">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                      CAT_KOR_COLOR_MAP?.[item.type] ?? 'bg-green-100 text-[#0F9B73]'
+                      TYPE_COLOR[item.type] ?? 'bg-green-100 text-[#0F9B73]'
                     }`}>
                       {TYPE_LABEL[item.type] ?? item.type}
                     </span>
