@@ -45,6 +45,14 @@ const CAT_TYPE_MAP = {
   'PLC004': 'sleep',
 };
 
+// 한글 카테고리 → type
+const KOR_CAT_TYPE_MAP = {
+  '볼거리': 'see',
+  '놀거리': 'play',
+  '먹거리': 'food',
+  '잘거리': 'sleep',
+};
+
 // 한글 카테고리 → 색상
 export const CAT_KOR_COLOR_MAP = {
   '볼거리': 'bg-blue-100 text-blue-700',
@@ -160,7 +168,10 @@ export const getSearchResults = async (selectedRegion, searchKeyword, searchCate
 // ────────────────────────────────────────────
 export const getDetailPath = (item, selectedRegion) => {
   const placeId  = item.placeId || String(item.id || '').replace(`${item.type}-`, '');
-  const type     = item.type || CAT_TYPE_MAP[item.category] || 'see';
+  const type     = item.type
+    || CAT_TYPE_MAP[item.category]
+    || KOR_CAT_TYPE_MAP[item.category]
+    || 'see';
   const regionEn = toEnRegion(selectedRegion);
 
   return `/${regionEn}/${type}/view?id=${placeId}`;

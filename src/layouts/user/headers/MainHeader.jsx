@@ -205,7 +205,7 @@ const Header = () => {
               </button>
             </div>
             <div className="flex flex-wrap gap-2.5 md:gap-5 px-2.5 text-[13px] md:text-[14px] text-gray-500">
-              {['#마술의 거리', '#낭만의 거리', '#숲속의 거리', '#필수 관광명소'].map(tag => (
+              {['#힐링', '#맛집', '#커플', '#애견','#가족'].map(tag => (
                 <span key={tag} onClick={() => handleTagClick(tag)} className="cursor-pointer hover:text-primary hover:underline transition-colors">
                   {tag}
                 </span>

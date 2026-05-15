@@ -23,8 +23,8 @@ const convertPlaceToCardItem = (place) => {
   const categoryMap = {
     PLC001: { tag: '볼거리', type: 'see', group: 'attractions' },
     PLC002: { tag: '놀거리', type: 'play', group: 'plays' },
-    PLC003: { tag: '잘거리', type: 'sleep', group: 'sleeps' },
-    PLC004: { tag: '먹거리', type: 'food', group: 'foods' },
+    PLC003: { tag: '먹거리', type: 'food', group: 'foods' },
+    PLC004: { tag: '잘거리', type: 'sleep', group: 'sleeps' },
   };
 
   const category = categoryMap[place.plcCatCd] || {
