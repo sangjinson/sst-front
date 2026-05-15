@@ -13,10 +13,10 @@ const TYPE_COLOR = {
 };
 
 const KOR_TYPE_COLOR = {
-  '볼거리': 'bg-blue-100 text-blue-700',
-  '먹거리': 'bg-orange-100 text-orange-700',
-  '잘거리': 'bg-green-100 text-green-700',
-  '놀거리': 'bg-purple-100 text-purple-700',
+  볼거리: "bg-blue-100 text-blue-700",
+  먹거리: "bg-orange-100 text-orange-700",
+  잘거리: "bg-green-100 text-green-700",
+  놀거리: "bg-purple-100 text-purple-700",
 };
 
 const DownloadIcon = () => (
@@ -58,6 +58,32 @@ const LifeCourseView = ({
   handleImportSchedule,
   handleMakePlan,
 }) => {
+  const getPlaceType = (type) => {
+    const typeMap = {
+      먹거리: "food",
+      볼거리: "see",
+      놀거리: "play",
+      잘거리: "sleep",
+      food: "food",
+      see: "see",
+      play: "play",
+      sleep: "sleep",
+    };
+
+    return typeMap[type] || "see";
+  };
+
+  const handlePlaceClick = (place) => {
+    if (!place.placeId) {
+      alert("장소 상세 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    const type = getPlaceType(place.type);
+
+    navigate(`/${region}/${type}/view?id=${place.placeId}`);
+  };
+
   return (
     <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
       <h3 className="fs-down-2 font-extrabold text-gray-900 mb-5 flex items-center gap-2">
@@ -81,7 +107,11 @@ const LifeCourseView = ({
                 )}
               </div>
 
-              <div className="flex-1 bg-gray-50 rounded-2xl p-4 flex gap-4 mb-2">
+              <button
+                type="button"
+                onClick={() => handlePlaceClick(c)}
+                className="flex-1 bg-gray-50 rounded-2xl p-4 flex gap-4 mb-2 text-left transition hover:bg-emerald-50 active:scale-[0.99]"
+              >
                 <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-200">
                   <img
                     src={c.image || thumbnail}
@@ -92,17 +122,25 @@ const LifeCourseView = ({
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`fs-down-1 px-2 py-0.5 rounded-full font-bold ${
-                      KOR_TYPE_COLOR[c.type] ?? TYPE_COLOR?.[c.type] ?? 'bg-emerald-50 text-emerald-600'
-                    }`}>
-                      {c.type || TYPE_LABEL?.[c.type] || '여행'}
+                    <span
+                      className={`text-sm px-2 py-0.5 rounded-full font-bold ${
+                        KOR_TYPE_COLOR[c.type] ??
+                        TYPE_COLOR?.[c.type] ??
+                        "bg-emerald-50 text-emerald-600"
+                      }`}
+                    >
+                      {c.type || TYPE_LABEL?.[c.type] || "여행"}
                     </span>
                   </div>
-                  <p className="fs-down-1 font-bold text-gray-900 truncate">{c.name}</p>
-                  <p className="fs-down-1 text-gray-400 mt-0.5">{c.address}</p>
+                  <p className="fs-down-1 font-bold text-gray-900 truncate">
+                    {c.name}
+                  </p>
+                  <p className="fs-down-1 text-gray-400 mt-0.5">
+                    {c.address}
+                  </p>
                   <p className="fs-down-1 text-gray-500 mt-1">{c.desc}</p>
                 </div>
-              </div>
+              </button>
             </div>
           ))}
         </div>

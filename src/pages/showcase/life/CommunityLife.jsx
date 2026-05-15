@@ -77,7 +77,7 @@ const CommunityLife = () => {
   }, [searchParams]);
 
   const getImageUrl = (url) => {
-    if (!url) return "https://placehold.co/600x400";
+    if (!url) return "/images/community/default-life.jpg";
     if (url.startsWith("http")) return url;
     return `http://localhost:8080${url}`;
   };

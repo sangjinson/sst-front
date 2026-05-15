@@ -7,6 +7,8 @@ export const openReportModal = async ({
   cmntNo = null,
   reviewNo = null,
 } = {}) => {
+
+
   const isComment = type === "comment";
   const isReview = type === "review";
 

@@ -44,7 +44,6 @@ const CommunitySearchBar = ({
           <option value="latest">최신순</option>
           <option value="popular">인기순</option>
           <option value="view">조회수순</option>
-          <option value="wish">찜순</option>
           <option value="comment">댓글순</option>
         </select>
       </div>

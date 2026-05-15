@@ -77,7 +77,7 @@ const CommunityLifeDetail = () => {
           ? item.commMainImgUrl.startsWith("http")
             ? item.commMainImgUrl
             : `http://localhost:8080${item.commMainImgUrl}`
-          : "https://placehold.co/800x400";
+          : "/images/community/default-life.jpg";
 
         const mappedPost = {
           id: item.commNo,
@@ -186,7 +186,7 @@ const CommunityLifeDetail = () => {
   const slideImages =
     post.images?.length > 0
       ? post.images.map(normalizeImageUrl).filter(Boolean)
-      : [thumbnail];
+      : [thumbnail || "/images/community/default-life.jpg"];
 
   // ✅ 내 일정으로 가져오기 - DB 저장
   const handleImportSchedule = async () => {
