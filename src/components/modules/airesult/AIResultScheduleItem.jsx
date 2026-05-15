@@ -65,7 +65,11 @@ const AIResultScheduleItem = ({
           </div>
         )}
         <button
-          onClick={(e) => { e.stopPropagation(); onGoDetail(item); }}
+          onClick={(e) => { 
+          e.stopPropagation(); 
+          console.log("상세보기 item:", JSON.stringify(item));
+          onGoDetail(item); 
+        }}
           className="p-1.5 rounded-lg text-gray-400 hover:text-[#0F9B73] hover:bg-green-50 transition"
           title="상세보기"
         >

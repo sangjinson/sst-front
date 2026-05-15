@@ -1,10 +1,10 @@
 import React from 'react';
-import { SEARCH_CATEGORIES, CAT_KOR_COLOR_MAP, TYPE_LABEL, CAT_LABEL_MAP } from './aiResultUtils';
+import { SEARCH_CATEGORIES, CAT_KOR_COLOR_MAP, TYPE_LABEL, CAT_LABEL_MAP, TYPE_COLOR } from './aiResultUtils';
 import { WishlistHeartButton } from '@components/modules/ActionButtons'; // ✅ 추가
 
 const AIResultSearchPanel = ({
   searchKeyword,
-  searchCategory,
+  searchCategory, 
   searchResults,
   currentDayItems,
   onKeywordChange,

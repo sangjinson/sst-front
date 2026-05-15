@@ -220,14 +220,14 @@ const AIPlanResultPage = () => {
     if (isConfirmed && tripName) {
       try {
         const requestBody = {
-          scheduleName: tripName.trim(),
-          startDate   : currentStartDate ?? '',
-          endDate     : currentEndDate   ?? '',
-          totalDays   : currentTotalDays ?? schedule.length,
-          rgnName     : currentRegion    ?? '',
-          themes      : currentThemes    ?? [],
-          schedule,
-        };
+        scheduleName: tripName.trim(),
+        startDate   : (currentStartDate && currentStartDate !== '') ? currentStartDate : null,
+        endDate     : (currentEndDate && currentEndDate !== '') ? currentEndDate : null,
+        totalDays   : currentTotalDays ?? schedule.length,
+        rgnName     : currentRegion    ?? '',
+        themes      : currentThemes    ?? [],
+        schedule,
+      };
 
         if (aisNo) {
           await api.put('/ai/schedule/update', requestBody, { params: { aisNo } });
