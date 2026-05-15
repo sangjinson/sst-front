@@ -54,7 +54,7 @@ const LIST_CONFIG = {
   play: {
     Component: PlayList,
     label: '놀거리',
-    subtitleSuffix: '의 거리에서 놀아보자',
+    subtitleSuffix: '의 거리에서 즐겁게 놀아보세요',
     bgImage: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80',
   },
   sleep: {

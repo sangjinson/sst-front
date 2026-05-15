@@ -1,8 +1,6 @@
 import React from 'react';
 import AIResultScheduleItem from './AIResultScheduleItem';
 
-
-// 좌측 일정 목록 + 일차탭
 const AIResultScheduleList = ({
   schedule,
   activeDay,
@@ -18,6 +16,7 @@ const AIResultScheduleList = ({
   showSearch,
   onItemClick,
   selectedItem,
+  renderHeart, // ✅ 추가
 }) => {
   const currentDayItems = schedule[activeDay]?.plans || [];
 
@@ -58,13 +57,14 @@ const AIResultScheduleList = ({
               onDelete={onDelete}
               onGoDetail={onGoDetail}
               onClick={() => onItemClick?.(item)}
-              isSelected={selectedItem?.id === item.id}
+              isSelected={selectedItem?.placeId === item.placeId} // ✅ placeId로 통일
+              renderHeart={renderHeart} // ✅ 전달
             />
           ))
         )}
       </div>
 
-      {/* 저장 / 추가 버튼 - 초록색 통일 */}
+      {/* 저장 / 추가 버튼 */}
       <div className="p-3 border-t border-gray-100 flex gap-2">
         <button
           onClick={onSave}
@@ -74,11 +74,7 @@ const AIResultScheduleList = ({
         </button>
         <button
           onClick={onToggleSearch}
-          className={`flex-1 py-2.5 text-sm font-medium rounded-xl transition ${
-            showSearch
-              ? 'bg-[#0F9B73] text-white hover:bg-[#0d8a66]'
-              : 'bg-[#0F9B73] text-white hover:bg-[#0d8a66]'
-          }`}
+          className="flex-1 py-2.5 bg-[#0F9B73] text-white text-sm font-medium rounded-xl hover:bg-[#0d8a66] transition"
         >
           {showSearch ? '닫기' : '+ 추가'}
         </button>
