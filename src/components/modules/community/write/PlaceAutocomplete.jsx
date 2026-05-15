@@ -23,13 +23,13 @@ const PlaceAutocomplete = ({
     <div className="relative">
       <label
         htmlFor="placeName"
-        className="block fs-down-2 font-bold text-gray-700 mb-3"
-      >
+        className="block fs-down-2 font-bold text-gray-700 mb-3">
         구체적인 장소
       </label>
 
       <input
         id="placeName"
+        autoComplete="off"
         value={placeName}
         onFocus={() => {
           if (!disabled) setIsOpen(true);
@@ -48,7 +48,7 @@ const PlaceAutocomplete = ({
         disabled={disabled}
         required
         className="w-full h-[3rem] px-[1rem] text-[1rem] border border-gray-200 rounded-lg bg-white focus:border-[#009277] outline-none transition-all disabled:bg-gray-50 disabled:text-gray-400"
-      />
+      />  
 
       {isOpen && !disabled && filteredPlaces.length > 0 && (
         <div className="absolute left-0 top-full mt-2 z-50 w-full max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-xl">
@@ -61,8 +61,7 @@ const PlaceAutocomplete = ({
                 setSelectedPlace(place);
                 setIsOpen(false);
               }}
-              className="w-full px-4 py-3 text-left text-gray-700 hover:bg-[#f0f9f7] hover:text-[#009277] transition-colors"
-            >
+              className="w-full px-4 py-3 text-left text-gray-700 hover:bg-[#f0f9f7] hover:text-[#009277] transition-colors">
               {place.plcName}
             </button>
           ))}

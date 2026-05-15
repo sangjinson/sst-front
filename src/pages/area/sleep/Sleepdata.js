@@ -23,6 +23,13 @@ const FLT_LABEL_MAP = {
 
 const stripHtml = (str) => str?.replace(/<[^>]*>/g, ' ').trim() || '';
 
+const extractUrl = (str) => {
+  if (!str) return '';
+  const match = str.match(/href=["']([^"']+)["']/);
+  if (match) return match[1];
+  return str.startsWith('http') ? str : '';
+};
+
 const getFacilities = (item) => {
   const facilities = [];
   if (item.sleepBarbecu)    facilities.push('바베큐');
@@ -43,15 +50,15 @@ const getFacilities = (item) => {
 
 const normalizeApiItem = (item) => ({
   id: item.plcNo,
-  plcNo: item.plcNo,                        // ← 추가
+  plcNo: item.plcNo,
   name: item.plcName,
   title: item.plcName,
   category: FLT_LABEL_MAP[item.plcFltCd] || '호텔/모텔',
   tag: FLT_LABEL_MAP[item.plcFltCd] || '호텔/모텔',
-  plcAvgRating: item.plcAvgRating ?? 0,     // ← 추가
-  plcReviewCnt: item.plcReviewCnt ?? 0,     // ← 추가
-  rating: item.plcAvgRating ?? 0,        // ← 추가 (AreaListCard용)
-  reviewCount: item.plcReviewCnt ?? 0,   // ← 추가 (AreaListCard용)
+  plcAvgRating: item.plcAvgRating ?? 0,
+  plcReviewCnt: item.plcReviewCnt ?? 0,
+  rating: item.plcAvgRating ?? 0,
+  reviewCount: item.plcReviewCnt ?? 0,
   reviews: [],
   description: stripHtml(item.plcOverview) || '',
   desc: stripHtml(item.plcOverview) || '',
@@ -69,18 +76,30 @@ const normalizeApiItem = (item) => ({
   reservation: stripHtml(item.sleepReservation) || '',
   reservationUrl: item.sleepReservationUrl || '',
   subFacility: stripHtml(item.sleepSubFacility) || '',
+  homepage: extractUrl(item.plcHomepage),
 });
 
 export const getSleepDataByRegion = async (region) => {
   try {
     const rgnCd = REGION_CODE_MAP[region];
-    const res = await axios.get(`${BASE_URL}/api/sleep/list`, {
-      params: { rgnCd },
-    });
+    const res = await axios.get(`${BASE_URL}/api/sleep/list`, { params: { rgnCd } });
     return res.data.map(normalizeApiItem);
   } catch (err) {
     console.error('잘거리 목록 조회 실패:', err);
     return [];
+  }
+};
+
+export const getSleepDataPaged = async (region, page = 1, size = 12, keyword = '') => {
+  try {
+    const rgnCd = REGION_CODE_MAP[region];
+    const res = await axios.get(`${BASE_URL}/api/sleep/paged`, {
+      params: { rgnCd, page, size, keyword },
+    });
+    return { ...res.data, list: res.data.list.map(normalizeApiItem) };
+  } catch (err) {
+    console.error('잘거리 페이징 조회 실패:', err);
+    return { list: [], totalCount: 0, totalPages: 1, currentPage: 1, pageSize: size };
   }
 };
 

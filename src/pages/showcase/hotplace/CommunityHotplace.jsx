@@ -1,12 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Breadcrumb from "@components/common/Breadcrumb";
-import { getAllPosts } from "./communityHotplaceData";
 import AreaPagination from "@components/modules/area/arealist/AreaPagination";
+import CommunitySearchBar from "@components/modules/community/common/CommunitySearchBar";
 import api from "@api/axios";
+import CommunityHotplaceSkeleton from "@components/skeleton/CommunityHotplaceSkeleton";
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const getImageUrl = (url) => {
     if (!url) return "https://placehold.co/600x400";
@@ -14,87 +17,151 @@ const CommunityHotplace = () => {
     return `http://localhost:8080${url}`;
   };
 
-  useEffect(() => {
-  api.get("/community?catCd=CMM002")
-    .then((res) => {
-      const mappedData = res.data.map((item) => ({
-        id: item.commNo,
-        title: item.commTitle,
-        description: item.commContent,
-        author: item.mbrNickname,
-        place: item.plcName || "장소 미등록",
-        hashtags: [],
-        img: getImageUrl(item.commMainImgUrl),
-        regDt: item.commRegDate,
-        wishCnt: item.commLikeCnt,
-        commentCnt: item.commCmntCnt,
-        viewCnt: item.commInqireCnt,
-        size: "wide",
-      }));
-      setPosts(mappedData);
-    })
-    .catch((err) => {
-      console.log("커뮤니티 조회 실패", err);
-    });
-
-  window.scrollTo(0, 0);
-}, []);
-
-  // 사용자가 좋아요를 눌렀는지 저장하는 상태
   const [likedPosts, setLikedPosts] = useState({});
-  const [keyword, setKeyword] = useState("");
-  const [searchType, setSearchType] = useState("all");
-  const [sortType, setSortType] = useState("latest");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [keyword, setKeyword] = useState(searchParams.get("keyword") || "");
+  const [searchType, setSearchType] = useState(searchParams.get("searchType") || "all");
+  const [sortType, setSortType] = useState(searchParams.get("sortType") || "latest");
+  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
   const ITEMS_PER_PAGE = 15;
+  const [loading, setLoading] = useState(true);
 
   const [posts, setPosts] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  // // 더미 + 유저 게시글 합쳐서 사용
-  // const posts = getAllPosts();
-  
+  const fetchPosts = () => {
+    api
+      .get("/community", {
+        params: {
+          catCd: "CMM002",
+          searchType,
+          keyword,
+          sortType,
+          page: currentPage,
+          size: ITEMS_PER_PAGE,
+        },
+      })
+      .then((res) => {
+        const mappedData = res.data.list.map((item) => ({
+          id: item.commNo,
+          title: item.commTitle,
+          description: item.commContent,
+          author: item.mbrNickname,
+          place: item.plcName || "장소 미등록",
+          region: item.rgnName || "지역 미정",
+          hashtags: item.hashtagText
+            ? item.hashtagText.split(",")
+            : [],
+          img: getImageUrl(item.commMainImgUrl),
+          regDt: item.commRegDate,
+          wishCnt: item.commLikeCnt,
+          commentCnt: item.commCmntCnt,
+          viewCnt: item.commInqireCnt,
+          size: "wide",
+        }));
 
-  const filteredPosts = useMemo(() => {
+        setPosts(mappedData);
+        setTotalPages(res.data.totalPages);
+        setTotalCount(res.data.totalCount);
+      })
+      .catch((err) => {
+        console.log("커뮤니티 조회 실패", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
-    const trimmedKeyword = keyword.trim().toLowerCase();
+  // 로그인 사용자 조회: 처음 한 번만
+  useEffect(() => {
 
-    let result = posts.filter((post) => {
-      if (!trimmedKeyword) return true;
-      const title = post.title.toLowerCase();
-      const content = post.description.toLowerCase();
-      const author = post.author.toLowerCase();
-      const place = post.place.toLowerCase();
-      const hashtags = post.hashtags.join(" ").toLowerCase();
+    api
+      .get("/auth/me")
+      .then((res) => {
+        setCurrentUserId(res.data.data.mbrId);
+      })
+      .catch((err) => {
+        console.error("로그인 사용자 조회 실패:", err);
+      });
+  }, []);
 
-      if (searchType === "title") return title.includes(trimmedKeyword);
-      if (searchType === "content") return content.includes(trimmedKeyword);
-      if (searchType === "author") return author.includes(trimmedKeyword);
-      if (searchType === "place") return place.includes(trimmedKeyword);
-      if (searchType === "hashtag") return hashtags.includes(trimmedKeyword);
-      return title.includes(trimmedKeyword) || content.includes(trimmedKeyword) ||
-        author.includes(trimmedKeyword) || place.includes(trimmedKeyword) || hashtags.includes(trimmedKeyword);
+  useEffect(() => {
+    const nextParams = {};
+
+    if (currentPage !== 1) nextParams.page = currentPage;
+    if (searchType !== "all") nextParams.searchType = searchType;
+    if (keyword.trim() !== "") nextParams.keyword = keyword;
+    if (sortType !== "latest") nextParams.sortType = sortType;
+
+    setSearchParams(nextParams, { replace: true });
+  }, [currentPage, searchType, keyword, sortType, setSearchParams]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchPosts();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [keyword, searchType, sortType, currentPage]);
+
+  // 페이지 변경 시 맨 위로 이동
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
     });
+  }, [currentPage]);
 
-    result = [...result].sort((a, b) => {
-      if (sortType === "latest") return new Date(b.regDt) - new Date(a.regDt);
-      if (sortType === "popular") return b.viewCnt + b.wishCnt + b.commentCnt - (a.viewCnt + a.wishCnt + a.commentCnt);
-      if (sortType === "view") return b.viewCnt - a.viewCnt;
-      if (sortType === "wish") return b.wishCnt - a.wishCnt;
-      if (sortType === "comment") return b.commentCnt - a.commentCnt;
-      return 0;
-    });
+  // 페이지 이동 시 검색 상태 초기화
+  useEffect(() => {
+    const nextKeyword = searchParams.get("keyword") || "";
+    const nextSearchType = searchParams.get("searchType") || "all";
+    const nextSortType = searchParams.get("sortType") || "latest";
+    const nextPage = Number(searchParams.get("page")) || 1;
 
-    return result;
-  }, [posts, keyword, searchType, sortType]);
-
-  const totalPages = Math.ceil(filteredPosts.length / ITEMS_PER_PAGE);
-  const paginatedPosts = filteredPosts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+    setKeyword(nextKeyword);
+    setSearchType(nextSearchType);
+    setSortType(nextSortType);
+    setCurrentPage(nextPage);
+  }, [searchParams]);
 
   const toggleLike = (postId) => {
-    setLikedPosts((prev) => ({ ...prev, [postId]: !prev[postId] }));
+    if (!currentUserId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    api
+      .post(`/community/${postId}/like`, null, {
+        params: {
+          mbrId: currentUserId,
+        },
+      })
+      .then((res) => {
+        const liked = res.data;
+
+        setLikedPosts((prev) => ({
+          ...prev,
+          [postId]: liked,
+        }));
+
+        setPosts((prev) =>
+          prev.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  wishCnt: liked
+                    ? post.wishCnt + 1
+                    : Math.max(post.wishCnt - 1, 0),
+                }
+              : post
+          )
+        );
+      })
+      .catch((err) => {
+        console.error("좋아요 처리 실패:", err);
+      });
   };
 
   const getImageRatio = (size) => {
@@ -123,10 +190,15 @@ const CommunityHotplace = () => {
     </svg>
   );
 
+  if (loading) {
+    return <CommunityHotplaceSkeleton />;
+  }
+
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
       <Breadcrumb paths={[{ label: "홈", to: "/" }, { label: "핫플거리", to: "/showcase" }]} className="mb-4" />
-
+      
+      {/* 제목 영역 */}
       <section className="mt-8 mb-8 flex flex-col gap-6 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-bold text-emerald-600">Hotplace</p>
@@ -161,45 +233,52 @@ const CommunityHotplace = () => {
             </p>
           </div>
         <Link to="/showcase/hotplace/write" className="w-fit">
-          <button className="cursor-pointer rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-md active:scale-95">
+          <button className="min-w-[120px] text-center cursor-pointer rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-md active:scale-95">
             글쓰기
           </button>
         </Link>
       </section>
 
-      <section className="mb-10 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[160px_minmax(0,1fr)_160px]">
-          <select value={searchType} onChange={(e) => setSearchType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
-            <option value="all">전체 검색</option>
-            <option value="title">제목 검색</option>
-            <option value="author">작성자 검색</option>
-            <option value="place">장소 검색</option>
-          </select>
-          <input type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)}
-            placeholder="검색어를 입력하세요"
-            className="h-11 rounded-xl border border-gray-200 px-4 fs-down-1 text-gray-700 outline-none focus:border-emerald-500" />
-          <select value={sortType} onChange={(e) => setSortType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
-            <option value="latest">최신순</option>
-            <option value="popular">인기순</option>
-            <option value="view">조회수순</option>
-          </select>
-        </div>
-        <div className="mt-3 flex items-center justify-between fs-down-1 text-gray-400">
-          <span>총 <strong className="text-emerald-600">{filteredPosts.length}</strong>개의 게시글</span>
-          {keyword && (
-            <button type="button" onClick={() => { setKeyword(""); setSearchType("all"); }}
-              className="cursor-pointer font-semibold text-gray-400 hover:text-emerald-600">검색 초기화</button>
-          )}
-        </div>
-      </section>
+      <CommunitySearchBar
+        keyword={keyword}
+        setKeyword={(value) => {
+          setKeyword(value);
+          setCurrentPage(1);
+        }}
+        searchType={searchType}
+        setSearchType={(value) => {
+          setSearchType(value);
+          setCurrentPage(1);
+        }}
+        sortType={sortType}
+        setSortType={(value) => {
+          setSortType(value);
+          setCurrentPage(1);
+        }}
+        totalCount={totalCount}
+        onSearch={fetchPosts}
+        onReset={() => {
+          setKeyword("");
+          setSearchType("all");
+          setCurrentPage(1);
+        }}
+        popularTags={["성수카페", "제주맛집", "부산야경", "혼자여행", "데이트코스"]}
+        searchOptions={[
+          { value: "all", label: "전체 검색" },
+          { value: "title", label: "제목 검색" },
+          { value: "content", label: "내용 검색" },
+          { value: "author", label: "작성자 검색" },
+          { value: "place", label: "장소 검색" },
+          { value: "region", label: "지역 검색" },
+          { value: "hashtag", label: "해시태그 검색" },
+        ]}
+      />
 
-      {filteredPosts.length > 0 ? (
+      {posts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
-          {paginatedPosts.map((post) => {
+          {posts.map((post) => {
             const liked = !!likedPosts[post.id];
-            const likeCount = post.wishCnt + (liked ? 1 : 0);
+            const likeCount = post.wishCnt;
             return (
               <article key={post.id}
                 className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
@@ -225,7 +304,17 @@ const CommunityHotplace = () => {
                   </div>
                   <div className="mb-4 flex flex-wrap gap-2">
                     {post.hashtags.map((tag) => (
-                      <span key={tag} className="fs-down-1 font-semibold text-emerald-600 hover:text-emerald-700">#{tag}</span>
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          setSearchType("hashtag");
+                          setKeyword(tag);
+                          setCurrentPage(1);
+                        }}
+                        className="fs-down-1 cursor-pointer font-semibold text-emerald-600 hover:text-emerald-700">
+                        #{tag}
+                      </button>
                     ))}
                   </div>
                   <div className="flex items-center justify-between gap-2 border-t border-gray-100 pt-3 fs-down-1">

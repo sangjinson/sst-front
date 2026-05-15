@@ -270,6 +270,14 @@ const AIPlanResultPage = () => {
       ? Number(rawId.split('-')[1])
       : Number(rawId);
 
+    // 중복 체크
+    const currentPlans = schedule[activeDay]?.plans || [];
+    const isDuplicate = currentPlans.some(p => p.placeId === placeId);
+    if (isDuplicate) {
+      Swal.fire({ icon: 'warning', title: '이미 추가된 장소입니다.', timer: 1000, showConfirmButton: false });
+      return;
+    }
+
     const newItem = {
       placeId  : placeId,
       placeName: item.name,

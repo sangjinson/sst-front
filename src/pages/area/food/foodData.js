@@ -24,18 +24,25 @@ const FLT_LABEL_MAP = {
 
 const stripHtml = (str) => str?.replace(/<[^>]*>/g, ' ').trim() || '';
 
+const extractUrl = (str) => {
+  if (!str) return '';
+  const match = str.match(/href=["']([^"']+)["']/);
+  if (match) return match[1];
+  return str.startsWith('http') ? str : '';
+};
+
 const normalizeApiItem = (item) => ({
   id: item.plcNo,
-  plcNo: item.plcNo,                        // ← 추가
+  plcNo: item.plcNo,
   name: item.plcName,
   title: item.plcName,
   category: FLT_LABEL_MAP[item.plcFltCd] || '한식',
   tag: FLT_LABEL_MAP[item.plcFltCd] || '한식',
-  plcAvgRating: item.plcAvgRating ?? 0,     // ← 추가
-  plcReviewCnt: item.plcReviewCnt ?? 0,     // ← 추가
-  rating: item.plcAvgRating ?? 0,        // ← 추가 (AreaListCard용)
-  reviewCount: item.plcReviewCnt ?? 0,   // ← 추가 (AreaListCard용)
-  reviews: [],                              // ← 빈 배열
+  plcAvgRating: item.plcAvgRating ?? 0,
+  plcReviewCnt: item.plcReviewCnt ?? 0,
+  rating: item.plcAvgRating ?? 0,
+  reviewCount: item.plcReviewCnt ?? 0,
+  reviews: [],
   description: stripHtml(item.plcOverview) || '',
   desc: stripHtml(item.plcOverview) || '',
   address: item.plcAddr || '',
@@ -50,18 +57,30 @@ const normalizeApiItem = (item) => ({
   restdate: stripHtml(item.foodRestdate) || '',
   menu: stripHtml(item.foodMenu) || '',
   infocenter: stripHtml(item.foodInfocenter) || '',
+  homepage: extractUrl(item.plcHomepage),
 });
 
 export const getFoodDataByRegion = async (regionName) => {
   try {
     const rgnCd = REGION_CODE_MAP[regionName];
-    const res = await axios.get(`${BASE_URL}/api/food/list`, {
-      params: { rgnCd },
-    });
+    const res = await axios.get(`${BASE_URL}/api/food/list`, { params: { rgnCd } });
     return res.data.map(normalizeApiItem);
   } catch (err) {
     console.error('먹거리 목록 조회 실패:', err);
     return [];
+  }
+};
+
+export const getFoodDataPaged = async (region, page = 1, size = 12, keyword = '') => {
+  try {
+    const rgnCd = REGION_CODE_MAP[region];
+    const res = await axios.get(`${BASE_URL}/api/food/paged`, {
+      params: { rgnCd, page, size, keyword },
+    });
+    return { ...res.data, list: res.data.list.map(normalizeApiItem) };
+  } catch (err) {
+    console.error('먹거리 페이징 조회 실패:', err);
+    return { list: [], totalCount: 0, totalPages: 1, currentPage: 1, pageSize: size };
   }
 };
 

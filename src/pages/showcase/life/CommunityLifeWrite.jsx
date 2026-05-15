@@ -20,7 +20,6 @@ const CommunityLifeWrite = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imagePreviews, setImagePreviews] = useState([]);
-  const [imageFiles, setImageFiles] = useState([]);
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState(null);
@@ -31,6 +30,12 @@ const CommunityLifeWrite = () => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [regions, setRegions] = useState([]);
+
+  const getImageUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    return `http://localhost:8080${url}`;
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -71,6 +76,12 @@ const CommunityLifeWrite = () => {
       try {
         const res = await api.get(`/community/${id}`);
         const item = res.data;
+
+        if (item.images?.length > 0) {
+          setImagePreviews(item.images.map(getImageUrl));
+        } else if (item.commMainImgUrl) {
+          setImagePreviews([getImageUrl(item.commMainImgUrl)]);
+        }
 
         setTitle(item.commTitle || "");
         setContent(item.commContent || "");
@@ -118,24 +129,53 @@ const CommunityLifeWrite = () => {
     fetchEditPost();
   }, [isEditMode, id]);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
 
-    setImageFiles((prev) => [...prev, ...files]);
+    if (!files.length) return;
 
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () =>
-        setImagePreviews((prev) => [...prev, reader.result]);
-      reader.readAsDataURL(file);
-    });
+    try {
+      const uploadedUrls = [];
 
-    e.target.value = "";
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await api.post("/community/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        uploadedUrls.push(`http://localhost:8080${res.data}`);
+      }
+
+      setImagePreviews((prev) => [...prev, ...uploadedUrls]);
+    } catch (error) {
+      console.error("이미지 업로드 실패:", error);
+      alert("이미지 업로드에 실패했습니다.");
+    } finally {
+      e.target.value = "";
+    }
   };
 
-  const handleRemoveImage = (index) => {
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveImage = async (removeIndex) => {
+    const imageUrl = imagePreviews[removeIndex];
+
+    try {
+      await api.delete("/community/image", {
+        params: {
+          imageUrl: imageUrl.replace("http://localhost:8080", ""),
+        },
+      });
+
+      setImagePreviews((prev) =>
+        prev.filter((_, index) => index !== removeIndex)
+      );
+    } catch (error) {
+      console.error("이미지 삭제 실패:", error);
+      alert("이미지 삭제에 실패했습니다.");
+    }
   };
 
   const handleSelectPlaces = (allPlaces, schedule) => {
@@ -248,35 +288,38 @@ const CommunityLifeWrite = () => {
     }
 
     if (isEditMode) {
+      const payload = {
+        commTitle: title,
+        commContent: content,
+        commCatCd: "CMM001",
+        commAisNo: selectedSchedule?.aisNo,
+        commPlcNo: null,
+
+        commMainImgUrl: imagePreviews[0]
+          ? imagePreviews[0].replace("http://localhost:8080", "")
+          : "",
+
+        commMbrId: user.mbrId,
+        hashtags: finalTags,
+
+        files: imagePreviews.map((url) => {
+          const path = url.replace("http://localhost:8080", "");
+          const saveName = path.split("/").pop();
+
+          return {
+            fileOrgNm: saveName,
+            fileSaveNm: saveName,
+            filePath: path,
+            fileExt: saveName.split(".").pop(),
+            fileSize: 0,
+            fileMimeType: "image/png",
+            fileType: "IMAGE",
+          };
+        }),
+      };
+
       try {
-        const data = {
-          commTitle: title,
-          commContent: content,
-          commCatCd: "CMM001",
-          commAisNo: selectedSchedule?.aisNo,
-          commPlcNo: null,
-          commMainImgUrl: null,
-          commMbrId: user.mbrId,
-          hashtags: finalTags,
-        };
-
-        const formData = new FormData();
-        formData.append(
-          "community",
-          new Blob([JSON.stringify(data)], {
-            type: "application/json",
-          })
-        );
-
-        imageFiles.forEach((file) => {
-          formData.append("images", file);
-        });
-
-        await api.put(`/community/${id}/with-images`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        await api.put(`/community/${id}`, payload);
 
         alert("글이 수정되었습니다!");
         navigate(`/showcase/life/view/${id}`);
@@ -289,44 +332,44 @@ const CommunityLifeWrite = () => {
     }
 
     try {
-      const data = {
+      const payload = {
         commTitle: title,
         commContent: content,
         commCatCd: "CMM001",
         commAisNo: selectedSchedule?.aisNo,
         commPlcNo: null,
-        commMainImgUrl: null,
+
+        commMainImgUrl: imagePreviews[0]
+          ? imagePreviews[0].replace("http://localhost:8080", "")
+          : "",
+
         commMbrId: user.mbrId,
         hashtags: finalTags,
+
+        files: imagePreviews.map((url) => {
+          const path = url.replace("http://localhost:8080", "");
+          const saveName = path.split("/").pop();
+
+          return {
+            fileOrgNm: saveName,
+            fileSaveNm: saveName,
+            filePath: path,
+            fileExt: saveName.split(".").pop(),
+            fileSize: 0,
+            fileMimeType: "image/png",
+            fileType: "IMAGE",
+          };
+        }),
       };
-      console.log("인생거리 등록 데이터:", data);
 
-      const formData = new FormData();
-
-      formData.append(
-        "community",
-        new Blob([JSON.stringify(data)], {
-          type: "application/json",
-        })
-      );
-
-      imageFiles.forEach((file) => {
-        formData.append("images", file);
-      });
-
-      await api.post("/community/with-images", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await api.post("/community", payload);
 
       alert("글이 등록되었습니다!");
       navigate("/showcase/life");
     } catch (err) {
       console.error("인생거리 등록 실패:", err);
       alert("글 등록에 실패했습니다.");
-    }
-  };
+    }}
 
   return (
     <>

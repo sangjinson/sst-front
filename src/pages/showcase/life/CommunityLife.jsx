@@ -1,112 +1,175 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import api from "@api/axios";
 import Breadcrumb from "@components/common/Breadcrumb";
 import CommunityLifeCard from "@components/modules/community/life/CommunityLifeCard";
+import Pagination from "@components/common/Pagination";
+import CommunitySearchBar from "@components/modules/community/common/CommunitySearchBar";
+import CommunityLifeSkeleton from "@components/skeleton/CommunityLifeSkeleton";
 
 
 const CommunityLife = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [keyword, setKeyword] = useState("");
-  const [searchType, setSearchType] = useState("all");
-  const [sortType, setSortType] = useState("latest");
+  const [keyword, setKeyword] = useState(searchParams.get("keyword") || "");
+  const [searchType, setSearchType] = useState(searchParams.get("searchType") || "all");
+  const [sortType, setSortType] = useState(searchParams.get("sortType") || "latest");
+  const [likedPosts, setLikedPosts] = useState({});
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 5;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
+
+    api
+      .get("/auth/me")
+      .then((res) => {
+        setCurrentUserId(res.data.data.mbrId);
+      })
+      .catch((err) => {
+        console.error("로그인 사용자 조회 실패:", err);
+      });
   }, []);
 
   useEffect(() => {
+    const nextParams = {};
+
+    if (page !== 1) nextParams.page = page;
+    if (searchType !== "all") nextParams.searchType = searchType;
+    if (keyword.trim() !== "") nextParams.keyword = keyword;
+    if (sortType !== "latest") nextParams.sortType = sortType;
+
+    setSearchParams(nextParams, { replace: true });
+  }, [page, searchType, keyword, sortType, setSearchParams]);
+
+  useEffect(() => {
+    const nextKeyword = searchParams.get("keyword") || "";
+    const nextSearchType = searchParams.get("searchType") || "all";
+    const nextSortType = searchParams.get("sortType") || "latest";
+    const nextPage = Number(searchParams.get("page")) || 1;
+
+    setKeyword(nextKeyword);
+    setSearchType(nextSearchType);
+    setSortType(nextSortType);
+    setPage(nextPage);
+  }, [searchParams]);
+
+  const getImageUrl = (url) => {
+    if (!url) return "https://placehold.co/600x400";
+    if (url.startsWith("http")) return url;
+    return `http://localhost:8080${url}`;
+  };
+
+  const fetchPosts = () => {
+    setLoading(true);
     api
       .get("/community", {
         params: {
           catCd: "CMM001",
+          searchType,
+          keyword,
+          sortType,
+          page,
+          size: pageSize,
         },
       })
       .then((res) => {
-        const mappedData = res.data.map((item) => ({
-          id: item.commNo,
-          title: item.commTitle,
-          description: item.commContent,
-          author: item.mbrNickname,
-          region: item.rgnName || "지역 미정",
-          hashtags: [],
-          thumbnail: item.commMainImgUrl || "https://placehold.co/800x400",
-          images: item.commMainImgUrl ? [item.commMainImgUrl] : [],
-          regDt: item.commRegDate,
-          viewCnt: item.commInqireCnt,
-          wishCnt: item.commLikeCnt,
-          commentCnt: item.commCmntCnt,
-        }));
+        console.log(res.data.list);
+        const mappedData = res.data.list.map((item) => {
+          const imageUrl = getImageUrl(item.commMainImgUrl);
+
+          return {
+            id: item.commNo,
+            title: item.commTitle,
+            description: item.commContent,
+            author: item.mbrNickname,
+            place: item.plcName || "장소 미정",
+            region: item.rgnName || "지역 미정",
+            hashtags: item.hashtagText
+              ? item.hashtagText.split(",")
+              : [],
+              themes: [
+              item.theme1Name,
+              item.theme2Name,
+              item.theme3Name,
+            ].filter(Boolean),
+            thumbnail: imageUrl,
+            images: item.commMainImgUrl ? [imageUrl] : [],
+            regDt: item.commRegDate,
+            viewCnt: item.commInqireCnt,
+            wishCnt: item.commLikeCnt,
+            commentCnt: item.commCmntCnt,
+          };
+        });
 
         setPosts(mappedData);
+        setTotalPages(res.data.totalPages);
+        setTotalCount(res.data.totalCount);
       })
       .catch((err) => {
         console.error("인생거리 목록 조회 실패:", err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, []);
+  };
 
-  //  좋아요 상태 관리 (핵심 추가)
-  // { postId: true/false }
-  const [likedPosts, setLikedPosts] = useState({});
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchPosts();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [keyword, searchType, sortType, page]);
 
   //  좋아요 토글 함수 (핵심 추가)
   const toggleLike = (postId) => {
-    setLikedPosts((prev) => ({
-      ...prev,
-      [postId]: !prev[postId],
-    }));
+    if (!currentUserId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    api
+      .post(`/community/${postId}/like`, null, {
+        params: {
+          mbrId: currentUserId,
+        },
+      })
+      .then((res) => {
+        const liked = res.data;
+
+        setLikedPosts((prev) => ({
+          ...prev,
+          [postId]: liked,
+        }));
+
+        setPosts((prev) =>
+          prev.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  wishCnt: liked
+                    ? post.wishCnt + 1
+                    : Math.max(post.wishCnt - 1, 0),
+                }
+              : post
+          )
+        );
+      })
+      .catch((err) => {
+        console.error("좋아요 처리 실패:", err);
+      });
   };
 
-  const filteredPosts = useMemo(() => {
-    const kw = keyword.trim().toLowerCase();
-
-    let result = posts.filter((post) => {
-      if (!kw) return true;
-
-      const title = post.title.toLowerCase();
-      const content = post.description.toLowerCase();
-      const author = post.author.toLowerCase();
-      const region = post.region.toLowerCase();
-      const hashtags = post.hashtags.join(" ").toLowerCase();
-
-      if (searchType === "title") return title.includes(kw);
-      if (searchType === "content") return content.includes(kw);
-      if (searchType === "author") return author.includes(kw);
-      if (searchType === "region") return region.includes(kw);
-      if (searchType === "hashtag") return hashtags.includes(kw);
-
-      return (
-        title.includes(kw) ||
-        content.includes(kw) ||
-        author.includes(kw) ||
-        region.includes(kw) ||
-        hashtags.includes(kw)
-      );
-    });
-
-    result = [...result].sort((a, b) => {
-      if (sortType === "latest") return new Date(b.regDt) - new Date(a.regDt);
-
-      if (sortType === "popular") {
-        return (
-          b.viewCnt +
-          b.wishCnt +
-          b.commentCnt -
-          (a.viewCnt + a.wishCnt + a.commentCnt)
-        );
-      }
-
-      if (sortType === "view") return b.viewCnt - a.viewCnt;
-      if (sortType === "wish") return b.wishCnt - a.wishCnt;
-      if (sortType === "comment") return b.commentCnt - a.commentCnt;
-
-      return 0;
-    });
-
-    return result;
-  }, [posts, keyword, searchType, sortType]);
+  if (loading) {
+    return <CommunityLifeSkeleton />;
+  }
 
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
@@ -119,7 +182,7 @@ const CommunityLife = () => {
       />
 
       {/* 제목 영역 */}
-      <section className="mt-8 mb-8 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
+      <section className="mt-8 mb-8 flex flex-col gap-6 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm font-bold text-[#0F9B73]">Life Course</p>
 
@@ -156,75 +219,52 @@ const CommunityLife = () => {
         </div>
 
         <Link to="/showcase/life/write" className="w-fit">
-          <button className="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#0F9B73] hover:shadow-md active:scale-95">
+          <button className="min-w-[120px] text-center rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#0F9B73] hover:shadow-md active:scale-95">
             코스 공유하기
           </button>
         </Link>
       </section>
 
       {/* 검색/필터 */}
-      <section className="mb-10 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[160px_minmax(0,1fr)_160px]">
-          <select
-            value={searchType}
-            onChange={(e) => setSearchType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
-            <option value="all">전체 검색</option>
-            <option value="title">제목 검색</option>
-            <option value="content">내용 검색</option>
-            <option value="author">작성자 검색</option>
-            <option value="region">지역 검색</option>
-            <option value="hashtag">해시태그 검색</option>
-          </select>
-
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="검색어를 입력하세요"
-            className="h-11 rounded-xl border border-gray-200 px-4 fs-down-1 text-gray-700 outline-none focus:border-emerald-500"
-          />
-
-          <select
-            value={sortType}
-            onChange={(e) => setSortType(e.target.value)}
-            className="h-11 rounded-xl border border-gray-200 bg-white px-3 fs-down-1 text-gray-700 outline-none focus:border-emerald-500">
-            <option value="latest">최신순</option>
-            <option value="popular">인기순</option>
-            <option value="view">조회수순</option>
-            <option value="wish">찜순</option>
-            <option value="comment">댓글순</option>
-          </select>
-        </div>
-
-        <div className="mt-3 flex items-center justify-between fs-down-1 text-gray-400">
-          <span>
-            총{" "}
-            <strong className="text-emerald-600">
-              {filteredPosts.length}
-            </strong>
-            개의 게시글
-          </span>
-
-          {keyword && (
-            <button
-              type="button"
-              onClick={() => {
-                setKeyword("");
-                setSearchType("all");
-              }}
-              className="font-semibold text-gray-400 hover:text-emerald-600"
-            >
-              검색 초기화
-            </button>
-          )}
-        </div>
-      </section>
+      <CommunitySearchBar
+        keyword={keyword}
+        setKeyword={(value) => {
+          setKeyword(value);
+          setPage(1);
+        }}
+        searchType={searchType}
+        setSearchType={(value) => {
+          setSearchType(value);
+          setPage(1);
+        }}
+        sortType={sortType}
+        setSortType={(value) => {
+          setSortType(value);
+          setPage(1);
+        }}
+        totalCount={totalCount}
+        onSearch={fetchPosts}
+        onReset={() => {
+          setKeyword("");
+          setSearchType("all");
+          setPage(1);
+        }}
+        popularTags={["제주코스", "부산여행", "혼자여행", "데이트코스", "뚜벅이여행"]}
+        searchOptions={[
+          { value: "all", label: "전체 검색" },
+          { value: "title", label: "제목 검색" },
+          { value: "content", label: "내용 검색" },
+          { value: "author", label: "작성자 검색" },
+          { value: "place", label: "장소 검색" },
+          { value: "region", label: "지역 검색" },
+          { value: "hashtag", label: "해시태그 검색" },
+        ]}
+      />
 
       {/* 게시글 목록 */}
-      {filteredPosts.length > 0 ? (
+      {posts.length > 0 ? (
         <div className="flex flex-col gap-8">
-          {filteredPosts.map((post) => (
+          {posts.map((post) => (
             <CommunityLifeCard
               key={post.id}
               post={post}
@@ -247,6 +287,11 @@ const CommunityLife = () => {
           검색 결과가 없습니다.
         </div>
       )}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
     </div>
   );
 };
