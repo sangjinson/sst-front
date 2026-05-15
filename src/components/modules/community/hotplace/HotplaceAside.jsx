@@ -37,7 +37,6 @@ const HotplaceAside = ({
   isLogin,
   isOwner,
   isLiked,
-  setIsLiked,
   wishCount,
   handleLikeClick,
   openReportModal,
