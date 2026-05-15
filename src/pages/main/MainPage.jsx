@@ -95,8 +95,8 @@ const convertPlaceToCardItem = (place) => {
   const categoryMap = {
     PLC001: { tag: '볼거리', type: 'see', group: 'attractions' },
     PLC002: { tag: '놀거리', type: 'play', group: 'plays' },
-    PLC003: { tag: '잘거리', type: 'sleep', group: 'sleeps' },
-    PLC004: { tag: '먹거리', type: 'food', group: 'foods' },
+    PLC003: { tag: '먹거리', type: 'food', group: 'foods' },
+    PLC004: { tag: '잘거리', type: 'sleep', group: 'sleeps' },
   };
 
   const category = categoryMap[place.plcCatCd] || {
@@ -220,9 +220,9 @@ const foods = placeList.filter(
 
   const categorySections = [
     { title: "놓치지 말아야 할 '볼거리'", pathType: "see", dataList: randomAttractions },
-    { title: "신나는 '놀거리'", pathType: "play", dataList: randomPlays },
-    { title: "편안한 '잘거리'", pathType: "sleep", dataList: randomSleeps },
     { title: `${currentRegion}의 맛, '먹거리'`, pathType: "food", dataList: randomFoods },
+    { title: "편안한 '잘거리'", pathType: "sleep", dataList: randomSleeps },
+    { title: "신나는 '놀거리'", pathType: "play", dataList: randomPlays },
   ];
 
   return (
