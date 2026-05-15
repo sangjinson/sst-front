@@ -8,79 +8,7 @@ import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
 import MainSkeleton from '@components/skeleton/MainSkeleton';
 
-// ----------------------------------------------------
-// 1. 배너 이미지 설정
-// ----------------------------------------------------
-const bannerImages = {
-  수원시: '/banners/수원시.png',
-  성남시: '/banners/성남시.png',
-  용인시: '/banners/용인시.png',
-  안양시: '/banners/안양시.png',
-  안산시: '/banners/안산시.png',
-  과천시: '/banners/과천시.png',
-  광명시: '/banners/광명시.png',
-  광주시: '/banners/광주시.png',
-  군포시: '/banners/군포시.png',
-  부천시: '/banners/부천시.png',
-  시흥시: '/banners/시흥시.png',
-  안성시: '/banners/안성시.png',
-  오산시: '/banners/오산시.png',
-  의왕시: '/banners/의왕시.png',
-  이천시: '/banners/이천시.png',
-  평택시: '/banners/평택시.png',
-  하남시: '/banners/하남시.png',
-  화성시: '/banners/화성시.png',
-  여주시: '/banners/여주시.png',
-  고양시: '/banners/고양시.png',
-  구리시: '/banners/구리시.png',
-  남양주시: '/banners/남양주시.png',
-  동두천시: '/banners/동두천시.png',
-  양주시: '/banners/양주시.png',
-  의정부시: '/banners/의정부시.png',
-  파주시: '/banners/파주시.png',
-  포천시: '/banners/포천시.png',
-  연천군: '/banners/연천군.png',
-  가평군: '/banners/가평군.png',
-  김포시: '/banners/김포시.png',
-};
-
-const defaultBanner = '/banners/수원시.png';
-
-// ----------------------------------------------------
-// 2. 지역별 서브타이틀
-// ----------------------------------------------------
-const regionSubtitles = {
-  수원시: '정조의 효심과 화성의 기상이 깃든, 미래를 여는 수반 도시',
-  성남시: '대한민국의 미래를 설계하는 IT의 심장인 명품 도시',
-  용인시: '반도체의 미래와 전통과 첨단이 공존하는 스마트 도시',
-  안양시: '안양천의 여유와 예술궁원의 감성이 숨 쉬는, 스마트 행복 도시',
-  안산시: '다채로운 문화가 어우러지고 서해의 바람이 쉼표를 찍는 도시',
-  과천시: '위엄과 서울대공원의 설렘이 공존하는, 품격 있는 전원 도시',
-  광명시: '빛이 머무는 동굴의 기적과 사통팔달 교통의 중심 도시',
-  광주시: '천년의 역사와 청정 자연이 숨 쉬는 문화 예술 도시',
-  군포시: '수리산의 정기와 설렘이 머무는, 책 읽는 행복 도시',
-  부천시: '영상과 선율이 흐르는 문화 예술 도시',
-  시흥시: '생명의 호수와 미래 해양 산업이 피어나는 도시',
-  안성시: '예술의 흥이 넘치는 풍요로운 도시',
-  오산시: '기개와 교육의 열정이 피어나는, 작지만 강한 활력 도시',
-  의왕시: '백운호수의 낭만과 철도 박물관의 역사가 만나는, 푸른 생태 도시',
-  이천시: '도자와 쌀의 고장, 전통과 현대가 조화로운 도시',
-  평택시: '첨단 산업과 국제 교류가 활발한, 비상하는 희망 도시',
-  하남시: '한강의 물결과 미사의 젊음이 만나는 도시',
-  화성시: '전통과 현대가 공존하는 도시',
-  여주시: '은빛 물결과 세종대왕의 지혜가 흐르는, 역사 문화 도시',
-  고양시: '호수와 문화가 공존하는 도시',
-  구리시: '조선의 숨결이 머무는 작지만 풍요로운 도시',
-  남양주시: '다산의 지혜와 한강의 숨결이 어우러진 인문·생태 도시',
-  동두천시: '소요산의 절경과 이색 문화가 어우러진 숲의 도시',
-  양주시: '600년 역사의 향기와 옥정·회천의 미래가 만나는 감동 도시',
-  의정부시: '경기 북부의 관문, 문화 예술이 흐르는 활력 도시',
-  파주시: '평화의 길목에서 꽃피는 예술과 출판의 감성 도시',
-  포천시: '푸른 호수와 숲의 향기가 흐르는 숲의 도시',
-  연천군: '한탄강의 신비가 흐르는 평화 도시',
-  가평군: '북한강의 낭만과 잣나무 숲의 휴식이 만나는 사계절 힐링 도시',
-  김포시: '한강의 물결과 서해의 바람이 만나는, 금빛 미래의 수변 도시',
-};
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 
 // ----------------------------------------------------
 // 무작위 추출 유틸리티
@@ -118,131 +46,131 @@ const convertPlaceToCardItem = (place) => {
 };
 
 const MainPage = () => {
-  const { region } = useParams();
-  const regionKor = toKorRegion(region);
-  const navigate = useNavigate();
-
-  const { pathname, search } = useLocation();
-
+  
+  const {getConfig, setConfig} = useConfig();   // Config 값 가져오기
   const [isLoading, setIsLoading] = useState(true);
+  const [placeList, setPlaceList] = useState([]); // Main content 리스트의 최신 데이터
 
-  const [placeList, setPlaceList] = useState([]);
+  // Index Banner 설정
+  const curRegion = getConfig('curRegion');                 // 지역 Obj
+  const curRegionCode = getConfig('curRegion.code');        // 지역 코드
+  const curRegionEn = getConfig('curRegion.textEn');        // 지역 영문명
+  const curRegionKr = getConfig('curRegion.textKor');       // 지역 한글명
+  const curRegionBg = getConfig('curRegion.bannerImg');     // 지역 배너
+  const curRegionDesc = getConfig('curRegion.description'); // 지역 설명
 
+  {/* 지역 코드(위치)가 변경된다면 데이터를 불러온다. */}
   useEffect(() => {
-  window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
+    const fetchPlaces = async () => {
+        if (!curRegionCode) return; // 코드가 아직 준비되지 않은 경우. (로딩 전)
+        try {
+            setIsLoading(true);
+            // URL 파라미터 뒤질 필요 없이, Context에 있는 코드를 바로 꽂아버립니다.
+            const response = await fetch(`/api/home/places?regionCode=${curRegionCode}`);
+            if (!response.ok) throw new Error(`API 요청 실패: ${response.status}`);
 
-  const fetchPlaces = async () => {
-    try {
-      setIsLoading(true);
+            const data = await response.json();
+            const convertedData = Array.isArray(data) ? data.map(convertPlaceToCardItem) : [];
 
-      const params = new URLSearchParams(search);
-      const regionCode = Number(params.get('regionCode')) || 11;
+            setPlaceList(convertedData);  // 플레이 리스트를 갱신한다.
+        } catch (error) {
+            console.error('데이터 조회 실패:', error);
+            setPlaceList([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    fetchPlaces();
 
-      const response = await fetch(
-        `/api/home/places?regionCode=${regionCode}`
-      );
+    // 지역 코드가 바뀔 때마다(=지역이 바뀔 때마다) 알아서 데이터를 새로 가져옵니다.
+  }, [curRegionCode]);
 
-      if (!response.ok) {
-        throw new Error(`API 요청 실패: ${response.status}`);
-      }
+  // 각 Section 별로 내용을 분기한다.
+  const { attractions, plays, sleeps, foods } = useMemo(() => {
+    return placeList.reduce(
+      (acc, item) => {
+        if (acc[item.group]) { acc[item.group].push(item); }
+        return acc;
+      },
+      { attractions: [], plays: [], sleeps: [], foods: [] } // 초기값 설정
+    );
+  }, [placeList]);
 
-      const data = await response.json();
+  /* Main Section들의 내용을 섞는다. */
+  const { topPicks, randomSections } = useMemo(() => {
+    // 각 카테고리별로 랜덤 아이템 추출 (Top용 1개, 섹션용 3개)
+    const getRandomData = (list, count) => getRandomItems(list, count);
 
-      const convertedData = Array.isArray(data)
-      ? data.map(convertPlaceToCardItem)
-      : [];
+    const rawPicks = {
+      see: getRandomData(attractions, 1)[0],
+      play: getRandomData(plays, 1)[0],
+      sleep: getRandomData(sleeps, 1)[0],
+      food: getRandomData(foods, 1)[0],
+    };
 
-      setPlaceList(convertedData);
-    } catch (error) {
-      console.error('메인 페이지 장소 데이터 조회 실패:', error);
-      setPlaceList([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    // 컨첸츠 상단 큐레이션용 topPicks 배열 생성
+    const picks = Object.entries(rawPicks)
+      .filter(([_, item]) => item) // 데이터가 있는 경우만
+      .map(([type, item]) => ({ ...item, type }));
 
-  fetchPlaces();
-}, [pathname, search, region]);
+    // 컨첸츠 상단 외 섹션별 추출된 데이터 객체
+    const sections = {
+      attractions: getRandomData(attractions, 3),
+      plays: getRandomData(plays, 3),
+      sleeps: getRandomData(sleeps, 3),
+      foods: getRandomData(foods, 3),
+    };
 
-  const currentRegion = regionKor || '수원시';
-  const currentBannerImage = bannerImages[currentRegion] || defaultBanner;
-  const currentSubtitle = regionSubtitles[currentRegion] || '경기도의 매력을 발견하세요';
-
-  const attractions = placeList.filter(
-  (item) => item.group === 'attractions'
-);
-
-const plays = placeList.filter(
-  (item) => item.group === 'plays'
-);
-
-const sleeps = placeList.filter(
-  (item) => item.group === 'sleeps'
-);
-
-const foods = placeList.filter(
-  (item) => item.group === 'foods'
-);
-
-  const topPicks = useMemo(() => {
-    const seeItem = getRandomItems(attractions, 1)[0];
-    const playItem = getRandomItems(plays, 1)[0];
-    const sleepItem = getRandomItems(sleeps, 1)[0];
-    const foodItem = getRandomItems(foods, 1)[0];
-
-    const picks = [];
-    if (seeItem) picks.push({ ...seeItem, type: 'see' });
-    if (playItem) picks.push({ ...playItem, type: 'play' });
-    if (sleepItem) picks.push({ ...sleepItem, type: 'sleep' });
-    if (foodItem) picks.push({ ...foodItem, type: 'food' });
-
-    return picks;
+    return { topPicks: picks, randomSections: sections };
   }, [attractions, plays, sleeps, foods]);
 
-  const randomAttractions = useMemo(() => getRandomItems(attractions, 3), [attractions]);
-  const randomPlays = useMemo(() => getRandomItems(plays, 3), [plays]);
-  const randomSleeps = useMemo(() => getRandomItems(sleeps, 3), [sleeps]);
-  const randomFoods = useMemo(() => getRandomItems(foods, 3), [foods]);
+  /* Section별 타이틀 및 컨텐츠 값 설정 */
+  const categorySections = [
+    { title: "놓치지 말아야 할 '볼거리'", pathType: "see", dataList: randomSections.attractions },
+    { title: "신나는 '놀거리'", pathType: "play", dataList: randomSections.plays },
+    { title: "편안한 '잘거리'", pathType: "sleep", dataList: randomSections.sleeps },
+    { title: `${curRegionKr}의 맛, '먹거리'`, pathType: "food", dataList: randomSections.foods },
+  ];
+  const { region } = useParams();
+  const navigate = useNavigate();
+  const { pathname, search } = useLocation();
 
-  const handleMoreClick = (pathType) => {
-    navigate(`/${region}/${pathType}/list`);
-  };
+  // ----------------------------------------------
+  // ::: EVENTS OR LISTENENR
+  // ----------------------------------------------
 
+  // 더보기 링크 클릭시 
+  const handleMoreClick = (pathType) => { navigate(`/${curRegionEn}/${pathType}/list`); };
+
+  // Section 카드 클릭시
   const handleCardClick = (pathType, item) => {
-    navigate(`/${region}/${pathType}/view?id=${item.id}`, {
-      state: { selectedRegion: region, selectedItem: item, food: item }
+    navigate(`/${curRegionEn}/${pathType}/view?id=${item.id}`, {
+      state: { selectedRegion: curRegionEn, selectedItem: item, food: item }
     });
   };
 
-  if (isLoading) {
-    return <MainSkeleton />;
-  }
-
-  const categorySections = [
-    { title: "놓치지 말아야 할 '볼거리'", pathType: "see", dataList: randomAttractions },
-    { title: `${currentRegion}의 맛, '먹거리'`, pathType: "food", dataList: randomFoods },
-    { title: "편안한 '잘거리'", pathType: "sleep", dataList: randomSleeps },
-    { title: "신나는 '놀거리'", pathType: "play", dataList: randomPlays },
-  ];
+  // ----------------------------------------------
+  // ::: PAGE RETURN
+  // ----------------------------------------------
+  
+  // 현재 로딩 중이라면
+  if (isLoading) { return <MainSkeleton />; }
 
   return (
     <div className="min-h-screen bg-[#f8f6f0]">
-
-      <HeroBanner
-        bgImage={currentBannerImage}
-        title={currentRegion}
-        subtitle={currentSubtitle}
-      />
+      {/* Index 상단 배너 */}
+      <HeroBanner bgImage={curRegionBg} title={curRegionKr} subtitle={curRegionDesc} />
+      
+      {/* Index Content 내용 */}
       <div className='container'>
         <div className="mx-auto px-4 py-6 md:py-10">
   
           <Breadcrumb
-            paths={[
-              { label: '홈', to: '/' },
-              { label: currentRegion }
-            ]}
+            paths={[ { label: '홈', to: '/' }, { label: curRegionKr } ]}
             className="mb-2 sm:mb-6"
           />
+
           {/* Section 1 : 방방곳곳 숨어있는 추천을 찾다  */}
           {topPicks.length > 0 && (
             <section className="mb-[6vw]">
@@ -255,7 +183,8 @@ const foods = placeList.filter(
             </section>
           )}
 
-            {categorySections.map((section) => (
+          {/* Section 2 ~ : 섹션 리스트 */}
+          {categorySections.map((section) => (
             <CategorySection
               key={section.pathType}
               title={section.title}

@@ -1,3 +1,9 @@
+/*
+26.05.15 
+ -> layouts/user/footers/MainFooter로 변경
+*/
+
+
 import React from 'react';
 import '@assets/css/footer.css';
 import { Link } from "react-router-dom";

@@ -159,15 +159,6 @@ const LifeCourseView = ({
           <DownloadIcon />
           <span className="leading-none">내 일정으로 가져오기</span>
         </button>
-
-        <button
-          type="button"
-          onClick={handleMakePlan}
-          className="flex-1 py-3 border border-[#0F9B73] text-[#0F9B73] fs-down-1 font-bold rounded-xl hover:bg-green-50 transition inline-flex items-center justify-center gap-2 leading-none"
-        >
-          <CalendarPlanIcon />
-          <span className="leading-none">이 코스로 일정 만들기</span>
-        </button>
       </div>
     </div>
   );
