@@ -1,4 +1,5 @@
 import React from 'react';
+import { ThemeProvider } from '@layouts/admin/tailadmin/context/ThemeContext';
 import { SidebarProvider, useSidebar } from '@layouts/admin/tailadmin/context/SidebarContext';
 import { Outlet } from 'react-router-dom';
 import AppHeader from '@layouts/admin/tailadmin/layout/AppHeader';
@@ -35,9 +36,11 @@ function AdminLayoutContent() {
 // 2. 외부에서 Provider로 감싸주는 메인 컴포넌트
 function AdminLayout() {
   return (
-    <SidebarProvider>
-      <AdminLayoutContent />
-    </SidebarProvider>
+    <ThemeProvider>
+      <SidebarProvider>
+        <AdminLayoutContent />
+      </SidebarProvider>
+    </ThemeProvider>
   );
 }
 

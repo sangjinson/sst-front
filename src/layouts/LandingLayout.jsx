@@ -2,19 +2,19 @@ import { Outlet } from 'react-router-dom';
 import { ConfigProvider } from '@context/ConfigContext';
 
 {/* Layouts */}
-import MainHeader from '@layouts/user/headers/MainHeader';
+import LandingHeader from '@layouts/user/headers/LandingHeader';
 import MainFooter from '@layouts/user/footers/MainFooter';
 
 
-const UserLayout = () => {
+const LandingLayout = () => {
   return (
     <ConfigProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div className="page-wrapper min-h-screen bg-[#f8f6f0]">
         {/* Header 영역 */}
-        <MainHeader />
-
+        <LandingHeader />
+        
         {/* Content 영역 */}
-        <main style={{ flex: 1}}>
+        <main className="container-fluid flex flex-col mt-10 pb-[5vw]">
           <Outlet />
         </main>
 
@@ -25,4 +25,4 @@ const UserLayout = () => {
   );
 };
 
-export default UserLayout;
+export default LandingLayout;
