@@ -29,7 +29,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     polylinesRef.current = [];
   };
 
-  const drawRoute = (map, items, dayIdx = 0) => {
+  const drawRoute = (map, items, dayIdx = 0, onSelect) => {
     const color      = DAY_COLORS[dayIdx % DAY_COLORS.length];
     const validItems = items.filter(i => i.lat && i.lng);
 
@@ -57,7 +57,8 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           display:flex; align-items:center; justify-content:center;
           border:2px solid white;
           box-shadow:0 2px 6px rgba(0,0,0,0.3);
-        ">${idx + 1}</div>
+          cursor:pointer;
+        " id="overlay-${item.placeId}">${idx + 1}</div>
       `;
       const overlay = new window.kakao.maps.CustomOverlay({
         map,
@@ -66,6 +67,16 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
         yAnchor: 1,
       });
       overlaysRef.current.push(overlay);
+
+      // 오버레이 클릭 이벤트
+      setTimeout(() => {
+        const el = document.getElementById(`overlay-${item.placeId}`);
+        if (el) {
+          el.addEventListener('click', () => {
+            onSelect(item);
+          });
+        }
+      }, 100);
     });
 
     if (linePath.length > 1) {
@@ -86,23 +97,30 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
   // 지도 초기화
   useEffect(() => {
     const initMap = () => {
-      if (!window.kakao?.maps || !mapRef.current) return;
+      if (!mapRef.current) return;
       window.kakao.maps.load(() => {
-        const map = new window.kakao.maps.Map(mapRef.current, {
-          center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-          level : 8,
-        });
-        mapObj.current = map;
-        window.__testMap = map;
-        map.relayout();
-        setMapReady(true);
+        if (!mapRef.current) return; // load 콜백 안에서도 체크
+        try {
+          const map = new window.kakao.maps.Map(mapRef.current, {
+            center: new window.kakao.maps.LatLng(37.5665, 126.9780),
+            level : 8,
+          });
+          mapObj.current = map;
+          map.relayout();
+          setMapReady(true);
+        } catch (e) {
+          console.warn("카카오맵 초기화 실패:", e);
+        }
       });
     };
 
     if (window.kakao?.maps) { initMap(); return; }
 
     const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
-    if (existing) { existing.addEventListener('load', initMap); return; }
+    if (existing) {
+      existing.addEventListener('load', initMap);
+      return () => existing.removeEventListener('load', initMap); // cleanup 추가
+    }
 
     const script = document.createElement('script');
     script.src   = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&libraries=services,drawing&autoload=false`;
@@ -117,7 +135,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     if (!currentDayItems.length) return;
     if (window.kakao?.maps) {
       window.kakao.maps.load(() => {
-        drawRoute(mapObj.current, currentDayItems, activeDay);
+        drawRoute(mapObj.current, currentDayItems, activeDay, onSelectItem);
       });
     }
   }, [mapReady, activeDay, schedule]);
@@ -157,19 +175,19 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
       </div>
 
       {selectedItem ? (
-        <div className="border-t border-gray-100 bg-white px-3 py-3 flex items-center gap-3">
+        <div className="border-t border-gray-100 bg-white px-4 py-4 flex items-center gap-4 min-h-[140px]">
 
           <button
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="text-gray-400 hover:text-gray-600 text-2xl shrink-0 disabled:opacity-30 transition"
+            className="text-gray-400 hover:text-gray-600 text-4xl shrink-0 disabled:opacity-30 transition"
           >
             ‹
           </button>
 
           <div
             onClick={handleGoDetail}
-            className="w-16 h-16 rounded-xl overflow-hidden shrink-0 cursor-pointer hover:opacity-80 transition"
+            className="w-28 h-28 rounded-xl overflow-hidden shrink-0 cursor-pointer hover:opacity-80 transition"
           >
             {selectedItem.imgUrl ? (
               <img src={selectedItem.imgUrl} alt={selectedItem.placeName} className="w-full h-full object-cover" />
@@ -179,29 +197,27 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           </div>
 
           <div onClick={handleGoDetail} className="flex-1 min-w-0 cursor-pointer">
-            <div className="flex items-center gap-2 mb-1">
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                 CAT_COLOR_MAP[selectedItem.category] ?? TYPE_COLOR[selectedItem.type] ?? 'bg-gray-100 text-gray-600'
               }`}>
                 {CAT_LABEL_MAP[selectedItem.category] ?? TYPE_LABEL[selectedItem.type] ?? selectedItem.category}
               </span>
             </div>
-            <p className="text-sm font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
+            <p className="text-lg font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
               {selectedItem.placeName}
             </p>
-            <p className="text-xs text-gray-400 mt-0.5 truncate">
+            <p className="text-sm text-gray-400 mt-1.5 line-clamp-3">
               {selectedItem.overview}
             </p>
           </div>
 
-          <button className="text-red-400 hover:text-red-500 transition text-xl shrink-0">
-            ♥
-          </button>
+          <button className="text-red-400 hover:text-red-500 transition text-2xl shrink-0">♥</button>
 
           <button
             onClick={handleNext}
             disabled={currentIdx === currentDayItems.length - 1}
-            className="text-gray-400 hover:text-gray-600 text-2xl shrink-0 disabled:opacity-30 transition"
+            className="text-gray-400 hover:text-gray-600 text-4xl shrink-0 disabled:opacity-30 transition"
           >
             ›
           </button>
