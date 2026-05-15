@@ -31,16 +31,27 @@ export const AREA_SORT_OPTIONS = [
 // sortOption: 'reviews' | 'rating'
 export const sortData = (data, sortOption) => {
   const result = [...data];
+
+  const hasImage = (item) => {
+    const url = item.image || '';
+    return url && !url.includes('picsum') && !url.includes('unsplash');
+  };
+
   if (sortOption === 'reviews') {
-    // 리뷰 많은 순 (좌측부터 우측)
     result.sort((a, b) => {
       const aCount = a.reviewCount ?? a.reviews ?? 0;
       const bCount = b.reviewCount ?? b.reviews ?? 0;
-      return bCount - aCount;
+      if (bCount !== aCount) return bCount - aCount;
+      // 리뷰 수 같으면 이미지 있는 것 앞으로
+      return hasImage(b) - hasImage(a);
     });
   } else if (sortOption === 'rating') {
-    // 평점 높은 순 (좌측부터 우측)
-    result.sort((a, b) => b.rating - a.rating);
+    result.sort((a, b) => {
+      if (b.rating !== a.rating) return b.rating - a.rating;
+      // 평점 같으면 이미지 있는 것 앞으로
+      return hasImage(b) - hasImage(a);
+    });
   }
+
   return result;
 };

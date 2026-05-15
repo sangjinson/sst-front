@@ -8,8 +8,9 @@ import CommentSection from "@components/modules/community/common/CommentSection"
 import LifeCourseView from "@components/modules/community/life/LifeCourseView";
 import LifeAside from "@components/modules/community/life/LifeAside";
 import LifePostHeader from "@components/modules/community/life/LifePostHeader";
+import { openReportModal } from "@components/modules/community/common/reportModal";
 import IconSVG from "@components/Icon/IconSVG";
-
+  
 // 공통 이미지 슬라이더 컴포넌트 import
 import ImageSlider from "@components/modules/community/common/ImageSlider";
 
@@ -141,6 +142,24 @@ const CommunityLifeDetail = () => {
     fetchComments(commNo);
   }, [post]);
 
+  // 게시글 좋아요 상태 조회
+  useEffect(() => {
+    if (!currentUserId || !post?.commNo) return;
+
+    api
+      .get(`/community/${post.commNo}/like`, {
+        params: {
+          mbrId: currentUserId,
+        },
+      })
+      .then((res) => {
+        setIsLiked(res.data);
+      })
+      .catch((err) => {
+        console.error("좋아요 상태 조회 실패:", err);
+      });
+  }, [currentUserId, post?.commNo]);
+
   if (loading) {
     return (
       <div className="py-20 text-center font-bold text-gray-500">
@@ -246,29 +265,47 @@ const CommunityLifeDetail = () => {
 
   // 이 코스로 일정 만들기
   const handleMakePlan = () => {
-    const scheduleItems = courseList.map((c, i) => ({
-      id: `life-${post.id}-${c.order || i + 1}`,
-      time: `${9 + i * 2}:00`,
-      name: c.name,
-      desc: c.desc,
-      image: c.image,
-      type: c.type,
-      region,
-    }));
+  if (courseList.length === 0) {
+    Swal.fire({ icon: 'warning', title: '코스 정보가 없습니다.', timer: 1000, showConfirmButton: false });
+    return;
+  }
 
-    navigate("/plan/result", {
-      state: {
-        region,
-        period: courseList.some((c) => c.type === "sleep")
-          ? "1박2일"
-          : "당일여행",
-        themes: post.hashtags?.slice(0, 2) || [],
-        startDate: "",
-        endDate: "",
-        schedule: [scheduleItems],
-      },
+  // dayNo 기준으로 그룹핑
+  const dayMap = {};
+  courseList.forEach((c, i) => {
+    const dayNo = c.dayNo ?? 1;
+    if (!dayMap[dayNo]) dayMap[dayNo] = [];
+    dayMap[dayNo].push({
+      placeId  : c.placeId ?? i + 1,
+      placeName: c.name,
+      category : c.type ?? 'PLC001',
+      overview : c.desc ?? '',
+      imgUrl   : c.image ?? '',
+      lat      : c.lat ? String(c.lat) : null,
+      lng      : c.lng ? String(c.lng) : null,
     });
-  };
+  });
+
+  const schedule = Object.keys(dayMap).sort().map((dayNo, idx) => ({
+    day  : idx + 1,
+    date : '',
+    plans: dayMap[dayNo],
+  }));
+
+  // sessionStorage에 저장
+  sessionStorage.removeItem('currentSchedule');
+  sessionStorage.removeItem('scheduleMetaData');
+  sessionStorage.setItem('currentSchedule', JSON.stringify(schedule));
+  sessionStorage.setItem('scheduleMetaData', JSON.stringify({
+    rgnName     : region,
+    themes      : post.hashtags?.slice(0, 3) ?? [],
+    aisBeginDate: null,
+    aisEndDate  : null,
+    aisTotDays  : schedule.length,
+  }));
+
+  navigate('/plan/result');
+};
 
   // 댓글 등록
   const handleCommentSubmit = () => {
@@ -486,12 +523,16 @@ const CommunityLifeDetail = () => {
             handleImportSchedule={handleImportSchedule}
             handleMakePlan={handleMakePlan}
             handleDeletePost={handleDeletePost}
-            openReportModal={() =>
-              openReportModal({
+            openReportModal={async () => {
+              const result = await openReportModal({
                 type: "post",
                 commNo: post.commNo ?? post.id,
-              })
-            }
+              });
+
+              if (result?.blinded) {
+                navigate("/showcase/life");
+              }
+            }}
             onCommentClick={scrollToComments}
           />
       </section>

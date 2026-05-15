@@ -1,8 +1,6 @@
 import React from 'react';
-import { SEARCH_CATEGORIES } from './aiResultUtils';
+import { SEARCH_CATEGORIES, CAT_KOR_COLOR_MAP, TYPE_LABEL, CAT_LABEL_MAP, TYPE_COLOR } from './aiResultUtils';
 
-
-// 장소 검색 패널
 const AIResultSearchPanel = ({
   searchKeyword,
   searchCategory,
@@ -14,7 +12,7 @@ const AIResultSearchPanel = ({
   onClose,
 }) => {
   return (
-    <div className="border-t border-gray-100 p-4">
+    <div className="border-t border-gray-100 p-4 h-[400px]">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-gray-800">장소 검색</h3>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -42,7 +40,7 @@ const AIResultSearchPanel = ({
         </div>
       </div>
 
-      {/* ✅ 카테고리 필터 - 초록색 통일 */}
+      {/* 카테고리 필터 */}
       <div className="flex gap-2 mb-3 flex-wrap">
         {SEARCH_CATEGORIES.map(cat => (
           <button
@@ -60,29 +58,50 @@ const AIResultSearchPanel = ({
       </div>
 
       {/* 검색 결과 */}
-      <div className="space-y-2 max-h-[280px] overflow-y-auto">
+      <div className="space-y-3 max-h-[280px] overflow-y-auto">
         {searchResults.length === 0 ? (
           <div className="text-center py-6 text-gray-400 text-sm">검색 결과가 없습니다</div>
         ) : (
           searchResults.map((item) => {
-            const isAdded = currentDayItems.some(i => i.id === item.id);
+            const isAdded = currentDayItems.some(i =>
+              i.placeId === item.id ||
+              i.placeId === item.placeId ||
+              String(i.placeId) === String(item.id)
+            );
             return (
               <div
                 key={item.id}
-                className="flex items-center gap-3 p-2 rounded-xl border border-gray-100 hover:border-gray-200 transition"
+                className="flex items-center gap-4 px-6 py-4 rounded-xl border border-gray-100 hover:border-gray-200 transition"
               >
-                <div className="w-2 h-2 rounded-full bg-red-400 shrink-0" />
-                <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
+                <button
+                  onClick={(e) => { e.stopPropagation(); }}
+                  className="text-gray-300 hover:text-red-400 transition shrink-0"
+                >
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </button>
+                <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-800 truncate">{item.name}</p>
-                  <p className="text-xs text-gray-400 truncate">{item.description || item.desc}</p>
+                  <div className="flex items-center gap-1 mb-1.5">
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                      TYPE_COLOR[item.type] ?? 'bg-green-100 text-[#0F9B73]'
+                    }`}>
+                      {TYPE_LABEL[item.type] ?? item.type}
+                    </span>
+                  </div>
+                  <p className="text-base font-semibold text-gray-800 truncate">{item.name}</p>
+                  <p className="text-sm text-gray-400 truncate mt-0.5">{item.description || item.desc}</p>
                 </div>
                 <button
-                  onClick={() => !isAdded && onAddPlace(item)}
+                  onClick={() => !isAdded && onAddPlace({
+                    ...item,
+                    category: CAT_LABEL_MAP[item.category] ?? item.category,
+                  })}
                   disabled={isAdded}
-                  className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                  className={`shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition ${
                     isAdded
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       : 'bg-[#0F9B73] text-white hover:bg-[#0d8a66]'

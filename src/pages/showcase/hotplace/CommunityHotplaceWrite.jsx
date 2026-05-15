@@ -181,16 +181,26 @@ const CommunityHotplaceWrite = () => {
         prev.filter((_, index) => index !== removeIndex)
       );
     } catch (error) {
-      console.error("이미지 삭제 실패:", error);
-      alert("이미지 삭제에 실패했습니다.");
-    }
-  };
+        console.error("이미지 삭제 실패:", error);
+        alert("이미지 삭제에 실패했습니다.");
+      }
+    };
+    
+  // 해시태그 공백, # 제거
+  const normalizeTag = (tag) =>
+    tag
+      .trim()
+      .replace(/^#/, "")
+      .replace(/\s+/g, "");
 
   const handleTagKeyDown = (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      const trimmedTag = tagInput.trim();
-      if (trimmedTag && !tags.includes(trimmedTag)) {
+
+      const trimmedTag = normalizeTag(tagInput);
+      const normalizedTags = tags.map(normalizeTag);
+
+      if (trimmedTag && !normalizedTags.includes(trimmedTag)) {
         setTags([...tags, trimmedTag]);
         setTagInput("");
       }
@@ -199,26 +209,36 @@ const CommunityHotplaceWrite = () => {
     }
   };
 
+  const matchedPlace = places.find(
+    (place) => place.plcName.trim() === placeName.trim()
+  );
+
   const handleSubmit = async(e) => {
     e.preventDefault();
 
-    const trimmedTag = tagInput.trim();
-    const finalTags = trimmedTag && !tags.includes(trimmedTag)
-      ? [...tags, trimmedTag]
-      : tags;
+    const trimmedTag = normalizeTag(tagInput);
+    
+    const finalTags = Array.from(
+      new Set(
+        [...tags, trimmedTag]
+          .map(normalizeTag)
+          .filter(Boolean)
+      )
+    );
 
-    if (!selectedRegion) {
-      alert("지역을 선택해주세요.");
-      return;
-    }
+    if (!selectedRegion) {alert("지역을 선택해주세요.");return;}
     if (!title.trim()) { alert("제목을 입력해주세요."); return; }
     if (!placeName.trim()) { alert("장소를 입력해주세요."); return; }
+    if (!matchedPlace) {
+      alert("목록에 있는 장소만 입력할 수 있습니다.");
+      return;
+    }
     if (!content.trim()) { alert("내용을 입력해주세요."); return; }
     if (!finalTags.length) { alert("해시태그를 입력해주세요."); return; }
 
     if (isEditMode) {
       const payload = {
-        commPlcNo: selectedPlace?.plcNo,
+        commPlcNo: matchedPlace.plcNo,
         commTitle: title,
         commContent: content,
         commMainImgUrl: imagePreviews[0]
@@ -263,7 +283,7 @@ const CommunityHotplaceWrite = () => {
       const payload = {
         commMbrId: user.mbrId,
         commCatCd: "CMM002",
-        commPlcNo: selectedPlace?.plcNo,
+        commPlcNo: matchedPlace.plcNo,
         commTitle: title,
         commContent: content,
         commMainImgUrl: imagePreviews[0]

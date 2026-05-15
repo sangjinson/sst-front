@@ -5,6 +5,7 @@ import Breadcrumb from "@components/common/Breadcrumb";
 import CommunityLifeCard from "@components/modules/community/life/CommunityLifeCard";
 import Pagination from "@components/common/Pagination";
 import CommunitySearchBar from "@components/modules/community/common/CommunitySearchBar";
+import CommunityLifeSkeleton from "@components/skeleton/CommunityLifeSkeleton";
 
 
 const CommunityLife = () => {
@@ -17,10 +18,12 @@ const CommunityLife = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [popularTags, setPopularTags] = useState([]);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 5;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -36,16 +39,42 @@ const CommunityLife = () => {
   }, []);
 
   useEffect(() => {
-    setSearchParams(
-      {
-        page,
-        searchType,
-        keyword,
-        sortType,
-      },
-      { replace: true }
-    );
+    api
+      .get("/community/popular-hashtags", {
+        params: {
+          catCd: "CMM001",
+        },
+      })
+      .then((res) => {
+        setPopularTags(res.data);
+      })
+      .catch((err) => {
+        console.error("인기 해시태그 조회 실패:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    const nextParams = {};
+
+    if (page !== 1) nextParams.page = page;
+    if (searchType !== "all") nextParams.searchType = searchType;
+    if (keyword.trim() !== "") nextParams.keyword = keyword;
+    if (sortType !== "latest") nextParams.sortType = sortType;
+
+    setSearchParams(nextParams, { replace: true });
   }, [page, searchType, keyword, sortType, setSearchParams]);
+
+  useEffect(() => {
+    const nextKeyword = searchParams.get("keyword") || "";
+    const nextSearchType = searchParams.get("searchType") || "all";
+    const nextSortType = searchParams.get("sortType") || "latest";
+    const nextPage = Number(searchParams.get("page")) || 1;
+
+    setKeyword(nextKeyword);
+    setSearchType(nextSearchType);
+    setSortType(nextSortType);
+    setPage(nextPage);
+  }, [searchParams]);
 
   const getImageUrl = (url) => {
     if (!url) return "https://placehold.co/600x400";
@@ -54,6 +83,7 @@ const CommunityLife = () => {
   };
 
   const fetchPosts = () => {
+    setLoading(true);
     api
       .get("/community", {
         params: {
@@ -100,6 +130,9 @@ const CommunityLife = () => {
       })
       .catch((err) => {
         console.error("인생거리 목록 조회 실패:", err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -110,6 +143,31 @@ const CommunityLife = () => {
 
     return () => clearTimeout(timer);
   }, [keyword, searchType, sortType, page]);
+
+  // 게시글 목록 좋아요 상태 조회
+  useEffect(() => {
+    if (!currentUserId || posts.length === 0) return;
+
+    api
+      .get("/community/likes", {
+        params: {
+          commNos: posts.map((post) => post.id),
+          mbrId: currentUserId,
+        },
+      })
+      .then((res) => {
+        const nextLikedPosts = {};
+
+        res.data.forEach((commNo) => {
+          nextLikedPosts[commNo] = true;
+        });
+
+        setLikedPosts(nextLikedPosts);
+      })
+      .catch((err) => {
+        console.error("게시글 목록 좋아요 상태 조회 실패:", err);
+      });
+  }, [currentUserId, posts]);
 
   //  좋아요 토글 함수 (핵심 추가)
   const toggleLike = (postId) => {
@@ -149,6 +207,10 @@ const CommunityLife = () => {
         console.error("좋아요 처리 실패:", err);
       });
   };
+
+  if (loading) {
+    return <CommunityLifeSkeleton />;
+  }
 
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
@@ -228,6 +290,7 @@ const CommunityLife = () => {
           setSearchType("all");
           setPage(1);
         }}
+        popularTags={popularTags}
         searchOptions={[
           { value: "all", label: "전체 검색" },
           { value: "title", label: "제목 검색" },
