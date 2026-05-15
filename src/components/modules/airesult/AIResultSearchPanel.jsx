@@ -1,5 +1,6 @@
 import React from 'react';
 import { SEARCH_CATEGORIES, CAT_KOR_COLOR_MAP, TYPE_LABEL, CAT_LABEL_MAP } from './aiResultUtils';
+import { WishlistHeartButton } from '@components/modules/ActionButtons'; // ✅ 추가
 
 const AIResultSearchPanel = ({
   searchKeyword,
@@ -10,6 +11,7 @@ const AIResultSearchPanel = ({
   onCategoryChange,
   onAddPlace,
   onClose,
+  selectedRegion, // ✅ 추가
 }) => {
   return (
     <div className="border-t border-gray-100 p-4 h-[400px]">
@@ -68,22 +70,35 @@ const AIResultSearchPanel = ({
               i.placeId === item.placeId ||
               String(i.placeId) === String(item.id)
             );
+
+            // ✅ id에서 숫자만 추출 (예: "see-123" → 123)
+            const rawId   = String(item.id || '');
+            const placeId = rawId.includes('-') ? Number(rawId.split('-')[1]) : Number(rawId);
+
             return (
               <div
                 key={item.id}
                 className="flex items-center gap-4 px-6 py-4 rounded-xl border border-gray-100 hover:border-gray-200 transition"
               >
-                <button
-                  onClick={(e) => { e.stopPropagation(); }}
-                  className="text-gray-300 hover:text-red-400 transition shrink-0"
-                >
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                  </svg>
-                </button>
+                {/* ✅ WishlistHeartButton으로 교체 */}
+                <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+                  <WishlistHeartButton
+                    item={{
+                      id      : placeId,
+                      name    : item.name,
+                      image   : item.image,
+                      category: item.category || item.tag,
+                      address : item.address || item.location || '',
+                    }}
+                    itemType={item.type ?? 'see'}
+                    region={selectedRegion}
+                  />
+                </div>
+
                 <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1 mb-1.5">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
@@ -95,6 +110,7 @@ const AIResultSearchPanel = ({
                   <p className="text-base font-semibold text-gray-800 truncate">{item.name}</p>
                   <p className="text-sm text-gray-400 truncate mt-0.5">{item.description || item.desc}</p>
                 </div>
+
                 <button
                   onClick={() => !isAdded && onAddPlace({
                     ...item,

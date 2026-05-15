@@ -12,6 +12,7 @@ const AIResultScheduleItem = ({
   onGoDetail,
   onClick,
   isSelected,
+  renderHeart, // ✅ 추가
 }) => {
   return (
     <div
@@ -52,11 +53,17 @@ const AIResultScheduleItem = ({
           </span>
         </div>
         <p className="text-base font-semibold text-gray-800 truncate">{item.placeName}</p>
-        <p className="text-sm text-gray-400 truncate" >{item.overview}</p>
+        <p className="text-sm text-gray-400 truncate">{item.overview}</p>
       </div>
 
       {/* 액션 버튼 */}
       <div className="flex items-center shrink-0">
+        {/* ✅ 하트 버튼 */}
+        {renderHeart && (
+          <div onClick={(e) => e.stopPropagation()}>
+            {renderHeart(item)}
+          </div>
+        )}
         <button
           onClick={(e) => { e.stopPropagation(); onGoDetail(item); }}
           className="p-1.5 rounded-lg text-gray-400 hover:text-[#0F9B73] hover:bg-green-50 transition"
