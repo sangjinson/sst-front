@@ -1,6 +1,5 @@
 import React from "react";
 import { ClipButton } from "@components/modules/ActionButtons";
-import { openReportModal } from "@components/modules/community/common/reportModal";
 
 const DownloadIcon = () => (
   <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -58,11 +57,13 @@ const LifeAside = ({
   setIsLiked,
   handleLikeClick,
   isLogin,
+  isOwner,
   navigate,
   handleImportSchedule,
   handleMakePlan,
   onCommentClick,
   handleDeletePost,
+  openReportModal,
 }) => {
   return (
     <aside className="h-fit rounded-3xl border border-gray-100 bg-white p-6 shadow-sm lg:sticky lg:top-28 space-y-6">
@@ -71,22 +72,26 @@ const LifeAside = ({
         <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-500">
           <ClipButton />
         </div>
-        <button
-          type="button"
-          onClick={() => openReportModal("post")}
-          className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500 flex items-center gap-1.5">
-          <svg viewBox="0 0 64 64" className="w-4 h-4">
-            <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor"/>
-            <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(45 32 32)"/>
-            <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(90 32 32)"/>
-            <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(135 32 32)"/>
-            <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(-45 32 32)"/>
-            <path d="M12 34 A20 20 0 0 1 52 34 Z" fill="currentColor"/>
-            <rect x="10" y="34" width="44" height="11" rx="5" fill="currentColor"/>
-            <rect x="8" y="45" width="48" height="10" rx="5" fill="#2d2d4e"/>
-          </svg>
-          신고
-        </button>
+
+        {/* 로그인 + 내 글 아님 */}
+        {isLogin && !isOwner && (
+          <button
+            type="button"
+            onClick={() => openReportModal("post")}
+            className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500 flex items-center gap-1.5">
+            <svg viewBox="0 0 64 64" className="w-4 h-4">
+              <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor"/>
+              <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(45 32 32)"/>
+              <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(90 32 32)"/>
+              <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(135 32 32)"/>
+              <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(-45 32 32)"/>
+              <path d="M12 34 A20 20 0 0 1 52 34 Z" fill="currentColor"/>
+              <rect x="10" y="34" width="44" height="11" rx="5" fill="currentColor"/>
+              <rect x="8" y="45" width="48" height="10" rx="5" fill="#2d2d4e"/>
+            </svg>
+            신고
+          </button>
+        )}
       </div>
 
       {/* 작성자 */}
@@ -168,7 +173,7 @@ const LifeAside = ({
         </div>
       </div>
       {/* 수정/삭제 */}
-      {isLogin && (
+      {isLogin && isOwner && (
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"

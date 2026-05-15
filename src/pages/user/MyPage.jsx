@@ -18,7 +18,9 @@ const CARDS = [
 
 const MyPage = () => {
   const location = useLocation();
-  const [activeSection, setActiveSection] = useState(location.state?.tab || 'member');
+  const [activeSection, setActiveSection] = useState(
+    location.state?.tab || sessionStorage.getItem("mypageTab") || "member"
+  );
   
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,6 +28,10 @@ const MyPage = () => {
   const [profileImg, setProfileImg] = useState(
     'https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png'
   );
+
+  useEffect(() => {
+    sessionStorage.setItem("mypageTab", activeSection);
+  }, [activeSection]);
 
   useEffect(() => {
     const fetchMemberData = async () => {

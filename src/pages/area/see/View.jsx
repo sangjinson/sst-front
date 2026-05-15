@@ -100,6 +100,9 @@ const View = () => {
           { icon: <IconSVG name="phone" size={18} className="shrink-0 fill-none stroke-[#E8956D] mt-1" strokeWidth={2}/>, label: '전화번호', value: item.phone?.trim() || item.infocenter?.trim() || '전화번호 정보 없음' },
           { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '주차', value: item.parking || '주차 정보 없음' },
           { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '휴무일', value: item.restdate || '연중무휴' },
+          { icon: <IconSVG name="circleprice" size={18} className="shrink-0 fill-none stroke-[#E8956D]" strokeWidth={4}/>, label: '홈페이지', value: item.homepage
+            ? <a href={item.homepage} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-700 break-all">🔗 홈페이지 방문</a>
+            : '전화로 문의바랍니다.' },
         ]}
         tags={item.tags}
         tagLabel="해시태그"
@@ -107,10 +110,7 @@ const View = () => {
 
       <AreaMap lat={item.lat} lng={item.lng} address={item.address} />
 
-      <AreaReview
-        plcNo={item.plcNo}
-        placeholder="볼거리에 대한 솔직한 리뷰를 남겨주세요."
-      />
+      <AreaReview plcNo={item.plcNo} placeholder="볼거리에 대한 솔직한 리뷰를 남겨주세요." />
 
       <AreaRelated
         title="연관 추천 볼거리"
