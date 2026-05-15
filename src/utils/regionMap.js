@@ -57,3 +57,9 @@ export const getGroupedRegions = () => {
     return acc;
   }, { north: [], south: [] });
 };
+
+// 10. 유효한 지역인지 검증하는 함수 추가 (영문명 기준)
+export const hasRegion = (engName) => {
+  if (!engName) return false;
+  return REGION_DATA.some(r => r.textEn === engName.toLowerCase());
+};

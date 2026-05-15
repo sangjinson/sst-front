@@ -1,6 +1,9 @@
 import { Outlet, useParams } from 'react-router-dom';
-import Header from '@components/common/Header';
-import Footer from '@components/common/Footer';
+
+
+{/* Layouts */}
+import MainHeader from '@layouts/user/headers/MainHeader';
+import MainFooter from '@layouts/user/footers/MainFooter';
 
 const AreaBaseTemplate = () => {
   const { region } = useParams();
@@ -8,7 +11,10 @@ const AreaBaseTemplate = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header />
+      {/* Header 영역 */}
+      <MainHeader />
+
+      {/* Content 영역 */}
       <main style={{ flex: 1}}>
           <Outlet context={
             { 
@@ -17,7 +23,9 @@ const AreaBaseTemplate = () => {
             }
           } />
       </main>
-      <Footer />
+
+      {/* Footer 영역 */}
+      <MainFooter />
     </div>
   );
 };
