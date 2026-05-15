@@ -8,8 +8,9 @@ import CommentSection from "@components/modules/community/common/CommentSection"
 import LifeCourseView from "@components/modules/community/life/LifeCourseView";
 import LifeAside from "@components/modules/community/life/LifeAside";
 import LifePostHeader from "@components/modules/community/life/LifePostHeader";
+import { openReportModal } from "@components/modules/community/common/reportModal";
 import IconSVG from "@components/Icon/IconSVG";
-
+  
 // 공통 이미지 슬라이더 컴포넌트 import
 import ImageSlider from "@components/modules/community/common/ImageSlider";
 
@@ -504,12 +505,16 @@ const CommunityLifeDetail = () => {
             handleImportSchedule={handleImportSchedule}
             handleMakePlan={handleMakePlan}
             handleDeletePost={handleDeletePost}
-            openReportModal={() =>
-              openReportModal({
+            openReportModal={async () => {
+              const result = await openReportModal({
                 type: "post",
                 commNo: post.commNo ?? post.id,
-              })
-            }
+              });
+
+              if (result?.blinded) {
+                navigate("/showcase/life");
+              }
+            }}
             onCommentClick={scrollToComments}
           />
       </section>
