@@ -5,6 +5,10 @@ import { LogIn, LogOut, Search } from 'lucide-react';
 import { useAuth } from '@hooks/useAuth'; 
 import '@assets/css/header.css';
 
+import ProfileImage from '@modules/member/ProfileImage'; // 프로필 아이콘
+
+
+
 // 🚀 방어막: 'showcase' 등 시스템 경로가 지역명으로 오염되는 것 차단
 const FORBIDDEN_REGIONS = ['showcase', 'plan', 'user', 'search', 'login', 'customersupport', 'admin'];
 const authButtonClass = 'group inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-lg text-lg font-semibold text-white! bg-black border-0 transition-colors duration-200 ease-out hover:bg-white hover:text-black! active:scale-[0.97] cursor-pointer';
@@ -194,24 +198,7 @@ const Header = () => {
             <div className="flex items-center gap-3">
               {/* 프로필 이미지 */}
               <Link to="/user/mypage" className="shrink-0 block">
-                {user.mbrProfileInfo?.filePath ? (
-                  <img 
-                    src={user.mbrProfileInfo.filePath} 
-                    alt="프로필" 
-                    className="w-[38px] h-[38px] md:w-[42px] md:h-[42px] rounded-full object-cover border-2 border-gray-100 hover:border-[#0F9B73] transition-colors cursor-pointer"
-                    onError={(e) => {
-                      // 이미지 로드 실패 시 기본 이미지로 교체하는 방어 코드
-                      //e.target.src = "https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png";
-                    }}
-                  />
-                ) : (
-                  /* 🚀 이미지가 없을 때 보여줄 기본 UI (아이콘 혹은 기본 이미지) */
-                  <div className="w-[38px] h-[38px] md:w-[42px] md:h-[42px] rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-100 hover:border-[#0F9B73] transition-colors cursor-pointer">
-                    <span className="text-gray-500 text-xs font-bold">
-                      {user.mbrNickname?.charAt(0) || 'U'}
-                    </span>
-                  </div>
-                )}
+                <ProfileImage user={user} size="sm" className="cursor-pointer" />
               </Link>
               <button className={authButtonClass} onClick={logout}>
                 <span className={authButtonTextClass}>Logout</span>

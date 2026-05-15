@@ -86,10 +86,8 @@ const MyPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 🚀 전체 컨테이너를 잡고, 그 안에서 브레드크럼과 아래쪽(사이드바+본문) 영역을 수직으로 나눔 */}
       <div className="container mx-auto px-4 py-6 md:px-10 lg:py-10">
-        
-        {/* 🚀 1. 브레드크럼을 젤 위로 분리해서 사이드바와 메뉴의 윗줄을 깔끔하게 맞춤 */}
+        {/* 브레드크럼을 젤 위로 분리해서 사이드바와 메뉴의 윗줄을 깔끔하게 맞춤 */}
         <div className="w-full flex justify-start mb-6">
           <Breadcrumb
             paths={[
@@ -104,8 +102,7 @@ const MyPage = () => {
         {/* 🚀 2. 사이드바와 메인 컨텐츠를 나란히 배치하는 래퍼 (items-start 속성으로 윗선 정렬) */}
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           
-          {/* 사이드바 */}
-          {/* !loading && profile && () */} 
+          {/* 사이드바 */} {/* !loading && profile && () */} 
           <Sidebar profile={profile} profileImg={profileImg} />
 
           {/* 메인 컨텐츠 */}
