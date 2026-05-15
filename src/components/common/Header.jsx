@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, LogOut, Search } from 'lucide-react';
 import { useAuth } from '@hooks/useAuth'; 
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+
 import '@assets/css/header.css';
 
 const FORBIDDEN_REGIONS = ['showcase', 'plan', 'user', 'search', 'login', 'customersupport', 'admin'];
@@ -10,6 +12,7 @@ const authButtonTextClass = 'text-white! transition-colors duration-200 group-ho
 const authButtonIconClass = 'w-4 h-4 text-white! transition-all duration-200 group-hover:text-black!';
 
 const Header = () => {
+
   const [isMenuOpen, setIsMenuOpen]     = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -30,6 +33,8 @@ const Header = () => {
   const currentRegion = (region && !FORBIDDEN_REGIONS.includes(region))
     ? region
     : localStorage.getItem('lastVisitedRegion') || '수원시';
+
+  // console.log(currentRegion);
 
   const navItems = [
     { name: '볼거리', path: `/${currentRegion}/see/list` },
