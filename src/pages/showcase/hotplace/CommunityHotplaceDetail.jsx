@@ -92,6 +92,24 @@ const CommunityHotplaceDetail = () => {
     fetchPost();
   }, [id]);
 
+  // 게시글 좋아요 상태 조회
+  useEffect(() => {
+    if (!currentUserId || !currentPost?.commNo) return;
+
+    api
+      .get(`/community/${currentPost.commNo}/like`, {
+        params: {
+          mbrId: currentUserId,
+        },
+      })
+      .then((res) => {
+        setIsLiked(res.data);
+      })
+      .catch((err) => {
+        console.error("좋아요 상태 조회 실패:", err);
+      });
+  }, [currentUserId, currentPost]);
+
   // 댓글 조회 함수
   const fetchComments = (commNo) => {
     axios
@@ -320,7 +338,6 @@ const CommunityHotplaceDetail = () => {
           isLogin={isLogin}
           isOwner={isOwner}
           isLiked={isLiked}
-          setIsLiked={setIsLiked}
           wishCount={wishCount}
           handleLikeClick={handleLikeClick}
           openReportModal={async () => {

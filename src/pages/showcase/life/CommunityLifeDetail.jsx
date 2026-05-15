@@ -142,6 +142,24 @@ const CommunityLifeDetail = () => {
     fetchComments(commNo);
   }, [post]);
 
+  // 게시글 좋아요 상태 조회
+  useEffect(() => {
+    if (!currentUserId || !post?.commNo) return;
+
+    api
+      .get(`/community/${post.commNo}/like`, {
+        params: {
+          mbrId: currentUserId,
+        },
+      })
+      .then((res) => {
+        setIsLiked(res.data);
+      })
+      .catch((err) => {
+        console.error("좋아요 상태 조회 실패:", err);
+      });
+  }, [currentUserId, post?.commNo]);
+
   if (loading) {
     return (
       <div className="py-20 text-center font-bold text-gray-500">

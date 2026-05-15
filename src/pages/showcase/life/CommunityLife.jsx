@@ -18,6 +18,7 @@ const CommunityLife = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [popularTags, setPopularTags] = useState([]);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -34,6 +35,21 @@ const CommunityLife = () => {
       })
       .catch((err) => {
         console.error("로그인 사용자 조회 실패:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    api
+      .get("/community/popular-hashtags", {
+        params: {
+          catCd: "CMM001",
+        },
+      })
+      .then((res) => {
+        setPopularTags(res.data);
+      })
+      .catch((err) => {
+        console.error("인기 해시태그 조회 실패:", err);
       });
   }, []);
 
@@ -127,6 +143,31 @@ const CommunityLife = () => {
 
     return () => clearTimeout(timer);
   }, [keyword, searchType, sortType, page]);
+
+  // 게시글 목록 좋아요 상태 조회
+  useEffect(() => {
+    if (!currentUserId || posts.length === 0) return;
+
+    api
+      .get("/community/likes", {
+        params: {
+          commNos: posts.map((post) => post.id),
+          mbrId: currentUserId,
+        },
+      })
+      .then((res) => {
+        const nextLikedPosts = {};
+
+        res.data.forEach((commNo) => {
+          nextLikedPosts[commNo] = true;
+        });
+
+        setLikedPosts(nextLikedPosts);
+      })
+      .catch((err) => {
+        console.error("게시글 목록 좋아요 상태 조회 실패:", err);
+      });
+  }, [currentUserId, posts]);
 
   //  좋아요 토글 함수 (핵심 추가)
   const toggleLike = (postId) => {
@@ -249,7 +290,7 @@ const CommunityLife = () => {
           setSearchType("all");
           setPage(1);
         }}
-        popularTags={["제주코스", "부산여행", "혼자여행", "데이트코스", "뚜벅이여행"]}
+        popularTags={popularTags}
         searchOptions={[
           { value: "all", label: "전체 검색" },
           { value: "title", label: "제목 검색" },
