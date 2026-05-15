@@ -28,3 +28,32 @@ export const toRegion = (key) => {
     (r) => r.textKor === key || r.textEn === key?.toLowerCase()
   ) || DEFAULT_REGION;
 };
+
+// 5. 특정 영역(north/south)의 모든 지역 객체 리스트 가져오기
+export const getRegionsByArea = (area) => {
+  const safeArea = area?.toLowerCase();
+  // 'north' 또는 'south'에 해당하는 데이터만 필터링 (기본값 null 제외)
+  return REGION_DATA.filter(r => r.area === safeArea);
+};
+
+// 6. 북부 지역 리스트만 가져오기 (편의용)
+export const getNorthRegions = () => getRegionsByArea('north');
+
+// 7. 남부 지역 리스트만 가져오기 (편의용)
+export const getSouthRegions = () => getRegionsByArea('south');
+
+// 8. 특정 지역이 어느 영역에 속하는지 확인 (이름이나 영어명 입력)
+export const getAreaByRegion = (key) => {
+  const region = toRegion(key);
+  return region ? region.area : null;
+};
+
+// 9. 영역별로 그룹화된 객체 가져오기 (전체 데이터를 분류해서 뿌려줄 때 유용)
+export const getGroupedRegions = () => {
+  return REGION_DATA.reduce((acc, r) => {
+    if (r.area === 'north' || r.area === 'south') {
+      acc[r.area].push(r);
+    }
+    return acc;
+  }, { north: [], south: [] });
+};
