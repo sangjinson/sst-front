@@ -129,8 +129,7 @@ const CourseSection = ({
                 <button
                   type="button"
                   onClick={() => onRemoveCourseItem(idx)}
-                  className="shrink-0 self-start p-1.5 text-gray-300 hover:text-red-400 transition"
-                >
+                  className="shrink-0 self-start p-1.5 text-gray-300 hover:text-red-400 transition">
                   ✕
                 </button>
               </div>

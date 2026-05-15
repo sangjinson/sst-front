@@ -179,7 +179,7 @@ const CommentSection = ({
 
               const canEdit = isOwnComment;
               const canDelete = isOwnComment;
-              const canReport = !isOwnComment;
+              const canReport = currentUserId && !isOwnComment;
 
               return (
                 <div
