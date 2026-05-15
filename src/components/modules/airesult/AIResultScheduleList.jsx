@@ -42,7 +42,7 @@ const AIResultScheduleList = ({
       </div>
 
       {/* 일정 리스트 */}
-      <div className="p-3 space-y-2 flex-1 overflow-y-auto max-h-[500px]">
+      <div className="p-3 space-y-3 flex-1 overflow-y-auto max-h-[550px]">
         {currentDayItems.length === 0 ? (
           <div className="text-center py-10 text-gray-400 text-sm">일정이 없습니다</div>
         ) : (

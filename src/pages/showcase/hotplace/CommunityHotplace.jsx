@@ -27,6 +27,7 @@ const CommunityHotplace = () => {
   const [loading, setLoading] = useState(true);
 
   const [posts, setPosts] = useState([]);
+  const [popularTags, setPopularTags] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
@@ -73,6 +74,31 @@ const CommunityHotplace = () => {
       });
   };
 
+  // 게시글 목록 좋아요 상태 조회
+  useEffect(() => {
+    if (!currentUserId || posts.length === 0) return;
+
+    api
+      .get("/community/likes", {
+        params: {
+          commNos: posts.map((post) => post.id),
+          mbrId: currentUserId,
+        },
+      })
+      .then((res) => {
+        const nextLikedPosts = {};
+
+        res.data.forEach((commNo) => {
+          nextLikedPosts[commNo] = true;
+        });
+
+        setLikedPosts(nextLikedPosts);
+      })
+      .catch((err) => {
+        console.error("게시글 목록 좋아요 상태 조회 실패:", err);
+      });
+  }, [currentUserId, posts]);
+
   // 로그인 사용자 조회: 처음 한 번만
   useEffect(() => {
 
@@ -83,6 +109,22 @@ const CommunityHotplace = () => {
       })
       .catch((err) => {
         console.error("로그인 사용자 조회 실패:", err);
+      });
+  }, []);
+
+  // 인기 해시태그 API 호출
+  useEffect(() => {
+    api
+      .get("/community/popular-hashtags", {
+        params: {
+          catCd: "CMM002",
+        },
+      })
+      .then((res) => {
+        setPopularTags(res.data);
+      })
+      .catch((err) => {
+        console.error("인기 해시태그 조회 실패:", err);
       });
   }, []);
 
@@ -262,7 +304,7 @@ const CommunityHotplace = () => {
           setSearchType("all");
           setCurrentPage(1);
         }}
-        popularTags={["성수카페", "제주맛집", "부산야경", "혼자여행", "데이트코스"]}
+        popularTags={popularTags}
         searchOptions={[
           { value: "all", label: "전체 검색" },
           { value: "title", label: "제목 검색" },
