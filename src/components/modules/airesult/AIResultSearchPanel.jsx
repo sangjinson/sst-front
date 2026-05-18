@@ -68,7 +68,7 @@ const AIResultSearchPanel = ({
             // ✅ id에서 숫자만 추출 (예: "see-123" → 123)
             const rawId   = String(item.id || '');
             const placeId = rawId.includes('-') ? Number(rawId.split('-')[1]) : Number(rawId);
-            
+
             const isAdded = currentDayItems.some(i =>
                 Number(i.placeId) === placeId
             );
@@ -79,7 +79,7 @@ const AIResultSearchPanel = ({
                 key={item.id}
                 className="flex items-center gap-4 px-6 py-4 rounded-xl border border-gray-100 hover:border-gray-200 transition h-28"
               >
-                {/* ✅ WishlistHeartButton으로 교체 */}
+                {/* WishlistHeartButton으로 교체 */}
                 <div onClick={(e) => e.stopPropagation()} className="shrink-0">
                   <WishlistHeartButton
                     item={{
