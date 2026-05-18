@@ -36,7 +36,7 @@ const REGION_BANNER = {
   하남시: { bgImage: '/banners/하남시.png' },
   화성시: { bgImage: '/banners/화성시.png' },
   여주시: { bgImage: '/banners/여주시.png' },
-  양평군: { bgImage: '/banners/양평시.png' },
+  양평군: { bgImage: '/banners/양평군.png' },
   고양시: { bgImage: '/banners/고양시.png' },
   구리시: { bgImage: '/banners/구리시.png' },
   남양주시: { bgImage: '/banners/남양주시.png' },

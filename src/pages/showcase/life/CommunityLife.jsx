@@ -96,7 +96,6 @@ const CommunityLife = () => {
         },
       })
       .then((res) => {
-        console.log(res.data.list);
         const mappedData = res.data.list.map((item) => {
           const imageUrl = getImageUrl(item.commMainImgUrl);
 

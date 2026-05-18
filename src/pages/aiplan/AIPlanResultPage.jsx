@@ -68,7 +68,6 @@ const AIPlanResultPage = () => {
   const finishScheduleLoading = () => {
     setLoadingFinishing(true);
     window.clearTimeout(loadingFinishTimer.current);
-
     loadingFinishTimer.current = window.setTimeout(() => {
       setScheduleLoading(false);
       setLoadingFinishing(false);
@@ -80,7 +79,6 @@ const AIPlanResultPage = () => {
       window.clearTimeout(loadingFinishTimer.current);
     };
   }, []);
-
 
   useEffect(() => {
     if (schedule.length > 0) {
@@ -185,13 +183,9 @@ const AIPlanResultPage = () => {
     }
   }, [selectedRegion]);
 
-  // 페이지 변경 시 맨 위로 이동
-    useEffect(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }, []);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   useEffect(() => {
     if (!showSearch) return;
@@ -252,14 +246,14 @@ const AIPlanResultPage = () => {
     if (isConfirmed && tripName) {
       try {
         const requestBody = {
-        scheduleName: tripName.trim(),
-        startDate   : (currentStartDate && currentStartDate !== '') ? currentStartDate : null,
-        endDate     : (currentEndDate && currentEndDate !== '') ? currentEndDate : null,
-        totalDays   : currentTotalDays ?? schedule.length,
-        rgnName     : currentRegion    ?? '',
-        themes      : currentThemes    ?? [],
-        schedule,
-      };
+          scheduleName: tripName.trim(),
+          startDate   : (currentStartDate && currentStartDate !== '') ? currentStartDate : null,
+          endDate     : (currentEndDate && currentEndDate !== '') ? currentEndDate : null,
+          totalDays   : currentTotalDays ?? schedule.length,
+          rgnName     : currentRegion    ?? '',
+          themes      : currentThemes    ?? [],
+          schedule,
+        };
 
         if (aisNo) {
           await api.put('/ai/schedule/update', requestBody, { params: { aisNo } });
@@ -270,7 +264,6 @@ const AIPlanResultPage = () => {
         sessionStorage.removeItem('currentSchedule');
         sessionStorage.removeItem('scheduleMetaData');
 
-        // ✅ navigate 제거 — 현재 화면 유지
         await Swal.fire({
           icon : 'success',
           title: aisNo ? '수정되었습니다!' : '저장되었습니다!',
@@ -288,9 +281,9 @@ const AIPlanResultPage = () => {
 
   const handleAddPlace = (item) => {
     const rawId   = String(item.id || '');
-    const placeId = rawId.includes('-')
+    const placeId = item.placeId ?? (rawId.includes('-')
       ? Number(rawId.split('-')[1])
-      : Number(rawId);
+      : Number(rawId));
 
     const currentPlans = schedule[activeDay]?.plans || [];
     const isDuplicate  = currentPlans.some(p => p.placeId === placeId);
@@ -317,6 +310,16 @@ const AIPlanResultPage = () => {
       return next;
     });
     Swal.fire({ icon: 'success', title: '추가되었습니다', timer: 1000, showConfirmButton: false });
+  };
+
+  // ✅ 검색 패널에서 선택 취소
+  const handleRemovePlace = (placeId) => {
+    setSchedule(prev => {
+      const next = prev.map(day => ({ ...day, plans: [...day.plans] }));
+      next[activeDay].plans = next[activeDay].plans.filter(p => p.placeId !== placeId);
+      sessionStorage.setItem('currentSchedule', JSON.stringify(next));
+      return next;
+    });
   };
 
   const handleGoDetail  = (item) => navigate(getDetailPath(item, currentRegion));
@@ -346,20 +349,18 @@ const AIPlanResultPage = () => {
           endDate={currentEndDate}
           selectedThemes={currentThemes}
           onDateChange={async (start, end) => {
-          setSavedStartDate(start);
-          setSavedEndDate(end);
-
-          // aisNo 있으면 DB도 업데이트
+            setSavedStartDate(start);
+            setSavedEndDate(end);
             if (aisNo) {
-                try {
-                    await api.put('/ai/schedule/date', null, {
-                        params: { aisNo, startDate: start, endDate: end }
-                    });
-                } catch (err) {
-                    console.error('날짜 업데이트 실패:', err);
-                }
+              try {
+                await api.put('/ai/schedule/date', null, {
+                  params: { aisNo, startDate: start, endDate: end }
+                });
+              } catch (err) {
+                console.error('날짜 업데이트 실패:', err);
+              }
             }
-        }}
+          }}
         />
 
         {scheduleLoading ? (
@@ -387,11 +388,11 @@ const AIPlanResultPage = () => {
               />
 
               <AIResultMapView
-                  selectedRegion={currentRegion}
-                  schedule={schedule}
-                  activeDay={activeDay}
-                  selectedItem={selectedItem}
-                  onSelectItem={(item) => setSelectedItem(item)}
+                selectedRegion={currentRegion}
+                schedule={schedule}
+                activeDay={activeDay}
+                selectedItem={selectedItem}
+                onSelectItem={(item) => setSelectedItem(item)}
               />
 
             </div>
@@ -405,6 +406,7 @@ const AIPlanResultPage = () => {
                 onKeywordChange={(kw) => setSearchKeyword(kw)}
                 onCategoryChange={(cat) => setSearchCategory(cat)}
                 onAddPlace={handleAddPlace}
+                onRemovePlace={handleRemovePlace}
                 onClose={() => setShowSearch(false)}
                 selectedRegion={currentRegion}
                 showSearch={showSearch}
@@ -418,4 +420,4 @@ const AIPlanResultPage = () => {
   );
 };
 
-export default AIPlanResultPage;  
+export default AIPlanResultPage;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { SEARCH_CATEGORIES, CAT_KOR_COLOR_MAP, TYPE_LABEL, CAT_LABEL_MAP, TYPE_COLOR } from './aiResultUtils';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 
@@ -10,15 +10,14 @@ const AIResultSearchPanel = ({
   onKeywordChange,
   onCategoryChange,
   onAddPlace,
+  onRemovePlace, // ✅ 추가
   onClose,
   selectedRegion,
-  showSearch, // 모바일 하단 시트 애니메이션용
+  showSearch,
 }) => {
 
-  // 검색 결과 내부 공통 컨텐츠
   const SearchContent = () => (
     <>
-      {/* 헤더 */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-gray-800">장소 검색</h3>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -29,7 +28,6 @@ const AIResultSearchPanel = ({
         </button>
       </div>
 
-      {/* 검색창 */}
       <div className="flex gap-2 mb-3">
         <div className="flex-1 flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 bg-gray-50">
           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-gray-400" strokeWidth="2">
@@ -46,7 +44,6 @@ const AIResultSearchPanel = ({
         </div>
       </div>
 
-      {/* 카테고리 필터 */}
       <div className="flex gap-2 mb-3 flex-wrap">
         {SEARCH_CATEGORIES.map(cat => (
           <button
@@ -63,13 +60,11 @@ const AIResultSearchPanel = ({
         ))}
       </div>
 
-      {/* 검색 결과 */}
       <div className="space-y-3 overflow-y-auto max-h-[280px] md:max-h-[280px]">
         {searchResults.length === 0 ? (
           <div className="text-center py-6 text-gray-400 text-sm">검색 결과가 없습니다</div>
         ) : (
           searchResults.map((item) => {
-            // id에서 숫자만 추출 (예: "see-123" → 123)
             const rawId   = String(item.id || '');
             const placeId = rawId.includes('-') ? Number(rawId.split('-')[1]) : Number(rawId);
             const isAdded = currentDayItems.some(i => Number(i.placeId) === placeId);
@@ -79,7 +74,6 @@ const AIResultSearchPanel = ({
                 key={item.id}
                 className="flex items-center gap-2 px-2 md:gap-4 md:px-4 py-4 rounded-xl border border-gray-100 hover:border-gray-200 transition h-28"
               >
-                {/* 하트 버튼 */}
                 <div onClick={(e) => e.stopPropagation()} className="shrink-0">
                   <WishlistHeartButton
                     item={{
@@ -94,12 +88,10 @@ const AIResultSearchPanel = ({
                   />
                 </div>
 
-                {/* 이미지 */}
                 <div className="w-22 h-22 rounded-lg overflow-hidden shrink-0">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
 
-                {/* 텍스트 영역 - 이미지 높이에 맞게 제한 */}
                 <div className="flex-1 min-w-0 h-22 overflow-hidden flex flex-col justify-between">
                   <div className="flex items-center gap-1">
                     <span className={`text-[10px] px-1.5 rounded-full ${
@@ -113,16 +105,22 @@ const AIResultSearchPanel = ({
                   <p className="text-sm text-gray-400 truncate">{item.description || item.desc}</p>
                 </div>
 
-                {/* 선택 버튼 */}
+                {/* ✅ 선택/취소 버튼 */}
                 <button
-                  onClick={() => !isAdded && onAddPlace({
-                    ...item,
-                    category: CAT_LABEL_MAP[item.category] ?? item.category,
-                  })}
-                  disabled={isAdded}
+                  onClick={() => {
+                    if (isAdded) {
+                      onRemovePlace(placeId);
+                    } else {
+                      onAddPlace({
+                        ...item,
+                        placeId,
+                        category: CAT_LABEL_MAP[item.category] ?? item.category,
+                      });
+                    }
+                  }}
                   className={`shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition focus:outline-none ${
                     isAdded
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      ? 'bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-400 cursor-pointer'
                       : 'bg-[#4CAF8C] text-white hover:bg-[#0d8a66]'
                   }`}
                 >
@@ -138,24 +136,20 @@ const AIResultSearchPanel = ({
 
   return (
     <>
-      {/* PC 전용 - 기존 하단 패널 */}
       <div className="hidden md:block border-t border-gray-100 p-4 h-[400px]">
         <SearchContent />
       </div>
 
-      {/* 모바일 전용 - 하단 시트 */}
       <div className={`
         fixed inset-0 z-50 md:hidden
         transition-opacity duration-300
         ${showSearch ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
       `}>
-        {/* 배경 딤처리 - 클릭시 닫힘 */}
         <div
           className="absolute inset-0 bg-black/40"
           onClick={onClose}
         />
 
-        {/* 시트 본체 - 아래에서 위로 슬라이드 */}
         <div
           className={`
             absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl
@@ -164,12 +158,10 @@ const AIResultSearchPanel = ({
           `}
           style={{ maxHeight: '70vh' }}
         >
-          {/* 핸들 바 */}
           <div className="flex justify-center pt-3 pb-1">
             <div className="w-10 h-1 bg-gray-300 rounded-full" />
           </div>
 
-          {/* 내용 영역 */}
           <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(70vh - 32px)' }}>
             <SearchContent />
           </div>
