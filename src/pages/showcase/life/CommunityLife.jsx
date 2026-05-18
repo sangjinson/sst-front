@@ -7,7 +7,6 @@ import CommunitySearchBar from "@components/modules/community/common/CommunitySe
 import CommunityLifeSkeleton from "@components/skeleton/CommunityLifeSkeleton";
 import CommunityListHeader from "@components/modules/community/common/CommunityListHeader";
 
-
 const CommunityLife = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -96,7 +95,6 @@ const CommunityLife = () => {
         },
       })
       .then((res) => {
-        console.log(res.data.list);
         const mappedData = res.data.list.map((item) => {
           const imageUrl = getImageUrl(item.commMainImgUrl);
 
