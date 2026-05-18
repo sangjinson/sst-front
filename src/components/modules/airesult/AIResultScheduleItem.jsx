@@ -53,7 +53,7 @@ const AIResultScheduleItem = ({
           </span>
         </div>
         <p className="text-base font-semibold text-gray-800 truncate">{item.placeName}</p>
-        <p className="text-sm text-gray-400 truncate">{item.overview}</p>
+        <p className="text-sm text-gray-400 truncate">{item.addr}</p>
       </div>
 
       {/* 액션 버튼 */}
