@@ -58,6 +58,10 @@ const AIPlanPage = () => {
     resetPlan();
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   const toggleTheme = (theme) => {
     setSelectedThemes(prev => {
       if (prev.includes(theme)) return prev.filter(t => t !== theme);
