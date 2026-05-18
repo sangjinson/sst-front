@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth'; 
 
+import ProfileImage from '@modules/member/ProfileImage'; // 프로필 아이콘
+
 const Sidebar = ({ profile, profileImg, coverImg, onImgChange, onCoverChange, imgRef, coverRef }) => {
   const { user } = useAuth();
 
@@ -38,24 +40,7 @@ const Sidebar = ({ profile, profileImg, coverImg, onImgChange, onCoverChange, im
           
           {/* 프로필 이미지 영역 - 요청하신 로직 반영 */}
           <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-24 h-24 cursor-pointer" onClick={handleProfileBtnClick}>
-            <div className="w-full h-full rounded-full border-[3px] border-[#0F9B73] shadow-lg bg-gray-100 overflow-hidden flex items-center justify-center">
-              {user?.mbrProfileInfo?.filePath ? (
-                <img 
-                  src={user.mbrProfileInfo.filePath} 
-                  alt="프로필" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = defaultProfile;
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-500 text-xl font-bold">
-                    {user?.mbrNickname?.charAt(0) || 'U'}
-                  </span>
-                </div>
-              )}
-            </div>
+            <ProfileImage user={user} size="lg"/>
             <input ref={imgRef} type="file" accept="image/*" className="hidden" onChange={onImgChange} />
           </div>
         </div>
