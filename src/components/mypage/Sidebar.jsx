@@ -49,9 +49,9 @@ const Sidebar = ({ profile, profileImg, coverImg, onImgChange, onCoverChange, im
           <div className="fs-up-2 font-bold text-gray-900 mb-2">{user?.mbrNickname || "미지정"} 🏅</div>
           <hr className="w-full border-b border-t-0 border-gray-200 my-2" />
           <ul className="w-full flex flex-col gap-3 py-2 fs-up-2 text-gray-700">
-            <li className="flex items-start gap-1.5"><span>📅</span>가입일: {user?.mbrRegDate || "0000.00.00"}</li>
-            <li className="flex items-start gap-1.5"><span>📞</span>{user?.mbrPhone || "등록된 번호 없음"}</li>
-            <li className="flex items-start gap-1.5"><span>✉️</span>{user?.mbrEmail || "이메일 정보 없음"}</li>
+            <li className="flex items-start gap-1.5"><span>📅</span>가입일: {profile?.joinDate || "0000.00.00"}</li>
+            <li className="flex items-start gap-1.5"><span>📞</span>{profile?.phone || "등록된 번호 없음"}</li>
+            <li className="flex items-start gap-1.5"><span>✉️</span>{profile?.email || "이메일 정보 없음"}</li>
           </ul>
         </div>
       </div>

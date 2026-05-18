@@ -51,8 +51,6 @@ const CommunityHotplaceDetail = () => {
         const res = await api.get(`/community/${id}`);
         const item = res.data;
 
-        console.log(item);
-
         const imageUrl = item.commMainImgUrl
           ? item.commMainImgUrl.startsWith("http")
             ? item.commMainImgUrl

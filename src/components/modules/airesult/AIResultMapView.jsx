@@ -143,18 +143,18 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
   const currentIdx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
 
   return (
-    <div className="flex-1 flex flex-col min-w-0">
+    <div className="flex-1 flex flex-col min-w-0 order-first md:order-none">
 
-      <div style={{ width: '100%', height: '500px', position: 'relative' }}>
+      <div className="w-full relative h-[240px] md:h-[500px]">
         <div
           ref={mapRef}
           id="ai-result-map"
-          style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
+          className="absolute inset-0 w-full h-full"
         />
       </div>
 
       {selectedItem ? (
-        <div className="border-t border-gray-100 bg-white px-4 py-4 flex items-center gap-4 min-h-[140px]">
+        <div className="hidden md:flex border-t border-gray-100 bg-white px-4 py-4 items-center gap-4 h-[140px]">
 
           <button
             onClick={handlePrev}
@@ -178,20 +178,23 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           <div onClick={handleGoDetail} className="flex-1 min-w-0 cursor-pointer">
             <div className="flex items-center gap-2 mb-2">
               <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                CAT_COLOR_MAP[selectedItem.category] ?? TYPE_COLOR[selectedItem.type] ?? 'bg-gray-100 text-gray-600'
+                CAT_KOR_COLOR_MAP[selectedItem.category] ?? CAT_COLOR_MAP[selectedItem.category] ?? TYPE_COLOR[selectedItem.type] ?? 'bg-gray-100 text-gray-600'
               }`}>
-                {CAT_LABEL_MAP[selectedItem.category] ?? TYPE_LABEL[selectedItem.type] ?? selectedItem.category}
+                {selectedItem.category ?? CAT_LABEL_MAP[selectedItem.category] ?? TYPE_LABEL[selectedItem.type]}
               </span>
             </div>
             <p className="text-lg font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
               {selectedItem.placeName}
             </p>
-            <p className="text-sm text-gray-400 mt-1.5 line-clamp-3">
+            <p className="text-sm text-gray-500 mt-0.5 truncate">
+              {selectedItem.addr}
+            </p>
+            <p className="text-sm text-gray-400 mt-1.5 line-clamp-2">
               {selectedItem.overview}
             </p>
           </div>
 
-          {/* ✅ 지도 하단 하트 버튼 유지 */}
+          {/* 지도 하단 하트 버튼 유지 */}
           <div onClick={(e) => e.stopPropagation()} className="shrink-0">
             <WishlistHeartButton
               item={{
@@ -215,7 +218,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           </button>
         </div>
       ) : (
-        <div className="border-t border-gray-100 bg-white px-4 py-4 text-center text-sm text-gray-400">
+        <div className="hidden md:flex border-t border-gray-100 bg-white px-4 py-4 items-center gap-4 h-[140px]">
           왼쪽 일정 목록에서 장소를 클릭하면 상세 정보를 볼 수 있어요
         </div>
       )}

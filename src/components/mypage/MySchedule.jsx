@@ -103,7 +103,7 @@ const MySchedule = () => {
             <table className="w-full min-w-[400px] border-collapse">
               <thead>
                 <tr className="border-b-2 border-gray-100">
-                  {['번호', '일정명', '여행 날짜', '총 일수', '상태', ''].map((h) => (
+                  {['번호', '일정명', '여행 날짜', '총 일수', '상태', '지역',''].map((h) => (
                     <th key={h} className="py-3 px-4 text-left text-xs font-semibold text-gray-400 whitespace-nowrap">
                       {h}
                     </th>
@@ -136,12 +136,19 @@ const MySchedule = () => {
                         {s.aisTotDays}일
                       </td>
                       <td className="py-4 px-4">
-                        <span
+                      <span
                           className="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"
                           style={{ backgroundColor: sc.bg, color: sc.color }}
-                        >
+                      >
                           {status}
-                        </span>
+                      </span>
+                      </td>
+                      <td className="py-4 px-4">
+                      {s.rgnName && (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 whitespace-nowrap">
+                              {s.rgnName}
+                          </span>
+                      )}
                       </td>
                       <td className="py-4 px-4">
                         <button

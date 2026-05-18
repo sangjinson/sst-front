@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import capybaraImage from '@assets/images/not-found-capybara.png';
 import roadImage from '@assets/images/not-found-road.png';
 
@@ -76,12 +77,22 @@ const notFoundStyles = `
 `;
 
 const NotFoundPage = () => {
+  const navigate = useNavigate();
+
   return (
     <main
-      className="min-h-screen overflow-hidden bg-cover bg-center bg-no-repeat text-white"
-      style={{ backgroundImage: `url(${roadImage})` }}
-    >
+  className="relative min-h-screen overflow-hidden bg-cover bg-center bg-no-repeat text-white"
+  style={{ backgroundImage: `url(${roadImage})` }}
+>
       <style>{notFoundStyles}</style>
+
+      <button
+  type="button"
+  onClick={() => navigate(-1)}
+  className="absolute bottom-[100px] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/25 bg-slate-950/45 px-7 py-3 text-base font-bold text-white shadow-[0_14px_34px_rgba(2,6,23,0.24)] backdrop-blur-md transition-all duration-200 hover:-translate-x-1/2 hover:-translate-y-0.5 hover:border-white/50 hover:bg-white hover:text-slate-950 active:-translate-x-1/2 active:translate-y-0 md:bottom-[150px] md:px-9 md:py-3.5 md:text-lg"
+>
+  ← 뒤로가기
+</button>
 
       <div className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col items-center justify-center px-5 py-16 text-center">
         <p className="mb-3 text-sm font-bold uppercase tracking-[0.28em] text-[#8ED0FF]">
@@ -100,7 +111,7 @@ const NotFoundPage = () => {
         <div className="not-found-capybara relative mt-6 w-full max-w-7xl overflow-visible">
           <svg
             viewBox="-420 -40 1600 700"
-            className="h-[620px] w-full overflow-visible"
+            className="h-[min(58vh,620px)] w-full overflow-visible"
             role="img"
             aria-label="발밑 손전등 불빛에 놀란 카피바라 404 애니메이션"
           >
@@ -178,8 +189,8 @@ const NotFoundPage = () => {
             {/* 404 */}
             <g filter="url(#softShadow)">
               <text
-                x="1140"
-                y="-240"
+                x="1240"
+                y="-290"
                 className="letters-front"
                 fontFamily="Arial Black, Arial, sans-serif"
                 fontSize="130"

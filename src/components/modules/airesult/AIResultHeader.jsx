@@ -1,7 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import AIResultShareButton from './AIResultShareButton';
-
 
 // 상단 버튼 (뒤로/공유/인쇄/저장)
 const AIResultHeader = ({ existingId, onSave, onRestart }) => {
@@ -19,8 +17,7 @@ const AIResultHeader = ({ existingId, onSave, onRestart }) => {
         {existingId ? '← 마이페이지로' : '← 다시 선택하기'}
       </button>
 
-      <div className="flex items-center gap-2">
-        <AIResultShareButton />
+      <div className="hidden md:flex items-center gap-2">
         <button
           onClick={() => window.print()}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-100 transition"
