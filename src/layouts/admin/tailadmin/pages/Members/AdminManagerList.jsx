@@ -16,8 +16,8 @@ export default function AdminManagerList() {
   const { user } = useAuth(); // 🚀 전역 상태에서 현재 로그인한 관리자 정보 추출
   
   const [managers, setManagers] = useState([]);
-  const [selected, setSelected] = useState([]);
-  const [allChecked, setAllChecked] = useState(false);
+  
+  // 🚀 삭제됨: 체크박스 관련 상태 (selected, allChecked)
 
   const [searchType, setSearchType] = useState('email');
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -50,8 +50,7 @@ export default function AdminManagerList() {
   // 페이지 이동 시 데이터 갱신
   useEffect(() => {
     fetchManagers();
-    setAllChecked(false);
-    setSelected([]);
+    // 🚀 삭제됨: 체크박스 상태 초기화 로직
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]); 
 
@@ -78,15 +77,7 @@ export default function AdminManagerList() {
     fetchManagers({ searchType: 'email', keyword: '', useYn: '', page: 1 });
   };
 
-  const toggleAll = () => {
-    if (allChecked) setSelected([]);
-    else setSelected(managers.map((m) => m.mbrId)); 
-    setAllChecked(!allChecked);
-  };
-
-  const toggleOne = (id) => {
-    setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
-  };
+  // 🚀 삭제됨: toggleAll, toggleOne 함수
 
   // 🚀 5. 상태 변경 로직
   const handleToggleStatus = async (mbrId, currentStatus) => {
@@ -183,9 +174,7 @@ export default function AdminManagerList() {
           <Table>
             <TableHeader className="bg-gray-50/50 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
-                <TableCell isHeader className="px-5 py-3 text-center">
-                  <input type="checkbox" checked={allChecked} onChange={toggleAll} />
-                </TableCell>
+                {/* 🚀 삭제됨: 전체 선택 체크박스 열 */}
                 <TableCell isHeader className="px-5 py-3 text-center">ID</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-start">관리자 정보</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-start">연락처 / 주소</TableCell>
@@ -199,7 +188,8 @@ export default function AdminManagerList() {
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {managers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="px-5 py-10 text-center text-gray-500">
+                  {/* 🚀 수정됨: 체크박스 열이 빠졌으므로 colSpan을 8에서 7로 변경 */}
+                  <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500">
                     검색 결과가 없습니다.
                   </TableCell>
                 </TableRow>
@@ -210,14 +200,7 @@ export default function AdminManagerList() {
 
                   return (
                     <TableRow key={m.mbrId} className={`transition-colors ${isMe ? 'bg-orange-50/30' : 'hover:bg-gray-50/50 dark:hover:bg-white/[0.01]'}`}>
-                      <TableCell className="px-5 py-4 text-center">
-                        <input 
-                          type="checkbox" 
-                          checked={selected.includes(m.mbrId)} 
-                          onChange={() => toggleOne(m.mbrId)} 
-                          disabled={isMe} // 🚀 본인은 체크 불가
-                        />
-                      </TableCell>
+                      {/* 🚀 삭제됨: 개별 체크박스 열 */}
                       <TableCell className="px-5 py-4 text-center text-gray-500">{m.mbrId}</TableCell>
                       <TableCell className="px-5 py-4">
                         <div className="flex items-center gap-3">
