@@ -78,7 +78,7 @@ const AIResultSearchPanel = ({
             return (
               <div
                 key={item.id}
-                className="flex items-center gap-4 px-6 py-4 rounded-xl border border-gray-100 hover:border-gray-200 transition"
+                className="flex items-center gap-4 px-6 py-4 rounded-xl border border-gray-100 hover:border-gray-200 transition h-28"
               >
                 {/* ✅ WishlistHeartButton으로 교체 */}
                 <div onClick={(e) => e.stopPropagation()} className="shrink-0">
@@ -95,19 +95,20 @@ const AIResultSearchPanel = ({
                   />
                 </div>
 
-                <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
+                <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1 mb-1.5">
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                    <span className={`text-[10px] px-1.5 py-0.4 rounded-full ${
                       TYPE_COLOR[item.type] ?? 'bg-green-100 text-[#0F9B73]'
                     }`}>
                       {TYPE_LABEL[item.type] ?? item.type}
                     </span>
                   </div>
                   <p className="text-base font-semibold text-gray-800 truncate">{item.name}</p>
+                  <p className="text-sm text-gray-500 truncate mt-0.5">{item.address || item.location}</p>
                   <p className="text-sm text-gray-400 truncate mt-0.5">{item.description || item.desc}</p>
                 </div>
 
