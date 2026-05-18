@@ -11,6 +11,7 @@ import {
   getDetailPath,
 } from '@components/modules/airesult';
 import AIResultMapView from '@components/modules/airesult/AIResultMapView';
+import AIPlanLoading from '@components/modules/aiplan/AIPlanLoading';
 import { useAIPlan } from '@pages/aiplan/AIPlanContext';
 import '@assets/css/common.css';
 import api from '@api/axios';
@@ -39,7 +40,8 @@ const AIPlanResultPage = () => {
   const [searchCategory, setSearchCategory]   = useState('전체');
   const [searchResults, setSearchResults]     = useState([]);
   const [selectedItem, setSelectedItem]       = useState(null);
-  const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [scheduleLoading, setScheduleLoading] = useState(() => typeof window !== 'undefined' && !sessionStorage.getItem('currentSchedule'));
+  const [loadingFinishing, setLoadingFinishing] = useState(false);
 
   const [savedRegion, setSavedRegion]         = useState(null);
   const [savedThemes, setSavedThemes]         = useState([]);
@@ -48,6 +50,7 @@ const AIPlanResultPage = () => {
   const [savedTotalDays, setSavedTotalDays]   = useState(null);
 
   const dragOverIndex = useRef(null);
+  const loadingFinishTimer = useRef(null);
 
   const currentRegion    = savedRegion    || selectedRegion;
   const currentThemes    = savedThemes.length > 0 ? savedThemes : selectedThemes;
@@ -61,6 +64,23 @@ const AIPlanResultPage = () => {
     resetPlan();
     navigate('/plan');
   };
+
+  const finishScheduleLoading = () => {
+    setLoadingFinishing(true);
+    window.clearTimeout(loadingFinishTimer.current);
+
+    loadingFinishTimer.current = window.setTimeout(() => {
+      setScheduleLoading(false);
+      setLoadingFinishing(false);
+    }, 1600);
+  };
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(loadingFinishTimer.current);
+    };
+  }, []);
+
 
   useEffect(() => {
     if (schedule.length > 0) {
@@ -77,6 +97,8 @@ const AIPlanResultPage = () => {
     if (aisNo && !saved) {
       const fetchSavedSchedule = async () => {
         setScheduleLoading(true);
+        setLoadingFinishing(false);
+        window.clearTimeout(loadingFinishTimer.current);
         try {
           const res  = await api.get('/ai/schedule/detail', { params: { aisNo } });
           const data = res.data;
@@ -98,7 +120,7 @@ const AIPlanResultPage = () => {
           console.error('일정 불러오기 실패:', err);
           setSchedule([]);
         } finally {
-          setScheduleLoading(false);
+          finishScheduleLoading();
         }
       };
       fetchSavedSchedule();
@@ -126,6 +148,8 @@ const AIPlanResultPage = () => {
 
     const fetchSchedule = async () => {
       setScheduleLoading(true);
+      setLoadingFinishing(false);
+      window.clearTimeout(loadingFinishTimer.current);
       try {
         const params = new URLSearchParams({
           region    : selectedRegion,
@@ -148,7 +172,7 @@ const AIPlanResultPage = () => {
         console.error('FastAPI 호출 실패:', err);
         setSchedule([]);
       } finally {
-        setScheduleLoading(false);
+        finishScheduleLoading();
       }
     };
 
@@ -331,10 +355,7 @@ const AIPlanResultPage = () => {
         />
 
         {scheduleLoading ? (
-          <div className="bg-white rounded-2xl shadow-sm p-12 text-center text-gray-400">
-            <div className="text-4xl mb-3">🗺</div>
-            <p className="text-sm">AI가 최적의 여행 코스를 생성하고 있어요...</p>
-          </div>
+          <AIPlanLoading isFinishing={loadingFinishing} />
         ) : (
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             <div className="flex flex-col md:flex-row">
