@@ -8,13 +8,12 @@ import AdminPagination from "@components/common/AdminPagination";
 
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@themeadmin/components/ui/table";
 import Badge from "@themeadmin/components/ui/badge/Badge";
-import { PencilIcon, TrashBinIcon } from "@themeadmin/icons"; // PlusIcon 제거
 
 export default function AdminMemberList() {
   const navigate = useNavigate();
   const [members, setMembers] = useState([]);
-  const [selected, setSelected] = useState([]);
-  const [allChecked, setAllChecked] = useState(false);
+  
+  // 🚀 삭제됨: 체크박스 관련 상태 (selected, allChecked)
 
   const [searchType, setSearchType] = useState('email');
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -45,8 +44,7 @@ export default function AdminMemberList() {
   // 페이지 이동 시 데이터 갱신
   useEffect(() => {
     fetchMembers();
-    setAllChecked(false);
-    setSelected([]);
+    // 🚀 삭제됨: 체크박스 상태 초기화 로직
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]); 
 
@@ -77,15 +75,7 @@ export default function AdminMemberList() {
     fetchMembers({ searchType: 'email', keyword: '', useYn: '', page: 1 });
   };
 
-  const toggleAll = () => {
-    if (allChecked) setSelected([]);
-    else setSelected(members.map((m) => m.mbrId)); 
-    setAllChecked(!allChecked);
-  };
-
-  const toggleOne = (id) => {
-    setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
-  };
+  // 🚀 삭제됨: toggleAll, toggleOne 함수
 
   const handleToggleStatus = async (mbrId, currentStatus) => {
     const newStatus = currentStatus === 'Y' ? 'N' : 'Y';
@@ -94,7 +84,9 @@ export default function AdminMemberList() {
     if (!window.confirm(`정말 이 회원의 계정을 ${actionText} 처리하시겠습니까?`)) return;
 
     try {
-      await api.put(`/admin/members/${mbrId}`, { mbrUseYn: newStatus });
+      await api.patch(`/admin/members/${mbrId}/status`, null, {
+        params: { useYn: newStatus }
+      });
       alert(`회원 계정이 ${actionText} 처리되었습니다.`);
       fetchMembers(); 
     } catch (error) {
@@ -102,19 +94,7 @@ export default function AdminMemberList() {
       alert("상태 변경 중 오류가 발생했습니다.");
     }
   };
-
-  const handleDelete = async (mbrId) => {
-    if (!window.confirm("정말 이 회원을 강제 탈퇴 처리하시겠습니까?\n(개인정보가 마스킹 처리됩니다.)")) return;
-    try {
-      await api.delete(`/admin/members/${mbrId}`);
-      alert("회원이 탈퇴 처리되었습니다.");
-      if (members.length === 1 && page > 1) setPage(page - 1); 
-      else fetchMembers(); 
-    } catch (error) {
-      alert("삭제 중 오류가 발생했습니다.");
-    }
-  };
-
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -173,9 +153,7 @@ export default function AdminMemberList() {
           <Table>
             <TableHeader className="bg-gray-50/50 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
-                <TableCell isHeader className="px-5 py-3 text-center">
-                  <input type="checkbox" checked={allChecked} onChange={toggleAll} />
-                </TableCell>
+                {/* 🚀 삭제됨: 전체 선택 체크박스 열 */}
                 <TableCell isHeader className="px-5 py-3 text-center">ID</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-start">회원 정보</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-start">연락처 / 주소</TableCell>
@@ -189,16 +167,15 @@ export default function AdminMemberList() {
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {members.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="px-5 py-10 text-center text-gray-500">
+                  {/* 🚀 수정됨: 체크박스 열이 빠졌으므로 colSpan을 8에서 7로 변경 */}
+                  <TableCell colSpan={7} className="px-5 py-10 text-center text-gray-500">
                     검색 결과가 없습니다.
                   </TableCell>
                 </TableRow>
               ) : (
                 members.map((m) => (
                   <TableRow key={m.mbrId} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
-                    <TableCell className="px-5 py-4 text-center">
-                      <input type="checkbox" checked={selected.includes(m.mbrId)} onChange={() => toggleOne(m.mbrId)} />
-                    </TableCell>
+                    {/* 🚀 삭제됨: 개별 체크박스 열 */}
                     <TableCell className="px-5 py-4 text-center text-gray-500">{m.mbrId}</TableCell>
                     <TableCell className="px-5 py-4">
                       <div className="flex items-center gap-3">
@@ -245,14 +222,6 @@ export default function AdminMemberList() {
                             <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
                             <line x1="12" y1="2" x2="12" y2="12"></line>
                           </svg>
-                        </button>
-
-                        <button 
-                          onClick={() => handleDelete(m.mbrId)}
-                          className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition" 
-                          title="강제탈퇴"
-                        >
-                          <TrashBinIcon className="w-5 h-5" />
                         </button>
                       </div>
                     </TableCell>
