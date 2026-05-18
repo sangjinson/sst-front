@@ -65,15 +65,14 @@ const AIResultSearchPanel = ({
           <div className="text-center py-6 text-gray-400 text-sm">검색 결과가 없습니다</div>
         ) : (
           searchResults.map((item) => {
-            const isAdded = currentDayItems.some(i =>
-              i.placeId === item.id ||
-              i.placeId === item.placeId ||
-              String(i.placeId) === String(item.id)
-            );
-
             // ✅ id에서 숫자만 추출 (예: "see-123" → 123)
             const rawId   = String(item.id || '');
             const placeId = rawId.includes('-') ? Number(rawId.split('-')[1]) : Number(rawId);
+            
+            const isAdded = currentDayItems.some(i =>
+                Number(i.placeId) === placeId
+            );
+
 
             return (
               <div
