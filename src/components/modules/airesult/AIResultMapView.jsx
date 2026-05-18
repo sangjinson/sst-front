@@ -178,13 +178,16 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           <div onClick={handleGoDetail} className="flex-1 min-w-0 cursor-pointer">
             <div className="flex items-center gap-2 mb-2">
               <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                CAT_COLOR_MAP[selectedItem.category] ?? TYPE_COLOR[selectedItem.type] ?? 'bg-gray-100 text-gray-600'
+                CAT_KOR_COLOR_MAP[selectedItem.category] ?? CAT_COLOR_MAP[selectedItem.category] ?? TYPE_COLOR[selectedItem.type] ?? 'bg-gray-100 text-gray-600'
               }`}>
-                {CAT_LABEL_MAP[selectedItem.category] ?? TYPE_LABEL[selectedItem.type] ?? selectedItem.category}
+                {selectedItem.category ?? CAT_LABEL_MAP[selectedItem.category] ?? TYPE_LABEL[selectedItem.type]}
               </span>
             </div>
             <p className="text-lg font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
               {selectedItem.placeName}
+            </p>
+            <p className="text-sm text-gray-500 mt-0.5 truncate">
+              {selectedItem.addr}
             </p>
             <p className="text-sm text-gray-400 mt-1.5 line-clamp-3">
               {selectedItem.overview}

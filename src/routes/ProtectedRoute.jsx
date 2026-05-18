@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth';
 import Swal from 'sweetalert2';
 
@@ -26,6 +26,7 @@ const SkeletonLoader = () => {
 const ProtectedRoute = ({ allowedRoles }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -35,12 +36,19 @@ const ProtectedRoute = ({ allowedRoles }) => {
         text: '로그인 후 이용 가능한 페이지입니다.',
         confirmButtonText: '로그인하러 가기',
         confirmButtonColor: '#0F9B73',
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/login', {
+            state: { from: location },
+            replace: true,
+          });
+        }
       });
     }
-  }, [loading, user]);
+  }, [loading, user, navigate, location]);
 
-  if (loading) return <SkeletonLoader />;
-  if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (loading || !user) return <SkeletonLoader />;
 
   if (!allowedRoles.includes(user.memberRole)) {
     return <Navigate to="/unauthorized" replace />;
