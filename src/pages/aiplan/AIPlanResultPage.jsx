@@ -275,6 +275,7 @@ const AIPlanResultPage = () => {
       imgUrl   : item.image || '',
       lat      : item.lat ? String(item.lat) : null,
       lng      : item.lng ? String(item.lng) : null,
+      addr     : item.address || item.location || '',
     };
 
     setSchedule(prev => {
