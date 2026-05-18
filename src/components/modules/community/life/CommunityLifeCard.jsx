@@ -159,7 +159,7 @@ const CommunityLifeCard = ({
           </div>
 
           {/* 좋아요 / 댓글 */}
-          <div className="absolute bottom-5 left-5 flex items-center gap-4 fs-down-1 font-bold text-gray-900 md:left-6">
+          <div className="absolute bottom-5 left-5 flex items-center gap-2 fs-down-1 font-bold text-gray-900 md:left-6">
             <button
               type="button"
               onClick={(e) => {

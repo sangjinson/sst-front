@@ -238,7 +238,6 @@ const CommunityHotplaceWrite = () => {
       alert("핫플거리는 사진을 1장 이상 등록해주세요.");
       return;
     }
-    if (!finalTags.length) { alert("해시태그를 입력해주세요."); return; }
 
     if (isEditMode) {
       const payload = {
@@ -387,7 +386,7 @@ const CommunityHotplaceWrite = () => {
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            rows="15" 
+            rows="10" 
             placeholder="경기도 여행의 추억을 담아보세요."
             className="w-full px-4 py-4 outline-none resize-none text-gray-700 leading-relaxed"
             // required

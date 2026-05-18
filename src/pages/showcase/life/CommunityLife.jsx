@@ -24,9 +24,8 @@ const CommunityLife = () => {
   const pageSize = 5;
   const [loading, setLoading] = useState(true);
 
+  // 처음 진입 시 로그인 사용자 조회
   useEffect(() => {
-    window.scrollTo({ top: 0 });
-
     api
       .get("/auth/me")
       .then((res) => {
@@ -36,6 +35,14 @@ const CommunityLife = () => {
         console.error("로그인 사용자 조회 실패:", err);
       });
   }, []);
+
+  // 페이지 변경 시 맨 위로 이동
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [page]);
 
   useEffect(() => {
     api

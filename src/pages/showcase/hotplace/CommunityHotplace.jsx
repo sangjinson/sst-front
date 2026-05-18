@@ -25,7 +25,6 @@ const CommunityHotplace = () => {
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
   const ITEMS_PER_PAGE = 15;
   const [loading, setLoading] = useState(true);
-
   const [posts, setPosts] = useState([]);
   const [popularTags, setPopularTags] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
