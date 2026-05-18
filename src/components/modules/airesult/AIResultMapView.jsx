@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TYPE_LABEL, TYPE_COLOR, CAT_LABEL_MAP, CAT_COLOR_MAP, getDetailPath } from './aiResultUtils';
+import { TYPE_LABEL, TYPE_COLOR, CAT_LABEL_MAP, CAT_COLOR_MAP, CAT_KOR_COLOR_MAP, getDetailPath } from './aiResultUtils';
+import { WishlistHeartButton } from '@components/modules/ActionButtons';
 
 const KAKAO_APP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
-const DAY_COLORS = [
-  '#0F9B73',
-  '#E8956D',
-  '#5B8DEF',
-  '#F5A623',
-  '#9B59B6',
-];
+const DAY_COLORS = ['#0F9B73', '#E8956D', '#5B8DEF', '#F5A623', '#9B59B6'];
+
+const CAT_TYPE_MAP = {
+  '볼거리': 'see',
+  '놀거리': 'play',
+  '먹거리': 'food',
+  '잘거리': 'sleep',
+};
 
 const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, onSelectItem }) => {
   const navigate     = useNavigate();
@@ -32,15 +34,11 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
   const drawRoute = (map, items, dayIdx = 0, onSelect) => {
     const color      = DAY_COLORS[dayIdx % DAY_COLORS.length];
     const validItems = items.filter(i => i.lat && i.lng);
-
-    const bounds   = new window.kakao.maps.LatLngBounds();
-    const linePath = [];
+    const bounds     = new window.kakao.maps.LatLngBounds();
+    const linePath   = [];
 
     validItems.forEach((item) => {
-      const pos = new window.kakao.maps.LatLng(
-        parseFloat(item.lat),
-        parseFloat(item.lng)
-      );
+      const pos = new window.kakao.maps.LatLng(parseFloat(item.lat), parseFloat(item.lng));
       linePath.push(pos);
       bounds.extend(pos);
     });
@@ -48,7 +46,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     clearMap();
 
     validItems.forEach((item, idx) => {
-      const pos = linePath[idx];
+      const pos     = linePath[idx];
       const content = `
         <div style="
           width:28px; height:28px; border-radius:50%;
@@ -60,22 +58,12 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           cursor:pointer;
         " id="overlay-${item.placeId}">${idx + 1}</div>
       `;
-      const overlay = new window.kakao.maps.CustomOverlay({
-        map,
-        position: pos,
-        content,
-        yAnchor: 1,
-      });
+      const overlay = new window.kakao.maps.CustomOverlay({ map, position: pos, content, yAnchor: 1 });
       overlaysRef.current.push(overlay);
 
-      // 오버레이 클릭 이벤트
       setTimeout(() => {
         const el = document.getElementById(`overlay-${item.placeId}`);
-        if (el) {
-          el.addEventListener('click', () => {
-            onSelect(item);
-          });
-        }
+        if (el) el.addEventListener('click', () => onSelect(item));
       }, 100);
     });
 
@@ -94,12 +82,11 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     if (validItems.length > 0) map.setBounds(bounds);
   };
 
-  // 지도 초기화
   useEffect(() => {
     const initMap = () => {
       if (!mapRef.current) return;
       window.kakao.maps.load(() => {
-        if (!mapRef.current) return; // load 콜백 안에서도 체크
+        if (!mapRef.current) return;
         try {
           const map = new window.kakao.maps.Map(mapRef.current, {
             center: new window.kakao.maps.LatLng(37.5665, 126.9780),
@@ -109,7 +96,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           map.relayout();
           setMapReady(true);
         } catch (e) {
-          console.warn("카카오맵 초기화 실패:", e);
+          console.warn('카카오맵 초기화 실패:', e);
         }
       });
     };
@@ -119,20 +106,18 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
     const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
     if (existing) {
       existing.addEventListener('load', initMap);
-      return () => existing.removeEventListener('load', initMap); // cleanup 추가
+      return () => existing.removeEventListener('load', initMap);
     }
 
-    const script = document.createElement('script');
-    script.src   = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&libraries=services,drawing&autoload=false`;
-    script.async = true;
-    script.onload = initMap;
+    const script    = document.createElement('script');
+    script.src      = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&libraries=services,drawing&autoload=false`;
+    script.async    = true;
+    script.onload   = initMap;
     document.head.appendChild(script);
   }, []);
 
-  // 지도 그리기
   useEffect(() => {
-    if (!mapReady || !mapObj.current) return;
-    if (!currentDayItems.length) return;
+    if (!mapReady || !mapObj.current || !currentDayItems.length) return;
     if (window.kakao?.maps) {
       window.kakao.maps.load(() => {
         drawRoute(mapObj.current, currentDayItems, activeDay, onSelectItem);
@@ -164,13 +149,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
         <div
           ref={mapRef}
           id="ai-result-map"
-          style={{
-            width   : '100%',
-            height  : '100%',
-            position: 'absolute',
-            top     : 0,
-            left    : 0,
-          }}
+          style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
         />
       </div>
 
@@ -199,20 +178,36 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           <div onClick={handleGoDetail} className="flex-1 min-w-0 cursor-pointer">
             <div className="flex items-center gap-2 mb-2">
               <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                CAT_COLOR_MAP[selectedItem.category] ?? TYPE_COLOR[selectedItem.type] ?? 'bg-gray-100 text-gray-600'
+                CAT_KOR_COLOR_MAP[selectedItem.category] ?? CAT_COLOR_MAP[selectedItem.category] ?? TYPE_COLOR[selectedItem.type] ?? 'bg-gray-100 text-gray-600'
               }`}>
-                {CAT_LABEL_MAP[selectedItem.category] ?? TYPE_LABEL[selectedItem.type] ?? selectedItem.category}
+                {selectedItem.category ?? CAT_LABEL_MAP[selectedItem.category] ?? TYPE_LABEL[selectedItem.type]}
               </span>
             </div>
             <p className="text-lg font-bold text-gray-900 truncate hover:text-[#0F9B73] transition">
               {selectedItem.placeName}
+            </p>
+            <p className="text-sm text-gray-500 mt-0.5 truncate">
+              {selectedItem.addr}
             </p>
             <p className="text-sm text-gray-400 mt-1.5 line-clamp-3">
               {selectedItem.overview}
             </p>
           </div>
 
-          <button className="text-red-400 hover:text-red-500 transition text-2xl shrink-0">♥</button>
+          {/* ✅ 지도 하단 하트 버튼 유지 */}
+          <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+            <WishlistHeartButton
+              item={{
+                id      : selectedItem.placeId,
+                name    : selectedItem.placeName,
+                image   : selectedItem.imgUrl,
+                category: selectedItem.category,
+                address : '',
+              }}
+              itemType={CAT_TYPE_MAP[selectedItem.category] ?? 'see'}
+              region={selectedRegion}
+            />
+          </div>
 
           <button
             onClick={handleNext}

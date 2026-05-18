@@ -11,22 +11,20 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const verifyUser = async () => {
-      try {
-        // 백엔드에 쿠키 검증 요청 (만료 시 인터셉터가 조용히 연장 시도)
-        const response = await api.get('/auth/me'); 
-        setUser(response.data.data); 
-      } catch (error) {
-        // 🚀 인터셉터에서 '/auth/me'의 갱신 실패를 조용히 에러로 던지면 여기로 떨어집니다.
-        // 즉, 게스트이거나 완전히 로그아웃된 사용자이므로 user를 null로 둡니다.
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    verifyUser();
-  }, []);
+  const verifyUser = async () => {
+    try {
+      // 🚀 프로젝트 규칙: 새로고침 시 딱 한 번만 실행되어야 함
+      const response = await api.get('/auth/me'); 
+      setUser(response.data.data); 
+    } catch (error) {
+      // 🚀 인증 실패(게스트) 시에도 무한 루프에 빠지지 않게 처리
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+  verifyUser();
+}, []); // 🚀 중요: 빈 배열이어야 초기 마운트 시 1회만 호출됨
 
   const login = (userData) => {
     // 🚀 로그인 성공 시 백엔드에서 쿠키는 이미 구워졌으므로, 전역 상태만 꽂아줍니다.

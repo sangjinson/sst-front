@@ -234,6 +234,10 @@ const CommunityHotplaceWrite = () => {
       return;
     }
     if (!content.trim()) { alert("내용을 입력해주세요."); return; }
+    if (imagePreviews.length === 0) {
+      alert("핫플거리는 사진을 1장 이상 등록해주세요.");
+      return;
+    }
     if (!finalTags.length) { alert("해시태그를 입력해주세요."); return; }
 
     if (isEditMode) {

@@ -20,7 +20,7 @@ import { CAT_LABEL_MAP, TYPE_LABEL } from '@components/modules/airesult/aiResult
 const AIPlanResultPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const aisNo = location.state?.aisNo;
+  const aisNo    = location.state?.aisNo;
 
   const {
     selectedRegion,
@@ -100,7 +100,7 @@ const AIPlanResultPage = () => {
         setLoadingFinishing(false);
         window.clearTimeout(loadingFinishTimer.current);
         try {
-          const res = await api.get('/ai/schedule/detail', { params: { aisNo } });
+          const res  = await api.get('/ai/schedule/detail', { params: { aisNo } });
           const data = res.data;
           setSchedule(data.schedule ?? []);
           setSavedRegion(data.rgnName);
@@ -214,7 +214,7 @@ const AIPlanResultPage = () => {
   const handleDrop = () => {
     if (dragIndex === null || dragOverIndex.current === null) return;
     setSchedule(prev => {
-      const next = prev.map(day => ({ ...day, plans: [...day.plans] }));
+      const next  = prev.map(day => ({ ...day, plans: [...day.plans] }));
       const items = next[activeDay].plans;
       const dragged = items.splice(dragIndex, 1)[0];
       items.splice(dragOverIndex.current, 0, dragged);
@@ -244,14 +244,14 @@ const AIPlanResultPage = () => {
     if (isConfirmed && tripName) {
       try {
         const requestBody = {
-          scheduleName: tripName.trim(),
-          startDate   : currentStartDate ?? '',
-          endDate     : currentEndDate   ?? '',
-          totalDays   : currentTotalDays ?? schedule.length,
-          rgnName     : currentRegion    ?? '',
-          themes      : currentThemes    ?? [],
-          schedule,
-        };
+        scheduleName: tripName.trim(),
+        startDate   : (currentStartDate && currentStartDate !== '') ? currentStartDate : null,
+        endDate     : (currentEndDate && currentEndDate !== '') ? currentEndDate : null,
+        totalDays   : currentTotalDays ?? schedule.length,
+        rgnName     : currentRegion    ?? '',
+        themes      : currentThemes    ?? [],
+        schedule,
+      };
 
         if (aisNo) {
           await api.put('/ai/schedule/update', requestBody, { params: { aisNo } });
@@ -262,6 +262,7 @@ const AIPlanResultPage = () => {
         sessionStorage.removeItem('currentSchedule');
         sessionStorage.removeItem('scheduleMetaData');
 
+        // ✅ navigate 제거 — 현재 화면 유지
         await Swal.fire({
           icon : 'success',
           title: aisNo ? '수정되었습니다!' : '저장되었습니다!',
@@ -269,8 +270,6 @@ const AIPlanResultPage = () => {
           timer: 1500,
           showConfirmButton: false,
         });
-
-        navigate('/user/mypage', { state: { tab: 'schedule' } });
 
       } catch (err) {
         console.error('저장 실패:', err);
@@ -280,14 +279,13 @@ const AIPlanResultPage = () => {
   };
 
   const handleAddPlace = (item) => {
-    const rawId = String(item.id || '');
+    const rawId   = String(item.id || '');
     const placeId = rawId.includes('-')
       ? Number(rawId.split('-')[1])
       : Number(rawId);
 
-    // 중복 체크
     const currentPlans = schedule[activeDay]?.plans || [];
-    const isDuplicate = currentPlans.some(p => p.placeId === placeId);
+    const isDuplicate  = currentPlans.some(p => p.placeId === placeId);
     if (isDuplicate) {
       Swal.fire({ icon: 'warning', title: '이미 추가된 장소입니다.', timer: 1000, showConfirmButton: false });
       return;
@@ -302,6 +300,7 @@ const AIPlanResultPage = () => {
       lat      : item.lat ? String(item.lat) : null,
       lng      : item.lng ? String(item.lng) : null,
     };
+
     setSchedule(prev => {
       const next = prev.map(day => ({ ...day, plans: [...day.plans] }));
       next[activeDay].plans.push(newItem);
@@ -337,6 +336,21 @@ const AIPlanResultPage = () => {
           startDate={currentStartDate}
           endDate={currentEndDate}
           selectedThemes={currentThemes}
+          onDateChange={async (start, end) => {
+          setSavedStartDate(start);
+          setSavedEndDate(end);
+
+          // aisNo 있으면 DB도 업데이트
+            if (aisNo) {
+                try {
+                    await api.put('/ai/schedule/date', null, {
+                        params: { aisNo, startDate: start, endDate: end }
+                    });
+                } catch (err) {
+                    console.error('날짜 업데이트 실패:', err);
+                }
+            }
+        }}
         />
 
         {scheduleLoading ? (
@@ -383,6 +397,7 @@ const AIPlanResultPage = () => {
                 onCategoryChange={(cat) => setSearchCategory(cat)}
                 onAddPlace={handleAddPlace}
                 onClose={() => setShowSearch(false)}
+                selectedRegion={currentRegion}
               />
             )}
           </div>
@@ -393,4 +408,4 @@ const AIPlanResultPage = () => {
   );
 };
 
-export default AIPlanResultPage;
+export default AIPlanResultPage;  
