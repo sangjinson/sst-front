@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {useNavigate, useSearchParams } from "react-router-dom";
 import api from "@api/axios";
-import Breadcrumb from "@components/common/Breadcrumb";
 import CommunityLifeCard from "@components/modules/community/life/CommunityLifeCard";
-import Pagination from "@components/common/Pagination";
+import AreaPagination from "@components/modules/area/arealist/AreaPagination";
 import CommunitySearchBar from "@components/modules/community/common/CommunitySearchBar";
 import CommunityLifeSkeleton from "@components/skeleton/CommunityLifeSkeleton";
+import CommunityListHeader from "@components/modules/community/common/CommunityListHeader";
 
 
 const CommunityLife = () => {
@@ -214,57 +214,18 @@ const CommunityLife = () => {
 
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
-      <Breadcrumb
-        paths={[
+      <CommunityListHeader
+        breadcrumb={[
           { label: "홈", to: "/" },
           { label: "인생거리", to: "/showcase/life" },
         ]}
-        className="mb-4"
+        label="Life Course"
+        title="인생거리"
+        description="여행자들이 직접 만든 인생 여행 코스를 공유해요."
+        switchTo={{ label: "핫플거리", to: "/showcase/hotplace" }}
+        writeTo="/showcase/life/write"
+        writeText="코스 공유하기"
       />
-
-      {/* 제목 영역 */}
-      <section className="mt-8 mb-8 flex flex-col gap-6 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-sm font-bold text-[#0F9B73]">Life Course</p>
-
-          <div className="mt-1 flex items-center gap-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                인생거리
-              </h2>
-              <Link
-                to="/showcase/hotplace"
-                className="group mb-1 inline-flex h-8 items-center gap-1.5 rounded-full text-gray-400 transition-all duration-200 hover:text-[#0F9B73]"
-                aria-label="핫플거리로 전환">
-                <span className="inline-flex h-8 w-8 items-center justify-center">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="M13 6l6 6-6 6" />
-                  </svg>
-                </span>
-                <span className="fs-down-1 md:text-lg font-bold">
-                  핫플거리
-                </span>
-              </Link>
-            </div>
-
-          <p className="mt-2 text-sm md:text-base text-gray-500">
-            여행자들이 직접 만든 인생 여행 코스를 공유해요.
-          </p>
-        </div>
-
-        <Link to="/showcase/life/write" className="w-fit">
-          <button className="min-w-[120px] text-center rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#0F9B73] hover:shadow-md active:scale-95">
-            코스 공유하기
-          </button>
-        </Link>
-      </section>
 
       {/* 검색/필터 */}
       <CommunitySearchBar
@@ -288,18 +249,10 @@ const CommunityLife = () => {
         onReset={() => {
           setKeyword("");
           setSearchType("all");
+          setSortType("latest");
           setPage(1);
         }}
         popularTags={popularTags}
-        searchOptions={[
-          { value: "all", label: "전체 검색" },
-          { value: "title", label: "제목 검색" },
-          { value: "content", label: "내용 검색" },
-          { value: "author", label: "작성자 검색" },
-          { value: "place", label: "장소 검색" },
-          { value: "region", label: "지역 검색" },
-          { value: "hashtag", label: "해시태그 검색" },
-        ]}
       />
 
       {/* 게시글 목록 */}
@@ -328,8 +281,8 @@ const CommunityLife = () => {
           검색 결과가 없습니다.
         </div>
       )}
-      <Pagination
-        page={page}
+      <AreaPagination
+        currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
       />

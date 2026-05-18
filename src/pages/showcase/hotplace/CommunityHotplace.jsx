@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import Breadcrumb from "@components/common/Breadcrumb";
+import {useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import AreaPagination from "@components/modules/area/arealist/AreaPagination";
 import CommunitySearchBar from "@components/modules/community/common/CommunitySearchBar";
 import api from "@api/axios";
 import CommunityHotplaceSkeleton from "@components/skeleton/CommunityHotplaceSkeleton";
+import CommunityListHeader from "@components/modules/community/common/CommunityListHeader";
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
@@ -238,48 +238,18 @@ const CommunityHotplace = () => {
 
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
-      <Breadcrumb paths={[{ label: "홈", to: "/" }, { label: "핫플거리", to: "/showcase" }]} className="mb-4" />
-      
-      {/* 제목 영역 */}
-      <section className="mt-8 mb-8 flex flex-col gap-6 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm font-bold text-emerald-600">Hotplace</p>
-            <div className="mt-1 flex items-center gap-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                핫플거리
-              </h2>
-              <Link
-                to="/showcase/life"
-                className="group mb-1 inline-flex h-8 items-center gap-1.5 rounded-full text-gray-400 transition-all duration-200 hover:text-[#0F9B73]"
-                aria-label="인생거리로 전환">
-                <span className="inline-flex h-8 w-8 items-center justify-center">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="M13 6l6 6-6 6" />
-                  </svg>
-                </span>
-                <span className="fs-down-1 md:text-lg font-bold">
-                  인생거리
-                </span>
-              </Link>
-            </div>
-            <p className="mt-2 text-sm md:text-base text-gray-500">
-              여행자들이 직접 발견한 장소와 분위기를 사진 카드로 모아봤어요.
-            </p>
-          </div>
-        <Link to="/showcase/hotplace/write" className="w-fit">
-          <button className="min-w-[120px] text-center cursor-pointer rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-600 hover:shadow-md active:scale-95">
-            글쓰기
-          </button>
-        </Link>
-      </section>
+      <CommunityListHeader
+        breadcrumb={[
+          { label: "홈", to: "/" },
+          { label: "핫플거리", to: "/showcase" },
+        ]}
+        label="Hotplace"
+        title="핫플거리"
+        description="여행자들이 직접 발견한 장소와 분위기를 사진 카드로 모아봤어요."
+        switchTo={{ label: "인생거리", to: "/showcase/life" }}
+        writeTo="/showcase/hotplace/write"
+        writeText="글쓰기"
+      />
 
       <CommunitySearchBar
         keyword={keyword}
@@ -302,18 +272,10 @@ const CommunityHotplace = () => {
         onReset={() => {
           setKeyword("");
           setSearchType("all");
+          setSortType("latest");
           setCurrentPage(1);
         }}
         popularTags={popularTags}
-        searchOptions={[
-          { value: "all", label: "전체 검색" },
-          { value: "title", label: "제목 검색" },
-          { value: "content", label: "내용 검색" },
-          { value: "author", label: "작성자 검색" },
-          { value: "place", label: "장소 검색" },
-          { value: "region", label: "지역 검색" },
-          { value: "hashtag", label: "해시태그 검색" },
-        ]}
       />
 
       {posts.length > 0 ? (
@@ -384,13 +346,11 @@ const CommunityHotplace = () => {
           검색 결과가 없습니다.
         </div>
       )}
-      {totalPages > 1 && (
-        <AreaPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-      )}
+      <AreaPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };

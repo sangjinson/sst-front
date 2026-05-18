@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
-import Breadcrumb from "@components/common/Breadcrumb";
-
+import CommunityDetailHeader from "@components/modules/community/common/CommunityDetailHeader";
 import { openReportModal } from "@components/modules/community/common/reportModal";
 import HotplaceImageSlider from "@components/modules/community/hotplace/HotplaceImageSlider";
 import HotplaceStats from "@components/modules/community/hotplace/HotplaceStats";
@@ -280,35 +279,17 @@ const CommunityHotplaceDetail = () => {
 
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 font-sans">
-      <Breadcrumb
-        paths={[
+      <CommunityDetailHeader
+        breadcrumb={[
           { label: "홈", to: "/" },
           { label: "핫플거리", to: "/showcase/hotplace" },
           { label: "상세보기" },
         ]}
-        className="mb-4"
+        label="Hotplace Detail"
+        title="핫플거리"
+        description="여행자가 남긴 장소의 분위기와 이야기를 자세히 확인해보세요."
+        onBack={() => navigate("/showcase/hotplace")}
       />
-
-      <section className="mb-8 mt-6 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-sm font-bold text-emerald-600 pt-2">
-            Hotplace Detail
-          </p>
-          <h2 className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">
-            핫플거리
-          </h2>
-          <p className="mt-2 text-sm md:text-base text-gray-500">
-            여행자가 남긴 장소의 분위기와 이야기를 자세히 확인해보세요.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => navigate("/showcase/hotplace")}
-          className="w-fit rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-600 transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:text-emerald-600 hover:shadow-sm active:scale-95">
-          목록으로
-        </button>
-      </section>
 
       <section className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr] lg:gap-8 lg:items-stretch">
         <div className="space-y-6">
