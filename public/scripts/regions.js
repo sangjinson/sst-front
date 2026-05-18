@@ -79,12 +79,12 @@ export const REGION_DATA = [
     code: 39, area: 'south'
   },
   { 
-    textEn: 'gunpo', textKor: '군포시', bannerImg: '/banners/군포시.png', 
-    description: '수리산의 정기와 설렘이 머무는, 책 읽는 행복 도시',
-    code: 41, area: 'south'
+    textEn: 'yangpyeong', textKor: '양평군', bannerImg: '/banners/양평군.png', 
+    description: '남한강과 북한강이 만나는 청정 자연의 힐링 도시',
+    code: 83, area: 'south'
   },
   { 
-    textEn: 'uiwang', textKor: '의왕시', bannerImg: '/banners/uiwang.png', 
+    textEn: 'uiwang', textKor: '의왕시', bannerImg: '/banners/의왕시.png', 
     description: '백운호수의 낭만과 철도 박물관의 역사가 만나는, 푸른 생태 도시',
     code: 43, area: 'south'
   },
