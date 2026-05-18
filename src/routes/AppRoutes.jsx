@@ -1,9 +1,14 @@
 import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 
-import LandingPage from '@pages/landing/LandingPage';
+{/* Layouts */}
 import UserLayout from '@layouts/UserLayout';
 import AdminLayout from '@layouts/AdminLayout';
+import LandingLayout from '@layouts/LandingLayout';
+
+
+{/* Pages */}
+import LandingPage from '@pages/landing/LandingPage';
 
 import MainPage from '@pages/main/MainPage';
 import AdminDashboard from '@pages/admin/Dashboard';
@@ -95,7 +100,11 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* 공개된 페이지 영역에 OAuth 콜백 주소 추가 */}
-      <Route path="/" element={<LandingPage />} />
+
+      {/* 랜딩 페이지 */}
+      <Route element={<LandingLayout />}>
+        <Route path="/" element={<LandingPage />} />
+      </Route>
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/login/signup" element={<SignupPage />} />

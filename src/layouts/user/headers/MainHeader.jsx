@@ -2,49 +2,64 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, LogOut, Search } from 'lucide-react';
 import { useAuth } from '@hooks/useAuth'; 
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+
+{/** Components */}
+import PCNavItem from '@components/common/Headers/PCNavItem'; // Header -> Menu Items
+
 import '@assets/css/header.css';
 
-const FORBIDDEN_REGIONS = ['showcase', 'plan', 'user', 'search', 'login', 'customersupport', 'admin'];
 const authButtonClass = 'group inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-lg text-lg font-semibold text-white! bg-black border-0 transition-colors duration-200 ease-out hover:bg-white hover:text-black! active:scale-[0.97] cursor-pointer';
 const authButtonTextClass = 'text-white! transition-colors duration-200 group-hover:text-black!';
 const authButtonIconClass = 'w-4 h-4 text-white! transition-all duration-200 group-hover:text-black!';
 
 const Header = () => {
+
+  const {getConfig, setConfig} = useConfig();   // Config 값 가져오기
+
   const [isMenuOpen, setIsMenuOpen]     = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const { user, logout } = useAuth();
-  const { region }       = useParams();
   const navigate         = useNavigate();
   const { pathname }     = useLocation();
   const headerRef        = useRef(null);
 
-  useEffect(() => {
-    if (region && !FORBIDDEN_REGIONS.includes(region)) {
-      localStorage.setItem('lastVisitedRegion', region);
-    }
-  }, [region]);
-
-  const currentRegion = (region && !FORBIDDEN_REGIONS.includes(region))
-    ? region
-    : localStorage.getItem('lastVisitedRegion') || '수원시';
-
+  const curRegionEn = getConfig('curRegion.textEn');        // 지역 영문명
   const navItems = [
-    { name: '볼거리', path: `/${currentRegion}/see/list` },
-    { name: '먹거리', path: `/${currentRegion}/food/list` },
-    { name: '잘거리', path: `/${currentRegion}/sleep/list` },
-    { name: '놀거리', path: `/${currentRegion}/play/list` },
+    { 
+      name: '볼거리',
+      path: `/${curRegionEn}/see/list`,
+      subMenu: []
+    },
+    { 
+      name: '먹거리',
+      path: `/${curRegionEn}/food/list`,
+      subMenu: []
+    },
+    { 
+      name: '잘거리',
+      path: `/${curRegionEn}/sleep/list`,
+      subMenu: []
+    },
     {
-      name: '뽐낼거리',
-      path: `/showcase/hotplace`,
+      name: '놀거리',
+      path: `/${curRegionEn}/play/list`,
+      subMenu: []
+    },
+    { name: '뽐낼거리', path: `/showcase/hotplace`,
       subMenu: [
         { name: '핫플거리', path: '/showcase/hotplace' },
         { name: '인생거리', path: '/showcase/life' },
       ]
     },
-    { name: '내거리', path: '/plan' },
+    { 
+      name: '내거리',
+      path: '/plan',
+      subMenu: [] 
+    },
   ];
 
   const isActiveNavItem = (item) => {
@@ -89,49 +104,19 @@ const Header = () => {
         </div>
 
         {/* 데스크탑 네비게이션 */}
-        <nav className="hidden md:flex gap-4 lg:gap-[30px] mb-2">
-          {navItems.map((item) => {
-            const isActive = isActiveNavItem(item);
-            return (
-              <div
+        <div>
+          <nav className="hidden md:flex gap-4 lg:gap-[30px] mb-2">
+            {navItems.map((item) => (
+              <PCNavItem
                 key={item.name}
-                className="relative"
-                onMouseEnter={() => { if (item.subMenu) setIsMenuOpen(true); }}
-                onMouseLeave={() => { if (item.subMenu) setIsMenuOpen(false); }}
-              >
-                <Link
-                  to={item.path}
-                  onClick={() => { setIsMenuOpen(false); setIsSearchOpen(false); }}
-                  className={`relative fs-up-3 font-medium py-1 px-1 transition-all duration-300 hover:text-[#0F9B73] after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-[#0F9B73] after:transition-all after:duration-300 hover:after:w-full hover:-translate-y-[1px] ${
-                    isActive ? 'text-[#0F9B73] -translate-y-[1px] after:w-full' : 'text-black after:w-0'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-
-                {item.subMenu && isMenuOpen && (
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 transition-all duration-200 ease-in-out z-[1001]">
-                    <div className="absolute -top-2 left-0 w-full h-2" />
-                    <div className="w-32 bg-white border border-gray-100 shadow-xl rounded-md py-1">
-                      {item.subMenu.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          to={sub.path}
-                          onClick={() => { setIsMenuOpen(false); setIsSearchOpen(false); }}
-                          className={`block px-4 py-2 text-[14px] hover:bg-gray-50 hover:text-primary transition-colors whitespace-nowrap text-center ${
-                            pathname.startsWith(sub.path) ? 'text-primary font-semibold' : 'text-gray-700'
-                          }`}
-                        >
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </nav>
+                item={item}
+                pathname={pathname}
+                setIsMenuOpen={setIsMenuOpen}
+                setIsSearchOpen={setIsSearchOpen}
+              />
+            ))}
+          </nav>
+        </div>
 
         {/* 우측 버튼 영역 */}
         <div className="flex items-center gap-4 md:gap-5 mb-2">
@@ -220,7 +205,7 @@ const Header = () => {
               </button>
             </div>
             <div className="flex flex-wrap gap-2.5 md:gap-5 px-2.5 text-[13px] md:text-[14px] text-gray-500">
-              {['#마술의 거리', '#낭만의 거리', '#숲속의 거리', '#필수 관광명소'].map(tag => (
+              {['#힐링', '#맛집', '#커플', '#애견','#가족'].map(tag => (
                 <span key={tag} onClick={() => handleTagClick(tag)} className="cursor-pointer hover:text-primary hover:underline transition-colors">
                   {tag}
                 </span>

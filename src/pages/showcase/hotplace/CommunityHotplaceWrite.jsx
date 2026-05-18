@@ -185,12 +185,22 @@ const CommunityHotplaceWrite = () => {
         alert("이미지 삭제에 실패했습니다.");
       }
     };
+    
+  // 해시태그 공백, # 제거
+  const normalizeTag = (tag) =>
+    tag
+      .trim()
+      .replace(/^#/, "")
+      .replace(/\s+/g, "");
 
   const handleTagKeyDown = (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      const trimmedTag = tagInput.trim();
-      if (trimmedTag && !tags.includes(trimmedTag)) {
+
+      const trimmedTag = normalizeTag(tagInput);
+      const normalizedTags = tags.map(normalizeTag);
+
+      if (trimmedTag && !normalizedTags.includes(trimmedTag)) {
         setTags([...tags, trimmedTag]);
         setTagInput("");
       }
@@ -206,10 +216,15 @@ const CommunityHotplaceWrite = () => {
   const handleSubmit = async(e) => {
     e.preventDefault();
 
-    const trimmedTag = tagInput.trim();
-    const finalTags = trimmedTag && !tags.includes(trimmedTag)
-      ? [...tags, trimmedTag]
-      : tags;
+    const trimmedTag = normalizeTag(tagInput);
+    
+    const finalTags = Array.from(
+      new Set(
+        [...tags, trimmedTag]
+          .map(normalizeTag)
+          .filter(Boolean)
+      )
+    );
 
     if (!selectedRegion) {alert("지역을 선택해주세요.");return;}
     if (!title.trim()) { alert("제목을 입력해주세요."); return; }
@@ -219,11 +234,15 @@ const CommunityHotplaceWrite = () => {
       return;
     }
     if (!content.trim()) { alert("내용을 입력해주세요."); return; }
+    if (imagePreviews.length === 0) {
+      alert("핫플거리는 사진을 1장 이상 등록해주세요.");
+      return;
+    }
     if (!finalTags.length) { alert("해시태그를 입력해주세요."); return; }
 
     if (isEditMode) {
       const payload = {
-        commPlcNo: validPlace.plcNo,
+        commPlcNo: matchedPlace.plcNo,
         commTitle: title,
         commContent: content,
         commMainImgUrl: imagePreviews[0]

@@ -115,7 +115,6 @@ const CommunityLifeWrite = () => {
             address: place.address || place.plcAddress || "",
             type: place.type || place.plcType || "see",
             image: place.image || place.plcImgUrl || "",
-            desc: place.desc || place.description || "",
             dayNo: place.dayNo,
           }));
 
@@ -212,7 +211,6 @@ const CommunityLifeWrite = () => {
       address: item.address || "",
       type: item.type || "see",
       image: item.image || "",
-      desc: item.desc || "",
       dayNo: item.dayNo,
     }));
 
@@ -238,13 +236,21 @@ const CommunityLifeWrite = () => {
     );
   };
 
+  // 해시태그 공백, # 제거
+  const normalizeTag = (tag) =>
+    tag
+      .trim()
+      .replace(/^#/, "")
+      .replace(/\s+/g, "");
+
   const handleTagKeyDown = (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
 
-      const trimmedTag = tagInput.trim();
+      const trimmedTag = normalizeTag(tagInput);
+      const normalizedTags = tags.map(normalizeTag);
 
-      if (trimmedTag && !tags.includes(trimmedTag)) {
+      if (trimmedTag && !normalizedTags.includes(trimmedTag)) {
         setTags([...tags, trimmedTag]);
         setTagInput("");
       }
@@ -256,11 +262,15 @@ const CommunityLifeWrite = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const trimmedTag = tagInput.trim();
-    const finalTags =
-      trimmedTag && !tags.includes(trimmedTag)
-        ? [...tags, trimmedTag]
-        : tags;
+    const trimmedTag = normalizeTag(tagInput);
+
+    const finalTags = Array.from(
+      new Set(
+        [...tags, trimmedTag]
+          .map(normalizeTag)
+          .filter(Boolean)
+      )
+    );
 
     if (!selectedRegion?.rgnCd && !selectedRegion?.rgnName) {
       alert("지역을 선택해주세요.");

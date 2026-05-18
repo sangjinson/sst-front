@@ -3,6 +3,8 @@ import api from '@api/axios';
 import { useAuth } from '@hooks/useAuth';
 import PasswordChange from './PasswordChange'; 
 
+import ProfileImage from '@modules/member/ProfileImage'; // 프로필 아이콘
+
 
 const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
   const imgRef = useRef(null);
@@ -206,24 +208,7 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
         {/* 프로필 이미지 영역 */}
         <div className="absolute left-6 bottom-[-32px] md:left-10 md:bottom-[-40px]">
           <div className="relative w-24 h-24 md:w-32 md:h-32">
-            {user?.mbrProfileInfo?.filePath ? (
-              <img 
-                src={user.mbrProfileInfo.filePath} 
-                alt="프로필" 
-                className="w-full h-full rounded-full object-cover border-[3px] border-white shadow-md bg-white" 
-                onError={(e) => {
-                  // 이미지 로드 실패 시 기본 이미지로 교체
-                  e.target.src = "/assets/images/default-user.png";
-                }}
-              />
-            ) : (
-              /* 🚀 이미지가 없을 때 보여줄 기본 UI (Header와 통일) */
-              <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center border-[3px] border-white shadow-md">
-                <span className="text-gray-500 text-2xl font-bold">
-                  {user?.mbrNickname?.charAt(0) || 'U'}
-                </span>
-              </div>
-            )}
+            <ProfileImage user={user} size="xl"/>
             <button 
               type="button" 
               onClick={() => imgRef.current?.click()} 

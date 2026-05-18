@@ -29,6 +29,7 @@ const HotplaceStats = ({
   isOwner,
   navigate,
   handleDeletePost,
+  handleLikeClick,
 }) => {
   return (
     <>
@@ -56,10 +57,13 @@ const HotplaceStats = ({
       </div>
 
         <div className="grid grid-cols-3 gap-3 border-t border-gray-100 pt-4 text-center">
-          <div className="rounded-2xl bg-gray-50 px-3 py-4">
+          <button
+            type="button"
+            onClick={handleLikeClick}
+            className="rounded-2xl bg-gray-50 px-3 py-4 transition hover:bg-blue-50 active:scale-95 cursor-pointer">
             <p className="fs-down-1 text-gray-400">좋아요</p>
             <strong className="mt-1 block text-lg text-gray-900">{wishCount}</strong>
-          </div>
+          </button>
           <div className="rounded-2xl bg-gray-50 px-3 py-4">
             <p className="fs-down-1 text-gray-400">댓글</p>
             <strong className="mt-1 block text-lg text-gray-900">{comments.length}</strong>
