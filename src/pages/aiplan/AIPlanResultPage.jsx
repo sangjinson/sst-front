@@ -313,6 +313,21 @@ const AIPlanResultPage = () => {
           startDate={currentStartDate}
           endDate={currentEndDate}
           selectedThemes={currentThemes}
+          onDateChange={async (start, end) => {
+          setSavedStartDate(start);
+          setSavedEndDate(end);
+
+          // aisNo 있으면 DB도 업데이트
+            if (aisNo) {
+                try {
+                    await api.put('/ai/schedule/date', null, {
+                        params: { aisNo, startDate: start, endDate: end }
+                    });
+                } catch (err) {
+                    console.error('날짜 업데이트 실패:', err);
+                }
+            }
+        }}
         />
 
         {scheduleLoading ? (
