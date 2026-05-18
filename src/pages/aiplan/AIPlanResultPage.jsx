@@ -185,6 +185,14 @@ const AIPlanResultPage = () => {
     }
   }, [selectedRegion]);
 
+  // 페이지 변경 시 맨 위로 이동
+    useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }, []);
+
   useEffect(() => {
     if (!showSearch) return;
 
@@ -357,7 +365,7 @@ const AIPlanResultPage = () => {
         {scheduleLoading ? (
           <AIPlanLoading isFinishing={loadingFinishing} />
         ) : (
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm">
             <div className="flex flex-col md:flex-row">
 
               <AIResultScheduleList
@@ -379,11 +387,11 @@ const AIPlanResultPage = () => {
               />
 
               <AIResultMapView
-                selectedRegion={currentRegion}
-                schedule={schedule}
-                activeDay={activeDay}
-                selectedItem={selectedItem}
-                onSelectItem={(item) => setSelectedItem(item)}
+                  selectedRegion={currentRegion}
+                  schedule={schedule}
+                  activeDay={activeDay}
+                  selectedItem={selectedItem}
+                  onSelectItem={(item) => setSelectedItem(item)}
               />
 
             </div>
@@ -399,6 +407,7 @@ const AIPlanResultPage = () => {
                 onAddPlace={handleAddPlace}
                 onClose={() => setShowSearch(false)}
                 selectedRegion={currentRegion}
+                showSearch={showSearch}
               />
             )}
           </div>

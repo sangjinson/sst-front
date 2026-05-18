@@ -118,7 +118,7 @@ function AreaListTemplate() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [pathname]);
 
   // ✅ 비동기 데이터 로딩
