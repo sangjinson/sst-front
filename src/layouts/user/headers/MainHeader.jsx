@@ -8,6 +8,8 @@ import { toKorRegion } from '@utils/regionMap';
 {/** Components */}
 import PCNavItem from '@components/common/Headers/PCNavItem'; // Header -> Menu Items
 
+import ProfileImage from '@modules/member/ProfileImage'; // 프로필 아이콘
+
 import '@assets/css/header.css';
 
 const authButtonClass = 'group inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-lg text-lg font-semibold text-white! bg-black border-0 transition-colors duration-200 ease-out hover:bg-white hover:text-black! active:scale-[0.97] cursor-pointer';
@@ -144,11 +146,9 @@ const Header = () => {
                 onMouseEnter={() => setIsProfileOpen(true)}
                 onMouseLeave={() => setIsProfileOpen(false)}
               >
-                <img
-                  src="https://img1.daumcdn.net/thumb/C500x500.fpng/?fname=http://t1.daumcdn.net/brunch/service/user/6qYm/image/eAFjiZeA-fGh8Y327AH7oTQIsxQ.png"
-                  alt="프로필"
-                  className="w-[38px] h-[38px] md:w-[42px] md:h-[42px] rounded-full object-cover border-2 border-gray-100 hover:border-[#0F9B73] transition-colors cursor-pointer"
-                />
+                {/* 프로필 이미지 */}
+                <ProfileImage user={getConfig('profile')} size="sm"/>
+
                 {isProfileOpen && (
                   <div className="absolute right-0 top-full mt-0 w-44 bg-white border border-gray-100 shadow-xl rounded-md py-1 z-[1001]">
                     {/* 프로필과 드롭다운 사이 마우스 이탈 방지 투명 레이어 */}
