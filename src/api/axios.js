@@ -28,8 +28,7 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
-    // 무한 루프 방지: 로그인이나 리프레시 API 자체의 401은 가로채지 않음
+    
     if (originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/refresh')) {
       return Promise.reject(error);
     }
@@ -45,30 +44,25 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // 🚀 명시적인 백엔드 주소로 리프레시 요청
         await axios.post(`${BACKEND_URL}/api/auth/refresh`, {}, { withCredentials: true });
-
         isRefreshing = false;
         processQueue(null);
-
-        // 성공하면 원래 실패했던 API 재요청
         return api(originalRequest);
-        
       } catch (refreshError) {
         isRefreshing = false;
         processQueue(refreshError, null);
         
-        // 🚀 2. 핵심 수정: 원래 요청이 '/auth/me'(초기 로드 검증)였다면, 
-        // 이 사용자는 단순 비로그인(게스트)이므로 알럿을 띄우거나 로그인 창으로 강제 이동시키지 않습니다!
+        // 만료 알럿 띄우기 및 로컬 플래그 강제 삭제
         if (!originalRequest.url?.includes('/auth/me')) {
           alert('보안을 위해 로그인이 만료되었습니다. 다시 로그인해 주세요.');
+          localStorage.removeItem('isLogin'); // 🚀 React Query가 다음번엔 찌르지 않도록 차단
           window.location.href = '/login'; 
         }
         
+        // React Query의 fetchUser나 mutation이 catch 블록으로 넘어갈 수 있도록 반드시 Reject
         return Promise.reject(refreshError);
       }
     }
-
     return Promise.reject(error);
   }
 );

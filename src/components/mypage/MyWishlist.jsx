@@ -88,9 +88,10 @@ const MyWishlist = () => {
                   onClick={() => navigate(`/${toEnRegion(item.rgnName)}/${type}/view?id=${item.wishPlcNo}`)}
                 >
                   <img
-                    src={item.plcMainImgUrl}
+                    src={item.plcMainImgUrl || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80'}
                     alt={item.plcName}
                     className="w-full h-32 md:h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80'; }}
                   />
                   <div className="p-3 pb-8">
                     <div className="text-sm font-semibold truncate text-gray-900">{item.plcName}</div>

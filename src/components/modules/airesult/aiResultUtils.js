@@ -61,7 +61,7 @@ export const CAT_KOR_COLOR_MAP = {
   '잘거리': 'bg-green-100 text-green-700',
 };
 
-export const SEARCH_CATEGORIES = ['전체', '볼거리', '먹거리', '잘거리', '놀거리'];
+export const SEARCH_CATEGORIES = ['전체', '볼거리', '먹거리', '잘거리', '놀거리','찜목록'];
 
 // ────────────────────────────────────────────
 // 일정 생성 함수

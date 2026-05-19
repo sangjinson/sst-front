@@ -29,10 +29,7 @@ export default function LoginPage() {
         mbrPassword: password
       };
 
-      const response = await api.post('/auth/login', payload);
-      // (가장 좋은 건 response.data.data에 들어있는 값을 그대로 넣어주는 것)
-      const userData = response.data.data;
-      login(userData); 
+      const userData = await login(payload); 
       
       if (userData.memberRole === 'ROLE_ADMIN') {
         navigate('/admin'); // 🚀 관리자면 회원 목록 페이지(또는 대시보드)로 바로 이동

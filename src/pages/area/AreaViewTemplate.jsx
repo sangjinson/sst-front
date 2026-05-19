@@ -22,8 +22,9 @@ const AreaViewTemplate = () => {
   const regionKor = toKorRegion(region);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname, search]);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [pathname, search]);
+  
 
   const currentConfig = VIEW_CONFIG[type];
 

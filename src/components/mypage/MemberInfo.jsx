@@ -145,7 +145,7 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
       alert('수정 중 오류가 발생했습니다.');
     }
   };
-
+  
   return (
     <div className="relative w-full">
       <div className="relative w-full h-48 md:h-64 overflow-visible">

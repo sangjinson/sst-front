@@ -4,15 +4,21 @@ import api from '@api/axios';
 /**
  * 찜 상태 관리 훅 - DB 연동
  *
- * @param {string|number} itemId   - 아이템 ID (plcNo)
- * @param {string}        itemType - 카테고리 타입 ('food' | 'see' | 'sleep' | 'play')
- * @param {object}        user     - 로그인 유저 { mbrId, ... } | null
+ * @param {string|number} itemId        - 아이템 ID (plcNo)
+ * @param {string}        itemType      - 카테고리 타입 ('food' | 'see' | 'sleep' | 'play')
+ * @param {object}        user          - 로그인 유저 { mbrId, ... } | null
+ * @param {boolean|null}  initialWished - 초기 찜 상태 (null이면 API 호출)
  */
-export function useWishlist(itemId, itemType, user) {
+export function useWishlist(itemId, itemType, user, initialWished = null) {
   const [isWished, setIsWished] = useState(false);
 
-  // 페이지 진입 시 찜 여부 확인
+  // ✅ initialWished 있으면 API 호출 안 하고 초기값 사용
   useEffect(() => {
+    if (initialWished !== null) {
+      setIsWished(initialWished);
+      return;
+    }
+
     if (!itemId || !user?.mbrId) return;
 
     api.get('/wishlist/check', {
@@ -24,9 +30,8 @@ export function useWishlist(itemId, itemType, user) {
     .then((res) => setIsWished(res.data.isWished))
     .catch(() => setIsWished(false));
 
-  }, [itemId, user?.mbrId]);
+  }, [itemId, user?.mbrId, initialWished]);
 
-  // 찜 토글
   const toggleWish = async (itemData) => {
     if (!user?.mbrId) {
       alert('로그인이 필요합니다.');

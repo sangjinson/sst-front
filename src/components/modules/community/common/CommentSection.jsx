@@ -173,7 +173,6 @@ const CommentSection = ({
           ) : (
             pagedComments.map((comment) => {
               const commentAuthor = getDisplayName(comment);
-              console.log("댓글:", comment);
               const isOwnComment =
                 Number(comment.cmntMbrId) === Number(currentUserId);
 

@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, LogOut, Search } from 'lucide-react';
 import { useAuth } from '@hooks/useAuth'; 
 import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+import { toKorRegion } from '@utils/regionMap';
 
 {/** Components */}
 import PCNavItem from '@components/common/Headers/PCNavItem'; // Header -> Menu Items
@@ -77,7 +78,13 @@ const Header = () => {
 
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;
-    navigate(`/search/${searchKeyword}`);
+    
+    if (curRegionEn) {
+        const regionKor = toKorRegion(curRegionEn);
+        navigate(`/search/${searchKeyword}?region=${encodeURIComponent(regionKor)}`);
+    } else {
+        navigate(`/search/${searchKeyword}`);
+    }
     setIsSearchOpen(false);
   };
 

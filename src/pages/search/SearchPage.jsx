@@ -5,6 +5,7 @@ import AreaListCard from '@components/modules/area/arealist/AreaListCard';
 import Pagination from '@components/common/Pagination';
 import ListSkeleton from '@components/skeleton/ListSkeleton';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
+import { useAuth } from '@hooks/useAuth';
 
 const PLACE_CATEGORIES = [
   { code: 'ALL',    name: '전체' },
@@ -14,16 +15,24 @@ const PLACE_CATEGORIES = [
   { code: 'PLC002', name: '놀거리' },
 ];
 
-// 카테고리 한글명을 URL 영문명으로 변환
-const getCategoryPath = (catName) => {
-  if (catName === '볼거리') return 'see';
-  if (catName === '먹거리') return 'food';
-  if (catName === '잘거리') return 'sleep';
-  if (catName === '놀거리') return 'play';
+const CAT_LABEL_MAP = Object.fromEntries(
+  PLACE_CATEGORIES.filter(c => c.code !== 'ALL').map(c => [c.code, c.name])
+);
+
+const getCategoryPath = (catCd) => {
+  if (catCd === 'PLC001' || catCd === '볼거리') return 'see';
+  if (catCd === 'PLC003' || catCd === '먹거리') return 'food';
+  if (catCd === 'PLC004' || catCd === '잘거리') return 'sleep';
+  if (catCd === 'PLC002' || catCd === '놀거리') return 'play';
   return 'see';
 };
 
-// 🚀 주소에서 시/군 추출 헬퍼 (지역 필드 없으므로 plcAddr에서 파싱)
+// ✅ 커뮤니티 경로 분기
+const getCommunityPath = (commCatCd, commNo) => {
+  if (commCatCd === 'CMM001') return `/showcase/life/view/${commNo}`;
+  return `/showcase/hotplace/view/${commNo}`;
+};
+
 const getRegionFromAddr = (addr) => {
   if (!addr) return localStorage.getItem('lastVisitedRegion') || '수원시';
   const match = addr.match(/경기도\s+(\S+시|\S+군)/);
@@ -34,13 +43,17 @@ const SearchPage = () => {
   const { keyword: pathKeyword } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const keyword        = pathKeyword || searchParams.get('keyword') || '';
-  const currentTab     = searchParams.get('tab')      || 'all';
+  const keyword         = pathKeyword || searchParams.get('keyword') || '';
+  const currentTab      = searchParams.get('tab')      || 'all';
   const currentCategory = searchParams.get('category') || 'ALL';
-  const currentPage    = parseInt(searchParams.get('page') || '1', 10);
+  const currentPage     = parseInt(searchParams.get('page') || '1', 10);
+  const currentRegion   = searchParams.get('region') || null;
+  const regionParam     = currentRegion ? `&region=${encodeURIComponent(currentRegion)}` : '';
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]           = useState(true);
+  const [wishedPlcNos, setWishedPlcNos] = useState([]);
 
   const [placeData,     setPlaceData]     = useState({ list: [], totalCount: 0, totalPages: 1 });
   const [communityData, setCommunityData] = useState({ list: [], totalCount: 0, totalPages: 1 });
@@ -53,6 +66,18 @@ const SearchPage = () => {
     community: { list: [], totalCount: 0 },
   });
 
+  const fetchWishStatus = async (plcNos) => {
+    if (!user?.mbrId || plcNos.length === 0) return;
+    try {
+      const res = await api.get('/wishlist/check-bulk', {
+        params: { mbrId: user.mbrId, plcNos: plcNos.join(',') }
+      });
+      setWishedPlcNos(res.data);
+    } catch (err) {
+      console.error('찜 상태 조회 실패:', err);
+    }
+  };
+
   useEffect(() => {
     const fetchResults = async () => {
       if (!keyword.trim()) { setLoading(false); return; }
@@ -61,22 +86,42 @@ const SearchPage = () => {
       try {
         if (currentTab === 'all') {
           const [seeRes, foodRes, sleepRes, playRes, commRes] = await Promise.all([
-            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC001&page=1&size=4`),
-            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC003&page=1&size=4`),
-            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC004&page=1&size=4`),
-            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC002&page=1&size=4`),
-            api.get(`/search/communities?keyword=${encodeURIComponent(keyword)}&page=1&size=4`),
+            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC001&page=1&size=4${regionParam}`),
+            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC003&page=1&size=4${regionParam}`),
+            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC004&page=1&size=4${regionParam}`),
+            api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC002&page=1&size=4${regionParam}`),
+            api.get(`/search/communities?keyword=${encodeURIComponent(keyword)}&page=${currentPage}&size=12${regionParam}`),
           ]);
+
+          const seeData   = seeRes?.data?.data   || { list: [], totalCount: 0 };
+          const foodData  = foodRes?.data?.data  || { list: [], totalCount: 0 };
+          const sleepData = sleepRes?.data?.data || { list: [], totalCount: 0 };
+          const playData  = playRes?.data?.data  || { list: [], totalCount: 0 };
+
           setIntegratedData({
-            see:       seeRes?.data?.data   || { list: [], totalCount: 0 },
-            food:      foodRes?.data?.data  || { list: [], totalCount: 0 },
-            sleep:     sleepRes?.data?.data || { list: [], totalCount: 0 },
-            play:      playRes?.data?.data  || { list: [], totalCount: 0 },
-            community: commRes?.data?.data  || { list: [], totalCount: 0 },
+            see:       seeData,
+            food:      foodData,
+            sleep:     sleepData,
+            play:      playData,
+            community: commRes?.data?.data || { list: [], totalCount: 0 },
           });
+
+          const allPlcNos = [
+            ...seeData.list,
+            ...foodData.list,
+            ...sleepData.list,
+            ...playData.list,
+          ].map(item => item.plcNo).filter(Boolean);
+          await fetchWishStatus(allPlcNos);
+
         } else if (currentTab === 'places') {
-          const res = await api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=${currentCategory}&page=${currentPage}&size=12`);
-          setPlaceData(res?.data?.data || { list: [], totalCount: 0, totalPages: 1 });
+          const res = await api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=${currentCategory}&page=${currentPage}&size=12${regionParam}`);
+          const data = res?.data?.data || { list: [], totalCount: 0, totalPages: 1 };
+          setPlaceData(data);
+
+          const plcNos = data.list.map(item => item.plcNo).filter(Boolean);
+          await fetchWishStatus(plcNos);
+
         } else if (currentTab === 'communities') {
           const res = await api.get(`/search/communities?keyword=${encodeURIComponent(keyword)}&page=${currentPage}&size=12`);
           setCommunityData(res?.data?.data || { list: [], totalCount: 0, totalPages: 1 });
@@ -89,19 +134,19 @@ const SearchPage = () => {
     };
 
     fetchResults();
-  }, [keyword, currentTab, currentCategory, currentPage]);
+  }, [keyword, currentTab, currentCategory, currentPage, currentRegion]);
 
-  const handleTabChange      = (tabName) => setSearchParams({ tab: tabName, category: 'ALL', page: 1 });
-  const handleCategoryChange = (catCode) => setSearchParams({ tab: currentTab, category: catCode, page: 1 });
-  const handlePageChange     = (page)    => setSearchParams({ tab: currentTab, category: currentCategory, page });
+  const handleTabChange      = (tabName) => setSearchParams({ tab: tabName, category: 'ALL', page: 1, ...(currentRegion && { region: currentRegion }) });
+  const handleCategoryChange = (catCode) => setSearchParams({ tab: currentTab, category: catCode, page: 1, ...(currentRegion && { region: currentRegion }) });
+  const handlePageChange     = (page)    => setSearchParams({ tab: currentTab, category: currentCategory, page, ...(currentRegion && { region: currentRegion }) });
 
   if (loading) return <ListSkeleton />;
 
   const totalIntegratedCount =
-    integratedData.see.totalCount       +
-    integratedData.food.totalCount      +
-    integratedData.sleep.totalCount     +
-    integratedData.play.totalCount      +
+    integratedData.see.totalCount   +
+    integratedData.food.totalCount  +
+    integratedData.sleep.totalCount +
+    integratedData.play.totalCount  +
     integratedData.community.totalCount;
 
   const renderIntegratedSection = (title, dataObj, targetCategoryCode, isCommunity = false) => (
@@ -115,7 +160,7 @@ const SearchPage = () => {
             onClick={() =>
               isCommunity
                 ? handleTabChange('communities')
-                : setSearchParams({ tab: 'places', category: targetCategoryCode, page: 1 })
+                : setSearchParams({ tab: 'places', category: targetCategoryCode, page: 1, ...(currentRegion && { region: currentRegion }) })
             }
             className="text-sm text-gray-500 hover:text-[#0F9B73] transition-colors"
           >
@@ -130,7 +175,7 @@ const SearchPage = () => {
             isCommunity ? (
               <div
                 key={item.commNo}
-                onClick={() => navigate(`/showcase/view/${item.commNo}`)}
+                onClick={() => navigate(getCommunityPath(item.commCatCd, item.commNo))} // ✅ 수정
                 className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md cursor-pointer"
               >
                 <img
@@ -154,16 +199,13 @@ const SearchPage = () => {
                   name:        item.plcName,
                   image:       item.plcMainImgUrl,
                   desc:        item.plcOverview,
-                  category:    item.plcCatCd,
+                  category:    CAT_LABEL_MAP[item.plcCatCd] ?? item.plcCatCd,
                   address:     item.plcAddr,
                   rating:      item.plcAvgRating,
                   reviewCount: item.plcReviewCnt,
                 }}
-                // 🚀 plcAddr에서 지역 파싱해서 정확한 URL로 이동
                 onClick={() =>
-                  navigate(
-                    `/${getRegionFromAddr(item.plcAddr)}/${getCategoryPath(item.plcCatCd)}/view?id=${item.plcNo}`
-                  )
+                  navigate(`/${getRegionFromAddr(item.plcAddr)}/${getCategoryPath(item.plcCatCd)}/view?id=${item.plcNo}`)
                 }
                 renderHeart={() => (
                   <WishlistHeartButton
@@ -171,11 +213,12 @@ const SearchPage = () => {
                       id:       item.plcNo,
                       name:     item.plcName,
                       image:    item.plcMainImgUrl,
-                      category: item.plcCatCd,
+                      category: CAT_LABEL_MAP[item.plcCatCd] ?? item.plcCatCd,
                       address:  item.plcAddr,
                     }}
                     itemType={getCategoryPath(item.plcCatCd)}
                     region={getRegionFromAddr(item.plcAddr)}
+                    initialWished={wishedPlcNos.includes(item.plcNo)}
                   />
                 )}
               />
@@ -193,12 +236,17 @@ const SearchPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-[1200px]">
-      <h2 className="text-2xl font-bold mb-8 text-gray-800 text-center">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">
         <span className="text-[#0F9B73]">'{keyword}'</span> 검색 결과
         {currentTab === 'all' && ` (${totalIntegratedCount}건)`}
       </h2>
 
-      {/* 탭 네비게이션 */}
+      {currentRegion && (
+        <p className="text-center text-sm text-gray-500 mb-6">
+          📍 <span className="font-bold text-[#0F9B73]">{currentRegion}</span> 지역 내 검색 결과
+        </p>
+      )}
+
       <div className="flex justify-center mb-8 border-b border-gray-200">
         {[
           { key: 'all',         label: '통합 검색' },
@@ -219,7 +267,6 @@ const SearchPage = () => {
         ))}
       </div>
 
-      {/* 통합 검색 탭 */}
       {currentTab === 'all' && (
         <div className="space-y-4">
           {renderIntegratedSection('볼거리', integratedData.see,       'PLC001')}
@@ -230,10 +277,8 @@ const SearchPage = () => {
         </div>
       )}
 
-      {/* 장소 탭 */}
       {currentTab === 'places' && (
         <>
-          {/* 카테고리 필터 */}
           <div className="flex gap-2 justify-center mb-6">
             {PLACE_CATEGORIES.map(cat => (
               <button
@@ -260,16 +305,13 @@ const SearchPage = () => {
                     name:        place.plcName,
                     image:       place.plcMainImgUrl,
                     desc:        place.plcOverview,
-                    category:    place.plcCatCd,
+                    category:    CAT_LABEL_MAP[place.plcCatCd] ?? place.plcCatCd,
                     address:     place.plcAddr,
                     rating:      place.plcAvgRating,
                     reviewCount: place.plcReviewCnt,
                   }}
-                  // 🚀 plcAddr에서 지역 파싱해서 정확한 URL로 이동
                   onClick={() =>
-                    navigate(
-                      `/${getRegionFromAddr(place.plcAddr)}/${getCategoryPath(place.plcCatCd)}/view?id=${place.plcNo}`
-                    )
+                    navigate(`/${getRegionFromAddr(place.plcAddr)}/${getCategoryPath(place.plcCatCd)}/view?id=${place.plcNo}`)
                   }
                   renderHeart={() => (
                     <WishlistHeartButton
@@ -277,11 +319,12 @@ const SearchPage = () => {
                         id:       place.plcNo,
                         name:     place.plcName,
                         image:    place.plcMainImgUrl,
-                        category: place.plcCatCd,
+                        category: CAT_LABEL_MAP[place.plcCatCd] ?? place.plcCatCd,
                         address:  place.plcAddr,
                       }}
                       itemType={getCategoryPath(place.plcCatCd)}
                       region={getRegionFromAddr(place.plcAddr)}
+                      initialWished={wishedPlcNos.includes(place.plcNo)}
                     />
                   )}
                 />
@@ -301,7 +344,6 @@ const SearchPage = () => {
         </>
       )}
 
-      {/* 뽐낼거리 탭 */}
       {currentTab === 'communities' && (
         <>
           {communityData?.list?.length > 0 ? (
@@ -309,7 +351,7 @@ const SearchPage = () => {
               {communityData.list.map((post) => (
                 <div
                   key={post.commNo}
-                  onClick={() => navigate(`/showcase/view/${post.commNo}`)}
+                  onClick={() => navigate(getCommunityPath(post.commCatCd, post.commNo))} // ✅ 수정
                   className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md cursor-pointer"
                 >
                   <img
