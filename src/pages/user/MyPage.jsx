@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import api from '@api/axios'; 
 import { useConfig } from '@hooks/useConfig'; // setConfig를 위해 추가
 import { useAuth } from '@hooks/useAuth'; // localLogout을 위해 추가
@@ -98,28 +99,80 @@ const MyPage = () => {
 
   // 회원 탈퇴 처리
   const handleWithdraw = async () => {
-    // 컨펌 창 호출
-    const isConfirmed = await confirm({
-      title: '정말로 탈퇴하시겠습니까?',
-      text: '탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.',
-      confirmButtonText: '탈퇴하기',
-      cancelButtonText: '유지하기'
-    });
-
-    // 사용자가 '유지하기'를 눌렀으면 여기서 중단
-    if (!isConfirmed) return;
-
-    try {
-      await api.delete('/member/me');
-      toast({ icon: 'success', title: '탈퇴가 완료되었습니다!' });
-      localLogout(); // 로그아웃 처리
-    } catch (error) {
-      toast({ 
-        icon: 'error', 
-        html: '탈퇴 처리 중 문제가 발생했습니다.<br/>관리자에게 문의해주세요.' 
+      // 🚀 1. SweetAlert2로 탈퇴 사유 모달 띄우기
+      const result = await Swal.fire({
+        title: '정말 탈퇴하시겠습니까?',
+        html: `
+          <div style="display:flex; flex-direction:column; gap:10px; text-align:left; margin-top:8px;">
+            <label style="display:flex; align-items:center; gap:12px; cursor:pointer;">
+              <input type="radio" name="withdraw-reason" value="WDR001" style="accent-color:#0F9B73;" />
+              사용 빈도가 낮아서
+            </label>
+            <label style="display:flex; align-items:center; gap:12px; cursor:pointer;">
+              <input type="radio" name="withdraw-reason" value="WDR002" style="accent-color:#0F9B73;" />
+              서비스 이용이 불편해서
+            </label>
+            <label style="display:flex; align-items:center; gap:12px; cursor:pointer;">
+              <input type="radio" name="withdraw-reason" value="WDR003" style="accent-color:#0F9B73;" />
+              개인정보 보호를 위해
+            </label>
+            <label style="display:flex; align-items:center; gap:12px; cursor:pointer;">
+              <input type="radio" name="withdraw-reason" value="WDR004" id="reason-etc" style="accent-color:#0F9B73;"
+                onclick="document.getElementById('etc-withdraw-wrap').style.display='block'" />
+              기타
+            </label>
+            <div id="etc-withdraw-wrap" style="display:none; margin-top:4px;">
+              <textarea id="etc-withdraw-input" placeholder="탈퇴 사유를 알려주시면 서비스 개선에 큰 도움이 됩니다."
+                style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:10px; font-size:13px; outline:none; resize:none; height:80px;"></textarea>
+            </div>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '탈퇴하기',
+        cancelButtonText: '취소',
+        confirmButtonColor: '#ef4444', // 🚀 탈퇴는 위험 행동이므로 빨간색 버튼
+        cancelButtonColor: '#9ca3af',
+        preConfirm: () => {
+          const selected = document.querySelector('input[name="withdraw-reason"]:checked');
+          if (!selected) {
+            Swal.showValidationMessage('탈퇴 사유를 선택해주세요.');
+            return false;
+          }
+          
+          let reasonDesc = null;
+          if (selected.value === 'WDR004') {
+            reasonDesc = document.getElementById('etc-withdraw-input')?.value?.trim();
+            if (!reasonDesc) {
+              Swal.showValidationMessage('기타 사유를 입력해주세요.');
+              return false;
+            }
+          }
+          
+          return { reasonCd: selected.value, reasonDesc };
+        },
       });
-    }
-  };
+  
+      if (!result.isConfirmed) return;
+  
+      try {
+        // 🚀 2. axios delete 요청 시 body에 데이터를 담으려면 { data: payload } 구조를 사용해야 합니다.
+        await api.delete('/member/me', {
+          data: result.value // { reasonCd, reasonDesc }
+        });
+        
+        await Swal.fire({
+          icon: 'success',
+          title: '탈퇴 완료',
+          text: '그동안 거리에섯을 이용해 주셔서 감사합니다.',
+          timer: 1500,
+          showConfirmButton: false,
+        });
+        
+        localLogout(); // 전역 상태 초기화 및 메인 이동
+      } catch (error) {
+        alert('탈퇴 처리 중 문제가 발생했습니다.');
+      }
+    };
 
   const sectionLabel = CARDS.find((c) => c.key === activeSection)?.label || '';
 
