@@ -171,7 +171,7 @@ const CommunityHotplace = () => {
 
   const toggleLike = (postId) => {
     if (!currentUserId) {
-      alert("로그인이 필요합니다.");
+      setShowLoginModal(true);
       return;
     }
 
@@ -216,7 +216,10 @@ const CommunityHotplace = () => {
       {showLoginModal && (
         <LoginRequiredModal
           onClose={() => setShowLoginModal(false)}
-          onLogin={() => navigate("/login")}
+          onLogin={() => {
+            setShowLoginModal(false);
+            navigate("/login");
+          }}
         />
       )}
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">

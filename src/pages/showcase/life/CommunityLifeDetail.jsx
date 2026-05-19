@@ -11,6 +11,7 @@ import LifePostHeader from "@components/modules/community/life/LifePostHeader";
 import { openReportModal } from "@components/modules/community/common/reportModal";
 import IconSVG from "@components/Icon/IconSVG";
 import ImageSlider from "@components/modules/community/common/ImageSlider";
+import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 
 const CommunityLifeDetail = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ const CommunityLifeDetail = () => {
   const [editText, setEditText] = useState("");
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -273,10 +275,6 @@ const CommunityLifeDetail = () => {
   };
 
   const handleCommentSubmit = () => {
-    if (!currentUserId) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
       return;
@@ -349,7 +347,7 @@ const CommunityLifeDetail = () => {
 
   const handleLikeClick = async () => {
     if (!currentUserId) {
-      alert("로그인이 필요합니다.");
+      setShowLoginModal(true);
       return;
     }
     try {
@@ -473,10 +471,20 @@ const CommunityLifeDetail = () => {
               cmntNo: comment.cmntNo ?? comment.id,
             })
           }
+          openLoginModal={() => setShowLoginModal(true)}
           currentUserId={currentUserId}
           postAuthor={post.author}
         />
       </div>
+      {showLoginModal && (
+        <LoginRequiredModal
+          onClose={() => setShowLoginModal(false)}
+          onLogin={() => {
+            setShowLoginModal(false);
+            navigate("/login");
+          }}
+        />
+      )}
     </div>
   );
 };

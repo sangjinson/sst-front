@@ -8,6 +8,7 @@ import ImageSlider from "@components/modules/community/common/ImageSlider";
 import HotplaceStats from "@components/modules/community/hotplace/HotplaceStats";
 import HotplaceAside from "@components/modules/community/hotplace/HotplaceAside";
 import CommentSection from "@components/modules/community/common/CommentSection";
+import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 
 const CommunityHotplaceDetail = () => {
   const { id } = useParams();
@@ -21,6 +22,7 @@ const CommunityHotplaceDetail = () => {
   const [currentPost, setCurrentPost] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
 
@@ -153,11 +155,6 @@ const CommunityHotplaceDetail = () => {
 
   // 댓글 등록
   const handleCommentSubmit = () => {
-    if (!currentUserId) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
-
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
       return;
@@ -239,7 +236,7 @@ const CommunityHotplaceDetail = () => {
   // 좋아요 처리
   const handleLikeClick = async () => {
     if (!currentUserId) {
-      alert("로그인이 필요합니다.");
+      setShowLoginModal(true);
       return;
     }
     try {
@@ -339,8 +336,18 @@ const CommunityHotplaceDetail = () => {
             cmntNo: comment.cmntNo ?? comment.id,
           })
         }
+        openLoginModal={() => setShowLoginModal(true)}
         currentUserId={currentUserId}
       />
+      {showLoginModal && (
+        <LoginRequiredModal
+          onClose={() => setShowLoginModal(false)}
+          onLogin={() => {
+            setShowLoginModal(false);
+            navigate("/login");
+          }}
+        />
+      )}
     </div>
   );
 };

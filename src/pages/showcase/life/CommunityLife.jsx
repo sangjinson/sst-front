@@ -200,7 +200,7 @@ const CommunityLife = () => {
   //  좋아요 토글 함수 (핵심 추가)
   const toggleLike = (postId) => {
     if (!currentUserId) {
-      alert("로그인이 필요합니다.");
+      setShowLoginModal(true);
       return;
     }
 
@@ -245,7 +245,10 @@ const CommunityLife = () => {
       {showLoginModal && (
       <LoginRequiredModal
         onClose={() => setShowLoginModal(false)}
-        onLogin={() => navigate("/login")}
+        onLogin={() => {
+          setShowLoginModal(false);
+          navigate("/login");
+        }}
       />
     )}
     {showModal && (

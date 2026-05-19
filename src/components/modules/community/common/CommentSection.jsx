@@ -102,6 +102,7 @@ const CommentSection = ({
   handleSaveEdit,
   handleDeleteComment,
   openReportModal,
+  openLoginModal,
   currentUserId,
   postAuthor,
 }) => {
@@ -117,6 +118,11 @@ const CommentSection = ({
   }, [comments, currentPage]);
 
   const handleSubmit = () => {
+    if (!currentUserId) {
+      openLoginModal?.();
+      return;
+    }
+
     handleCommentSubmit();
     setCurrentPage(1);
   };
