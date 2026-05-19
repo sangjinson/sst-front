@@ -127,7 +127,7 @@ const CommentSection = ({
   };
 
   return (
-    <section className="border-t border-gray-100 pt-10">
+    <section className="pt-10">
       <div className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm md:p-8">
         {/* 댓글 제목 */}
         <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-5">

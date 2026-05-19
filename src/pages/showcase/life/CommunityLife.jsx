@@ -7,6 +7,7 @@ import CommunitySearchBar from "@components/modules/community/common/CommunitySe
 import CommunityLifeSkeleton from "@components/skeleton/CommunityLifeSkeleton";
 import CommunityListHeader from "@components/modules/community/common/CommunityListHeader";
 import SchedulePickerModal from "@components/modules/community/life/SchedulePickerModal";
+import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 
 const CommunityLife = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const CommunityLife = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [schedules, setSchedules] = useState([]);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // 처음 진입 시 로그인 사용자 조회
   useEffect(() => {
@@ -240,6 +242,12 @@ const CommunityLife = () => {
 
   return (
     <>
+      {showLoginModal && (
+      <LoginRequiredModal
+        onClose={() => setShowLoginModal(false)}
+        onLogin={() => navigate("/login")}
+      />
+    )}
     {showModal && (
       <SchedulePickerModal
         schedules={schedules}
@@ -264,9 +272,15 @@ const CommunityLife = () => {
         title="인생거리"
         description="여행자들이 직접 만든 인생 여행 코스를 공유해요."
         switchTo={{ label: "핫플거리", to: "/showcase/hotplace" }}
-        writeTo="/showcase/life/write"
-        onWriteClick={() => setShowModal(true)}
         writeText="내거리 공유하기"
+        onWriteClick={() => {
+          if (!currentUserId) {
+            setShowLoginModal(true);
+            return;
+          }
+
+          setShowModal(true);
+        }}
       />
 
       {/* 검색/필터 */}

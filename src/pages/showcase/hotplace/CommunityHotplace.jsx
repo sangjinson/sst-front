@@ -6,6 +6,7 @@ import api from "@api/axios";
 import CommunityHotplaceSkeleton from "@components/skeleton/CommunityHotplaceSkeleton";
 import CommunityListHeader from "@components/modules/community/common/CommunityListHeader";
 import CommunityHotplaceCard from "@components/modules/community/hotplace/CommunityHotplaceCard";
+import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const CommunityHotplace = () => {
   const [popularTags, setPopularTags] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const fetchPosts = () => {
     api
@@ -210,6 +212,13 @@ const CommunityHotplace = () => {
   }
 
   return (
+    <>
+      {showLoginModal && (
+        <LoginRequiredModal
+          onClose={() => setShowLoginModal(false)}
+          onLogin={() => navigate("/login")}
+        />
+      )}
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
       <CommunityListHeader
         breadcrumb={[
@@ -220,8 +229,15 @@ const CommunityHotplace = () => {
         title="핫플거리"
         description="여행자들이 직접 발견한 장소와 분위기를 사진 카드로 모아봤어요."
         switchTo={{ label: "인생거리", to: "/showcase/life" }}
-        writeTo="/showcase/hotplace/write"
         writeText="글쓰기"
+        onWriteClick={() => {
+          if (!currentUserId) {
+            setShowLoginModal(true);
+            return;
+          }
+
+          navigate("/showcase/hotplace/write");
+        }}
       />
 
       <CommunitySearchBar
@@ -278,7 +294,8 @@ const CommunityHotplace = () => {
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
-    </div>
+     </div>
+    </>
   );
 };
 
