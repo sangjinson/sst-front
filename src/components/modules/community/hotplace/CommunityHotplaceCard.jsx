@@ -93,7 +93,7 @@ const CommunityHotplaceCard = ({
             </strong>
           </div>
 
-          <span className="shrink-0">{post.regDt}</span>
+          <span className="shrink-0 fs-down-1">{post.regDt}</span>
         </div>
 
         <div className="mb-4 h-7 flex flex-wrap gap-2">
