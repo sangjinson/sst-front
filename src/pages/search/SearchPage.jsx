@@ -27,6 +27,12 @@ const getCategoryPath = (catCd) => {
   return 'see';
 };
 
+// ✅ 커뮤니티 경로 분기
+const getCommunityPath = (commCatCd, commNo) => {
+  if (commCatCd === 'CMM001') return `/showcase/life/view/${commNo}`;
+  return `/showcase/hotplace/view/${commNo}`;
+};
+
 const getRegionFromAddr = (addr) => {
   if (!addr) return localStorage.getItem('lastVisitedRegion') || '수원시';
   const match = addr.match(/경기도\s+(\S+시|\S+군)/);
@@ -47,7 +53,7 @@ const SearchPage = () => {
   const regionParam     = currentRegion ? `&region=${encodeURIComponent(currentRegion)}` : '';
 
   const [loading, setLoading]           = useState(true);
-  const [wishedPlcNos, setWishedPlcNos] = useState([]); // ✅ 추가
+  const [wishedPlcNos, setWishedPlcNos] = useState([]);
 
   const [placeData,     setPlaceData]     = useState({ list: [], totalCount: 0, totalPages: 1 });
   const [communityData, setCommunityData] = useState({ list: [], totalCount: 0, totalPages: 1 });
@@ -60,7 +66,6 @@ const SearchPage = () => {
     community: { list: [], totalCount: 0 },
   });
 
-  // ✅ 찜 상태 한번에 조회
   const fetchWishStatus = async (plcNos) => {
     if (!user?.mbrId || plcNos.length === 0) return;
     try {
@@ -85,7 +90,7 @@ const SearchPage = () => {
             api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC003&page=1&size=4${regionParam}`),
             api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC004&page=1&size=4${regionParam}`),
             api.get(`/search/places?keyword=${encodeURIComponent(keyword)}&category=PLC002&page=1&size=4${regionParam}`),
-            api.get(`/search/communities?keyword=${encodeURIComponent(keyword)}&page=1&size=4`),
+            api.get(`/search/communities?keyword=${encodeURIComponent(keyword)}&page=${currentPage}&size=12${regionParam}`),
           ]);
 
           const seeData   = seeRes?.data?.data   || { list: [], totalCount: 0 };
@@ -101,7 +106,6 @@ const SearchPage = () => {
             community: commRes?.data?.data || { list: [], totalCount: 0 },
           });
 
-          // ✅ 찜 상태 한번에 조회
           const allPlcNos = [
             ...seeData.list,
             ...foodData.list,
@@ -115,7 +119,6 @@ const SearchPage = () => {
           const data = res?.data?.data || { list: [], totalCount: 0, totalPages: 1 };
           setPlaceData(data);
 
-          // ✅ 찜 상태 한번에 조회
           const plcNos = data.list.map(item => item.plcNo).filter(Boolean);
           await fetchWishStatus(plcNos);
 
@@ -172,7 +175,7 @@ const SearchPage = () => {
             isCommunity ? (
               <div
                 key={item.commNo}
-                onClick={() => navigate(`/showcase/view/${item.commNo}`)}
+                onClick={() => navigate(getCommunityPath(item.commCatCd, item.commNo))} // ✅ 수정
                 className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md cursor-pointer"
               >
                 <img
@@ -215,7 +218,7 @@ const SearchPage = () => {
                     }}
                     itemType={getCategoryPath(item.plcCatCd)}
                     region={getRegionFromAddr(item.plcAddr)}
-                    initialWished={wishedPlcNos.includes(item.plcNo)} // ✅ 추가
+                    initialWished={wishedPlcNos.includes(item.plcNo)}
                   />
                 )}
               />
@@ -321,7 +324,7 @@ const SearchPage = () => {
                       }}
                       itemType={getCategoryPath(place.plcCatCd)}
                       region={getRegionFromAddr(place.plcAddr)}
-                      initialWished={wishedPlcNos.includes(place.plcNo)} // ✅ 추가
+                      initialWished={wishedPlcNos.includes(place.plcNo)}
                     />
                   )}
                 />
@@ -348,7 +351,7 @@ const SearchPage = () => {
               {communityData.list.map((post) => (
                 <div
                   key={post.commNo}
-                  onClick={() => navigate(`/showcase/view/${post.commNo}`)}
+                  onClick={() => navigate(getCommunityPath(post.commCatCd, post.commNo))} // ✅ 수정
                   className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md cursor-pointer"
                 >
                   <img
