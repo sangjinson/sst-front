@@ -13,8 +13,6 @@ const CommunitySearchBar = ({
     { value: "title", label: "제목 검색" },
     { value: "content", label: "내용 검색" },
     { value: "author", label: "작성자 검색" },
-    { value: "place", label: "장소 검색" },
-    { value: "region", label: "지역 검색" },
     { value: "hashtag", label: "해시태그 검색" },
   ],
   popularTags = [],

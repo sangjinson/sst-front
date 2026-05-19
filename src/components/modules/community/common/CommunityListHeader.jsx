@@ -10,6 +10,7 @@ const CommunityListHeader = ({
   switchTo,
   writeTo,
   writeText,
+  onWriteClick,
 }) => {
   return (
     <>
@@ -53,11 +54,21 @@ const CommunityListHeader = ({
           </p>
         </div>
 
-        <Link to={writeTo} className="w-fit">
-          <button className="min-w-[120px] text-center cursor-pointer rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#0F9B73] hover:shadow-md active:scale-95">
+        {onWriteClick ? (
+          <button
+            type="button"
+            onClick={onWriteClick}
+            className="min-w-[120px] text-center cursor-pointer rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#0F9B73] hover:shadow-md active:scale-95"
+          >
             {writeText}
           </button>
-        </Link>
+        ) : (
+          <Link to={writeTo} className="w-fit">
+            <button className="min-w-[120px] text-center cursor-pointer rounded-full bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#0F9B73] hover:shadow-md active:scale-95">
+              {writeText}
+            </button>
+          </Link>
+        )}
       </section>
     </>
   );

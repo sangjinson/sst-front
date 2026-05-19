@@ -4,7 +4,7 @@ import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import CommunityDetailHeader from "@components/modules/community/common/CommunityDetailHeader";
 import { openReportModal } from "@components/modules/community/common/reportModal";
-import HotplaceImageSlider from "@components/modules/community/hotplace/HotplaceImageSlider";
+import ImageSlider from "@components/modules/community/common/ImageSlider";
 import HotplaceStats from "@components/modules/community/hotplace/HotplaceStats";
 import HotplaceAside from "@components/modules/community/hotplace/HotplaceAside";
 import CommentSection from "@components/modules/community/common/CommentSection";
@@ -16,7 +16,6 @@ const CommunityHotplaceDetail = () => {
   const [currentUserId, setCurrentUserId] = useState(null);
   const isLogin = !!currentUserId;
   const [isLiked, setIsLiked] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
   const [currentPost, setCurrentPost] = useState(null);
@@ -148,16 +147,6 @@ const CommunityHotplaceDetail = () => {
     `https://picsum.photos/seed/hotplace-${currentPost.id}-sub1/900/650`,
     `https://picsum.photos/seed/hotplace-${currentPost.id}-sub2/900/650`,
   ];
-
-  const handlePrevImage = () =>
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? slideImages.length - 1 : prev - 1
-    );
-
-  const handleNextImage = () =>
-    setCurrentImageIndex((prev) =>
-      prev === slideImages.length - 1 ? 0 : prev + 1
-    );
 
   const viewCount = currentPost.viewCnt;
   const wishCount = currentPost.wishCnt;
@@ -291,13 +280,11 @@ const CommunityHotplaceDetail = () => {
 
       <section className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr] lg:gap-8 lg:items-stretch">
         <div className="space-y-6">
-          <HotplaceImageSlider
-            slideImages={slideImages}
-            currentImageIndex={currentImageIndex}
-            setCurrentImageIndex={setCurrentImageIndex}
-            currentPost={currentPost}
-            handlePrevImage={handlePrevImage}
-            handleNextImage={handleNextImage}
+          <ImageSlider
+            images={slideImages}
+            alt={currentPost.title}
+            label={currentPost.place}
+            height="h-[400px]"
           />
 
           <HotplaceStats

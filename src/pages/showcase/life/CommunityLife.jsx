@@ -6,6 +6,7 @@ import AreaPagination from "@components/modules/area/arealist/AreaPagination";
 import CommunitySearchBar from "@components/modules/community/common/CommunitySearchBar";
 import CommunityLifeSkeleton from "@components/skeleton/CommunityLifeSkeleton";
 import CommunityListHeader from "@components/modules/community/common/CommunityListHeader";
+import SchedulePickerModal from "@components/modules/community/life/SchedulePickerModal";
 
 const CommunityLife = () => {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ const CommunityLife = () => {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 5;
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [schedules, setSchedules] = useState([]);
 
   // 처음 진입 시 로그인 사용자 조회
   useEffect(() => {
@@ -35,6 +38,24 @@ const CommunityLife = () => {
         console.error("로그인 사용자 조회 실패:", err);
       });
   }, []);
+
+  // 내 AI 일정 목록 조회
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    api
+      .get("/community/life/schedules", {
+        params: {
+          mbrId: currentUserId,
+        },
+      })
+      .then((res) => {
+        setSchedules(res.data);
+      })
+      .catch((err) => {
+        console.error("내 AI 일정 목록 조회 실패:", err);
+      });
+  }, [currentUserId]);
 
   // 페이지 변경 시 맨 위로 이동
   useEffect(() => {
@@ -218,6 +239,21 @@ const CommunityLife = () => {
   }
 
   return (
+    <>
+    {showModal && (
+      <SchedulePickerModal
+        schedules={schedules}
+        onClose={() => setShowModal(false)}
+        onSelect={(places, schedule) => {
+          navigate("/showcase/life/write", {
+            state: {
+              selectedPlaces: places,
+              selectedSchedule: schedule,
+            },
+          });
+        }}
+      />
+    )}
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
       <CommunityListHeader
         breadcrumb={[
@@ -229,7 +265,8 @@ const CommunityLife = () => {
         description="여행자들이 직접 만든 인생 여행 코스를 공유해요."
         switchTo={{ label: "핫플거리", to: "/showcase/hotplace" }}
         writeTo="/showcase/life/write"
-        writeText="코스 공유하기"
+        onWriteClick={() => setShowModal(true)}
+        writeText="내거리 공유하기"
       />
 
       {/* 검색/필터 */}
@@ -291,7 +328,8 @@ const CommunityLife = () => {
         totalPages={totalPages}
         onPageChange={setPage}
       />
-    </div>
+      </div>
+    </>
   );
 };
 

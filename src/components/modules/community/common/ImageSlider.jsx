@@ -33,7 +33,7 @@ const ImageSlider = ({
 
         {/* label 값이 있을 때만 표시 */}
         {label && (
-          <div className="absolute left-5 top-5 z-20 rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-gray-700 shadow-sm">
+          <div className="absolute left-5 top-5 z-20 rounded-full bg-white/90 px-4 py-2 fs-down-1 font-semibold text-gray-700 shadow-sm">
             {label}
           </div>
         )}

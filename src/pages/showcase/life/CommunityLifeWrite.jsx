@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import api from "@api/axios";
 import { useAuth } from "@hooks/useAuth";
 
@@ -15,6 +15,7 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 
 const CommunityLifeWrite = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
   const isEditMode = !!id;
   const { user } = useAuth();
@@ -239,6 +240,22 @@ const CommunityLifeWrite = () => {
       setTitle(schedule.aisSchdulName);
     }
   };
+
+  // 리스트에서 코스 공유하기를 통해 넘어온 일정 자동 반영
+  useEffect(() => {
+    if (isEditMode) return;
+
+    const selectedPlaces = location.state?.selectedPlaces;
+    const selectedSchedule = location.state?.selectedSchedule;
+
+    if (!selectedPlaces || !selectedSchedule) return;
+
+    handleSelectPlaces(selectedPlaces, selectedSchedule);
+
+    if (selectedSchedule?.aisSchdulName) {
+      setTitle(selectedSchedule.aisSchdulName);
+    }
+  }, [location.state, isEditMode]);
 
   const removeCourseItem = (idx) => {
     setCourse((prev) =>

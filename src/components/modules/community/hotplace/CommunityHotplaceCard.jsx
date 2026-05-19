@@ -72,26 +72,22 @@ const CommunityHotplaceCard = ({
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent opacity-90" />
 
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h4 className="line-clamp-2 fs-down-2 font-extrabold leading-snug text-white drop-shadow-sm">
-              {post.title}
-            </h4>
-
-            <p className="mt-1 line-clamp-1 fs-down-1 font-medium text-white/85">
+          <div className="absolute left-4 top-4 z-10">
+            <span className="inline-flex items-center rounded-full bg-white/95 px-3 py-1 fs-down-1 font-bold text-gray-800 shadow-sm backdrop-blur">
               {post.place}
-            </p>
+            </span>
           </div>
         </div>
       </button>
 
       <div className="p-4 bg-white">
         <p className="mb-8 line-clamp-2 fs-down-2 leading-relaxed text-gray-700">
-          {post.description}
+          {post.title}
         </p>
 
-        <div className="mb-3 flex items-center justify-between gap-3 fs-down-1 text-gray-500">
+        <div className="mb-3 flex items-center justify-between gap-3 fs-down-2 text-gray-500">
           <div className="min-w-0">
-            <span className="mr-2">by</span>
+            <span className="mr-2 fs-down-1">by</span>
             <strong className="fs-down-2 text-[#E8956D] truncate">
               {post.author}
             </strong>
