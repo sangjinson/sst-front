@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import Swal from 'sweetalert2';
 import api from '@api/axios'; 
 import { useConfig } from '@hooks/useConfig'; // setConfig를 위해 추가
 import { useAuth } from '@hooks/useAuth'; // localLogout을 위해 추가
