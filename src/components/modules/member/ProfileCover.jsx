@@ -11,13 +11,15 @@ const ProfileCover = ({ user: propsUser, preview = null, className = "" }) => {
   // 기본 이미지
   const defaultCover = '/images/user/default-cover.jpg';
 
+
   // 이미지 표시 우선순위: 1. 미리보기(DataURL), 2. 서버 경로, 3. 기본 이미지
-  const displayImage = preview || currentUser?.mbrBackInfo?.filePath;
+  const displayImage = preview || currentUser?.profileBg?.filePath;
+
 
   return (
     <div className={`w-full h-full overflow-hidden bg-gray-100 ${className}`}>
       <img 
-        src={displayImage || defaultCover} d
+        src={displayImage || defaultCover}
         alt="배경" 
         className="w-full h-full object-cover" 
         onError={(e) => {
@@ -31,7 +33,7 @@ const ProfileCover = ({ user: propsUser, preview = null, className = "" }) => {
 export default memo(ProfileCover, (prev, next) => {
   return (
     prev.preview === next.preview &&
-    prev.user?.mbrBackInfo?.filePath === next.user?.mbrBackInfo?.filePath &&
+    prev.user?.profileBg?.filePath === next.user?.profileBg?.filePath &&
     prev.className === next.className
   );
 });

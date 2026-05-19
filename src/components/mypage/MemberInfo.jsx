@@ -10,6 +10,8 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
   const isInitialized = useRef(false); 
   
   const [isPwdModalOpen, setIsPwdModalOpen] = useState(false);
+  
+  // 파일 객체와 미리보기를 각각 관리
   const [profileFile, setProfileFile] = useState(null);
   const [profilePreview, setProfilePreview] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
@@ -36,7 +38,7 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
         zipcode: profile.zipcode || '',
         address: profile.address || '',
         detailAddress: profile.detailAddress || '',
-        coverImg: profile.mbrBackInfo?.filePath || '',
+        coverImg: profile.profileBg?.filePath || '',
       });
       isInitialized.current = true;
     }
@@ -63,20 +65,19 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
     }
   };
 
-  const handleProfileFileChange = (e) => {
+  // 🚀 파일 변경 공통 핸들러
+  const handleFileChange = (e, type) => {
     const file = e.target.files[0];
-    if (file) {
-      setProfileFile(file);
-      setProfilePreview(URL.createObjectURL(file)); 
-    }
-  };
+    if (!file) return;
 
-  const handleCoverFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const previewUrl = URL.createObjectURL(file);
+
+    if (type === 'profile') {
+      setProfileFile(file);
+      setProfilePreview(previewUrl);
+    } else if (type === 'cover') {
       setCoverFile(file);
-      // ProfileImage 방식과 동일하게 미리보기 URL 생성
-      setForm(prev => ({ ...prev, coverImg: URL.createObjectURL(file) }));
+      setForm(prev => ({ ...prev, coverImg: previewUrl }));
     }
   };
 
@@ -145,11 +146,10 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
       alert('수정 중 오류가 발생했습니다.');
     }
   };
-  
+
   return (
     <div className="relative w-full">
       <div className="relative w-full h-48 md:h-64 overflow-visible">
-        {/* 커버 이미지 컴포넌트 적용 */}
         <ProfileCover user={profile} preview={form.coverImg} />
         
         <button 
@@ -162,7 +162,8 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
             <circle cx="12" cy="13" r="4"/>
           </svg>
         </button>
-        <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverFileChange} />
+        {/* 인자값을 전달하기 위해 화살표 함수 사용 */}
+        <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileChange(e, 'cover')} />
 
         <div className="absolute left-6 bottom-[-32px] md:left-10 md:bottom-[-40px]">
           <div className="relative w-24 h-24 md:w-32 md:h-32">
@@ -177,7 +178,8 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
                 <circle cx="12" cy="13" r="4"/>
               </svg>
             </button>
-            <input ref={imgRef} type="file" accept="image/*" className="hidden" onChange={handleProfileFileChange} />
+            {/* 인자값을 전달하기 위해 화살표 함수 사용 */}
+            <input ref={imgRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileChange(e, 'profile')} />
           </div>
         </div>
       </div>

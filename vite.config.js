@@ -53,6 +53,10 @@ export default defineConfig(({ mode }) => {
           target: apiUrl, // 🚀 이미지/파일 업로드도 스프링 부트 서버를 향하므로 동일한 apiUrl 사용
           changeOrigin: true,
         },
+        '/attachment': {
+          target: apiUrl, // 🚀 이미지/파일 업로드도 스프링 부트 서버를 향하므로 동일한 apiUrl 사용
+          changeOrigin: true,
+        },
       },
     },
   };

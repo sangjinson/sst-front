@@ -30,11 +30,13 @@ const ProfileImage = ({ user: propsUser, size = 'sm', className = "", preview = 
 
   const currentStyle = sizeStyles[size] || sizeStyles.sm;
 
-  // 🚀 2. 이미지 표시 우선순위
+  // 이미지 표시 우선순위
   // [1순위] 로컬 파일 선택 시 미리보기(preview) 
   // [2순위] 전역 상태 혹은 props의 서버 이미지 경로
   // [3순위] 닉네임 첫 글자 아바타 (이미지 없을 시)
-  const displayImage = preview || currentUser?.profileIcon?.filePath;
+  const displayImage = preview || currentUser?.profileIcon?.filePath  ;
+
+  
 
   return (
     <div className={`${baseStyle} ${currentStyle.container} ${className}`}>

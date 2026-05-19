@@ -36,8 +36,6 @@ const MyPage = () => {
     location.state?.tab || sessionStorage.getItem("mypageTab") || "member"
   );
 
-  
-  
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -72,12 +70,16 @@ const MyPage = () => {
         // 반환 데이터를 가져온다.
         const updatedData = response.data.data;
 
+        console.log(updatedData)
+
         // 프로필 상태 업데이트
         // 1. 업데이트할 데이터를 미리 변수로 정의 (규격 맞추기)
         const nextProfile = mapDataToState('profile', updatedData, profile) 
 
         // 2. 상태 업데이트 (Sidebar가 Props로 받는 값)
         setProfile(nextProfile);
+
+        console.log(nextProfile)
 
         // 3. 전역 설정 동기화 (가공된 데이터를 넘겨야 Sidebar가 useConfig를 써도 반응함)
         setConfig('profile', nextProfile);
@@ -174,6 +176,7 @@ const MyPage = () => {
     };
 
   const sectionLabel = CARDS.find((c) => c.key === activeSection)?.label || '';
+
 
   return (
     <div className="min-h-screen bg-gray-50">

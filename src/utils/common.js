@@ -86,7 +86,7 @@ const fieldMap = {
         mbrEmail: 'email',
         mbrZip: 'zipcode',
         mbrAddr: 'address',
-        mbrDaddr: 'detailAddress',
+        mbrDaddr: 'detailAddress',        
         mbrProfileIcon: 'profileIcon',
         mbrProfileBg: 'profileBg'
     },
@@ -101,37 +101,49 @@ const fieldMap = {
 export const mapDataToState = (type, updatedData, profileState = {}) => {
     if (!updatedData) return profileState;
 
-    // 정의서에서 해당 타입의 규칙을 가져옴
     const mapping = fieldMap[type];
     if (!mapping) {
         console.warn(`fieldMap에 '${type}' 정의가 없습니다.`);
-        return { ...profileState, ...updatedData }; // 규칙 없으면 그냥 합침
+        return { ...profileState, ...updatedData };
     }
 
-    // 기존 상태가 있으면 복사, 없으면 빈 객체로 시작 (불변성)
-    const result = profileState ? { ...profileState } : {};
+    // 1. 초기 결과 객체 생성 (기본 상태 복사)
+    const result = { ...profileState };
 
-    // 서버 데이터의 키를 순회하며 매핑 규칙 적용
+    // 2. 서버 데이터 순회 및 매핑
     Object.keys(updatedData).forEach((serverKey) => {
         const frontKey = mapping[serverKey];
-        const value = updatedData[serverKey];
+        let value = updatedData[serverKey];
+
+        // 값이 객체인 경우(예: 파일 정보 객체), 새로운 객체로 복사하여 할당 (깊은 복사 효과)
+        if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+            value = { ...value };
+        }
 
         if (frontKey) {
-            // 규칙에 있는 키라면 프론트용 키 이름으로 저장
             result[frontKey] = value;
-        } else {
-            // 규칙엔 없지만 기존 객체에 이미 존재하는 키라면 업데이트
-            if (Object.prototype.hasOwnProperty.call(result, serverKey)) {
-                result[serverKey] = value;
-            }
+        } else if (Object.prototype.hasOwnProperty.call(result, serverKey)) {
+            result[serverKey] = value;
         }
     });
 
-    // 날짜 포맷팅 같은 공통 처리 (옵션)
-    if (updatedData.mbrJoinDate) { result.joinDate = updatedData.mbrJoinDate.split('T')[0]; }
+    // 3. 날짜 처리
+    if (updatedData.mbrJoinDate) { 
+        result.joinDate = updatedData.mbrJoinDate.split('T')[0]; 
+    }
 
-    // 프로필 이미지 캐시 방지 처리
-    if (updatedData.mbrProfileInfo?.filePath) { result.profileIcon.filePath += `?t=${new Date().getTime()}`; }
+    // 4. 이미지 캐시 방지 및 객체 안전성 체크
+    // profileIcon 처리
+    if (result.profileIcon && result.profileIcon.filePath) {
+        const separator = result.profileIcon.filePath.includes('?') ? '&' : '?';
+        result.profileIcon.filePath += `${separator}t=${new Date().getTime()}`;
+    }
+    
+    // profileBg 처리 (배경화면도 캐시 방지가 필요하다면 추가)
+    if (result.profileBg && result.profileBg.filePath) {
+        const separator = result.profileBg.filePath.includes('?') ? '&' : '?';
+        result.profileBg.filePath += `${separator}t=${new Date().getTime()}`;
+    }
 
     return result;
 };

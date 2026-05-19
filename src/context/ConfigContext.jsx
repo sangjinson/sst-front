@@ -115,6 +115,7 @@ export const ConfigProvider = ({ children }) => {
             if (!siteConfig.profile || siteConfig.profile.id !== user.mbrId) {
                 fetchFullProfile();
             }
+            
             if (!siteConfig.isUser) makeConfig('isUser', true);
         } else {
             if (siteConfig.profile !== null) makeConfig('profile', null);
