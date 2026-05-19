@@ -17,32 +17,32 @@ import { THEME_OPTIONS } from './aiPlanUtils';
 const AIPlanThemeGrid = ({ selectedThemes = [], onToggle }) => {
   return (
     <div>
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <svg viewBox="0 0 24 24" className="w-6 h-6 fill-none stroke-[#0F9B73]" strokeWidth="2">
+      <div className="mb-9 text-center md:mb-11">
+        <div className="mb-3 flex items-center justify-center gap-2.5">
+          <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-[#0F9B73]" strokeWidth="2">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
           </svg>
-          <h2 className="text-lg font-bold text-gray-800">어떤 여행을 원하시나요?</h2>
+          <h2 className="text-2xl font-black text-gray-900 md:text-3xl">어떤 여행을 원하시나요?</h2>
         </div>
-        <p className="text-sm text-gray-400">테마는 최대 3개까지 선택 가능합니다</p>
+        <p className="text-base font-semibold text-gray-400">테마는 최대 3개까지 선택 가능합니다</p>
         {selectedThemes.length > 0 && (
-          <p className="text-xs text-[#0F9B73] mt-1">{selectedThemes.length}/3 선택됨</p>
+          <p className="mt-2 text-sm font-bold text-[#0F9B73]">{selectedThemes.length}/3 선택됨</p>
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
         {THEME_OPTIONS.map(theme => (
           <button
             key={theme.value}
             onClick={() => onToggle(theme.value)}
-            className={`p-5 rounded-2xl border-2 flex flex-col items-center gap-2 transition ${
+            className={`flex min-h-[112px] flex-col items-center justify-center gap-3 rounded-2xl border p-5 transition-all duration-200 active:scale-[0.98] ${
               selectedThemes.includes(theme.value)
-                ? 'border-[#0F9B73] bg-green-50'
-                : 'border-gray-200 hover:border-green-200'
+                ? 'border-gray-200 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.08)] ring-1 ring-[#0F9B73]/20'
+                : 'border-gray-200 bg-gray-50 hover:-translate-y-0.5 hover:border-[#0F9B73]/30 hover:bg-white hover:shadow-sm'
             }`}
           >
-            <span className="text-3xl">{theme.emoji}</span>
-            <span className="text-sm font-medium text-gray-700">{theme.label}</span>
+            <span className="text-4xl">{theme.emoji}</span>
+            <span className={`text-base font-bold transition-colors duration-200 ${selectedThemes.includes(theme.value) ? 'text-[#0F9B73]' : 'text-gray-800'}`}>{theme.label}</span>
           </button>
         ))}
       </div>
