@@ -129,9 +129,9 @@ export const ClipButton = () => {
 };
 
 // 리스트 페이지용 - 찜 로직 내장 (원복: 이 컴포넌트 전체 삭제 + import 삭제)
-export const WishlistHeartButton = ({ item, itemType, region }) => {
-  const { user } = useAuth();                                    // ← 추가
-  const { isWished, toggleWish } = useWishlist(item?.id, itemType, user); // ← user 추가
+export const WishlistHeartButton = ({ item, itemType, region, initialWished }) => {
+  const { user } = useAuth();
+  const { isWished, toggleWish } = useWishlist(item?.id, itemType, user, initialWished); // ✅ initialWished 추가
 
   const handleClick = (e) => {
     e.stopPropagation();
