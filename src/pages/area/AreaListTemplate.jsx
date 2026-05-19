@@ -5,10 +5,12 @@ import Breadcrumb from '@components/common/Breadcrumb';
 import { toKorRegion } from '@utils/regionMap';
 import ListSkeleton from '@components/skeleton/ListSkeleton';
 import { getSeeDataByRegion } from './see/seeData';
-import { getSleepDataByRegion } from './sleep/sleepdata';
+import { getSleepDataByRegion } from './sleep/sleepData';
 import { getFoodDataByRegion } from './food/foodData';
 import { getPlayDataByRegion } from './play/playData';
-  
+import { useAuth } from '@hooks/useAuth';
+import api from '@api/axios';
+
 import TEMP_API_LIST_DATA from './temp/ListData';
 
 const PlayList  = lazy(() => import('./play/List'));
@@ -87,7 +89,7 @@ const LIST_DATA_CONFIG = {
     getItems: getSleepDataByRegion,
   },
   food: {
-    categories: ['전체', '한식', '중식', '일식', '양식', '카페','간이음식'],
+    categories: ['전체', '한식', '중식', '일식', '양식', '카페', '간이음식'],
     getItems: getFoodDataByRegion,
   },
   play: {
@@ -108,6 +110,7 @@ function AreaListTemplate() {
   const { region, type } = useParams();
   const { pathname } = useLocation();
   const regionKor = toKorRegion(region);
+  const { user } = useAuth();
 
   const [dataSet, setDataSet] = useState({
     totalCount: 0,
@@ -116,12 +119,12 @@ function AreaListTemplate() {
     items: [],
   });
   const [loading, setLoading] = useState(true);
+  const [wishedPlcNos, setWishedPlcNos] = useState([]); // ✅ 추가
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [pathname]);
 
-  // ✅ 비동기 데이터 로딩
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -129,7 +132,6 @@ function AreaListTemplate() {
         const listDataConfig = LIST_DATA_CONFIG[type];
 
         if (listDataConfig?.getItems) {
-          // ✅ see는 async, sleep/food는 동기 함수라 둘 다 처리
           const raw = listDataConfig.getItems(regionKor);
           const items = (raw instanceof Promise ? await raw : raw).map(normalizeListItem);
 
@@ -139,6 +141,20 @@ function AreaListTemplate() {
             categories: listDataConfig.categories,
             items,
           });
+
+          // ✅ 찜 상태 한번에 조회
+          if (user?.mbrId && items.length > 0) {
+            const plcNos = items.map(item => item.id).filter(Boolean);
+            try {
+              const wishRes = await api.get('/wishlist/check-bulk', {
+                params: { mbrId: user.mbrId, plcNos: plcNos.join(',') }
+              });
+              setWishedPlcNos(wishRes.data);
+            } catch (err) {
+              console.error('찜 상태 조회 실패:', err);
+            }
+          }
+
         } else {
           const fallback =
             TEMP_API_LIST_DATA?.[type]?.[regionKor] ??
@@ -160,7 +176,7 @@ function AreaListTemplate() {
     };
 
     fetchData();
-  }, [type, regionKor]);
+  }, [type, regionKor, user?.mbrId]);
 
   const currentConfig = LIST_CONFIG[type];
   const regionBanner  = REGION_BANNER[regionKor];
@@ -190,11 +206,10 @@ function AreaListTemplate() {
               ]}
               className="mb-3"
             />
-            {/* ✅ 로딩 중이면 스켈레톤 */}
             {loading ? (
               <ListSkeleton />
             ) : (
-              <currentConfig.Component rows={dataSet} />
+              <currentConfig.Component rows={dataSet} wishedPlcNos={wishedPlcNos} /> // ✅ 추가
             )}
           </div>
         </div>
