@@ -1,23 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '@api/axios';
-import { useAuth } from '@hooks/useAuth';
 import PasswordChange from './PasswordChange'; 
+import ProfileImage from '@modules/member/ProfileImage';
+import ProfileCover from '@modules/member/ProfileCover';
 
-import ProfileImage from '@modules/member/ProfileImage'; // 프로필 아이콘
-
-
-const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
+const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
   const imgRef = useRef(null);
   const coverRef = useRef(null);
-  const { localLogout, user } = useAuth();
+  const isInitialized = useRef(false); 
   
   const [isPwdModalOpen, setIsPwdModalOpen] = useState(false);
-
-  // 🚀 파일 객체를 별도로 관리하기 위한 상태
   const [profileFile, setProfileFile] = useState(null);
+  const [profilePreview, setProfilePreview] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
 
-  // 폼 상태
   const [form, setForm] = useState({
     name: '',
     nickname: '',
@@ -25,15 +21,14 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
     zipcode: '',
     address: '',
     detailAddress: '',
-    coverImg: '', // 미리보기용 URL
+    coverImg: '', 
   });
 
   const [nicknameChecked, setNicknameChecked] = useState(false);
   const [nicknameMsg, setNicknameMsg] = useState('');
 
-  // 부모 데이터 동기화
   useEffect(() => {
-    if (profile) {
+    if (profile && !isInitialized.current) {
       setForm({
         name: profile.name || '',
         nickname: profile.nickname || '',
@@ -41,8 +36,9 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
         zipcode: profile.zipcode || '',
         address: profile.address || '',
         detailAddress: profile.detailAddress || '',
-        coverImg: profile.coverImg || '',
+        coverImg: profile.mbrBackInfo?.filePath || '',
       });
+      isInitialized.current = true;
     }
   }, [profile]);
 
@@ -56,43 +52,38 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'phone') {
-      setForm(prev => ({ ...prev, [name]: autoHyphenPhone(value) }));
-      return; 
-    }
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm(prev => ({
+      ...prev,
+      [name]: name === 'phone' ? autoHyphenPhone(value) : value
+    }));
+
     if (name === 'nickname') {
       setNicknameChecked(false);
       setNicknameMsg('');
     }
   };
 
-  // 🚀 프로필 이미지 변경 핸들러
   const handleProfileFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setProfileFile(file); // 실제 전송할 파일 저장
-      if (onImgChange) onImgChange(e); // 부모 컴포넌트의 미리보기 연동
+      setProfileFile(file);
+      setProfilePreview(URL.createObjectURL(file)); 
     }
   };
 
-  // 🚀 배경 이미지 변경 핸들러
   const handleCoverFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setCoverFile(file); // 실제 전송할 파일 저장
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setForm(prev => ({ ...prev, coverImg: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      setCoverFile(file);
+      // ProfileImage 방식과 동일하게 미리보기 URL 생성
+      setForm(prev => ({ ...prev, coverImg: URL.createObjectURL(file) }));
     }
   };
 
   const handleNicknameCheck = async () => {
     const trimmedNickname = form.nickname.trim();
     if (!trimmedNickname) { alert('닉네임을 입력해주세요.'); return; }
-    if (trimmedNickname === profile.nickname) {
+    if (trimmedNickname === profile?.nickname) {
       setNicknameMsg('현재 사용 중인 회원님의 닉네임입니다.');
       setNicknameChecked(true); 
       return; 
@@ -129,11 +120,10 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
     if (!form.name.trim()) { alert('이름을 입력해주세요.'); return; }
     if (!form.nickname.trim()) { alert('닉네임을 입력해주세요.'); return; }
     if (!form.phone.trim()) { alert('전화번호를 입력해주세요.'); return; }
-    if (form.nickname !== profile.nickname && !nicknameChecked) { alert('닉네임 중복 확인을 진행해주세요.'); return; }
+    if (form.nickname !== profile?.nickname && !nicknameChecked) { alert('닉네임 중복 확인을 진행해주세요.'); return; }
 
     try {
       const formData = new FormData();
-      // 텍스트 필드 추가
       formData.append('mbrName', form.name);
       formData.append('mbrNickname', form.nickname);
       formData.append('mbrTelno', form.phone);
@@ -141,51 +131,27 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
       formData.append('mbrAddr', form.address || '');
       formData.append('mbrDaddr', form.detailAddress || '');
 
-      // 🚀 상태값에 담긴 실제 파일 객체 추가
-      if (profileFile) {
-        formData.append('profileImage', profileFile);
-      }
-      if (coverFile) {
-        formData.append('backgroundImage', coverFile);
-      }
+      if (profileFile) formData.append('profileImage', profileFile);
+      if (coverFile) formData.append('backgroundImage', coverFile);
 
-      // API 전송 (multipart/form-data 헤더 강제 설정)
-      const response = await api.post('/member/me', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      alert('회원정보가 성공적으로 수정되었습니다.');
-      if (onUpdate) onUpdate(response.data.data);
+      const isSuccess = await onUpdate(formData);
       
-      // 전송 완료 후 파일 상태 초기화
-      setProfileFile(null);
-      setCoverFile(null);
+      if (isSuccess) {
+        setProfileFile(null);
+        setProfilePreview(null);
+        setCoverFile(null);
+      }
     } catch (error) {
-      console.error('에러 상세:', error.response?.data);
       alert('수정 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handleWithdraw = async () => {
-    if (!window.confirm('정말로 탈퇴하시겠습니까?')) return;
-    try {
-      await api.delete('/member/me');
-      alert('탈퇴가 완료되었습니다.');
-      localLogout();
-    } catch (error) {
-      alert('탈퇴 처리 중 문제가 발생했습니다.');
     }
   };
 
   return (
     <div className="relative w-full">
-      {/* 배경 이미지 영역 */}
-      <div className="relative w-full h-48 md:h-64 bg-gray-100 overflow-visible">
-        <img 
-          src={form.coverImg || '/default-cover.jpg'} 
-          alt="배경" 
-          className="w-full h-full object-cover" 
-        />
+      <div className="relative w-full h-48 md:h-64 overflow-visible">
+        {/* 커버 이미지 컴포넌트 적용 */}
+        <ProfileCover user={profile} preview={form.coverImg} />
+        
         <button 
           type="button" 
           onClick={() => coverRef.current?.click()} 
@@ -196,19 +162,11 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
             <circle cx="12" cy="13" r="4"/>
           </svg>
         </button>
-        <input 
-          ref={coverRef} 
-          type="file" 
-          name="backgroundImage" 
-          accept="image/*" 
-          className="hidden" 
-          onChange={handleCoverFileChange} 
-        />
+        <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverFileChange} />
 
-        {/* 프로필 이미지 영역 */}
         <div className="absolute left-6 bottom-[-32px] md:left-10 md:bottom-[-40px]">
           <div className="relative w-24 h-24 md:w-32 md:h-32">
-            <ProfileImage user={user} size="xl"/>
+            <ProfileImage user={profile} size="xl" preview={profilePreview} />
             <button 
               type="button" 
               onClick={() => imgRef.current?.click()} 
@@ -219,14 +177,7 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
                 <circle cx="12" cy="13" r="4"/>
               </svg>
             </button>
-            <input 
-              ref={imgRef} 
-              type="file" 
-              name="profileImage"
-              accept="image/*" 
-              className="hidden" 
-              onChange={handleProfileFileChange} 
-            />
+            <input ref={imgRef} type="file" accept="image/*" className="hidden" onChange={handleProfileFileChange} />
           </div>
         </div>
       </div>
@@ -250,12 +201,8 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
             <div className="sm:col-span-2">
               <div className="flex justify-between items-center mb-1.5">
                 <label className="block text-xs text-gray-400">닉네임 *</label>
-                {user?.mbrProviderCd === 'LOCAL' && (
-                  <button 
-                    type="button" 
-                    onClick={() => setIsPwdModalOpen(true)}
-                    className="text-[11px] px-2 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-50 flex items-center gap-1"
-                  >
+                {profile?.loginType === 'LOCAL' && (
+                  <button type="button" onClick={() => setIsPwdModalOpen(true)} className="text-[11px] px-2 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-50 flex items-center gap-1">
                     <span>🔒</span> 비밀번호 변경
                   </button>
                 )}
@@ -270,14 +217,14 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
             <div>
               <label className="block text-xs text-gray-400 mb-1.5">우편번호</label>
               <div className="flex gap-2">
-                <input name="zipcode" value={form.zipcode} readOnly className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 cursor-not-allowed" />
+                <input name="zipcode" value={form.zipcode} readOnly className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50" />
                 <button type="button" onClick={handleAddressSearch} className="px-4 py-2.5 bg-[#0F9B73] text-white text-sm font-medium rounded-lg hover:bg-[#0d8a66] transition">주소 검색</button>
               </div>
             </div>
 
             <div>
               <label className="block text-xs text-gray-400 mb-1.5">주소</label>
-              <input name="address" value={form.address} readOnly className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 cursor-not-allowed" />
+              <input name="address" value={form.address} readOnly className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50" />
             </div>
 
             <div className="sm:col-span-2">
@@ -291,20 +238,12 @@ const MemberInfo = ({ profile, onUpdate, profileImg, onImgChange }) => {
           </button>
           
           <div className="mt-4 text-right">
-            <button 
-              type="button" 
-              onClick={handleWithdraw}
-              className="text-xs text-gray-400 hover:text-red-500 underline transition-colors"
-            >
-              회원 탈퇴
-            </button>
+            <button type="button" onClick={onWithdraw} className="text-xs text-gray-400 hover:text-red-500 underline transition-colors">회원 탈퇴</button>
           </div>
         </div>
       </div>
 
-      {isPwdModalOpen && (
-        <PasswordChange onClose={() => setIsPwdModalOpen(false)} />
-      )}
+      {isPwdModalOpen && <PasswordChange onClose={() => setIsPwdModalOpen(false)} />}
     </div>
   );
 };

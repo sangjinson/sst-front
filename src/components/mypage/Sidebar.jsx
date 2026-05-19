@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth'; 
+import { useConfig } from '@hooks/useConfig'; // setConfig를 위해 추가
 
 import ProfileImage from '@modules/member/ProfileImage'; // 프로필 아이콘
+import ProfileCover from '@modules/member/ProfileCover';
 
-const Sidebar = ({ profile, profileImg, coverImg, onImgChange, onCoverChange, imgRef, coverRef }) => {
+const Sidebar = ({ profile, coverImg, onImgChange, onCoverChange, imgRef, coverRef }) => {
   const { user } = useAuth();
 
   // 기본 이미지 경로
@@ -27,6 +29,8 @@ const Sidebar = ({ profile, profileImg, coverImg, onImgChange, onCoverChange, im
         <div className="relative mb-14">
           {/* 배경 이미지 영역 */}
           <div className="relative w-full h-28 bg-gray-200 cursor-pointer" onClick={handleCoverBtnClick}>
+            <ProfileCover user={profile}  />
+
             {coverImg && (
               <img 
                 src={coverImg} 
@@ -40,18 +44,18 @@ const Sidebar = ({ profile, profileImg, coverImg, onImgChange, onCoverChange, im
           
           {/* 프로필 이미지 영역 - 요청하신 로직 반영 */}
           <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-24 h-24 cursor-pointer" onClick={handleProfileBtnClick}>
-            <ProfileImage user={user} size="lg"/>
+            <ProfileImage user={profile} size="lg"/>
             <input ref={imgRef} type="file" accept="image/*" className="hidden" onChange={onImgChange} />
           </div>
         </div>
 
         <div className="flex flex-col items-center px-5 pb-5">
-          <div className="fs-up-2 font-bold text-gray-900 mb-2">{user?.mbrNickname || "미지정"} 🏅</div>
+          <div className="fs-up-2 font-bold text-gray-900 mb-2">{profile?.nickname || "미지정"} 🏅</div>
           <hr className="w-full border-b border-t-0 border-gray-200 my-2" />
           <ul className="w-full flex flex-col gap-3 py-2 fs-up-2 text-gray-700">
-            <li className="flex items-start gap-1.5"><span>📅</span>가입일: {user?.mbrRegDate || "0000.00.00"}</li>
-            <li className="flex items-start gap-1.5"><span>📞</span>{user?.mbrPhone || "등록된 번호 없음"}</li>
-            <li className="flex items-start gap-1.5"><span>✉️</span>{user?.mbrEmail || "이메일 정보 없음"}</li>
+            <li className="flex items-start gap-1.5"><span>📅</span>가입일: {profile?.joinDate || "---- -- --"}</li>
+            <li className="flex items-start gap-1.5"><span>📞</span>{profile?.phone || "등록된 번호 없음"}</li>
+            <li className="flex items-start gap-1.5"><span>✉️</span>{profile?.email || "이메일 정보 없음"}</li>
           </ul>
         </div>
       </div>
