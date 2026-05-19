@@ -24,13 +24,20 @@ const SelectionSummary = ({ selectedRegion, selectedPeriod, startDate, endDate, 
   if (items.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-2 mb-6 bg-white rounded-2xl px-5 py-3 shadow-sm border border-gray-100">
-      <span className="text-xs font-semibold text-gray-400 mr-1">선택됨</span>
-      {items.map((item, i) => (
-        <span key={i} className="flex items-center gap-1 px-3 py-1 bg-green-50 text-[#0F9B73] text-xs font-semibold rounded-full">
-          <span className="text-gray-400">{item.label}:</span> {item.value}
-        </span>
-      ))}
+    <div className="mb-7 rounded-3xl border border-gray-100 bg-white px-5 py-4 shadow-sm md:px-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="shrink-0 text-sm font-bold text-gray-500">내 여행 조건</span>
+        {items.map((item, i) => (
+          <span
+            key={i}
+            className="inline-flex items-center gap-2 rounded-full border border-gray-100 bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-800"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-[#0F9B73]" />
+            <span className="font-semibold text-gray-500">{item.label}</span>
+            <span>{item.value}</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 };
@@ -93,7 +100,7 @@ const AIPlanPage = () => {
 
   return (
     <div className="min-h-screen bg-[#f7f8fa]">
-      <div className="container mx-auto py-8 px-4 max-w-[900px]">
+      <div className="container mx-auto max-w-[1040px] px-4 py-10 md:py-14">
 
         <Breadcrumb
           paths={[{ label: '홈', to: '/' }, { label: '내거리' }]}
@@ -110,7 +117,7 @@ const AIPlanPage = () => {
           selectedThemes={selectedThemes}
         />
 
-        <div className="bg-white rounded-2xl shadow-sm p-8">
+        <div className="min-h-[500px] rounded-3xl border border-gray-100 bg-white px-6 py-12 shadow-sm md:px-12 md:py-16">
 
           {/* STEP 0: 지역 선택 */}
           {step === 0 && (
@@ -145,11 +152,11 @@ const AIPlanPage = () => {
         </div>
 
         {/* 하단 버튼 */}
-        <div className="flex items-center justify-between mt-6">
+        <div className="mt-9 flex items-center justify-between md:mt-10">
           <button
             onClick={() => setStep(s => s - 1)}
             disabled={step === 0}
-            className="px-6 py-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-0 transition"
+            className="rounded-2xl border border-gray-300 bg-white px-7 py-3 text-base font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:border-gray-400 hover:bg-gray-50 active:scale-[0.98] disabled:opacity-0"
           >
             ← 이전
           </button>
@@ -159,7 +166,7 @@ const AIPlanPage = () => {
               <button
                 onClick={handleSubmit}
                 disabled={!selectedRegion || selectedThemes.length === 0}
-                className="px-6 py-2.5 bg-[#0F9B73] text-white rounded-xl text-sm font-semibold hover:bg-[#0d8a66] disabled:opacity-50 transition"
+                className="rounded-2xl bg-[#0F9B73] px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#0d8a66] hover:shadow-[0_10px_24px_rgba(15,155,115,0.22)] active:scale-[0.98] disabled:opacity-50"
               >
                 AI 코스 추천받기 →
               </button>
@@ -168,7 +175,7 @@ const AIPlanPage = () => {
             <button
               onClick={() => setStep(s => s + 1)}
               disabled={isNextDisabled}
-              className="px-6 py-2.5 bg-[#0F9B73] text-white rounded-xl text-sm font-semibold hover:bg-[#0d8a66] disabled:opacity-50 transition"
+              className="rounded-2xl bg-[#0F9B73] px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#0d8a66] hover:shadow-[0_10px_24px_rgba(15,155,115,0.22)] active:scale-[0.98] disabled:opacity-50"
             >
               다음 →
             </button>

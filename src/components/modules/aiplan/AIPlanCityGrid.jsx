@@ -22,25 +22,27 @@ const AIPlanCityGrid = ({ selectedRegion, onSelect }) => {
 
   return (
     <div>
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <svg viewBox="0 0 24 24" className="w-6 h-6 fill-none stroke-[#0F9B73]" strokeWidth="2">
+      <div className="mb-10 text-center md:mb-12">
+        <div className="mb-3 flex items-center justify-center gap-2.5">
+          <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-[#0F9B73]" strokeWidth="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
             <circle cx="12" cy="10" r="3"/>
           </svg>
-          <h2 className="text-lg font-bold text-gray-800">어디로 떠나시겠어요?</h2>
+          <h2 className="text-2xl font-black text-gray-900 md:text-3xl">어디로 떠나시겠어요?</h2>
         </div>
-        <p className="text-sm text-gray-400">경기도 시·군을 선택해주세요</p>
+        <p className="text-base font-semibold text-gray-400">경기도 시·군을 선택해주세요</p>
       </div>
 
       {/* 남부/북부 탭 */}
-      <div className="flex justify-center gap-2 mb-5">
+      <div className="mb-10 flex justify-center gap-3">
         {['남부', '북부'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition ${
-              activeTab === tab ? 'bg-[#0F9B73] text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            className={`rounded-full px-7 py-3 text-base font-semibold transition-all duration-200 active:scale-[0.98] ${
+              activeTab === tab
+                ? 'bg-white text-[#0F9B73] shadow-[0_8px_22px_rgba(15,23,42,0.08)] ring-1 ring-[#0F9B73]/25'
+                : 'bg-gray-100 text-gray-500 hover:-translate-y-0.5 hover:bg-white hover:text-gray-700 hover:shadow-sm'
             }`}
           >
             경기 {tab}
@@ -49,28 +51,21 @@ const AIPlanCityGrid = ({ selectedRegion, onSelect }) => {
       </div>
 
       {/* 도시 그리드 */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 md:gap-5">
         {cities.map(city => (
           <button
             key={city}
             onClick={() => onSelect(city)}
-            className={`py-2.5 px-2 rounded-xl text-sm font-medium transition ${
+            className={`h-16 rounded-2xl px-3 text-base font-semibold transition-all duration-200 active:scale-[0.98] ${
               selectedRegion === city
-                ? 'bg-[#0F9B73] text-white shadow-sm'
-                : 'bg-gray-50 text-gray-600 hover:bg-green-50 hover:text-[#0F9B73] border border-gray-200'
+                ? 'border border-gray-200 bg-white text-[#0F9B73] shadow-[0_10px_24px_rgba(15,23,42,0.08)]'
+                : 'border border-gray-200 bg-gray-50 text-gray-600 hover:-translate-y-0.5 hover:border-[#0F9B73]/30 hover:bg-white hover:text-gray-800 hover:shadow-sm'
             }`}
           >
             {city}
           </button>
         ))}
       </div>
-
-      {selectedRegion && (
-        <div className="mt-4 text-center">
-          <span className="text-sm text-gray-500">선택됨: </span>
-          <span className="text-sm font-bold text-[#0F9B73]">{selectedRegion}</span>
-        </div>
-      )}
     </div>
   );
 };
