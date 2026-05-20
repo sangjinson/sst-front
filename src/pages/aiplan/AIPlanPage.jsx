@@ -21,13 +21,12 @@ const SelectionSummary = ({ selectedRegion, selectedPeriod, startDate, endDate, 
     selectedThemes.length > 0 && { label: '테마', value: selectedThemes.join(', ') },
   ].filter(Boolean);
 
-  if (items.length === 0) return null;
 
   return (
     <div className="mb-7 rounded-3xl border border-gray-100 bg-white px-5 py-4 shadow-sm md:px-6">
       <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
         <span className="shrink-0 text-base font-bold text-gray-600 md:text-lg">내 여행 조건</span>
-        <div className="flex flex-wrap gap-2.5 md:gap-3">
+        <div className="flex min-h-[38px] flex-wrap gap-2.5 md:min-h-[40px] md:gap-3">
           {items.map((item, i) => (
             <span
               key={i}

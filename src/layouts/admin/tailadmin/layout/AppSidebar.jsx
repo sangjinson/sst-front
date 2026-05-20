@@ -273,35 +273,20 @@ const AppSidebar = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-8 flex ${
+        className={`py-8 ${isMobileOpen ? "hidden lg:flex" : "flex"} ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link to="/admin">
-          {isExpanded || isHovered || isMobileOpen ? (
-            <>
-              <img
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
-                alt="Logo"
-                width={150}
-                height={40}
-              />
-              <img
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={150}
-                height={40}
-              />
-            </>
-          ) : (
-            <img
-              src="/images/logo/logo-icon.svg"
-              alt="Logo"
-              width={32}
-              height={32}
-            />
+        <Link to="/admin" className="flex items-center gap-4 no-underline">
+          <img
+            src="/admin-logo.png"
+            alt="거리에섯 관리자 로고"
+            className={`shrink-0 rounded-2xl object-cover ${isExpanded || isHovered || isMobileOpen ? "h-16 w-16" : "h-12 w-12"}`}
+          />
+          {(isExpanded || isHovered || isMobileOpen) && (
+            <span className="text-3xl font-extrabold tracking-[-0.02em] text-gray-900 dark:text-white">
+              거리에섯
+            </span>
           )}
         </Link>
       </div>
