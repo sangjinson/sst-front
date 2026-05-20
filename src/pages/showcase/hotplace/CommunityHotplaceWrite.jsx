@@ -12,6 +12,8 @@ import { useAuth } from "@hooks/useAuth";
 // 공통 글쓰기 폼
 import WriteForm from "@components/modules/community/write/WriteForm";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const CommunityHotplaceWrite = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -21,7 +23,11 @@ const CommunityHotplaceWrite = () => {
   const [notFound, setNotFound] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [existingImageUrls, setExistingImageUrls] = useState([]);
+
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState(null);
@@ -36,13 +42,27 @@ const CommunityHotplaceWrite = () => {
   const [places, setPlaces] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
 
+  const getImageUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("blob:")) return url;
+    if (url.startsWith("http")) return url;
+    return `${BASE_URL}${url}`;
+  };
+
+  const getServerPath = (url) => {
+    if (!url) return "";
+    if (url.startsWith(BASE_URL)) {
+      return url.replace(BASE_URL, "");
+    }
+    return url;
+  };
+
   // 1. 페이지 처음 열릴 때: 지역, 카테고리, 수정 데이터 조회
   useEffect(() => {
     window.scrollTo({ top: 0 });
 
     const fetchData = async () => {
       try {
-
         // 지역 목록 조회
         const regionRes = await api.get("/regions");
         setRegions(regionRes.data);
@@ -56,25 +76,18 @@ const CommunityHotplaceWrite = () => {
           const res = await api.get(`/community/${id}`);
           const post = res.data;
 
-          const imageUrl = post.commMainImgUrl
-            ? post.commMainImgUrl.startsWith("http")
-              ? post.commMainImgUrl
-              : `http://localhost:8080${post.commMainImgUrl}`
-            : "";
-
-          const imageUrls = post.images?.length
+          const serverImages = post.images?.length
             ? post.images.map((img) =>
-                img.startsWith("http")
-                  ? img
-                  : `http://localhost:8080${img}`
+                typeof img === "string" ? img : img.filePath
               )
-            : imageUrl
-              ? [imageUrl]
+            : post.commMainImgUrl
+              ? [post.commMainImgUrl]
               : [];
 
           setTitle(post.commTitle || "");
           setContent(post.commContent || "");
-          setImagePreviews(imageUrls);
+          setExistingImageUrls(serverImages);
+          setImagePreviews(serverImages.map(getImageUrl));
 
           setSelectedRegion({
             rgnCd: post.rgnCd,
@@ -95,7 +108,6 @@ const CommunityHotplaceWrite = () => {
 
           setTags(post.hashtagText ? post.hashtagText.split(",") : []);
         }
-
       } catch (error) {
         console.error("데이터 조회 실패:", error);
 
@@ -129,7 +141,6 @@ const CommunityHotplaceWrite = () => {
       .catch((err) => {
         console.error("장소 목록 조회 실패:", err);
       });
-
   }, [selectedRegion, selectedCategory]);
 
   if (loading) {
@@ -140,51 +151,45 @@ const CommunityHotplaceWrite = () => {
     return <div className="py-20 text-center font-bold text-gray-500">수정할 게시글이 존재하지 않습니다.</div>;
   }
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
 
     if (!files.length) return;
 
-    try {
-      const uploadedUrls = [];
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await api.post("/community/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+    const previews = files.map((file) => URL.createObjectURL(file));
 
-        uploadedUrls.push(`http://localhost:8080${res.data}`);
-      }
-     
-      setImagePreviews((prev) => [...prev, ...uploadedUrls]);
-    } catch (error) {
-      alert("이미지 업로드에 실패했습니다.");
-    } finally {
-      e.target.value = "";
-    }
+    setImageFiles((prev) => [...prev, ...files]);
+    setImagePreviews((prev) => [...prev, ...previews]);
+
+    e.target.value = "";
   };
 
-  const handleRemoveImage = async (removeIndex) => {
-    const imageUrl = imagePreviews[removeIndex];
+  const handleRemoveImage = (removeIndex) => {
+    const removePreview = imagePreviews[removeIndex];
 
-    try {
-      await api.delete("/community/image", {
-        params: {
-          imageUrl: imageUrl.replace("http://localhost:8080", ""),
-        },
-      });
+    setImagePreviews((prev) =>
+      prev.filter((_, index) => index !== removeIndex)
+    );
 
-      setImagePreviews((prev) =>
-        prev.filter((_, index) => index !== removeIndex)
+    if (removePreview.startsWith(BASE_URL)) {
+      const serverPath = getServerPath(removePreview);
+
+      setExistingImageUrls((prev) =>
+        prev.filter((url) => url !== serverPath)
       );
-    } catch (error) {
-        console.error("이미지 삭제 실패:", error);
-        alert("이미지 삭제에 실패했습니다.");
-      }
-    };
+
+      return;
+    }
+
+    const existingCount = existingImageUrls.length;
+    const fileIndex = removeIndex - existingCount;
+
+    if (fileIndex >= 0) {
+      setImageFiles((prev) =>
+        prev.filter((_, index) => index !== fileIndex)
+      );
+    }
+  };
     
   // 해시태그 공백, # 제거
   const normalizeTag = (tag) =>
@@ -207,6 +212,23 @@ const CommunityHotplaceWrite = () => {
     } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
       setTags(tags.slice(0, -1));
     }
+  };
+
+  const createFormData = (payload) => {
+    const formData = new FormData();
+
+    formData.append(
+      "community",
+      new Blob([JSON.stringify(payload)], {
+        type: "application/json",
+      })
+    );
+
+    imageFiles.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    return formData;
   };
 
   const matchedPlace = places.find(
@@ -241,33 +263,25 @@ const CommunityHotplaceWrite = () => {
 
     if (isEditMode) {
       const payload = {
+        commCatCd: "CMM002",
         commPlcNo: matchedPlace.plcNo,
         commTitle: title,
         commContent: content,
-        commMainImgUrl: imagePreviews[0]
-          ? imagePreviews[0].replace("http://localhost:8080", "")
-          : "",
         hashtags: finalTags,
-
-        files: imagePreviews.map((url, index) => {
-          const path = url.replace("http://localhost:8080", "");
-          const saveName = path.split("/").pop();
-
-          return {
-            fileOrgNm: saveName,
-            fileSaveNm: saveName,
-            filePath: path,
-            fileExt: saveName.split(".").pop(),
-            fileSize: 0,
-            fileMimeType: "image/png",
-            fileType: "IMAGE",
-          };
-        }),
+        existingImageUrls,
+        commMainImgUrl: existingImageUrls[0] || "",
       };
+
+      const formData = createFormData(payload);
 
       try {
         // 게시글 수정 요청
-        await api.put(`/community/${id}`, payload);
+        await api.put(`/community/${id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
         alert("글이 수정되었습니다!");
         // 수정 완료 후 상세페이지 이동
         navigate(`/showcase/hotplace/view/${id}`);
@@ -289,29 +303,17 @@ const CommunityHotplaceWrite = () => {
         commPlcNo: matchedPlace.plcNo,
         commTitle: title,
         commContent: content,
-        commMainImgUrl: imagePreviews[0]
-          ? imagePreviews[0].replace("http://localhost:8080", "")
-          : "",
         hashtags: finalTags,
-
-        files: imagePreviews.map((url, index) => {
-          const path = url.replace("http://localhost:8080", "");
-          const saveName = path.split("/").pop();
-
-          return {
-            fileOrgNm: saveName,
-            fileSaveNm: saveName,
-            filePath: path,
-            fileExt: saveName.split(".").pop(),
-            fileSize: 0,
-            fileMimeType: "image/png",
-            fileType: "IMAGE",
-          };
-        }),
       };
 
+      const formData = createFormData(payload);
+
       try {
-        await api.post("/community", payload);
+        await api.post("/community", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
         alert("글이 등록되었습니다!");
         navigate("/showcase/hotplace");

@@ -13,6 +13,8 @@ import IconSVG from "@components/Icon/IconSVG";
 import ImageSlider from "@components/modules/community/common/ImageSlider";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 
+ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const CommunityLifeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -180,9 +182,8 @@ const CommunityLifeDetail = () => {
   const normalizeImageUrl = (url) => {
     if (!url) return null;
     if (url.startsWith("http")) return url;
-    if (url.startsWith("/uploads")) return `http://localhost:8080${url}`;
-    if (url.startsWith("uploads")) return `http://localhost:8080/${url}`;
-    return `http://localhost:8080/uploads/${url}`;
+    if (url.startsWith("/")) return `${BASE_URL}${url}`;
+    return `${BASE_URL}/${url}`;
   };
 
   const slideImages =
