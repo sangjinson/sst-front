@@ -2,62 +2,13 @@ import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { useWishlist } from '@hooks/useWishlist';
 import { useAuth } from '@hooks/useAuth';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 /**
  * AreaActionButtons - 공통 공유/찜 버튼 컴포넌트
- *
- * ────────────────────────────────────────────────
- * [ClipButton] 공유 버튼 - props 없음, 어디서든 사용 가능
- *
- * import { ClipButton } from '@components/modules/AreaActionButtons';
- * <ClipButton />
- * ────────────────────────────────────────────────
- *
- * ────────────────────────────────────────────────
- * [HeartButton] 찜 버튼 - 마이페이지 찜목록 연동 불필요한 곳에서 사용
- * (예: 커뮤니티 상세, 단순 UI 토글이 필요한 곳)
- *
- * import { HeartButton } from '@components/modules/AreaActionButtons';
- *
- * const [liked, setLiked] = useState(false);
- * <HeartButton liked={liked} onClick={() => setLiked(prev => !prev)} />
- *
- * props:
- * - liked   : 찜 상태 (boolean)
- * - onClick : 클릭 핸들러
- * ────────────────────────────────────────────────
- *
- * ────────────────────────────────────────────────
- * [WishlistHeartButton] 찜 버튼 - 마이페이지 찜목록 연동이 필요한 곳에서 사용
- * (예: 볼거리/먹거리/잘거리 리스트·뷰 페이지)
- * - 찜 상태가 localStorage에 저장되어 마이페이지 찜목록과 연동됨
- * - 마이페이지에서 클릭 시 /{region}/{itemType}/view?id= 로 이동
- *
- * import { WishlistHeartButton } from '@components/modules/AreaActionButtons';
- *
- * // 뷰 페이지에서 사용 예시 (renderHeart prop으로 전달)
- * <AreaDetailHero
- *   ...
- *   renderHeart={() => (
- *     <WishlistHeartButton item={item} itemType="see" region={region} />
- *   )}
- * />
- *
- * // 리스트 페이지에서 사용 예시 (AreaListCard의 renderHeart prop으로 전달)
- * <AreaListCard
- *   ...
- *   renderHeart={() => (
- *     <WishlistHeartButton item={item} itemType="food" region={region} />
- *   )}
- * />
- *
- * props:
- * - item     : 장소 데이터 객체 { id, name|title, image, category|tag, address|location }
- * - itemType : 카테고리 타입 ('see' | 'food' | 'sleep')
- * - region   : URL 지역 파라미터 (영문, 예: 'suwon')
- * ────────────────────────────────────────────────
  */
 
-// 공유(링크 복사) 버튼 - 팝업 및 복사 로직 내장
+// 공유(링크 복사) 버튼
 export const ClipButton = () => {
   const [isShareOpen, setIsShareOpen] = useState(false);
 
@@ -87,7 +38,6 @@ export const ClipButton = () => {
 
   return (
     <div className="relative">
-      {/* 공유 버튼 */}
       <button
         onClick={() => setIsShareOpen((prev) => !prev)}
         className="group/link w-11 h-11 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md hover:bg-white hover:scale-105 active:scale-90 transition-all duration-200 cursor-pointer border-none outline-none"
@@ -105,7 +55,6 @@ export const ClipButton = () => {
         </svg>
       </button>
 
-      {/* 공유 URL 팝업 */}
       {isShareOpen && (
         <div className="absolute top-[46px] right-0 w-[300px] max-w-[calc(100vw-32px)] rounded-2xl bg-white/95 backdrop-blur-md p-3 shadow-xl z-10">
           <p className="text-xs font-semibold text-gray-500 mb-2">페이지 링크</p>
@@ -128,13 +77,36 @@ export const ClipButton = () => {
   );
 };
 
-// 리스트 페이지용 - 찜 로직 내장 (원복: 이 컴포넌트 전체 삭제 + import 삭제)
+// ✅ WishlistHeartButton - 비로그인 시 팝업 처리
 export const WishlistHeartButton = ({ item, itemType, region, initialWished }) => {
   const { user } = useAuth();
-  const { isWished, toggleWish } = useWishlist(item?.id, itemType, user, initialWished); // ✅ initialWished 추가
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isWished, toggleWish } = useWishlist(item?.id, itemType, user, initialWished);
 
   const handleClick = (e) => {
     e.stopPropagation();
+
+    // ✅ 비로그인 시 팝업
+    if (!user) {
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용 가능한 서비스입니다.',
+        confirmButtonText: '로그인하러 가기',
+        confirmButtonColor: '#0F9B73',
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/login', {
+            state: { from: location },
+            replace: true,
+          });
+        }
+      });
+      return;
+    }
+
     toggleWish({
       id: item.id,
       name: item.name || item.title,
@@ -149,8 +121,7 @@ export const WishlistHeartButton = ({ item, itemType, region, initialWished }) =
   return <HeartButton liked={isWished} onClick={handleClick} />;
 };
 
-
-// 찜(하트) 버튼 - 순수 UI (liked, onClick을 외부에서 주입)
+// 찜(하트) 버튼 - 순수 UI
 export const HeartButton = ({ liked, onClick }) => (
   <button
     onClick={onClick}

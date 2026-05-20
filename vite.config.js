@@ -34,6 +34,10 @@ export default defineConfig(({ mode }) => {
         '@api': fileURLToPath(new URL('./src/api', import.meta.url)),
         '@themeadmin': fileURLToPath(new URL('./src/layouts/admin/tailadmin', import.meta.url)),
       },
+      '/attachment': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
     },
     server: {
       proxy: {
@@ -46,6 +50,10 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
         },
         '/uploads': {
+          target: apiUrl, // 🚀 이미지/파일 업로드도 스프링 부트 서버를 향하므로 동일한 apiUrl 사용
+          changeOrigin: true,
+        },
+        '/attachment': {
           target: apiUrl, // 🚀 이미지/파일 업로드도 스프링 부트 서버를 향하므로 동일한 apiUrl 사용
           changeOrigin: true,
         },
