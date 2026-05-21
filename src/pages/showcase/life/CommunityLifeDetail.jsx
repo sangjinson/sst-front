@@ -77,11 +77,19 @@ const CommunityLifeDetail = () => {
           }));
         }
 
+        const getRegionBannerImage = (regionName) => {
+          if (!regionName || regionName === "장소 정보 없음") {
+            return "/images/community/default-life.jpg";
+          }
+
+          return `/banners/${regionName}.webp`;
+        };
+
         const imageUrl = item.commMainImgUrl
           ? item.commMainImgUrl.startsWith("http")
             ? item.commMainImgUrl
             : `http://localhost:8080${item.commMainImgUrl}`
-          : "/images/community/default-life.jpg";
+          : getRegionBannerImage(item.rgnName || item.plcName);
 
         const mappedPost = {
           id: item.commNo,

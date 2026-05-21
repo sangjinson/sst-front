@@ -105,10 +105,23 @@ const CommunityLife = () => {
     setPage(nextPage);
   }, [searchParams]);
 
-  const getImageUrl = (url) => {
-    if (!url) return "/images/community/default-life.jpg";
-    if (url.startsWith("http")) return url;
-    return `http://localhost:8080${url}`;
+  const getRegionBannerImage = (regionName) => {
+    if (!regionName || regionName === "지역 미정") {
+      return "/images/community/default-life.jpg";
+    }
+
+    return `/banners/${regionName}.webp`;
+  };
+
+  const getImageUrl = (url, regionName) => {
+    // 업로드 이미지가 있는 경우
+    if (url) {
+      if (url.startsWith("http")) return url;
+      return `http://localhost:8080${url}`;
+    }
+
+    // 업로드 이미지가 없으면 지역 배너 사용
+    return getRegionBannerImage(regionName);
   };
 
   const fetchPosts = () => {
@@ -126,7 +139,10 @@ const CommunityLife = () => {
       })
       .then((res) => {
         const mappedData = res.data.list.map((item) => {
-          const imageUrl = getImageUrl(item.commMainImgUrl);
+          const imageUrl = getImageUrl(
+            item.commMainImgUrl,
+            item.rgnName || "지역 미정"
+          );
 
           return {
             id: item.commNo,
