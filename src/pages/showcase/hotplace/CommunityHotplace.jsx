@@ -222,7 +222,7 @@ const CommunityHotplace = () => {
           }}
         />
       )}
-    <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 mb-20 font-sans">
+    <div className="paperlogy container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20 font-sans">
       <CommunityListHeader
         breadcrumb={[
           { label: "홈", to: "/" },
