@@ -50,14 +50,25 @@ const LifePostHeader = ({
 }) => {
   return (
     <div className="relative bg-white rounded-3xl border border-gray-100 p-6 pr-32 pb-16 shadow-sm">
-      {/* 작성자 */}
-      <div className="mb-3 flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-          😊
-        </div>
-        <span className="fs-down-1 font-semibold text-[#E8956D]">
-          {post.author}
-        </span>
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        {[post.theme1Name, post.theme2Name, post.theme3Name]
+          .filter(Boolean)
+          .map((theme, index) => {
+            const themeColors = [
+              "bg-emerald-100 text-[#0F9B73]",
+              "bg-blue-100 text-blue-700",
+              "bg-purple-100 text-purple-700",
+            ];
+
+            return (
+              <span
+                key={theme}
+                className={`rounded-full px-3 py-1 fs-down-1 font-bold ${themeColors[index]}`}
+              >
+                {theme}
+              </span>
+            );
+          })}
       </div>
 
       {/* 제목 */}
