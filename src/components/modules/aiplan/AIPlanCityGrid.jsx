@@ -21,7 +21,7 @@ const AIPlanCityGrid = ({ selectedRegion, onSelect }) => {
   const cities = activeTab === '남부' ? CITIES_SOUTH : CITIES_NORTH;
 
   return (
-    <div>
+    <div data-aos="zoom-in" data-aos-once="true">
       <div className="mb-10 text-center md:mb-12">
         <div className="mb-3 flex items-center justify-center gap-2.5">
           <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-[#0F9B73] md:h-8 md:w-8" strokeWidth="2">
@@ -51,7 +51,7 @@ const AIPlanCityGrid = ({ selectedRegion, onSelect }) => {
       </div>
 
       {/* 도시 그리드 */}
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-3 md:grid-cols-5 md:gap-5">
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-3 md:grid-cols-5 md:gap-5" data-aos="zoom-in-up" data-aos-once="true">
         {cities.map(city => (
           <button
             key={city}
