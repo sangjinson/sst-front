@@ -5,6 +5,8 @@ import { useConfig } from '@hooks/useConfig';
 import { getNorthRegions, getSouthRegions } from '@utils/regionMap'; 
 
 import '@assets/css/landing.css';
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const LandingPage = () => {
   const { getConfig, setConfig } = useConfig(); 
@@ -31,12 +33,13 @@ const LandingPage = () => {
   useEffect(() => {
     // 타이틀 설정
     //setConfig('pageTitle', '거리에섯 | 나만의 완벽한 여행 일정');
+    AOS.init();
   }, []);
 
   return (
     <>
       {/* 검색 영역 */}
-      <div className="container fs-up-3">
+      <div className="container fs-up-3" data-aos="flip-up" data-aos-once="true">
         <div className="w-full md:w-8/12 mx-auto">
           <div className="flex flex-col md:flex-row items-center bg-white rounded-[20px] md:rounded-[50px] p-4 md:py-[10px] md:px-[20px] w-full shadow-[0_4px_15px_rgba(0,0,0,0.05)] mb-10 md:mb-[50px] gap-3 md:gap-0">
             <input
@@ -60,7 +63,7 @@ const LandingPage = () => {
       {/* 탭 및 지역 선택 카드 영역 */}
       <div className="container my-10">
         <div className="bg-white/40 backdrop-blur-[8px] border border-white/50 rounded-[20px] p-5 md:p-[40px] w-full">
-          <div className="flex justify-center gap-[15px] mb-[30px] fs-up-3">
+          <div className="flex justify-center gap-[15px] mb-[30px] fs-up-3" data-aos="zoom-in" data-aos-once="true">
             <button
               className={`py-[12px] px-[40px] font-bold rounded-lg cursor-pointer transition-all duration-200 border-none ${
                 activeTab === '남부' ? 'bg-[#2B4A48] text-white' : 'bg-white/70 text-[#555]'
@@ -79,7 +82,7 @@ const LandingPage = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-3 md:grid-cols-5 gap-[15px] fs-up-3">
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-[15px] fs-up-3" data-aos="zoom-in-up" data-aos-once="true">
             {currentRegions.map((region) => (
               <button
                 key={region.code}

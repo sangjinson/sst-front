@@ -1,9 +1,14 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Link } from "react-router-dom";
 import { useConfig } from '@hooks/useConfig'; // Config 훅
 import '@assets/css/footer.css';
 
+import AOS from "aos";
+import "aos/dist/aos.css";
+
 const MainFooter = () => {
+  useEffect(() => { AOS.init(); }, []);
+
   const { getConfig } = useConfig();
 
   // 데이터들을 config에서 추출
@@ -31,7 +36,7 @@ const MainFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10 pb-5 border-b border-white/10 items-start">
 
           {/* 왼쪽: Contract */}
-          <div className="flex flex-col gap-2 md:gap-4">
+          <div className="flex flex-col gap-2 md:gap-4" data-aos="slide-right" data-aos-once="true">
             <h3 className="text-gray-100 font-bold fs-6 fs-md-8 leading-none border-b border-white/20 pb-3 md:pb-6">
               Contract
             </h3>
@@ -52,7 +57,7 @@ const MainFooter = () => {
           </div>
 
           {/* 오른쪽: Dev Team */}
-          <div className="flex flex-col gap-2 md:gap-4">
+          <div className="flex flex-col gap-2 md:gap-4" data-aos="slide-left" data-aos-once="true">
             <h3 className="text-gray-100 font-bold fs-6 fs-md-8 leading-none border-b border-white/20 pb-3 md:pb-6">
               Dev Team
             </h3>

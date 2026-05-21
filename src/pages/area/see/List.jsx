@@ -1,12 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AreaFilterBar, AreaListCard, AreaPagination, sortData } from '@components/modules/area/arealist';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import EyesFollow from '@components/modules/anim/EyesFollow';
 
+
+
 const pageLabel = "볼거리";
 
 const List = ({ rows, wishedPlcNos = [] }) => {
+  
   const { region, type } = useParams();
   const navigate = useNavigate();
 
