@@ -50,7 +50,6 @@ const LifePostHeader = ({
 }) => {
   return (
     <div className="relative bg-white rounded-3xl border border-gray-100 p-6 pr-32 pb-16 shadow-sm">
-      <span className="absolute right-6 top-6 fs-down-1 font-medium text-gray-400">{post.regDt}</span>
       {/* 작성자 */}
       <div className="mb-3 flex items-center gap-2">
         <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center">
@@ -73,8 +72,7 @@ const LifePostHeader = ({
           {(post.hashtags || []).map((tag) => (
             <span
               key={tag}
-              className="fs-down-1 font-semibold text-[#0F9B73] pr-1"
-            >
+              className="fs-down-1 font-semibold text-[#0F9B73] pr-1">
               #{tag}
             </span>
           ))}

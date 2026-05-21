@@ -27,15 +27,13 @@ const PCNavItem = ({ item, pathname, setIsMenuOpen, setIsSearchOpen }) => {
     <div
       className="relative"
       onMouseEnter={() => { if (hasSubMenu) setIsHovered(true); }}
-      onMouseLeave={() => { if (hasSubMenu) setIsHovered(false); }}
-    >
+      onMouseLeave={() => { if (hasSubMenu) setIsHovered(false); }}>
       <Link
         to={item.path}
         onClick={handleLinkClick}
         className={`relative fs-up-3 font-medium py-1 px-1 transition-all duration-300 hover:text-[#0F9B73] after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-[#0F9B73] after:transition-all after:duration-300 hover:after:w-full hover:-translate-y-[1px] ${
           isActive ? 'text-[#0F9B73] -translate-y-[1px] after:w-full' : 'text-black after:w-0'
-        }`}
-      >
+        }`}>
         {item.name}
       </Link>
 
@@ -50,8 +48,7 @@ const PCNavItem = ({ item, pathname, setIsMenuOpen, setIsSearchOpen }) => {
                 onClick={handleLinkClick}
                 className={`block px-4 py-2 text-[14px] hover:bg-gray-50 hover:text-primary transition-colors whitespace-nowrap text-center ${
                   pathname.startsWith(sub.path) ? 'text-primary font-semibold' : 'text-gray-700'
-                }`}
-              >
+                }`}>
                 {sub.name}
               </Link>
             ))}
