@@ -183,7 +183,7 @@ const CommunityLife = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchPosts();
-    }, 500);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [keyword, searchType, sortType, page]);

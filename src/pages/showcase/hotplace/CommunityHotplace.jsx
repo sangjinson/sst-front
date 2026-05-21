@@ -7,6 +7,8 @@ import CommunityHotplaceSkeleton from "@components/skeleton/CommunityHotplaceSke
 import CommunityListHeader from "@components/modules/community/common/CommunityListHeader";
 import CommunityHotplaceCard from "@components/modules/community/hotplace/CommunityHotplaceCard";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
+import AOS from "aos";
+
 
 const CommunityHotplace = () => {
   const navigate = useNavigate();
@@ -143,10 +145,16 @@ const CommunityHotplace = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchPosts();
-    }, 500);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [keyword, searchType, sortType, currentPage]);
+
+  useEffect(() => {
+    if (!loading) {
+      AOS.refreshHard();
+    }
+  }, [loading, posts]);
 
   // 페이지 변경 시 맨 위로 이동
   useEffect(() => {
