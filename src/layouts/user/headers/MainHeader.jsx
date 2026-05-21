@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
-import { LogIn, LogOut, Search } from 'lucide-react';
+import { ChevronDown, ChevronUp, CircleHelp, LogIn, LogOut, Megaphone, Search, UserRound } from 'lucide-react';
 import { useAuth } from '@hooks/useAuth'; 
 import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 import { toKorRegion } from '@utils/regionMap';
@@ -24,6 +24,7 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [openMobileSections, setOpenMobileSections] = useState({});
 
   const { user, logout } = useAuth();
   const navigate         = useNavigate();
@@ -35,21 +36,25 @@ const Header = () => {
     { 
       name: '볼거리',
       path: `/${curRegionEn}/see/list`,
+      sectionType: 'see',
       subMenu: []
     },
     { 
       name: '먹거리',
       path: `/${curRegionEn}/food/list`,
+      sectionType: 'food',
       subMenu: []
     },
     { 
       name: '잘거리',
       path: `/${curRegionEn}/sleep/list`,
+      sectionType: 'sleep',
       subMenu: []
     },
     {
       name: '놀거리',
       path: `/${curRegionEn}/play/list`,
+      sectionType: 'play',
       subMenu: []
     },
     { name: '뽐낼거리', path: `/showcase/hotplace`,
@@ -65,8 +70,25 @@ const Header = () => {
     },
   ];
 
+  const customerSupportItem = {
+    name: '고객지원',
+    path: '/customersupport/notice',
+    subMenu: [
+      { name: '공지사항', path: '/customersupport/notice' },
+      { name: '자주하는 질문', path: '/customersupport/faq' },
+    ],
+  };
+
   const isActiveNavItem = (item) => {
-    if (item.subMenu) return item.subMenu.some((sub) => pathname.startsWith(sub.path));
+    if (item.sectionType) {
+      const [, , currentType] = pathname.split('/');
+      return currentType === item.sectionType;
+    }
+
+    if (item.subMenu && item.subMenu.length > 0) {
+      return item.subMenu.some((sub) => pathname.startsWith(sub.path));
+    }
+
     if (pathname === item.path || pathname.startsWith(`${item.path}/`)) return true;
     const sectionPath = item.path.replace(/\/list$/, '');
     return sectionPath !== item.path && pathname.startsWith(`${sectionPath}/`);
@@ -75,6 +97,10 @@ const Header = () => {
   const toggleMenu   = () => { setIsMenuOpen(!isMenuOpen); setIsSearchOpen(false); };
   const closeMenu    = () => setIsMenuOpen(false);
   const toggleSearch = () => { setIsSearchOpen(!isSearchOpen); setIsMenuOpen(false); setIsProfileOpen(false); };
+  const toggleMobileSection = (name) => {
+    setOpenMobileSections((prev) => ({ ...prev, [name]: !prev[name] }));
+  };
+  const isMobileSectionOpen = (item) => openMobileSections[item.name] ?? isActiveNavItem(item);
 
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;
@@ -140,7 +166,7 @@ const Header = () => {
           </button>
 
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="hidden items-center gap-3 md:flex">
               {/* 프로필 + 아코디언 */}
               <div className="relative"
                 onMouseEnter={() => setIsProfileOpen(true)}
@@ -150,22 +176,32 @@ const Header = () => {
                 <ProfileImage user={getConfig('profile')} size="sm"/>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 top-full mt-0 w-44 bg-white border border-gray-100 shadow-xl rounded-md py-1 z-[1001]">
+                  <div className="absolute right-0 top-full z-[1001] mt-2 w-48 rounded-2xl border border-gray-100 bg-white p-2 shadow-[0_16px_36px_rgba(15,23,42,0.12)]">
                     {/* 프로필과 드롭다운 사이 마우스 이탈 방지 투명 레이어 */}
-                    <div className="absolute -top-2 left-0 w-full h-2" />
+                    <div className="absolute -top-2 left-0 h-2 w-full" />
                     <Link
                       to="/user/mypage"
                       onClick={() => setIsProfileOpen(false)}
-                      className="flex items-center gap-2 px-5 py-3 text-[15px] font-medium text-gray-700 hover:bg-gray-50 hover:text-[#0F9B73] transition-colors"
+                      className={`flex items-center gap-2.5 rounded-xl px-3.5 py-3 text-[15px] font-bold no-underline transition-all duration-200 active:scale-[0.98] ${
+                        pathname.startsWith('/user/mypage')
+                          ? 'text-[#0F9B73]'
+                          : 'text-gray-700 hover:bg-gray-50 hover:text-[#0F9B73]'
+                      }`}
                     >
-                      👤 마이페이지
+                      <UserRound className="h-5 w-5 shrink-0" aria-hidden="true" />
+                      마이페이지
                     </Link>
                     <Link
                       to="/customersupport/notice"
                       onClick={() => setIsProfileOpen(false)}
-                      className="flex items-center gap-2 px-5 py-3 text-[15px] font-medium text-gray-700 hover:bg-gray-50 hover:text-[#0F9B73] transition-colors"
+                      className={`flex items-center gap-2.5 rounded-xl px-3.5 py-3 text-[15px] font-bold no-underline transition-all duration-200 active:scale-[0.98] ${
+                        pathname.startsWith('/customersupport/notice')
+                          ? 'text-[#0F9B73]'
+                          : 'text-gray-700 hover:bg-gray-50 hover:text-[#0F9B73]'
+                      }`}
                     >
-                      📢 공지사항
+                      <Megaphone className="h-5 w-5 shrink-0" aria-hidden="true" />
+                      공지사항
                     </Link>
                   </div>
                 )}
@@ -178,17 +214,30 @@ const Header = () => {
               </button>
             </div>
           ) : (
-            <Link to="/login" className={authButtonClass}>
-              <span className={authButtonTextClass}>Login</span>
-              <LogIn className={`${authButtonIconClass} rotate-180 group-hover:-translate-x-0.5`} aria-hidden="true" />
-            </Link>
+            <div className="hidden md:block">
+              <Link to="/login" className={authButtonClass}>
+                <span className={authButtonTextClass}>Login</span>
+                <LogIn className={`${authButtonIconClass} rotate-180 group-hover:-translate-x-0.5`} aria-hidden="true" />
+              </Link>
+            </div>
           )}
 
           <button
-            className="block md:hidden w-9 h-9 flex items-center justify-center fs-up-3 text-gray-800 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition"
+            type="button"
+            className="group relative flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:bg-gray-50 active:scale-[0.96] md:hidden"
             onClick={toggleMenu}
+            aria-label={isMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+            aria-expanded={isMenuOpen}
           >
-            {isMenuOpen ? '✖' : '☰'}
+            <span className={`absolute h-0.5 w-5 rounded-full bg-gray-800 transition-all duration-300 ease-out ${
+              isMenuOpen ? 'translate-y-0 rotate-45' : '-translate-y-1.5 rotate-0'
+            }`} />
+            <span className={`absolute h-0.5 w-5 rounded-full bg-gray-800 transition-all duration-200 ease-out ${
+              isMenuOpen ? 'scale-x-0 opacity-0' : 'scale-x-100 opacity-100'
+            }`} />
+            <span className={`absolute h-0.5 w-5 rounded-full bg-gray-800 transition-all duration-300 ease-out ${
+              isMenuOpen ? 'translate-y-0 -rotate-45' : 'translate-y-1.5 rotate-0'
+            }`} />
           </button>
         </div>
       </div>
@@ -224,54 +273,186 @@ const Header = () => {
 
       {/* 모바일 드롭다운 메뉴 */}
       {isMenuOpen && (
-        <nav className="absolute top-full left-0 w-full bg-white shadow-lg border-t border-gray-100 flex flex-col md:hidden z-[998]">
-          {navItems.map((item) => {
-            const isActive = isActiveNavItem(item);
-            return (
-              <React.Fragment key={item.name}>
-                <Link
-                  to={item.path}
-                  onClick={closeMenu}
-                  className={`text-[16px] py-[15px] px-5 border-b border-gray-50 hover:bg-gray-50 no-underline font-bold ${
-                    isActive ? 'text-[#0F9B73]' : 'text-gray-800'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-                {item.subMenu && item.subMenu.map(sub => (
+        <nav className="absolute left-0 top-full z-[998] w-full border-t border-gray-100 bg-white px-4 py-5 shadow-[0_18px_42px_rgba(15,23,42,0.10)] animate-slidedown md:hidden">
+          <div className="mx-auto flex max-h-[calc(100vh-96px)] w-full max-w-md flex-col overflow-y-auto">
+            <div className="mb-4 grid gap-3 border-b border-gray-100 pb-4">
+              {user ? (
+                <div className="grid grid-cols-2 gap-3">
                   <Link
-                    key={sub.name}
-                    to={sub.path}
+                    to="/user/mypage"
                     onClick={closeMenu}
-                    className={`text-[14px] py-[10px] px-8 border-b border-gray-50 hover:bg-gray-50 no-underline ${
-                      pathname.startsWith(sub.path) ? 'text-[#0F9B73] font-semibold' : 'text-gray-500'
+                    className={`flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border px-3 text-[15px] font-bold no-underline transition-all duration-200 active:scale-[0.98] ${
+                      pathname.startsWith('/user/mypage')
+                        ? 'border-[#0F9B73]/40 bg-white text-[#0F9B73]'
+                        : 'border-gray-200 bg-white text-gray-800 hover:-translate-y-0.5 hover:border-gray-300 hover:text-[#0F9B73] hover:shadow-sm'
                     }`}
                   >
-                    - {sub.name}
+                    <UserRound className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    마이페이지
                   </Link>
-                ))}
-              </React.Fragment>
-            );
-          })}
-          {/* 모바일에서 마이페이지/공지사항 */}
-          {user && (
-            <>
-              <Link
-                to="/user/mypage"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      closeMenu();
+                    }}
+                    className="flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 text-[15px] font-bold text-gray-800 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:text-[#0F9B73] hover:shadow-sm active:scale-[0.98]"
+                  >
+                    <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    로그아웃
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={closeMenu}
+                  className="flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 text-[15px] font-bold text-gray-800 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:text-[#0F9B73] hover:shadow-sm active:scale-[0.98]"
+                >
+                  <LogIn className="h-5 w-5 shrink-0 rotate-180" aria-hidden="true" />
+                  로그인
+                </Link>
+              )}
+            </div>
+
+            {navItems.map((item) => {
+              const isActive = isActiveNavItem(item);
+              const hasSubMenu = item.subMenu && item.subMenu.length > 0;
+              const isOpen = hasSubMenu && isMobileSectionOpen(item);
+              const itemClassName = `relative flex min-h-[56px] w-full items-center justify-between rounded-2xl px-4 py-4 text-left text-[16px] font-bold no-underline transition-all duration-200 active:scale-[0.98] ${
+                isActive
+                  ? 'bg-white text-[#0F9B73]'
+                  : 'text-gray-800 hover:-translate-y-0.5 hover:bg-gray-50 hover:text-gray-950'
+              }`;
+
+              return (
+                <div key={item.name} className="border-b border-gray-100">
+                  {hasSubMenu ? (
+                    <button
+                      type="button"
+                      onClick={() => toggleMobileSection(item.name)}
+                      className={itemClassName}
+                      aria-expanded={isOpen}
+                    >
+                      {isActive && (
+                        <span className="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-[#0F9B73]" />
+                      )}
+                      <span className="pl-1">{item.name}</span>
+                      <ChevronDown
+                        className={`h-4 w-4 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#0F9B73]' : 'text-gray-400'}`}
+                        aria-hidden="true"
+                      />
+                    </button>
+                  ) : (
+                    <Link
+                      to={item.path}
+                      onClick={closeMenu}
+                      className={itemClassName}
+                    >
+                      {isActive && (
+                        <span className="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-[#0F9B73]" />
+                      )}
+                      <span className="pl-1">{item.name}</span>
+                      <span
+                        className={`h-2 w-2 rounded-full transition-all duration-200 ${
+                          isActive ? 'scale-100 bg-[#0F9B73]' : 'scale-0 bg-transparent'
+                        }`}
+                      />
+                    </Link>
+                  )}
+
+                  {hasSubMenu && isOpen && (
+                    <div className="ml-4 border-l border-gray-200 pb-3 pl-3">
+                      {item.subMenu.map(sub => {
+                        const isSubActive = pathname.startsWith(sub.path);
+                        return (
+                          <Link
+                            key={sub.name}
+                            to={sub.path}
+                            onClick={closeMenu}
+                            className={`flex min-h-[44px] items-center rounded-xl px-3 text-[14px] font-semibold no-underline transition-all duration-200 active:scale-[0.98] ${
+                              isSubActive
+                                ? 'text-[#0F9B73]'
+                                : 'text-gray-500 hover:-translate-y-0.5 hover:bg-gray-50 hover:text-gray-800'
+                            }`}
+                          >
+                            {sub.name}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {(() => {
+              const isActive = isActiveNavItem(customerSupportItem);
+              const isOpen = isMobileSectionOpen(customerSupportItem);
+
+              return (
+                <div className="border-b border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => toggleMobileSection(customerSupportItem.name)}
+                    className={`relative flex min-h-[56px] w-full items-center justify-between rounded-2xl px-4 py-4 text-left text-[16px] font-bold no-underline transition-all duration-200 active:scale-[0.98] ${
+                      isActive
+                        ? 'bg-white text-[#0F9B73]'
+                        : 'text-gray-800 hover:-translate-y-0.5 hover:bg-gray-50 hover:text-gray-950'
+                    }`}
+                    aria-expanded={isOpen}
+                  >
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-[#0F9B73]" />
+                    )}
+                    <span className="pl-1">{customerSupportItem.name}</span>
+                    <ChevronDown
+                      className={`h-4 w-4 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#0F9B73]' : 'text-gray-400'}`}
+                      aria-hidden="true"
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div className="ml-4 border-l border-gray-200 pb-3 pl-3">
+                      {customerSupportItem.subMenu.map(sub => {
+                        const isSubActive = pathname.startsWith(sub.path);
+                        return (
+                          <Link
+                            key={sub.name}
+                            to={sub.path}
+                            onClick={closeMenu}
+                            className={`flex min-h-[44px] items-center gap-2 rounded-xl px-3 text-[14px] font-semibold no-underline transition-all duration-200 active:scale-[0.98] ${
+                              isSubActive
+                                ? 'text-[#0F9B73]'
+                                : 'text-gray-500 hover:-translate-y-0.5 hover:bg-gray-50 hover:text-gray-800'
+                            }`}
+                          >
+                            {sub.path.includes('notice') ? (
+                              <Megaphone className="h-4 w-4 shrink-0" aria-hidden="true" />
+                            ) : (
+                              <CircleHelp className="h-4 w-4 shrink-0" aria-hidden="true" />
+                            )}
+                            {sub.name}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            <div className="mt-4 flex justify-center border-t border-gray-100 pt-3">
+              <button
+                type="button"
                 onClick={closeMenu}
-                className="text-[16px] py-[15px] px-5 border-b border-gray-50 hover:bg-gray-50 no-underline font-bold text-gray-800"
+                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-white px-4 text-sm font-bold text-gray-500 transition-all duration-200 hover:-translate-y-px hover:bg-gray-50 hover:text-[#0F9B73] active:scale-[0.98]"
+                aria-label="모바일 메뉴 접기"
               >
-                👤 마이페이지
-              </Link>
-              <Link
-                to="/customersupport/notice"
-                onClick={closeMenu}
-                className="text-[16px] py-[15px] px-5 border-b border-gray-50 hover:bg-gray-50 no-underline font-bold text-gray-800"
-              >
-                📢 공지사항
-              </Link>
-            </>
-          )}
+                <ChevronUp className="h-4 w-4" aria-hidden="true" />
+                접기
+              </button>
+            </div>
+          </div>
         </nav>
       )}
     </header>

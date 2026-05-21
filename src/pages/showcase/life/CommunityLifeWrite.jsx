@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import api from "@api/axios";
 import { useAuth } from "@hooks/useAuth";
 
@@ -11,15 +11,27 @@ import WriteForm from "@components/modules/community/write/WriteForm";
 import SchedulePickerModal from "@components/modules/community/life/SchedulePickerModal";
 import CourseSection from "@components/modules/community/life/CourseSection";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const CommunityLifeWrite = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
   const isEditMode = !!id;
   const { user } = useAuth();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  // 화면 미리보기용 이미지
   const [imagePreviews, setImagePreviews] = useState([]);
+
+  // 새로 선택한 실제 파일
+  const [imageFiles, setImageFiles] = useState([]);
+
+  // 수정 모드에서 기존 서버 이미지 경로
+  const [existingImageUrls, setExistingImageUrls] = useState([]);
+
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState(null);
@@ -33,8 +45,17 @@ const CommunityLifeWrite = () => {
 
   const getImageUrl = (url) => {
     if (!url) return "";
+    if (url.startsWith("blob:")) return url;
     if (url.startsWith("http")) return url;
-    return `http://localhost:8080${url}`;
+    return `${BASE_URL}${url}`;
+  };
+
+  const getServerPath = (url) => {
+    if (!url) return "";
+    if (url.startsWith(BASE_URL)) {
+      return url.replace(BASE_URL, "");
+    }
+    return url;
   };
 
   useEffect(() => {
@@ -77,18 +98,25 @@ const CommunityLifeWrite = () => {
         const res = await api.get(`/community/${id}`);
         const item = res.data;
 
+        let serverImages = [];
+
         if (item.images?.length > 0) {
-          setImagePreviews(item.images.map(getImageUrl));
+          serverImages = item.images.map((img) =>
+            typeof img === "string" ? img : img.filePath
+          );
         } else if (item.commMainImgUrl) {
-          setImagePreviews([getImageUrl(item.commMainImgUrl)]);
+          serverImages = [item.commMainImgUrl];
         }
+
+        setExistingImageUrls(serverImages);
+        setImagePreviews(serverImages.map(getImageUrl));
 
         setTitle(item.commTitle || "");
         setContent(item.commContent || "");
         setTags(item.hashtagText ? item.hashtagText.split(",") : []);
-        setSelectedSchedule({ aisNo: item.commAisNo });
 
         if (item.commAisNo) {
+          setSelectedSchedule({ aisNo: item.commAisNo });
           setImportedSchedule({ aisNo: item.commAisNo });
 
           const placeRes = await api.get(
@@ -128,52 +156,43 @@ const CommunityLifeWrite = () => {
     fetchEditPost();
   }, [isEditMode, id]);
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
 
     if (!files.length) return;
 
-    try {
-      const uploadedUrls = [];
+    const previews = files.map((file) => URL.createObjectURL(file));
 
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
+    setImageFiles((prev) => [...prev, ...files]);
+    setImagePreviews((prev) => [...prev, ...previews]);
 
-        const res = await api.post("/community/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        uploadedUrls.push(`http://localhost:8080${res.data}`);
-      }
-
-      setImagePreviews((prev) => [...prev, ...uploadedUrls]);
-    } catch (error) {
-      console.error("이미지 업로드 실패:", error);
-      alert("이미지 업로드에 실패했습니다.");
-    } finally {
-      e.target.value = "";
-    }
+    e.target.value = "";
   };
 
-  const handleRemoveImage = async (removeIndex) => {
-    const imageUrl = imagePreviews[removeIndex];
+  const handleRemoveImage = (removeIndex) => {
+    const removePreview = imagePreviews[removeIndex];
 
-    try {
-      await api.delete("/community/image", {
-        params: {
-          imageUrl: imageUrl.replace("http://localhost:8080", ""),
-        },
-      });
+    setImagePreviews((prev) =>
+      prev.filter((_, index) => index !== removeIndex)
+    );
 
-      setImagePreviews((prev) =>
-        prev.filter((_, index) => index !== removeIndex)
+    if (removePreview.startsWith(BASE_URL)) {
+      const serverPath = getServerPath(removePreview);
+
+      setExistingImageUrls((prev) =>
+        prev.filter((url) => url !== serverPath)
       );
-    } catch (error) {
-      console.error("이미지 삭제 실패:", error);
-      alert("이미지 삭제에 실패했습니다.");
+
+      return;
+    }
+
+    const existingCount = existingImageUrls.length;
+    const fileIndex = removeIndex - existingCount;
+
+    if (fileIndex >= 0) {
+      setImageFiles((prev) =>
+        prev.filter((_, index) => index !== fileIndex)
+      );
     }
   };
 
@@ -222,6 +241,22 @@ const CommunityLifeWrite = () => {
     }
   };
 
+  // 리스트에서 코스 공유하기를 통해 넘어온 일정 자동 반영
+  useEffect(() => {
+    if (isEditMode) return;
+
+    const selectedPlaces = location.state?.selectedPlaces;
+    const selectedSchedule = location.state?.selectedSchedule;
+
+    if (!selectedPlaces || !selectedSchedule) return;
+
+    handleSelectPlaces(selectedPlaces, selectedSchedule);
+
+    if (selectedSchedule?.aisSchdulName) {
+      setTitle(selectedSchedule.aisSchdulName);
+    }
+  }, [location.state, isEditMode]);
+
   const removeCourseItem = (idx) => {
     setCourse((prev) =>
       prev
@@ -236,7 +271,6 @@ const CommunityLifeWrite = () => {
     );
   };
 
-  // 해시태그 공백, # 제거
   const normalizeTag = (tag) =>
     tag
       .trim()
@@ -259,17 +293,30 @@ const CommunityLifeWrite = () => {
     }
   };
 
+  const createFormData = (payload) => {
+    const formData = new FormData();
+
+    formData.append(
+      "community",
+      new Blob([JSON.stringify(payload)], {
+        type: "application/json",
+      })
+    );
+
+    imageFiles.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    return formData;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const trimmedTag = normalizeTag(tagInput);
 
     const finalTags = Array.from(
-      new Set(
-        [...tags, trimmedTag]
-          .map(normalizeTag)
-          .filter(Boolean)
-      )
+      new Set([...tags, trimmedTag].map(normalizeTag).filter(Boolean))
     );
 
     if (!selectedRegion?.rgnCd && !selectedRegion?.rgnName) {
@@ -292,94 +339,50 @@ const CommunityLifeWrite = () => {
       return;
     }
 
-    if (!finalTags.length) {
-      alert("해시태그를 입력해주세요.");
-      return;
-    }
+    const payload = {
+      commTitle: title,
+      commContent: content,
+      commCatCd: "CMM001",
+      commAisNo: selectedSchedule?.aisNo,
+      commPlcNo: null,
+      commMbrId: user.mbrId,
+      hashtags: finalTags,
 
-    if (isEditMode) {
-      const payload = {
-        commTitle: title,
-        commContent: content,
-        commCatCd: "CMM001",
-        commAisNo: selectedSchedule?.aisNo,
-        commPlcNo: null,
+      existingImageUrls,
+      commMainImgUrl: existingImageUrls[0] || "",
+    };
 
-        commMainImgUrl: imagePreviews[0]
-          ? imagePreviews[0].replace("http://localhost:8080", "")
-          : "",
+    const formData = createFormData(payload);
 
-        commMbrId: user.mbrId,
-        hashtags: finalTags,
-
-        files: imagePreviews.map((url) => {
-          const path = url.replace("http://localhost:8080", "");
-          const saveName = path.split("/").pop();
-
-          return {
-            fileOrgNm: saveName,
-            fileSaveNm: saveName,
-            filePath: path,
-            fileExt: saveName.split(".").pop(),
-            fileSize: 0,
-            fileMimeType: "image/png",
-            fileType: "IMAGE",
-          };
-        }),
-      };
-
-      try {
-        await api.put(`/community/${id}`, payload);
+    try {
+      if (isEditMode) {
+        await api.put(`/community/${id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
         alert("글이 수정되었습니다!");
         navigate(`/showcase/life/view/${id}`);
-      } catch (err) {
-        console.error("인생거리 수정 실패:", err);
-        alert("글 수정에 실패했습니다.");
+        return;
       }
 
-      return;
-    }
-
-    try {
-      const payload = {
-        commTitle: title,
-        commContent: content,
-        commCatCd: "CMM001",
-        commAisNo: selectedSchedule?.aisNo,
-        commPlcNo: null,
-
-        commMainImgUrl: imagePreviews[0]
-          ? imagePreviews[0].replace("http://localhost:8080", "")
-          : "",
-
-        commMbrId: user.mbrId,
-        hashtags: finalTags,
-
-        files: imagePreviews.map((url) => {
-          const path = url.replace("http://localhost:8080", "");
-          const saveName = path.split("/").pop();
-
-          return {
-            fileOrgNm: saveName,
-            fileSaveNm: saveName,
-            filePath: path,
-            fileExt: saveName.split(".").pop(),
-            fileSize: 0,
-            fileMimeType: "image/png",
-            fileType: "IMAGE",
-          };
-        }),
-      };
-
-      await api.post("/community", payload);
+      await api.post("/community", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       alert("글이 등록되었습니다!");
       navigate("/showcase/life");
     } catch (err) {
-      console.error("인생거리 등록 실패:", err);
-      alert("글 등록에 실패했습니다.");
-    }}
+      console.error(
+        isEditMode ? "인생거리 수정 실패:" : "인생거리 등록 실패:",
+        err
+      );
+      alert(isEditMode ? "글 수정에 실패했습니다." : "글 등록에 실패했습니다.");
+    }
+  };
 
   return (
     <>
@@ -444,7 +447,7 @@ const CommunityLifeWrite = () => {
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              rows="15"
+              rows="10"
               placeholder="여행의 이야기를 자유롭게 적어주세요."
               className="w-full px-4 py-4 outline-none resize-none text-gray-700 leading-relaxed"
             />

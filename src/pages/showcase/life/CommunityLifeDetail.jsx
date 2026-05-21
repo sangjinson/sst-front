@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
-import Breadcrumb from "@components/common/Breadcrumb";
+import CommunityDetailHeader from "@components/modules/community/common/CommunityDetailHeader";
 import Swal from "sweetalert2";
 import CommentSection from "@components/modules/community/common/CommentSection";
 import LifeCourseView from "@components/modules/community/life/LifeCourseView";
@@ -11,6 +11,9 @@ import LifePostHeader from "@components/modules/community/life/LifePostHeader";
 import { openReportModal } from "@components/modules/community/common/reportModal";
 import IconSVG from "@components/Icon/IconSVG";
 import ImageSlider from "@components/modules/community/common/ImageSlider";
+import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
+
+ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const CommunityLifeDetail = () => {
   const { id } = useParams();
@@ -25,6 +28,7 @@ const CommunityLifeDetail = () => {
   const [editText, setEditText] = useState("");
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -73,11 +77,19 @@ const CommunityLifeDetail = () => {
           }));
         }
 
+        const getRegionBannerImage = (regionName) => {
+          if (!regionName || regionName === "장소 정보 없음") {
+            return "/images/community/default-life.jpg";
+          }
+
+          return `/banners/${regionName}.webp`;
+        };
+
         const imageUrl = item.commMainImgUrl
           ? item.commMainImgUrl.startsWith("http")
             ? item.commMainImgUrl
             : `http://localhost:8080${item.commMainImgUrl}`
-          : "/images/community/default-life.jpg";
+          : getRegionBannerImage(item.rgnName || item.plcName);
 
         const mappedPost = {
           id: item.commNo,
@@ -86,6 +98,9 @@ const CommunityLifeDetail = () => {
           title: item.commTitle,
           description: item.commContent,
           author: item.mbrNickname,
+          theme1Name: item.theme1Name,
+          theme2Name: item.theme2Name,
+          theme3Name: item.theme3Name,
           region: item.rgnName || item.plcName || "장소 정보 없음",
           hashtags: item.hashtagText ? item.hashtagText.split(",") : [],
           thumbnail: imageUrl,
@@ -178,9 +193,8 @@ const CommunityLifeDetail = () => {
   const normalizeImageUrl = (url) => {
     if (!url) return null;
     if (url.startsWith("http")) return url;
-    if (url.startsWith("/uploads")) return `http://localhost:8080${url}`;
-    if (url.startsWith("uploads")) return `http://localhost:8080/${url}`;
-    return `http://localhost:8080/uploads/${url}`;
+    if (url.startsWith("/")) return `${BASE_URL}${url}`;
+    return `${BASE_URL}/${url}`;
   };
 
   const slideImages =
@@ -273,10 +287,6 @@ const CommunityLifeDetail = () => {
   };
 
   const handleCommentSubmit = () => {
-    if (!currentUserId) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
       return;
@@ -349,7 +359,7 @@ const CommunityLifeDetail = () => {
 
   const handleLikeClick = async () => {
     if (!currentUserId) {
-      alert("로그인이 필요합니다.");
+      setShowLoginModal(true);
       return;
     }
     try {
@@ -377,31 +387,17 @@ const CommunityLifeDetail = () => {
 
   return (
     <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 font-sans">
-      <Breadcrumb
-        paths={[
+      <CommunityDetailHeader
+        breadcrumb={[
           { label: "홈", to: "/" },
           { label: "인생거리", to: "/showcase/life" },
           { label: "상세보기" },
         ]}
-        className="mb-4"
+        label="Life Course Detail"
+        title="인생거리"
+        description="여행자들이 남긴 인생샷 장소와 순간을 모아봤어요."
+        onBack={() => navigate("/showcase/life")}
       />
-
-      <section className="mb-8 mt-6 flex flex-col gap-4 border-b border-gray-200 pb-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-sm font-bold text-[#0F9B73] pt-2">Life Course Detail</p>
-          <h2 className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">인생거리</h2>
-          <p className="mt-2 text-sm md:text-base text-gray-500">
-            여행자들이 남긴 인생샷 장소와 순간을 모아봤어요.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate("/showcase/life")}
-          className="w-fit rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-600 transition-all hover:-translate-y-0.5 hover:border-[#0F9B73] hover:text-[#0F9B73] hover:shadow-sm active:scale-95"
-        >
-          목록으로
-        </button>
-      </section>
 
       <section className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
@@ -487,10 +483,20 @@ const CommunityLifeDetail = () => {
               cmntNo: comment.cmntNo ?? comment.id,
             })
           }
+          openLoginModal={() => setShowLoginModal(true)}
           currentUserId={currentUserId}
           postAuthor={post.author}
         />
       </div>
+      {showLoginModal && (
+        <LoginRequiredModal
+          onClose={() => setShowLoginModal(false)}
+          onLogin={() => {
+            setShowLoginModal(false);
+            navigate("/login");
+          }}
+        />
+      )}
     </div>
   );
 };

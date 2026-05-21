@@ -58,9 +58,15 @@ const AppHeader = () => {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
           </button>
 
-          <Link to="/" className="lg:hidden">
-            <img className="dark:hidden" src="./images/logo/logo.svg" alt="Logo" />
-            <img className="hidden dark:block" src="./images/logo/logo-dark.svg" alt="Logo" />
+          <Link to="/admin" className="flex items-center gap-2 no-underline lg:hidden">
+            <img
+              src="/admin-logo.png"
+              alt="거리에섯 관리자 로고"
+              className="h-12 w-12 shrink-0 rounded-2xl object-cover"
+            />
+            <span className="text-2xl font-extrabold tracking-[-0.02em] text-gray-900 dark:text-white">
+              거리에섯
+            </span>
           </Link>
 
           {/* 모바일용 메뉴 버튼 (우측 상단 점 3개 메뉴 등) */}

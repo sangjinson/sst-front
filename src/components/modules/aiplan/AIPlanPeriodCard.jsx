@@ -38,15 +38,15 @@ const AIPlanPeriodCard = ({
     <div>
       <div className="mb-9 text-center md:mb-11">
         <div className="mb-3 flex items-center justify-center gap-2.5">
-          <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-[#0F9B73]" strokeWidth="2">
+          <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-[#0F9B73] md:h-8 md:w-8" strokeWidth="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
             <line x1="16" y1="2" x2="16" y2="6"/>
             <line x1="8" y1="2" x2="8" y2="6"/>
             <line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
-          <h2 className="text-2xl font-black text-gray-900 md:text-3xl">여행 기간을 선택해주세요</h2>
+          <h2 className="text-2xl font-black text-gray-900 md:text-[2rem]">여행 기간을 선택해주세요</h2>
         </div>
-        <p className="text-base font-semibold text-gray-400">원하는 여행 일정 유형을 고르거나 직접 입력하세요</p>
+        <p className="text-base font-semibold leading-relaxed text-gray-400 md:text-lg">원하는 여행 일정 유형을 고르거나 직접 입력하세요</p>
       </div>
 
       {/* 기간 카드 */}
@@ -55,21 +55,21 @@ const AIPlanPeriodCard = ({
           <button
             key={opt.value}
             onClick={() => onPeriodSelect(opt)}
-            className={`min-h-[96px] rounded-2xl border p-5 text-left transition-all duration-200 active:scale-[0.98] ${
+            className={`min-h-[96px] rounded-2xl border p-5 text-left md:min-h-[112px] md:p-6 transition-all duration-200 active:scale-[0.98] ${
               selectedPeriod === opt.value
                 ? 'border-gray-200 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.08)] ring-1 ring-[#0F9B73]/20'
                 : 'border-gray-200 bg-gray-50 hover:-translate-y-0.5 hover:border-[#0F9B73]/30 hover:bg-white hover:shadow-sm'
             }`}
           >
-            <p className={`mb-1 text-lg font-bold transition-colors duration-200 ${selectedPeriod === opt.value ? 'text-[#0F9B73]' : 'text-gray-900'}`}>{opt.label}</p>
-            <p className="text-sm font-medium text-gray-400">{opt.desc}</p>
+            <p className={`mb-1 text-lg font-bold tracking-[0.04em] md:text-xl transition-colors duration-200 ${selectedPeriod === opt.value ? 'text-[#0F9B73]' : 'text-gray-900'}`}>{opt.label}</p>
+            <p className="text-sm font-medium leading-relaxed text-gray-400 tracking-[0.02em] md:text-base">{opt.desc}</p>
           </button>
         ))}
       </div>
 
       {/* 날짜 선택 - 시작일/종료일 각각 분리 */}
       <div className="border-t border-gray-100 pt-7">
-        <p className="mb-4 text-base font-bold text-gray-800">
+        <p className="mb-4 text-base font-bold text-gray-800 tracking-[0.03em] md:text-lg">
           날짜를 선택해주세요
           {selectedPeriod && (
             <span className="ml-2 text-xs text-[#0F9B73] font-normal">
@@ -84,11 +84,11 @@ const AIPlanPeriodCard = ({
           <div className="relative flex-1">
             <div
               onClick={() => { setShowStartCal(prev => !prev); setShowEndCal(false); }}
-              className={`cursor-pointer rounded-2xl border bg-gray-50 px-5 py-4 text-base font-semibold text-gray-700 transition-all duration-200 hover:border-[#0F9B73]/70 ${
+              className={`cursor-pointer rounded-2xl border bg-gray-50 px-5 py-4 text-base font-semibold text-gray-700 tracking-[0.03em] md:px-6 md:py-5 md:text-lg transition-all duration-200 hover:border-[#0F9B73]/70 ${
                 showStartCal ? 'border-[#0F9B73]/70 bg-white shadow-sm' : 'border-gray-200'
               }`}
             >
-              <span className="mb-1 block text-sm font-semibold text-gray-400">시작일</span>
+              <span className="mb-1 block text-sm font-semibold text-gray-400 tracking-[0.02em] md:text-base">시작일</span>
               {startDate || '날짜 선택'}
             </div>
             {showStartCal && (
@@ -110,11 +110,11 @@ const AIPlanPeriodCard = ({
           <div className="relative flex-1">
             <div
               onClick={() => { setShowEndCal(prev => !prev); setShowStartCal(false); }}
-              className={`cursor-pointer rounded-2xl border bg-gray-50 px-5 py-4 text-base font-semibold text-gray-700 transition-all duration-200 hover:border-[#0F9B73]/70 ${
+              className={`cursor-pointer rounded-2xl border bg-gray-50 px-5 py-4 text-base font-semibold text-gray-700 tracking-[0.03em] md:px-6 md:py-5 md:text-lg transition-all duration-200 hover:border-[#0F9B73]/70 ${
                 showEndCal ? 'border-[#0F9B73]/70 bg-white shadow-sm' : 'border-gray-200'
               }`}
             >
-              <span className="mb-1 block text-sm font-semibold text-gray-400">종료일</span>
+              <span className="mb-1 block text-sm font-semibold text-gray-400 tracking-[0.02em] md:text-base">종료일</span>
               {endDate || '날짜 선택'}
             </div>
             {showEndCal && (
