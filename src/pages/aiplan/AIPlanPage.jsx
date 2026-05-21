@@ -10,6 +10,9 @@ import {
 import { useAIPlan } from '@pages/aiplan/AIPlanContext';
 import '@assets/css/common.css';
 
+import AOS from "aos";
+import "aos/dist/aos.css";
+
 // ────────────────────────────────────────────
 // 선택 요약 배너
 // ────────────────────────────────────────────
@@ -63,11 +66,11 @@ const AIPlanPage = () => {
   } = useAIPlan();
 
   useEffect(() => {
-    resetPlan();
-  }, []);
 
-  useEffect(() => {
+    resetPlan();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    AOS.init();
+
   }, []);
 
   const toggleTheme = (theme) => {
@@ -118,7 +121,7 @@ const AIPlanPage = () => {
           selectedThemes={selectedThemes}
         />
 
-        <div className="min-h-[500px] rounded-3xl border border-gray-100 bg-white px-6 py-12 shadow-sm md:px-12 md:py-16">
+        <div className="min-h-[500px] rounded-3xl border border-gray-100 bg-white px-6 py-12 shadow-sm md:px-12 md:py-16" data-aos="flip-down" data-aos-once="true">
 
           {/* STEP 0: 지역 선택 */}
           {step === 0 && (

@@ -1,7 +1,11 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import AOS from "aos";
+import "aos/dist/aos.css";
+
 const HeroBanner = ({ bgImage, title, subtitle, className = '', to }) => {
+  useEffect(() => { AOS.init(); }, []);
   const navigate = useNavigate();
 
   return (
@@ -18,11 +22,11 @@ const HeroBanner = ({ bgImage, title, subtitle, className = '', to }) => {
       )}
 
       <div className="relative z-20 text-center text-white drop-shadow-md">
-        <h1 className="fs-up-10 md:text-[80px] mb-[15px] font-black">
+        <h1 className="fs-up-10 md:text-[80px] mb-[15px] font-black" data-aos="fade">
           {title}
         </h1>
         {subtitle && (
-          <p className="text-[18px] md:text-[24px] font-medium tracking-[2px]">
+          <p className="text-[18px] md:text-[24px] font-medium tracking-[2px]" data-aos="fade-up" data-aos-once="true">
             {subtitle}
           </p>
         )}
