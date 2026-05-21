@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom"; // react-router 대신 보통 react-router-dom을 사용합니다.
-import { useSidebar } from "../context/SidebarContext";
-import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
-import NotificationDropdown from "../components/header/NotificationDropdown";
-import UserDropdown from "../components/header/UserDropdown";
+import { useSidebar } from "@themeadmin/context/SidebarContext";
+import { ThemeToggleButton } from "@themeadmin/components/common/ThemeToggleButton";
+import NotificationDropdown from "@themeadmin/components/header/NotificationDropdown";
+import UserDropdown from "@themeadmin/components/header/UserDropdown";
 
 const AppHeader = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);

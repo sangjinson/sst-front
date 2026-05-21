@@ -3,9 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "@api/axios";
 
 import { usePagination } from "@hooks/usePagination";
-import AdminPagination from "@components/common/AdminPagination";
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "@themeadmin/components/ui/table";
-import Badge from "@themeadmin/components/ui/badge/Badge";
+import AdminPagination from "@components/admin/AdminPagination";
+
 import { PlusIcon, PencilIcon, TrashBinIcon } from "@themeadmin/icons";
 
 export default function AdminPlaceList() {
@@ -107,46 +106,49 @@ export default function AdminPlaceList() {
   
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">
-            {currentConfig.title} 관리
-          </h2>
-          <p className="text-sm text-gray-500">
-            전체 {currentConfig.title} 수: <span className="font-bold text-blue-600">{totalCount}</span>개
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            {/* 🚀 dark:text-gray-100으로 통일성 부여 */}
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+              {currentConfig.title} 관리
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              전체 {currentConfig.title} 수: <span className="font-bold text-[#0F9B73]">{totalCount}</span>개
+            </p>
+          </div>
+          
+          {/* 🚀 bg-blue-600 -> bg-[#0F9B73] (청록색)으로 통일 */}
+          <button 
+            onClick={() => navigate(`/admin/area/${type}/create`)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#0F9B73] text-white text-sm font-medium rounded-lg hover:bg-[#0c8261] shadow-sm"
+          >
+            <PlusIcon className="w-5 h-5 text-white shadow-sm" /> {currentConfig.title} 추가
+          </button>
         </div>
-        <button 
-          onClick={() => navigate(`/admin/area/${type}/create`)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition shadow-sm"
-        >
-          <PlusIcon className="w-5 h-5 text-white shadow-sm" /> {currentConfig.title} 추가
-        </button>
-      </div>
 
-      {/* 🚀 5. 정상 목록 / 휴지통 탭 UI 추가 */}
-      <div className="flex gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
-        <button
-          onClick={() => { setUseYnFilter('Y'); setPage(1); }}
-          className={`px-4 py-2 text-sm font-bold rounded-t-lg transition-colors ${
-            useYnFilter === 'Y' 
-              ? 'bg-blue-600 text-white' 
-              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-          }`}
-        >
-          운영 중인 장소
-        </button>
-        <button
-          onClick={() => { setUseYnFilter('N'); setPage(1); }}
-          className={`px-4 py-2 text-sm font-bold rounded-t-lg transition-colors ${
-            useYnFilter === 'N' 
-              ? 'bg-red-500 text-white' 
-              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-          }`}
-        >
-          휴지통 🗑️
-        </button>
-      </div>
+        {/* 🚀 탭 UI 색상 테마 수정 (청록색 계열로 통일) */}
+        <div className="flex gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
+          <button
+            onClick={() => { setUseYnFilter('Y'); setPage(1); }}
+            className={`px-4 py-2 text-sm font-bold rounded-t-lg ${
+              useYnFilter === 'Y' 
+                ? 'bg-[#0F9B73] text-white' 
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            운영 중인 장소
+          </button>
+          <button
+            onClick={() => { setUseYnFilter('N'); setPage(1); }}
+            className={`px-4 py-2 text-sm font-bold rounded-t-lg ${
+              useYnFilter === 'N' 
+                ? 'bg-red-600 text-white' 
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            휴지통 🗑️
+          </button>
+        </div>
 
       <div className="flex flex-col sm:flex-row gap-3 p-4 bg-white border border-gray-200 rounded-xl dark:bg-white/[0.03] dark:border-white/[0.05]">
         <input
@@ -158,65 +160,82 @@ export default function AdminPlaceList() {
           className="flex-1 h-10 px-3 border border-gray-300 rounded-lg text-sm text-gray-700 outline-none focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
         <div className="flex gap-2">
-          <button onClick={handleSearch} className="px-5 h-10 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition">조회</button>
-          <button onClick={handleResetSearch} className="px-5 h-10 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition">초기화</button>
+          <button 
+            onClick={handleSearch} 
+            className="px-5 h-10 bg-[#0F9B73] text-white text-sm font-semibold rounded-lg hover:bg-[#0c8261] shadow-sm"
+          >
+            조회
+          </button>
+          
+          <button 
+            onClick={handleResetSearch} 
+            className="px-5 h-10 bg-gray-900 border border-gray-700 text-gray-300 text-sm font-semibold rounded-lg hover:bg-gray-800 shadow-sm"
+          >
+            초기화
+          </button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
         <div className="max-w-full overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-gray-50/50 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/[0.05]">
-              <TableRow>
-                <TableCell isHeader className="px-5 py-3 text-center">
-                  <input type="checkbox" checked={allChecked} onChange={toggleAll} />
-                </TableCell>
-                <TableCell isHeader className="px-5 py-3 text-center">No</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-start">장소명</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-start">주소</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-center">상태</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-center">관리</TableCell>
-              </TableRow>
-            </TableHeader>
+          <table className="w-full text-sm text-left whitespace-nowrap">
+            <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-semibold">
+              <tr>
+                <th className="px-5 py-3 text-center">
+                  <input type="checkbox" checked={allChecked} onChange={toggleAll} className="cursor-pointer" />
+                </th>
+                <th className="px-5 py-3 text-center">No</th>
+                <th className="px-5 py-3 text-start">장소명</th>
+                <th className="px-5 py-3 text-start">주소</th>
+                <th className="px-5 py-3 text-center">상태</th>
+                <th className="px-5 py-3 text-center">관리</th>
+              </tr>
+            </thead>
 
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
               {places.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="px-5 py-10 text-center text-gray-500">
+                <tr>
+                  <td colSpan={6} className="px-5 py-10 text-center text-gray-500 dark:text-gray-400">
                     {useYnFilter === 'N' ? "휴지통이 비어 있습니다." : "검색 결과가 없습니다."}
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
+                // 🚀 { } 대신 ( ) 를 사용하여 JSX를 즉시 반환하도록 수정
                 places.map((p) => (
-                  <TableRow key={p.plcNo} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.01] transition-colors">
-                    <TableCell className="px-5 py-4 text-center">
-                      <input type="checkbox" checked={selected.includes(p.plcNo)} onChange={() => toggleOne(p.plcNo)} />
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-center text-gray-500">{p.plcNo}</TableCell>
-                    <TableCell className="px-5 py-4"><span className="block font-medium text-gray-800 dark:text-white/90">{p.plcName}</span></TableCell>
-                    <TableCell className="px-5 py-4">
-                      <span className="block text-sm text-gray-800 dark:text-white/90 truncate max-w-[200px]" title={p.plcAddr}>{p.plcAddr}</span>
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-center">
-                      <Badge color={useYnFilter === 'Y' ? "success" : "error"}>
+                  <tr key={p.plcNo} className="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <td className="px-5 py-4 text-center">
+                      <input type="checkbox" checked={selected.includes(p.plcNo)} onChange={() => toggleOne(p.plcNo)} className="cursor-pointer" />
+                    </td>
+                    <td className="px-5 py-4 text-center text-gray-500 dark:text-gray-400">{p.plcNo}</td>
+                    <td className="px-5 py-4">
+                      <span className="block font-medium text-gray-800 dark:text-gray-200">{p.plcName}</span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="block text-sm text-gray-800 dark:text-gray-300 truncate max-w-[200px]" title={p.plcAddr}>{p.plcAddr}</span>
+                    </td>
+                    <td className="px-5 py-4 text-center">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        useYnFilter === 'Y' 
+                        ? "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-400" 
+                        : "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400"
+                      }`}>
                         {useYnFilter === 'Y' ? "운영 중" : "삭제됨"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="px-5 py-4">
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
                       <div className="flex items-center justify-center gap-2">
-                        {/* 🚀 6. 정상 탭에서는 [수정], [삭제] 버튼 / 휴지통 탭에서는 [복구] 버튼 렌더링 */}
                         {useYnFilter === 'Y' ? (
                           <>
                             <button 
                               onClick={() => navigate(`/admin/area/${type}/${p.plcNo}`)}
-                              className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition" 
+                              className="p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 rounded-lg" 
                               title="수정"
                             >
                               <PencilIcon className="w-5 h-5" />
                             </button>
                             <button 
                               onClick={() => handleToggleStatus(p.plcNo, 'Y')}
-                              className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition" 
+                              className="p-2 text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900 rounded-lg" 
                               title="휴지통으로 이동"
                             >
                               <TrashBinIcon className="w-5 h-5" />
@@ -225,18 +244,18 @@ export default function AdminPlaceList() {
                         ) : (
                           <button 
                             onClick={() => handleToggleStatus(p.plcNo, 'N')}
-                            className="px-3 py-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition"
+                            className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F9B73] hover:bg-[#0c8261] rounded-lg shadow-sm"
                           >
                             복구하기
                           </button>
                         )}
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))
               )}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
       </div>
       <AdminPagination page={page} size={size} totalCount={totalCount} totalPages={totalPages} onPageChange={setPage} />
