@@ -11,8 +11,6 @@ import { getPlayDataByRegion } from './play/playData';
 import { useAuth } from '@hooks/useAuth';
 import api from '@api/axios';
 
-import TEMP_API_LIST_DATA from './temp/ListData';
-
 const PlayList  = lazy(() => import('./play/List'));
 const FoodList  = lazy(() => import('./food/List'));
 const SeeList   = lazy(() => import('./see/List'));
@@ -131,39 +129,36 @@ function AreaListTemplate() {
       try {
         const listDataConfig = LIST_DATA_CONFIG[type];
 
-        if (listDataConfig?.getItems) {
-          const raw = listDataConfig.getItems(regionKor);
-          const items = (raw instanceof Promise ? await raw : raw).map(normalizeListItem);
+        // 🚀 listDataConfig.getItems가 무조건 있다고 가정하고 로직을 단순화합니다.
+        if (!listDataConfig || !listDataConfig.getItems) {
+          throw new Error("유효하지 않은 카테고리입니다.");
+        }
 
-          setDataSet({
-            totalCount: items.length,
-            perPage: 12,
-            categories: listDataConfig.categories,
-            items,
-          });
+        const raw = listDataConfig.getItems(regionKor);
+        const items = (raw instanceof Promise ? await raw : raw).map(normalizeListItem);
 
-          // ✅ 찜 상태 한번에 조회
-          if (user?.mbrId && items.length > 0) {
-            const plcNos = items.map(item => item.id).filter(Boolean);
-            try {
-              const wishRes = await api.get('/wishlist/check-bulk', {
-                params: { mbrId: user.mbrId, plcNos: plcNos.join(',') }
-              });
-              setWishedPlcNos(wishRes.data);
-            } catch (err) {
-              console.error('찜 상태 조회 실패:', err);
-            }
+        setDataSet({
+          totalCount: items.length,
+          perPage: 12,
+          categories: listDataConfig.categories,
+          items,
+        });
+
+        // ✅ 찜 상태 한번에 조회
+        if (user?.mbrId && items.length > 0) {
+          const plcNos = items.map(item => item.id).filter(Boolean);
+          try {
+            const wishRes = await api.get('/wishlist/check-bulk', {
+              params: { mbrId: user.mbrId, plcNos: plcNos.join(',') }
+            });
+            setWishedPlcNos(wishRes.data);
+          } catch (err) {
+            console.error('찜 상태 조회 실패:', err);
           }
-
-        } else {
-          const fallback =
-            TEMP_API_LIST_DATA?.[type]?.[regionKor] ??
-            TEMP_API_LIST_DATA?.[type]?.['성남시'] ??
-            {};
-          setDataSet(fallback);
         }
       } catch (err) {
         console.error('데이터 로딩 실패:', err);
+        // 🚀 에러가 나거나 데이터가 없을 때는 가짜 데이터를 보여주지 말고 빈 화면을 구성합니다.
         setDataSet({
           totalCount: 0,
           perPage: 12,

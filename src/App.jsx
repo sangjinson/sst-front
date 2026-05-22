@@ -2,6 +2,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import AppRoutes from '@routes/AppRoutes';
+import { ThemeProvider } from '@context/ThemeContext'; // 🚀 위치 확인
+import { SidebarProvider } from '@context/SidebarContext'; // 🚀 위치 확인
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,13 +17,17 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-      {/* 개발 환경에서 쿼리 캐시 상태를 확인할 수 있는 툴 (선택사항) */}
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    // 🚀 Context 최상단 배치: Router보다 위에 있어야 전체 페이지가 상태를 공유함
+    <ThemeProvider>
+      <SidebarProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </SidebarProvider>
+    </ThemeProvider>
   );
 }
 
