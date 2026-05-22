@@ -165,7 +165,7 @@ const CourseSection = ({
                 const isLast = dayIndex === activeDayCourses.length - 1;
 
                 return (
-                  <div key={c.originalIndex} className="flex gap-3">
+                  <div key={c.originalIndex} className="flex gap-2 min-w-0">
                     <div className="flex flex-col items-center">
                       <div
                         className={`w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center shrink-0 ${activeDayStyle.number}`}>
@@ -180,15 +180,15 @@ const CourseSection = ({
                     </div>
 
                     <div
-                      className={`flex-1 rounded-2xl border p-4 flex gap-3 ${activeDayStyle.card}`}>
+                      className={`min-w-0 flex-1 rounded-2xl border p-3 sm:p-4 flex gap-2 sm:gap-3 ${activeDayStyle.card}`}>
                       {c.image ? (
                         <img
                           src={c.image}
                           alt={c.name}
-                          className="w-14 h-14 rounded-xl object-cover shrink-0"
+                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover shrink-0"
                         />
                       ) : (
-                        <div className="w-14 h-14 rounded-xl bg-white/70 flex items-center justify-center text-xl shrink-0">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/70 flex items-center justify-center text-xl shrink-0">
                           {c.type === "food" || c.type === "먹거리"
                             ? "🍽"
                             : c.type === "sleep" || c.type === "잘거리"

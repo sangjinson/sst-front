@@ -33,7 +33,7 @@ const Faq = () => {
 
   /* FAQ 데이터 조회 */
   useEffect(() => {
-    fetch("http://localhost:8080/api/customersupport/faq")
+    fetch(`${import.meta.env.VITE_API_URL}/api/customersupport/faq`)
       .then((res) => {
 
         /* 응답 실패 처리 */

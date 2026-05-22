@@ -12,7 +12,7 @@ import { useAuth } from "@hooks/useAuth";
 // 공통 글쓰기 폼
 import WriteForm from "@components/modules/community/write/WriteForm";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const CommunityHotplaceWrite = () => {
   const navigate = useNavigate();
