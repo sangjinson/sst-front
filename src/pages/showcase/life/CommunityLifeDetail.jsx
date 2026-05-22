@@ -12,6 +12,7 @@ import { openReportModal } from "@components/modules/community/common/reportModa
 import IconSVG from "@components/Icon/IconSVG";
 import ImageSlider from "@components/modules/community/common/ImageSlider";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
+import CommunityLifeDetailSkeleton from "@components/skeleton/CommunityLifeDetailSkeleton";
 
  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -165,11 +166,7 @@ const CommunityLifeDetail = () => {
   }, [currentUserId, post?.commNo]);
 
   if (loading) {
-    return (
-      <div className="py-20 text-center font-bold text-gray-500">
-        게시글을 불러오는 중입니다.
-      </div>
-    );
+    return <CommunityLifeDetailSkeleton />;
   }
 
   if (!post) {
@@ -386,7 +383,7 @@ const CommunityLifeDetail = () => {
     Number(currentUserId) === Number(post.mbrId);
 
   return (
-    <div className="paperlogy max-w-[1420px] mx-auto px-4 py-6 md:py-10 font-sans">
+    <div className="paperlogy container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20 font-sans">
       <CommunityDetailHeader
         breadcrumb={[
           { label: "홈", to: "/" },

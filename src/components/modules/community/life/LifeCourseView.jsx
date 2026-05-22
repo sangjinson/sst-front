@@ -283,17 +283,7 @@ const LifeCourseView = ({
         <p className="rounded-2xl bg-gray-50 p-5 fs-down-1 text-gray-500">
           등록된 여행 코스가 없습니다.
         </p>
-      )}
-
-      <div className="flex flex-col gap-3 mt-6 sm:flex-row">
-        <button
-          type="button"
-          onClick={handleImportSchedule}
-          className="flex-1 py-3 bg-[#0F9B73] text-white fs-down-1 font-bold rounded-xl hover:bg-[#0d8a66] transition inline-flex items-center justify-center gap-2 leading-none">
-          <DownloadIcon />
-          <span className="leading-none">내 일정으로 가져오기</span>
-        </button>
-      </div>
+      )}  
     </div>
   );
 };

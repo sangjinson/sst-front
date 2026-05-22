@@ -52,8 +52,12 @@ const ImageUpload = ({
         </div>
 
         {imagePreviews.length === 0 && (
-          <div className="w-full h-40 flex items-center justify-center border border-dashed border-gray-300 rounded-lg text-gray-400">
-            등록된 사진이 없습니다
+          <div className="w-full h-40 flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg text-gray-400">
+            <p className="fs-down-2">등록된 사진이 없습니다</p>
+
+            <p className="mt-5 fs-down-1 text-gray-400">
+              JPG, PNG, WEBP 파일 업로드 가능 · 파일당 최대 10MB
+            </p>
           </div>
         )}
       </div>
