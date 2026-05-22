@@ -167,7 +167,7 @@ const AIPlanResultPage = () => {
           themes    : selectedThemes.join(','),
         });
 
-        const res  = await fetch(`${import.meta.env.VITE_FASTAPI_URL}/travel/plan?${params}`);
+        const res  = await fetch(`${import.meta.env.VITE_FASTAPI_URL}/ai/travel/plan?${params}`);
         const json = await res.json();
 
         if (json.success) {

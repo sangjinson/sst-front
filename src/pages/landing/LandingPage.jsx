@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { useConfig } from '@hooks/useConfig'; 
 import { getNorthRegions, getSouthRegions } from '@utils/regionMap'; 
 
@@ -9,7 +8,6 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 const LandingPage = () => {
-  const { getConfig, setConfig } = useConfig(); 
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('남부');

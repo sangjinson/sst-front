@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
-import PageMeta from "@themeadmin/components/common/PageMeta";
+import PageMeta from "@components/admin/PageMeta";
 import api from "@api/axios"; 
 
 export default function Home() {
@@ -11,7 +11,7 @@ export default function Home() {
     newMembersToday: 0,
     totalPosts: 0,
     totalReports: 0,
-    recentMembers: [], // 🚀 추가된 리스트 데이터 초기화
+    recentMembers: [],
     recentPosts: [],
   });
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,6 @@ export default function Home() {
         setLoading(false);
       }
     };
-
     fetchDashboardStats();
   }, []);
 
@@ -46,12 +45,12 @@ export default function Home() {
       />
       
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white/90">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           시스템 현황
         </h2>
 
         {loading ? (
-          <div className="py-20 text-center font-bold text-gray-500">
+          <div className="py-20 text-center font-bold text-gray-500 dark:text-gray-400">
             데이터를 불러오는 중입니다...
           </div>
         ) : (
@@ -75,57 +74,55 @@ export default function Home() {
               ))}
             </div>
 
-            {/* 🚀 2. 하단 최근 활동 리스트 (2단 분할 레이아웃) */}
+            {/* 2. 하단 최근 활동 리스트 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
               
               {/* 최근 가입 회원 리스트 */}
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-                  <h3 className="text-lg font-bold text-gray-800">최근 가입 회원</h3>
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5">
+                <div className="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">최근 가입 회원</h3>
                   <button onClick={() => navigate('/admin/members')} className="text-sm text-[#0F9B73] hover:underline">더보기</button>
                 </div>
                 <ul className="space-y-3">
                   {stats.recentMembers?.length > 0 ? (
                     stats.recentMembers.map((member) => (
-                      <li key={member.mbrId} className="flex justify-between items-center text-sm p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                      <li key={member.mbrId} className="flex justify-between items-center text-sm p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-gray-700">{member.mbrNickname}</span>
-                          <span className="text-xs text-gray-400">{member.mbrEmail}</span>
+                          <span className="font-semibold text-gray-700 dark:text-gray-200">{member.mbrNickname}</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">{member.mbrEmail}</span>
                         </div>
-                        <span className="text-xs text-gray-500">
-                          {/* 날짜 포맷 (YYYY-MM-DD) */}
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {new Date(member.mbrJoinDate).toLocaleDateString('ko-KR')}
                         </span>
                       </li>
                     ))
                   ) : (
-                    <div className="text-center text-gray-400 py-4 text-sm">최근 가입한 회원이 없습니다.</div>
+                    <div className="text-center text-gray-400 dark:text-gray-600 py-4 text-sm">최근 가입한 회원이 없습니다.</div>
                   )}
                 </ul>
               </div>
 
               {/* 최근 게시글 리스트 */}
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-                  <h3 className="text-lg font-bold text-gray-800">최근 등록된 뽐낼거리</h3>
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-5">
+                <div className="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">최근 등록된 뽐낼거리</h3>
                   <button onClick={() => navigate('/admin/showcase/hotplace')} className="text-sm text-[#0F9B73] hover:underline">더보기</button>
                 </div>
                 <ul className="space-y-3">
                   {stats.recentPosts?.length > 0 ? (
                     stats.recentPosts.map((post) => (
-                      <li key={post.commNo} className="flex justify-between items-center text-sm p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                        <span className="font-medium text-gray-700 truncate pr-4">{post.commTitle}</span>
-                        <span className="text-xs text-gray-500 whitespace-nowrap">
+                      <li key={post.commNo} className="flex justify-between items-center text-sm p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                        <span className="font-medium text-gray-700 dark:text-gray-200 truncate pr-4">{post.commTitle}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                           {new Date(post.commRegDate).toLocaleDateString('ko-KR')}
                         </span>
                       </li>
                     ))
                   ) : (
-                    <div className="text-center text-gray-400 py-4 text-sm">최근 등록된 게시글이 없습니다.</div>
+                    <div className="text-center text-gray-400 dark:text-gray-600 py-4 text-sm">최근 등록된 게시글이 없습니다.</div>
                   )}
                 </ul>
               </div>
-
             </div>
           </>
         )}
