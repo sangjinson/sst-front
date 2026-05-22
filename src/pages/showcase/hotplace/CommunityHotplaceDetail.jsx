@@ -9,6 +9,7 @@ import HotplaceStats from "@components/modules/community/hotplace/HotplaceStats"
 import HotplaceAside from "@components/modules/community/hotplace/HotplaceAside";
 import CommentSection from "@components/modules/community/common/CommentSection";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
+import CommunityHotplaceDetailSkeleton from "@components/skeleton/CommunityHotplaceDetailSkeleton";
 
 const CommunityHotplaceDetail = () => {
   const { id } = useParams();
@@ -23,6 +24,7 @@ const CommunityHotplaceDetail = () => {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
 
@@ -40,54 +42,60 @@ const CommunityHotplaceDetail = () => {
 
   // 게시글 조회 함수
   const fetchPost = async () => {
-      try {
-        const viewedKey = `hotplace_viewed_${id}`;
-        // 처음 조회 시에만 조회수 증가
-        if (!localStorage.getItem(viewedKey)) {
-          localStorage.setItem(viewedKey, "true");
-          await api.put(`/community/${id}/view`);
-        }
-        // 게시글 상세 조회
-        const res = await api.get(`/community/${id}`);
-        const item = res.data;
+    try {
+      setLoading(true);
 
-        const imageUrl = item.commMainImgUrl
-          ? item.commMainImgUrl.startsWith("http")
-            ? item.commMainImgUrl
-            : `http://localhost:8080${item.commMainImgUrl}`
-          : "https://placehold.co/900x650";
+      const viewedKey = `hotplace_viewed_${id}`;
 
-        setCurrentPost({
-          id: item.commNo,
-          commNo: item.commNo,
-          mbrId: item.commMbrId, // 작성자 회원번호 추가
-          title: item.commTitle,
-          description: item.commContent,
-          content: item.commContent,
-          author: item.mbrNickname,
-          place: item.plcName || "장소 미등록",
-          region: item.rgnName || "지역 미정",
-          hashtags: item.hashtagText ? item.hashtagText.split(",") : [],
-          img: imageUrl,
-          images:
-            item.images?.length > 0
-              ? item.images.map((img) =>
-                  img.startsWith("http")
-                    ? img
-                    : `http://localhost:8080${img}`
-                )
-              : [imageUrl],
-          regDt: item.commRegDate,
-          wishCnt: item.commLikeCnt ?? 0,
-          commentCnt: item.commCmntCnt ?? 0,
-          viewCnt: item.commInqireCnt ?? 0,
-          size: "wide",
-        });
-      } catch (err) {
-        console.error("게시글 상세 조회 실패:", err);
+      // 처음 조회 시에만 조회수 증가
+      if (!localStorage.getItem(viewedKey)) {
+        localStorage.setItem(viewedKey, "true");
+        await api.put(`/community/${id}/view`);
       }
-    };
-    fetchPost();
+
+      // 게시글 상세 조회
+      const res = await api.get(`/community/${id}`);
+      const item = res.data;
+
+      const imageUrl = item.commMainImgUrl
+        ? item.commMainImgUrl.startsWith("http")
+          ? item.commMainImgUrl
+          : `http://localhost:8080${item.commMainImgUrl}`
+        : "https://placehold.co/900x650";
+
+      setCurrentPost({
+        id: item.commNo,
+        commNo: item.commNo,
+        mbrId: item.commMbrId,
+        title: item.commTitle,
+        description: item.commContent,
+        content: item.commContent,
+        author: item.mbrNickname,
+        place: item.plcName || "장소 미등록",
+        region: item.rgnName || "지역 미정",
+        hashtags: item.hashtagText ? item.hashtagText.split(",") : [],
+        img: imageUrl,
+        images:
+          item.images?.length > 0
+            ? item.images.map((img) =>
+                img.startsWith("http")
+                  ? img
+                  : `http://localhost:8080${img}`
+              )
+            : [imageUrl],
+        regDt: item.commRegDate,
+        wishCnt: item.commLikeCnt ?? 0,
+        commentCnt: item.commCmntCnt ?? 0,
+        viewCnt: item.commInqireCnt ?? 0,
+        size: "wide",
+      });
+    } catch (err) {
+      console.error("게시글 상세 조회 실패:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchPost();
   }, [id]);
 
   // 게시글 좋아요 상태 조회
@@ -135,6 +143,10 @@ const CommunityHotplaceDetail = () => {
     const commNo = currentPost.commNo ?? currentPost.id;
     fetchComments(commNo);
   }, [currentPost]);
+
+  if (loading) {
+    return <CommunityHotplaceDetailSkeleton />;
+  }
 
   if (!currentPost) {
     return (
