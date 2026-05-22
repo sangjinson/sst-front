@@ -4,7 +4,6 @@ import { Link, useLocation } from "react-router-dom";
 // 아이콘 및 컴포넌트 임포트
 import {
   BoxCubeIcon,
-  CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
@@ -15,7 +14,7 @@ import {
   TableIcon,
   UserCircleIcon,
 } from "@themeadmin/icons";
-import { useSidebar } from "@themeadmin/context/SidebarContext";
+import { useSidebar } from "@context/SidebarContext";
 import SidebarWidget from "@themeadmin/layout/SidebarWidget";
 
 // --- 메뉴 데이터 구성 (거리에섯 관리자 맞춤) ---

@@ -1,16 +1,19 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom"; // react-router 대신 보통 react-router-dom을 사용합니다.
-import { useSidebar } from "@themeadmin/context/SidebarContext";
-import { ThemeToggleButton } from "@themeadmin/components/common/ThemeToggleButton";
-import NotificationDropdown from "@themeadmin/components/header/NotificationDropdown";
-import UserDropdown from "@themeadmin/components/header/UserDropdown";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useSidebar } from "@context/SidebarContext";
+import { ThemeToggleButton } from "@components/admin/ThemeToggleButton";
+// 🚀 1. 전역 인증 상태와 로그아웃 함수를 가져오기 위해 useAuth 훅 추가
+import { useAuth } from "@hooks/useAuth"; 
+// 🚀 2. 직관적인 UI를 위해 lucide-react에서 아이콘 임포트
+import { LogOut, UserCircle } from "lucide-react"; 
 
 const AppHeader = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
-  const inputRef = useRef(null); // 타입 정의 삭제
+  
+  // 🚀 3. useAuth에서 user 정보와 logout 로직 추출
+  const { user, logout } = useAuth(); 
 
-  // 화면 크기에 따라 사이드바 토글 방식 결정
   const handleToggle = () => {
     if (window.innerWidth >= 1024) {
       toggleSidebar();
@@ -23,39 +26,22 @@ const AppHeader = () => {
     setApplicationMenuOpen(!isApplicationMenuOpen);
   };
 
-  // 단축키 (Ctrl/Cmd + K)로 검색창 포커스
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
-        event.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
   return (
-    // 🚀 수정: z-index를 99999에서 z-40으로 하향 조정. 모달(보통 z-50)이 이 헤더를 덮을 수 있게 함.
     <header className="sticky top-0 flex w-full bg-white border-gray-200 z-40 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
         
-        {/* --- 왼쪽 영역 (토글, 로고, 검색) --- */}
+        {/* --- 왼쪽 영역 (토글, 로고) --- */}
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
-          
-          {/* 사이드바 토글 버튼 */}
           <button
-            // 🚀 수정: 내부 요소가 아닌 버튼 자체의 z-index는 제거(헤더의 z-index를 따름)
             className="items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
-            {/* SVG 아이콘 로직 생략 (기존과 동일) */}
-            {isMobileOpen ? ( /* ... X 아이콘 ... */ null ) : ( /* ... 햄버거 아이콘 ... */ null )}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            {isMobileOpen ? ( 
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> 
+            ) : ( 
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg> 
+            )}
           </button>
 
           <Link to="/admin" className="flex items-center gap-2 no-underline lg:hidden">
@@ -69,40 +55,50 @@ const AppHeader = () => {
             </span>
           </Link>
 
-          {/* 모바일용 메뉴 버튼 (우측 상단 점 3개 메뉴 등) */}
           <button
             onClick={toggleApplicationMenu}
             className="flex items-center justify-center w-10 h-10 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
           </button>
-
-          {/* 데스크탑용 검색창 (Ctrl+K) */}
-          <div className="hidden lg:block">
-            <div className="relative">
-              {/* 검색 아이콘 및 Input 생략 (기존과 동일) */}
-              <input ref={inputRef} type="text" className="..." placeholder="Search..." />
-            </div>
-          </div>
         </div>
 
-        {/* --- 오른쪽 영역 (테마, 알림, 유저) --- */}
-        {/* 🚀 보완: 모바일 메뉴 오픈 시의 배경 쉐도우와 배치 로직을 명확히 함 */}
+        {/* --- 오른쪽 영역 (다크모드 테마, 유저/로그아웃) --- */}
         <div className={`
           ${isApplicationMenuOpen ? "flex" : "hidden"} 
           flex-col items-center justify-between w-full gap-4 px-5 py-4 
           lg:flex lg:flex-row lg:justify-end lg:px-0 lg:py-0 lg:shadow-none
           bg-white dark:bg-gray-900 border-b lg:border-b-0 border-gray-200 dark:border-gray-800
         `}>
-          <div className="flex items-center gap-2 2xsm:gap-3">
+          
+          <div className="flex items-center gap-4">
             <ThemeToggleButton />
-            <NotificationDropdown />
+            
+            {/* 🚀 4. 분리하지 않고 헤더 내부에 직접 구현한 관리자 인증 섹션 */}
+            <div className="flex items-center gap-4 border-l border-gray-200 dark:border-gray-700 pl-4 ml-2">
+              <div className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
+                <UserCircle className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                <span className="text-sm font-semibold">
+                  {user?.mbrNickname || '최고관리자'} 님
+                </span>
+              </div>
+
+              <button
+                onClick={logout}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg transition-colors hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+                title="로그아웃"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">로그아웃</span>
+              </button>
+            </div>
+
           </div>
-          <UserDropdown />
         </div>
 
       </div>
     </header>
   );
 };
+
 export default AppHeader;

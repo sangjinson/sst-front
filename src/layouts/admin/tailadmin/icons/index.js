@@ -1,3 +1,9 @@
+import BoxCubeIcon from "./box-cube.svg?react";
+import ChevronDownIcon from "./chevron-down.svg?react";
+import GridIcon from "./grid.svg?react";
+import HorizontaLDots from "./horizontal-dots.svg?react";
+
+
 import PlusIcon from "./plus.svg?react";
 import CloseIcon from "./close.svg?react";
 import BoxIcon from "./box.svg?react";
@@ -11,7 +17,6 @@ import ArrowDownIcon from "./arrow-down.svg?react";
 import FolderIcon from "./folder.svg?react";
 import VideoIcon from "./videos.svg?react";
 import AudioIcon from "./audio.svg?react";
-import GridIcon from "./grid.svg?react";
 import FileIcon from "./file.svg?react";
 import DownloadIcon from "./download.svg?react";
 import ArrowRightIcon from "./arrow-right.svg?react";
@@ -28,7 +33,6 @@ import AngleRightIcon from "./angle-right.svg?react";
 import PencilIcon from "./pencil.svg?react";
 import CheckLineIcon from "./check-line.svg?react";
 import CloseLineIcon from "./close-line.svg?react";
-import ChevronDownIcon from "./chevron-down.svg?react";
 import ChevronUpIcon from "./chevron-up.svg?react";
 import PaperPlaneIcon from "./paper-plane.svg?react";
 import LockIcon from "./lock.svg?react";
@@ -47,11 +51,9 @@ import ListIcon from "./list.svg?react";
 import TableIcon from "./table.svg?react";
 import PageIcon from "./page.svg?react";
 import PieChartIcon from "./pie-chart.svg?react";
-import BoxCubeIcon from "./box-cube.svg?react";
 import PlugInIcon from "./plug-in.svg?react";
 import DocsIcon from "./docs.svg?react";
 import MailIcon from "./mail-line.svg?react";
-import HorizontaLDots from "./horizontal-dots.svg?react";
 import ChatIcon from "./chat.svg?react";
 import MoreDotIcon from "./moredot.svg?react";
 import AlertHexaIcon from "./alert-hexa.svg?react";
