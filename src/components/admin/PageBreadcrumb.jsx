@@ -9,7 +9,7 @@ const PageBreadcrumb = ({ pageTitle }) => {
         {pageTitle}
       </h2>
 
-      {/* 브레드크럼 네비게이션 */}
+      {/ 브레드크럼 네비게이션 /}
       <nav>
         <ol className="flex items-center gap-1.5">
           <li>
@@ -18,7 +18,7 @@ const PageBreadcrumb = ({ pageTitle }) => {
               to="/"
             >
               Home
-              {/* 구분선 화살표 아이콘 */}
+              {/ 구분선 화살표 아이콘 /}
               <svg
                 className="stroke-current"
                 width="17"
@@ -36,8 +36,8 @@ const PageBreadcrumb = ({ pageTitle }) => {
               </svg>
             </Link>
           </li>
-          
-          {/* 현재 페이지 위치 */}
+
+          {/ 현재 페이지 위치 */}
           <li className="text-sm text-gray-800 dark:text-white/90">
             {pageTitle}
           </li>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "@api/axios";
-import PageBreadcrumb from "@themeadmin/components/common/PageBreadCrumb";
-import PageMeta from "@themeadmin/components/common/PageMeta";
+import PageBreadcrumb from "@components/admin/PageBreadCrumb";
+import PageMeta from "@components/admin/PageMeta";
 
 export default function AdminMemberInfoForm() {
   const navigate = useNavigate();

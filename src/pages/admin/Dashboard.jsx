@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
-import PageMeta from "@themeadmin/components/common/PageMeta";
+import PageMeta from "@components/admin/PageMeta";
 import api from "@api/axios"; 
 
 export default function Home() {

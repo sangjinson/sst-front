@@ -13,9 +13,8 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
-} from "@themeadmin/icons";
+} from "@components/icon";
 import { useSidebar } from "@context/SidebarContext";
-import SidebarWidget from "@themeadmin/layout/SidebarWidget";
 
 // --- 메뉴 데이터 구성 (거리에섯 관리자 맞춤) ---
 const navItems = [
@@ -326,7 +325,7 @@ const AppSidebar = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+        {isExpanded || isHovered || isMobileOpen ? <></> : null}
       </div>
     </aside>
   );

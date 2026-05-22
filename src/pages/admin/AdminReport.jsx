@@ -4,7 +4,6 @@ import api from "@api/axios";
 import { usePagination } from "@hooks/usePagination";
 import AdminPagination from "@components/admin/AdminPagination";
 
-import Badge from "@themeadmin/components/ui/badge/Badge";
 
 const TYPE_MAP = {
   RPT001: "리뷰",
@@ -19,10 +18,22 @@ const REASON_MAP = {
 };
 
 const STATUS_MAP = {
-  RST001: { label: "접수 대기", color: "error" },
-  RST002: { label: "처리중", color: "warning" },
-  RST003: { label: "처리 완료", color: "success" },
-  RST004: { label: "반려", color: "light" },
+  RST001: { 
+    label: "접수 대기", 
+    classes: "bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400" 
+  },
+  RST002: { 
+    label: "처리중", 
+    classes: "bg-orange-50 text-orange-600 border border-orange-200 dark:bg-orange-500/10 dark:border-orange-500/20 dark:text-orange-400" 
+  },
+  RST003: { 
+    label: "처리 완료", 
+    classes: "bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400" 
+  },
+  RST004: { 
+    label: "반려", 
+    classes: "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400" 
+  },
 };
 
 export default function AdminReport() {
@@ -249,10 +260,13 @@ export default function AdminReport() {
                     </td>
 
                     <td className="px-5 py-4 text-center">
-                      {/* Badge 컴포넌트는 커스텀 UI지만 레이아웃을 망치지 않으므로 유지합니다 */}
-                      <Badge color={STATUS_MAP[report.rptStatusCd]?.color || "light"}>
+                      <span 
+                        className={`inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-full ${
+                          STATUS_MAP[report.rptStatusCd]?.classes || "bg-gray-100 text-gray-600 border border-gray-200"
+                        }`}
+                      >
                         {STATUS_MAP[report.rptStatusCd]?.label || report.rptStatusCd}
-                      </Badge>
+                      </span>
                     </td>
 
                     <td className="px-5 py-4 text-center">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import api from "@api/axios";
-import { PencilIcon, TrashBinIcon } from "@themeadmin/icons";
+import { PencilIcon, TrashBinIcon } from "@components/icon";
 
 export default function AdminSupportManage() {
   const { type } = useParams();
