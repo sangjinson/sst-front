@@ -1,6 +1,6 @@
 import { getFoodDataByRegion } from '@pages/area/food/foodData';
 import { getSeeDataByRegion } from '@pages/area/see/seeData';
-import { getSleepDataByRegion } from '@pages/area/sleep/sleepdata';
+import { getSleepDataByRegion } from '@pages/area/sleep/SleepData';
 import { getPlayDataByRegion } from '@pages/area/play/playData';
 import { toEnRegion } from '@utils/regionMap';
 
