@@ -5,7 +5,6 @@ import TopPickDeck from '@components/card/TopPickDeck';
 import HeroBanner from '@components/common/HeroBanner';
 import CategorySection from '@components/card/CategorySection';
 import Breadcrumb from '@components/common/Breadcrumb';
-import { toKorRegion } from '@utils/regionMap';
 import MainSkeleton from '@components/skeleton/MainSkeleton';
 
 import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
