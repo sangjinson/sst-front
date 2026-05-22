@@ -12,6 +12,7 @@ import { openReportModal } from "@components/modules/community/common/reportModa
 import IconSVG from "@components/Icon/IconSVG";
 import ImageSlider from "@components/modules/community/common/ImageSlider";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
+import CommunityLifeDetailSkeleton from "@components/skeleton/CommunityLifeDetailSkeleton";
 
  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -165,11 +166,7 @@ const CommunityLifeDetail = () => {
   }, [currentUserId, post?.commNo]);
 
   if (loading) {
-    return (
-      <div className="py-20 text-center font-bold text-gray-500">
-        게시글을 불러오는 중입니다.
-      </div>
-    );
+    return <CommunityLifeDetailSkeleton />;
   }
 
   if (!post) {
