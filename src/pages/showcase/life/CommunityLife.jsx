@@ -117,7 +117,7 @@ const CommunityLife = () => {
     // 업로드 이미지가 있는 경우
     if (url) {
       if (url.startsWith("http")) return url;
-      return `http://localhost:8080${url}`;
+      return `${import.meta.env.VITE_API_URL}${url}`;
     }
 
     // 업로드 이미지가 없으면 지역 배너 사용
@@ -151,14 +151,15 @@ const CommunityLife = () => {
             author: item.mbrNickname,
             place: item.plcName || "장소 미정",
             region: item.rgnName || "지역 미정",
-            hashtags: item.hashtagText
-              ? item.hashtagText.split(",")
-              : [],
-              themes: [
-              item.theme1Name,
-              item.theme2Name,
-              item.theme3Name,
-            ].filter(Boolean),
+            hashtags: (item.hashtagText || "")
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean),
+            themes: [
+            item.theme1Name,
+            item.theme2Name,
+            item.theme3Name,
+              ].filter(Boolean),
             thumbnail: imageUrl,
             images: item.commMainImgUrl ? [imageUrl] : [],
             regDt: item.commRegDate,

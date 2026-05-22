@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import api from "@api/axios";
 
 /* 
@@ -18,7 +19,6 @@ import api from "@api/axios";
  *   />
  * )}
 */
-
 
 const SchedulePickerModal = ({ onClose, onSelect, schedules = [] }) => {
   const [loadingId, setLoadingId] = useState(null);
@@ -41,10 +41,20 @@ const SchedulePickerModal = ({ onClose, onSelect, schedules = [] }) => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[520px] mx-4 flex flex-col max-h-[70vh]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center box-border pt-24 px-4 pb-4"
+      style={{
+        width: "100vw",
+        height: "100dvh",
+      }}>
+      <div
+        className="max-h-[85vh] overflow-hidden rounded-2xl bg-white shadow-2xl flex flex-col"
+        style={{
+          width: "min(520px, calc(100vw - 32px))",
+        }}>
+
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
           <div>
             <h3 className="text-base font-bold text-gray-900">
               내 AI 일정에서 가져오기
@@ -62,11 +72,15 @@ const SchedulePickerModal = ({ onClose, onSelect, schedules = [] }) => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
           {schedules.length === 0 ? (
             <div className="text-center py-12 text-gray-400">
               <div className="text-4xl mb-3">📅</div>
-              <p className="text-sm font-medium">저장된 AI 일정이 없습니다.</p>
+
+              <p className="text-sm font-medium">
+                저장된 AI 일정이 없습니다.
+              </p>
+
               <p className="text-xs mt-1 text-gray-300">
                 먼저 AI 여행 일정을 만들어보세요.
               </p>
@@ -93,7 +107,9 @@ const SchedulePickerModal = ({ onClose, onSelect, schedules = [] }) => {
                       <span className="text-xs text-gray-400">
                         {schedule.aisBeginDate}
                       </span>
+
                       <span className="text-gray-200">~</span>
+
                       <span className="text-xs text-gray-400">
                         {schedule.aisEndDate}
                       </span>
@@ -104,6 +120,7 @@ const SchedulePickerModal = ({ onClose, onSelect, schedules = [] }) => {
                     <span className="text-xs font-semibold text-[#0F9B73]">
                       {schedule.aisTotDays}일 일정
                     </span>
+
                     <span className="text-xs text-gray-400">
                       {loadingId === schedule.aisNo
                         ? "불러오는 중..."
@@ -116,7 +133,7 @@ const SchedulePickerModal = ({ onClose, onSelect, schedules = [] }) => {
           )}
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-100">
+        <div className="px-4 sm:px-6 py-4 border-t border-gray-100">
           <button
             type="button"
             onClick={onClose}
@@ -125,7 +142,8 @@ const SchedulePickerModal = ({ onClose, onSelect, schedules = [] }) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
