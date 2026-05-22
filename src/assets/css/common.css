@@ -1,0 +1,230 @@
+
+ol, ul {
+  list-style: none;
+  text-decoration: none;
+}
+
+a {
+  /*
+  text-decoration: none;
+  color: inherit;
+  */
+}
+
+img, picture, video, canvas, svg {
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+
+/* 변경시 주의 (고정 클래스)*/
+
+
+/* css 변수 선언*/
+:root{
+  --tw-default-font-size:13px;
+  --tw-device-max-width-sm: 540px;
+  --tw-device-max-width-md: 720px;
+  --tw-device-max-width-lg: 960px;
+  --tw-device-max-width-xl: 1140px;
+  --tw-device-max-width-2xl: 1320px;
+  --tw-device-max-width-3xl: 1420px;
+}
+html, body{
+    font-size: var(--tw-default-font-size);
+}
+html, body{
+  
+  font-family: 'Paperlogy', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.container,
+.container-max,
+.container-full,
+.container-fluid,
+.container-3xl,
+.container-2xl,
+.container-xl,
+.container-lg,
+.container-md,
+.container-sm {
+  --tw-gutter-x: 1.5rem;
+  --tw-gutter-y: 0;
+  width: 100%;
+  padding-right: calc(var(--tw-gutter-x) * 0.5);
+  padding-left: calc(var(--tw-gutter-x) * 0.5);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 576px) { 
+  .container-sm, .container { max-width: var(--tw-device-max-width-sm); } 
+}
+@media (min-width: 768px) { 
+  .container-md, .container-sm, .container { max-width: var(--tw-device-max-width-md); } 
+}
+@media (min-width: 992px) { 
+  .container-lg, .container-md, .container-sm, .container { max-width: var(--tw-device-max-width-lg); }
+}
+@media (min-width: 1200px) {
+  .container-xl, .container-lg, .container-md, .container-sm, .container { max-width: var(--tw-device-max-width-xl); }
+}
+@media (min-width: 1400px) {
+  .container-2xl, .container-xl, .container-lg, .container-md, .container-sm, .container { max-width: var(--tw-device-max-width-2xl); }
+}
+
+@media (min-width: 1900px) {
+  .container-3xl, .container-2xl, .container-xl, .container-lg, .container-md, .container-sm, .container { max-width: var(--tw-device-max-width-3xl); }
+}
+
+.fs-1 { font-size: 0.75em; }
+.fs-2 { font-size: 0.85em; }
+.fs-3 { font-size: 0.95em; }
+.fs-4 { font-size: 1.05em; }
+.fs-5 { font-size: 1.2em; }
+.fs-6 { font-size: 1.4em; }
+.fs-7 { font-size: 1.6em; }
+.fs-8 { font-size: 1.9em; }
+.fs-9 { font-size: 2.3em; }
+.fs-10 { font-size: 2.8em; }
+
+@media (min-width: 576px) {
+  .fs-sm-1 { font-size: 0.75em; }
+  .fs-sm-2 { font-size: 0.85em; }
+  .fs-sm-3 { font-size: 0.95em; }
+  .fs-sm-4 { font-size: 1.05em; }
+  .fs-sm-5 { font-size: 1.2em; }
+  .fs-sm-6 { font-size: 1.4em; }
+  .fs-sm-7 { font-size: 1.6em; }
+  .fs-sm-8 { font-size: 1.9em; }
+  .fs-sm-9 { font-size: 2.3em; }
+  .fs-sm-10 { font-size: 2.8em; }
+}
+
+@media (min-width: 768px) {
+  .fs-md-1 { font-size: 0.75em; }
+  .fs-md-2 { font-size: 0.85em; }
+  .fs-md-3 { font-size: 0.95em; }
+  .fs-md-4 { font-size: 1.05em; }
+  .fs-md-5 { font-size: 1.2em; }
+  .fs-md-6 { font-size: 1.4em; }
+  .fs-md-7 { font-size: 1.6em; }
+  .fs-md-8 { font-size: 1.9em; }
+  .fs-md-9 { font-size: 2.3em; }
+  .fs-md-10 { font-size: 2.8em; }
+}
+@media (min-width: 992px) {
+  .fs-lg-1 { font-size: 0.75em; }
+  .fs-lg-2 { font-size: 0.85em; }
+  .fs-lg-3 { font-size: 0.95em; }
+  .fs-lg-4 { font-size: 1.05em; }
+  .fs-lg-5 { font-size: 1.2em; }
+  .fs-lg-6 { font-size: 1.4em; }
+  .fs-lg-7 { font-size: 1.6em; }
+  .fs-lg-8 { font-size: 1.9em; }
+  .fs-lg-9 { font-size: 2.3em; }
+  .fs-lg-10 { font-size: 2.8em; }
+}
+@media (min-width: 1200px) {
+  .fs-xl-1 { font-size: 0.75em; }
+  .fs-xl-2 { font-size: 0.85em; }
+  .fs-xl-3 { font-size: 0.95em; }
+  .fs-xl-4 { font-size: 1.05em; }
+  .fs-xl-5 { font-size: 1.2em; }
+  .fs-xl-6 { font-size: 1.4em; }
+  .fs-xl-7 { font-size: 1.6em; }
+  .fs-xl-8 { font-size: 1.9em; }
+  .fs-xl-9 { font-size: 2.3em; }
+  .fs-xl-10 { font-size: 2.8em; }
+}
+@media (min-width: 1400px) {
+  .fs-2xl-1 { font-size: 0.75em; }
+  .fs-2xl-2 { font-size: 0.85em; }
+  .fs-2xl-3 { font-size: 0.95em; }
+  .fs-2xl-4 { font-size: 1.05em; }
+  .fs-2xl-5 { font-size: 1.2em; }
+  .fs-2xl-6 { font-size: 1.4em; }
+  .fs-2xl-7 { font-size: 1.6em; }
+  .fs-2xl-8 { font-size: 1.9em; }
+  .fs-2xl-9 { font-size: 2.3em; }
+  .fs-2xl-10 { font-size: 2.8em; }
+}
+@media (min-width: 1900px) {
+  .fs-3xl-1 { font-size: 0.75em; }
+  .fs-3xl-2 { font-size: 0.85em; }
+  .fs-3xl-3 { font-size: 0.95em; }
+  .fs-3xl-4 { font-size: 1.05em; }
+  .fs-3xl-5 { font-size: 1.2em; }
+  .fs-3xl-6 { font-size: 1.4em; }
+  .fs-3xl-7 { font-size: 1.6em; }
+  .fs-3xl-8 { font-size: 1.9em; }
+  .fs-3xl-9 { font-size: 2.3em; }
+  .fs-3xl-10 { font-size: 2.8em; }
+}
+
+.fs-up-1 {
+  font-size: clamp(0.75rem, 0.6rem + 1vw, 0.9rem);
+}
+.fs-up-2 {
+  font-size: clamp(0.85rem, 0.7rem + 1.2vw, 1.1rem);
+}
+.fs-up-3 {
+  font-size: clamp(1rem, 0.8rem + 1.5vw, 1.4rem);
+}
+.fs-up-4 {
+  font-size: clamp(1.1rem, 0.9rem + 1.8vw, 1.7rem);
+}
+.fs-up-5 {
+  font-size: clamp(1.2rem, 1rem + 2vw, 2rem);
+}
+.fs-up-6 {
+  font-size: clamp(1.4rem, 1.1rem + 2.3vw, 2.4rem);
+}
+.fs-up-7 {
+  font-size: clamp(1.6rem, 1.2rem + 2.6vw, 2.8rem);
+}
+.fs-up-8 {
+  font-size: clamp(1.8rem, 1.3rem + 3vw, 3.2rem);
+}
+.fs-up-9 {
+  font-size: clamp(2rem, 1.5rem + 3.4vw, 3.8rem);
+}
+.fs-up-10 {
+  font-size: clamp(2.4rem, 1.8rem + 4vw, 4.5rem);
+}
+
+.fs-down-1 {
+  font-size: clamp(1rem, 1.2rem - 0.8vw, 0.85rem);
+}
+.fs-down-2 {
+  font-size: clamp(1.2rem, 1.5rem - 1vw, 1rem);
+}
+.fs-down-3 {
+  font-size: clamp(1.5rem, 1.8rem - 1.2vw, 1.1rem);
+}
+.fs-down-4 {
+  font-size: clamp(1.8rem, 2.2rem - 1.4vw, 1.3rem);
+}
+.fs-down-5 {
+  font-size: clamp(2.2rem, 2.6rem - 1.6vw, 1.5rem);
+}
+.fs-down-6 {
+  font-size: clamp(2.6rem, 3rem - 1.8vw, 1.7rem);
+}
+.fs-down-7 {
+  font-size: clamp(3rem, 3.5rem - 2vw, 2rem);
+}
+.fs-down-8 {
+  font-size: clamp(3.4rem, 4rem - 2.2vw, 2.3rem);
+}
+.fs-down-9 {
+  font-size: clamp(4rem, 4.6rem - 2.5vw, 2.6rem);
+}
+.fs-down-10 {
+  font-size: clamp(4.6rem, 5.2rem - 3vw, 3rem);
+}
+

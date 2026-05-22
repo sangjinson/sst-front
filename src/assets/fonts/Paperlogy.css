@@ -89,3 +89,7 @@
         url('./Paperlogy/Paperlogy-9Black.otf') format('opentype'),
         url('./Paperlogy/Paperlogy-9Black.ttf') format('truetype');
 }
+
+.paperlogy {
+  font-family: "Paperlogy", sans-serif;
+}
