@@ -35,7 +35,7 @@ const AIPlanPeriodCard = ({
   const [showEndCal, setShowEndCal]     = useState(false);
 
   return (
-    <div>
+    <div data-aos="zoom-in" data-aos-once="true">
       <div className="mb-9 text-center md:mb-11">
         <div className="mb-3 flex items-center justify-center gap-2.5">
           <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-[#0F9B73] md:h-8 md:w-8" strokeWidth="2">
@@ -50,87 +50,89 @@ const AIPlanPeriodCard = ({
       </div>
 
       {/* 기간 카드 */}
-      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {PERIOD_OPTIONS.map(opt => (
-          <button
-            key={opt.value}
-            onClick={() => onPeriodSelect(opt)}
-            className={`min-h-[96px] rounded-2xl border p-5 text-left md:min-h-[112px] md:p-6 transition-all duration-200 active:scale-[0.98] ${
-              selectedPeriod === opt.value
-                ? 'border-gray-200 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.08)] ring-1 ring-[#0F9B73]/20'
-                : 'border-gray-200 bg-gray-50 hover:-translate-y-0.5 hover:border-[#0F9B73]/30 hover:bg-white hover:shadow-sm'
-            }`}
-          >
-            <p className={`mb-1 text-lg font-bold tracking-[0.04em] md:text-xl transition-colors duration-200 ${selectedPeriod === opt.value ? 'text-[#0F9B73]' : 'text-gray-900'}`}>{opt.label}</p>
-            <p className="text-sm font-medium leading-relaxed text-gray-400 tracking-[0.02em] md:text-base">{opt.desc}</p>
-          </button>
-        ))}
-      </div>
-
-      {/* 날짜 선택 - 시작일/종료일 각각 분리 */}
-      <div className="border-t border-gray-100 pt-7">
-        <p className="mb-4 text-base font-bold text-gray-800 tracking-[0.03em] md:text-lg">
-          날짜를 선택해주세요
-          {selectedPeriod && (
-            <span className="ml-2 text-xs text-[#0F9B73] font-normal">
-              시작일 선택 시 {selectedPeriod} 자동 적용
-            </span>
-          )}
-        </p>
-
-        <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center">
-
-          {/* 시작일 */}
-          <div className="relative flex-1">
-            <div
-              onClick={() => { setShowStartCal(prev => !prev); setShowEndCal(false); }}
-              className={`cursor-pointer rounded-2xl border bg-gray-50 px-5 py-4 text-base font-semibold text-gray-700 tracking-[0.03em] md:px-6 md:py-5 md:text-lg transition-all duration-200 hover:border-[#0F9B73]/70 ${
-                showStartCal ? 'border-[#0F9B73]/70 bg-white shadow-sm' : 'border-gray-200'
+      <div data-aos="zoom-in-up" data-aos-once="true">
+        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {PERIOD_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => onPeriodSelect(opt)}
+              className={`min-h-[96px] rounded-2xl border p-5 text-left md:min-h-[112px] md:p-6 transition-all duration-200 active:scale-[0.98] ${
+                selectedPeriod === opt.value
+                  ? 'border-gray-200 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.08)] ring-1 ring-[#0F9B73]/20'
+                  : 'border-gray-200 bg-gray-50 hover:-translate-y-0.5 hover:border-[#0F9B73]/30 hover:bg-white hover:shadow-sm'
               }`}
             >
-              <span className="mb-1 block text-sm font-semibold text-gray-400 tracking-[0.02em] md:text-base">시작일</span>
-              {startDate || '날짜 선택'}
-            </div>
-            {showStartCal && (
-              <AIPlanCalendar
-                mode="start"
-                nights={selectedNights}
-                onSelect={(start, end) => {
-                  onDateSelect(start, end);
-                  setShowStartCal(false);
-                }}
-                onClose={() => setShowStartCal(false)}
-              />
+              <p className={`mb-1 text-lg font-bold tracking-[0.04em] md:text-xl transition-colors duration-200 ${selectedPeriod === opt.value ? 'text-[#0F9B73]' : 'text-gray-900'}`}>{opt.label}</p>
+              <p className="text-sm font-medium leading-relaxed text-gray-400 tracking-[0.02em] md:text-base">{opt.desc}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* 날짜 선택 - 시작일/종료일 각각 분리 */}
+        <div className="border-t border-gray-100 pt-7">
+          <p className="mb-4 text-base font-bold text-gray-800 tracking-[0.03em] md:text-lg">
+            날짜를 선택해주세요
+            {selectedPeriod && (
+              <span className="ml-2 text-xs text-[#0F9B73] font-normal">
+                시작일 선택 시 {selectedPeriod} 자동 적용
+              </span>
             )}
-          </div>
+          </p>
 
-          <span className="text-center text-gray-400">~</span>
+          <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center">
 
-          {/* 종료일 */}
-          <div className="relative flex-1">
-            <div
-              onClick={() => { setShowEndCal(prev => !prev); setShowStartCal(false); }}
-              className={`cursor-pointer rounded-2xl border bg-gray-50 px-5 py-4 text-base font-semibold text-gray-700 tracking-[0.03em] md:px-6 md:py-5 md:text-lg transition-all duration-200 hover:border-[#0F9B73]/70 ${
-                showEndCal ? 'border-[#0F9B73]/70 bg-white shadow-sm' : 'border-gray-200'
-              }`}
-            >
-              <span className="mb-1 block text-sm font-semibold text-gray-400 tracking-[0.02em] md:text-base">종료일</span>
-              {endDate || '날짜 선택'}
+            {/* 시작일 */}
+            <div className="relative flex-1">
+              <div
+                onClick={() => { setShowStartCal(prev => !prev); setShowEndCal(false); }}
+                className={`cursor-pointer rounded-2xl border bg-gray-50 px-5 py-4 text-base font-semibold text-gray-700 tracking-[0.03em] md:px-6 md:py-5 md:text-lg transition-all duration-200 hover:border-[#0F9B73]/70 ${
+                  showStartCal ? 'border-[#0F9B73]/70 bg-white shadow-sm' : 'border-gray-200'
+                }`}
+              >
+                <span className="mb-1 block text-sm font-semibold text-gray-400 tracking-[0.02em] md:text-base">시작일</span>
+                {startDate || '날짜 선택'}
+              </div>
+              {showStartCal && (
+                <AIPlanCalendar
+                  mode="start"
+                  nights={selectedNights}
+                  onSelect={(start, end) => {
+                    onDateSelect(start, end);
+                    setShowStartCal(false);
+                  }}
+                  onClose={() => setShowStartCal(false)}
+                />
+              )}
             </div>
-            {showEndCal && (
-              <AIPlanCalendar
-                mode="end"
-                startDate={startDate}
-                nights={selectedNights}
-                onSelect={(start, end) => {
-                  onDateSelect(start, end);
-                  setShowEndCal(false);
-                }}
-                onClose={() => setShowEndCal(false)}
-              />
-            )}
-          </div>
 
+            <span className="text-center text-gray-400">~</span>
+
+            {/* 종료일 */}
+            <div className="relative flex-1">
+              <div
+                onClick={() => { setShowEndCal(prev => !prev); setShowStartCal(false); }}
+                className={`cursor-pointer rounded-2xl border bg-gray-50 px-5 py-4 text-base font-semibold text-gray-700 tracking-[0.03em] md:px-6 md:py-5 md:text-lg transition-all duration-200 hover:border-[#0F9B73]/70 ${
+                  showEndCal ? 'border-[#0F9B73]/70 bg-white shadow-sm' : 'border-gray-200'
+                }`}
+              >
+                <span className="mb-1 block text-sm font-semibold text-gray-400 tracking-[0.02em] md:text-base">종료일</span>
+                {endDate || '날짜 선택'}
+              </div>
+              {showEndCal && (
+                <AIPlanCalendar
+                  mode="end"
+                  startDate={startDate}
+                  nights={selectedNights}
+                  onSelect={(start, end) => {
+                    onDateSelect(start, end);
+                    setShowEndCal(false);
+                  }}
+                  onClose={() => setShowEndCal(false)}
+                />
+              )}
+            </div>
+
+          </div>
         </div>
       </div>
     </div>

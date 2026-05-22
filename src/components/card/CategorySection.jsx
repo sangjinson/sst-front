@@ -1,9 +1,14 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import AreaListCard from '@components/card/AreaListCard';
 
+import AOS from "aos";
+import "aos/dist/aos.css";
+
 const CategorySection = ({ title, pathType, dataList, onMoreClick, onCardClick }) => {
+  useEffect(() => { AOS.init(); }, []);
+
   return (
-    <section className="mb-[5vw]">
+    <section className="mb-[5vw]" data-aos="fade-up" data-aos-once="true">
       <div className="mb-5 flex items-end justify-between gap-4 md:mb-8">
         {/* 변경 전 확인용: 배지 형태 제목 스타일
         <h3 className="flex items-center gap-3 text-[1.9rem] font-bold text-gray-900">

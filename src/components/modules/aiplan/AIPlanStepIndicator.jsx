@@ -17,7 +17,7 @@ const AIPlanStepIndicator = ({ current }) => {
     <div className="mb-9 flex items-center justify-center md:mb-10">
       {steps.map((label, i) =>  (
         <React.Fragment key={i}>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center" data-aos="zoom-in" data-aos-once="true">
             <div className={`flex h-10 w-10 items-center justify-center rounded-full text-base font-black shadow-sm transition-all duration-200 ${
               i < current   ? 'bg-[#0F9B73] text-white' :
               i === current ? 'bg-[#0F9B73] text-white ring-4 ring-green-100' :

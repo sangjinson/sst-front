@@ -16,7 +16,7 @@ import { THEME_OPTIONS } from './aiPlanUtils';
  */
 const AIPlanThemeGrid = ({ selectedThemes = [], onToggle }) => {
   return (
-    <div>
+    <div data-aos="zoom-in" data-aos-once="true">
       <div className="mb-9 text-center md:mb-11">
         <div className="mb-3 flex items-center justify-center gap-2.5">
           <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-[#0F9B73] md:h-8 md:w-8" strokeWidth="2">
@@ -30,7 +30,7 @@ const AIPlanThemeGrid = ({ selectedThemes = [], onToggle }) => {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3" data-aos="zoom-in-up" data-aos-once="true">
         {THEME_OPTIONS.map(theme => (
           <button
             key={theme.value}

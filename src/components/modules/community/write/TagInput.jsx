@@ -6,6 +6,7 @@ const TagInput = ({
   tagInput,
   setTagInput,
   handleTagKeyDown,
+  setIsComposing,
 }) => {
   return (
     <div>
@@ -17,14 +18,12 @@ const TagInput = ({
         {tags.map((tag, index) => (
           <span
             key={index}
-            className="bg-[#f0f9f7] text-[#009277] px-3 py-1 rounded-md text-sm font-medium flex items-center gap-1 shadow-sm"
-          >
+            className="bg-[#f0f9f7] text-[#009277] px-3 py-1 rounded-md text-sm font-medium flex items-center gap-1 shadow-sm">
             #{tag}
             <button
               type="button"
               onClick={() => setTags(tags.filter((_, i) => i !== index))}
-              className="ml-1 hover:text-red-500"
-            >
+              className="ml-1 hover:text-red-500">
               ×
             </button>
           </span>
@@ -38,6 +37,8 @@ const TagInput = ({
           onKeyDown={handleTagKeyDown}
           placeholder={tags.length === 0 ? "태그 입력 후 엔터" : ""}
           inputClassName="fs-down-1"
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
         />
       </div>
     </div>

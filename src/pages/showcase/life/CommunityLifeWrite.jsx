@@ -42,6 +42,7 @@ const CommunityLifeWrite = () => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [regions, setRegions] = useState([]);
+  const [isComposing, setIsComposing] = useState(false);
 
   const getImageUrl = (url) => {
     if (!url) return "";
@@ -278,7 +279,10 @@ const CommunityLifeWrite = () => {
       .replace(/\s+/g, "");
 
   const handleTagKeyDown = (e) => {
-    if (e.key === "Enter" || e.key === " ") {
+    if (isComposing || e.nativeEvent.isComposing) return;
+
+    if (e.key === "Enter") {
+      console.log(e.target.value);
       e.preventDefault();
 
       const trimmedTag = normalizeTag(tagInput);
@@ -288,8 +292,10 @@ const CommunityLifeWrite = () => {
         setTags([...tags, trimmedTag]);
         setTagInput("");
       }
+    } else if(e.key === " "){
+        e.preventDefault();
     } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
-      setTags(tags.slice(0, -1));
+        setTags(tags.slice(0, -1));
     }
   };
 
@@ -467,6 +473,7 @@ const CommunityLifeWrite = () => {
           tagInput={tagInput}
           setTagInput={setTagInput}
           handleTagKeyDown={handleTagKeyDown}
+          setIsComposing={setIsComposing}
         />
       </WriteForm>
     </>

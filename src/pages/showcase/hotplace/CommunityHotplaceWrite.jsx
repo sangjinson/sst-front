@@ -41,6 +41,7 @@ const CommunityHotplaceWrite = () => {
   const [placeName, setPlaceName] = useState("");
   const [places, setPlaces] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [isComposing, setIsComposing] = useState(false);
 
   const getImageUrl = (url) => {
     if (!url) return "";
@@ -199,7 +200,10 @@ const CommunityHotplaceWrite = () => {
       .replace(/\s+/g, "");
 
   const handleTagKeyDown = (e) => {
-    if (e.key === "Enter" || e.key === " ") {
+
+    if (isComposing || e.nativeEvent.isComposing) return;
+
+    if (e.key === "Enter") {
       e.preventDefault();
 
       const trimmedTag = normalizeTag(tagInput);
@@ -209,8 +213,10 @@ const CommunityHotplaceWrite = () => {
         setTags([...tags, trimmedTag]);
         setTagInput("");
       }
+    } else if(e.key === " "){
+        e.preventDefault();
     } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
-      setTags(tags.slice(0, -1));
+        setTags(tags.slice(0, -1));
     }
   };
 
@@ -403,6 +409,7 @@ const CommunityHotplaceWrite = () => {
         tagInput={tagInput}
         setTagInput={setTagInput}
         handleTagKeyDown={handleTagKeyDown}
+        setIsComposing={setIsComposing}
       />
     </WriteForm>
   );
