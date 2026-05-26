@@ -58,6 +58,21 @@ const DeleteIcon = () => (
   </svg>
 );
 
+const UserIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21a8 8 0 0 0-16 0" />
+    <circle cx="12" cy="8" r="4" />
+  </svg>
+);
+
 const normalizeName = (name) => String(name || "").trim();
 
 const getDisplayName = (item) => {
@@ -87,6 +102,13 @@ const getCommentText = (comment, authorName = "") => {
     .slice(author.length)
     .replace(/^\s*[:：-]?\s*/, "")
     .trim();
+};
+
+const getProfileImageUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${import.meta.env.VITE_API_URL}${url}`;
+  return `${import.meta.env.VITE_API_URL}/${url}`;
 };
 
 const CommentSection = ({
@@ -222,8 +244,15 @@ const CommentSection = ({
                   )}
 
                   <div className="mb-4 flex items-start gap-4 pr-12">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50 text-sm">
-                      👤
+                    <div className="flex h-10 w-10 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-gray-50 items-center justify-center text-emerald-600">
+                      {comment.mbrProfileImgUrl ? (
+                        <img
+                          src={getProfileImageUrl(comment.mbrProfileImgUrl)}
+                          alt={commentAuthor}
+                          className="h-full w-full object-cover"/>
+                      ) : (
+                        <UserIcon />
+                      )}
                     </div>
 
                     <div>
