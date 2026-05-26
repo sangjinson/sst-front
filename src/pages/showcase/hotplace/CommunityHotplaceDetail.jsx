@@ -70,6 +70,7 @@ const CommunityHotplaceDetail = () => {
         description: item.commContent,
         content: item.commContent,
         author: item.mbrNickname,
+        mbrProfileImgUrl: item.mbrProfileImgUrl,
         place: item.plcName || "장소 미등록",
         region: item.rgnName || "지역 미정",
         hashtags: item.hashtagText ? item.hashtagText.split(",") : [],

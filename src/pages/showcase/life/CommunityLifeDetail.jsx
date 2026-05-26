@@ -98,6 +98,7 @@ const CommunityLifeDetail = () => {
           title: item.commTitle,
           description: item.commContent,
           author: item.mbrNickname,
+          mbrProfileImgUrl: item.mbrProfileImgUrl,
           theme1Name: item.theme1Name,
           theme2Name: item.theme2Name,
           theme3Name: item.theme3Name,
