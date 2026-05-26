@@ -118,7 +118,7 @@ const MySchedule = () => {
                     <tr
                       key={s.aisNo}
                       onClick={() => {
-                        sessionStorage.removeItem('currentSchedule');
+                        localStorage.removeItem('currentSchedule');
                         navigate('/plan/result', { state: { aisNo: s.aisNo } });
                       }}
                       className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer"

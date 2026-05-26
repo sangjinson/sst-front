@@ -50,8 +50,8 @@ const CommunityLifeDetail = () => {
       try {
         const viewedKey = `life_viewed_${id}`;
 
-        if (!localStorage.getItem(viewedKey)) {
-          localStorage.setItem(viewedKey, "true");
+        if (!sessionStorage.getItem(viewedKey)) {
+          sessionStorage.setItem(viewedKey, "true");
           await api.put(`/community/${id}/view`);
         }
 

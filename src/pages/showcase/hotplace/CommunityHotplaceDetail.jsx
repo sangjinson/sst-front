@@ -47,8 +47,8 @@ const CommunityHotplaceDetail = () => {
       const viewedKey = `hotplace_viewed_${id}`;
 
       // 처음 조회 시에만 조회수 증가
-      if (!localStorage.getItem(viewedKey)) {
-        localStorage.setItem(viewedKey, "true");
+      if (!sessionStorage.getItem(viewedKey)) {
+        sessionStorage.setItem(viewedKey, "true");
         await api.put(`/community/${id}/view`);
       }
 
