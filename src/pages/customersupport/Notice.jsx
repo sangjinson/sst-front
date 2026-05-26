@@ -34,7 +34,7 @@ const Notice = () => {
   /* 공지사항 데이터 조회 */
   useEffect(() => {
 
-    fetch("http://localhost:8080/api/customersupport/notice")
+    fetch(`${import.meta.env.VITE_API_URL}/api/customersupport/notice`)
 
       .then((res) => {
 

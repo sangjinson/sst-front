@@ -127,20 +127,9 @@ const CommunityLifeCard = ({
                 😊
               </div>
 
-              <span className="fs-down-1 font-semibold text-[#E8956D] truncate">
+              <span className="fs-down-1 font-semibold text-[#E8956D] truncate mr-3">
                 {post.author}
               </span>
-            </div>
-
-            {/* 제목 */}
-            <h3 className="fs-down-3 font-extrabold text-gray-900 mb-2 line-clamp-1 hover:text-[#0F9B73] transition break-all">
-              {post.title}
-            </h3>
-
-            {/* 설명 */}
-            <p className="fs-down-1 text-gray-500 leading-relaxed line-clamp-2 mb-3 break-all">
-              {post.description}
-            </p>
 
             {/* 테마 뱃지 */}
             {(post.themes || []).length > 0 && (
@@ -152,6 +141,30 @@ const CommunityLifeCard = ({
                       THEME_COLOR[i % THEME_COLOR.length]
                     }`}>
                     {theme}
+                  </span>
+                ))}
+              </div>
+            )}
+            </div>
+
+            {/* 제목 */}
+            <h3 className="fs-down-3 font-extrabold text-gray-900 mb-3 mt-5 line-clamp-1 hover:text-[#0F9B73] transition break-all">
+              {post.title}
+            </h3>
+
+            {/* 설명 */}
+            <p className="fs-down-1 text-gray-500 leading-relaxed line-clamp-2 mb-4 break-all">
+              {post.description}
+            </p>
+
+            {/* 해시태그 */}
+            {(post.hashtags || []).length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {post.hashtags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="rounded-full bg-emerald-50 px-2 py-1 fs-down-1 font-semibold text-[#0F9B73]">
+                    #{tag.replace("#", "")}
                   </span>
                 ))}
               </div>
