@@ -3,7 +3,7 @@ import api from "@api/axios";
 import { useParams, Navigate } from "react-router-dom";
 import { usePagination } from "@hooks/usePagination";
 import AdminPagination from "@components/admin/AdminPagination";
-import { TrashBinIcon } from "@components/icon";
+import { TrashBinIcon } from "@components/Icon";
 
 export default function AdminReplyList() {
 
