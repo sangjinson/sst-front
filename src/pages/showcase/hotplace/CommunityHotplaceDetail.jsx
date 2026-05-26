@@ -126,6 +126,7 @@ const CommunityHotplaceDetail = () => {
           user: comment.mbrNickname,
           text: comment.cmntContent,
           date: comment.cmntRegDate?.substring(0, 10),
+          mbrProfileImgUrl: comment.mbrProfileImgUrl,
           cmntNo: comment.cmntNo,
           cmntCommNo: comment.cmntCommNo,
           cmntMbrId: comment.cmntMbrId,
