@@ -271,7 +271,7 @@ const AppSidebar = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-8 ${isMobileOpen ? "hidden lg:flex" : "flex"} ${
+        className={`py-2 px-7 mb-7 ${isMobileOpen ? "hidden lg:flex" : "flex"} ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
