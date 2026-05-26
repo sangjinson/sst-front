@@ -199,6 +199,12 @@ const CommunityHotplaceWrite = () => {
       .replace(/^#/, "")
       .replace(/\s+/g, "");
 
+  const parseTags = (value) =>
+    value
+      .split(/[,\s#]+/)
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+
   const handleTagKeyDown = (e) => {
 
     if (isComposing || e.nativeEvent.isComposing) return;
@@ -206,15 +212,16 @@ const CommunityHotplaceWrite = () => {
     if (e.key === "Enter") {
       e.preventDefault();
 
-      const trimmedTag = normalizeTag(tagInput);
-      const normalizedTags = tags.map(normalizeTag);
+      const nextTags = parseTags(tagInput);
 
-      if (trimmedTag && !normalizedTags.includes(trimmedTag)) {
-        setTags([...tags, trimmedTag]);
-        setTagInput("");
-      }
-    } else if(e.key === " "){
-        e.preventDefault();
+      setTags((prev) => [
+        ...new Set([
+          ...prev,
+          ...nextTags.map(normalizeTag),
+        ]),
+      ]);
+
+      setTagInput("");
     } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
         setTags(tags.slice(0, -1));
     }
@@ -243,12 +250,10 @@ const CommunityHotplaceWrite = () => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-
-    const trimmedTag = normalizeTag(tagInput);
     
     const finalTags = Array.from(
       new Set(
-        [...tags, trimmedTag]
+        [...tags, ...parseTags(tagInput)]
           .map(normalizeTag)
           .filter(Boolean)
       )
