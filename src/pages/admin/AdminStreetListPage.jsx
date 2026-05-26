@@ -5,7 +5,7 @@ import api from "@api/axios";
 import { usePagination } from "@hooks/usePagination";
 import AdminPagination from "@components/admin/AdminPagination";
 
-import { PlusIcon, PencilIcon, TrashBinIcon } from "@components/icon";
+import { PlusIcon, PencilIcon, TrashBinIcon } from "@components/Icon";
 
 export default function AdminPlaceList() {
   const navigate = useNavigate();

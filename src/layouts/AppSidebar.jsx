@@ -13,7 +13,7 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
-} from "@components/icon";
+} from "@components/Icon";
 import { useSidebar } from "@context/SidebarContext";
 
 // --- 메뉴 데이터 구성 (거리에섯 관리자 맞춤) ---

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import api from "@api/axios";
-import { ArrowLeftIcon, PaperPlaneIcon } from "@components/icon";
+import { ArrowLeftIcon, PaperPlaneIcon } from "@components/Icon";
 
 export default function AdminStreetForm() {
   const { type } = useParams(); // food, play, see, sleep

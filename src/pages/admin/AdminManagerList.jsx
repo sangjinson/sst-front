@@ -7,7 +7,7 @@ import { usePagination } from "@hooks/usePagination";
 import { useAuth } from "@hooks/useAuth"; // 🚀 본인 계정 보호를 위해 현재 로그인 정보 가져오기
 import AdminPagination from "@components/admin/AdminPagination";
 
-import { PlusIcon, TrashBinIcon } from "@components/icon";
+import { PlusIcon, TrashBinIcon } from "@components/Icon";
 
 export default function AdminManagerList() {
   const navigate = useNavigate();
