@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "@api/axios";
-import PageBreadcrumb from "@components/admin/PageBreadCrumb";
+import PageBreadcrumb from "@components/admin/PageBreadcrumb";
 import PageMeta from "@components/admin/PageMeta";
 
 export default function AdminMemberInfoForm() {
