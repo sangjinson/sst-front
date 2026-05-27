@@ -66,7 +66,7 @@ const Sidebar = ({ profile, coverImg, onImgChange, onCoverChange, imgRef, coverR
         <ul className="flex flex-col gap-1.5 fs-up-2">
           <li>
             <Link to="/customersupport/notice" className="text-gray-700 flex items-center gap-2 py-1.5 hover:text-[#0F9B73] transition-colors">
-              <span>👤</span> 공지사항
+              <span>📢</span> 공지사항
             </Link>
           </li>
           <li>
