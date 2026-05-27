@@ -56,6 +56,7 @@ const CommunityHotplace = () => {
           title: item.commTitle,
           description: item.commContent,
           author: item.mbrNickname,
+          mbrProfileImgUrl: item.mbrProfileImgUrl,
           place: item.plcName || "장소 미등록",
           region: item.rgnName || "지역 미정",
           hashtags: item.hashtagText
@@ -146,6 +147,11 @@ const CommunityHotplace = () => {
 
     return () => clearTimeout(timer);
   }, [keyword, searchType, sortType, currentPage]);
+
+  // AOS 스크롤 애니메이션
+  useEffect(() => {
+    AOS.init();
+  }, []);
 
   useEffect(() => {
     if (!loading) {
@@ -278,8 +284,8 @@ const CommunityHotplace = () => {
       {posts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
           {posts.map((post) => (
+            <div key={post.id} data-aos="fade-up" data-aos-once="true">
             <CommunityHotplaceCard
-              key={post.id}
               post={post}
               liked={!!likedPosts[post.id]}
               onClick={() => navigate(`/showcase/hotplace/view/${post.id}`)}
@@ -288,8 +294,8 @@ const CommunityHotplace = () => {
                 setSearchType("hashtag");
                 setKeyword(tag);
                 setCurrentPage(1);
-              }}
-            />
+              }}/>
+            </div>
           ))}
         </div>
       ) : (

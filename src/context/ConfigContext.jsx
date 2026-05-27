@@ -30,7 +30,7 @@ export const ConfigProvider = ({ children }) => {
             slogan: '숨겨진 경기도의 매력을 발견하세요.',
             subSlogan: '나만의 완벽한 여행 일정을 AI와 함께 쉽게 계획할 수 있습니다.',
             copyright: '© 2026 SST. All rights reserved.',
-            portfolioNotice: '본 사이트는 팀 [SST]의 공동 역량 증명을 위한 포트폴리오 용도로 제작되었으며, 일체의 상업적 목적이 없음을 밝립니다.',
+            portfolioNotice: '본 사이트는 팀 [SST]의 공동 역량 증명을 위한 포트폴리오 용도로 제작되었으며, 일체의 상업적 목적이 없음을 밝힙니다.',
             devTeam: [
                 { name: '김영훈', email: 'weed3029@gmail.com' },
                 { name: '김지태', email: 'jtkim4510@gmail.com' },

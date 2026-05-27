@@ -282,24 +282,30 @@ const CommunityLifeWrite = () => {
       .replace(/^#/, "")
       .replace(/\s+/g, "");
 
+  const parseTags = (value) =>
+    value
+      .split(/[,\s#]+/)
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+
   const handleTagKeyDown = (e) => {
     if (isComposing || e.nativeEvent.isComposing) return;
 
     if (e.key === "Enter") {
-      console.log(e.target.value);
       e.preventDefault();
 
-      const trimmedTag = normalizeTag(tagInput);
-      const normalizedTags = tags.map(normalizeTag);
+      const nextTags = parseTags(tagInput);
 
-      if (trimmedTag && !normalizedTags.includes(trimmedTag)) {
-        setTags([...tags, trimmedTag]);
-        setTagInput("");
-      }
-    } else if(e.key === " "){
-        e.preventDefault();
+      setTags((prev) => [
+        ...new Set([
+          ...prev,
+          ...nextTags.map(normalizeTag),
+        ]),
+      ]);
+
+      setTagInput("");
     } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
-        setTags(tags.slice(0, -1));
+      setTags(tags.slice(0, -1));
     }
   };
 
@@ -323,10 +329,12 @@ const CommunityLifeWrite = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const trimmedTag = normalizeTag(tagInput);
-
     const finalTags = Array.from(
-      new Set([...tags, trimmedTag].map(normalizeTag).filter(Boolean))
+      new Set(
+        [...tags, ...parseTags(tagInput)]
+          .map(normalizeTag)
+          .filter(Boolean)
+      )
     );
 
     if (!selectedRegion?.rgnCd && !selectedRegion?.rgnName) {
