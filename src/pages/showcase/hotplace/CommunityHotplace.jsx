@@ -9,8 +9,12 @@ import CommunityHotplaceCard from "@components/modules/community/hotplace/Commun
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 import AOS from "aos";
 
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+
+
 
 const CommunityHotplace = () => {
+  const {getConfig} = useConfig();   // Config 값 가져오기
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -104,15 +108,8 @@ const CommunityHotplace = () => {
 
   // 로그인 사용자 조회: 처음 한 번만
   useEffect(() => {
-
-    api
-      .get("/auth/me")
-      .then((res) => {
-        setCurrentUserId(res.data.data.mbrId);
-      })
-      .catch((err) => {
-        console.error("로그인 사용자 조회 실패:", err);
-      });
+    let userId = getConfig('user.mbrId')
+    if(userId) setCurrentUserId(userId)
   }, []);
 
   // 인기 해시태그 API 호출

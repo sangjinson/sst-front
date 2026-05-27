@@ -9,7 +9,11 @@ import CommunityListHeader from "@components/modules/community/common/CommunityL
 import SchedulePickerModal from "@components/modules/community/life/SchedulePickerModal";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+
 const CommunityLife = () => {
+  const {getConfig} = useConfig();   // Config 값 가져오기
+  
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -31,14 +35,9 @@ const CommunityLife = () => {
 
   // 처음 진입 시 로그인 사용자 조회
   useEffect(() => {
-    api
-      .get("/auth/me")
-      .then((res) => {
-        setCurrentUserId(res.data.data.mbrId);
-      })
-      .catch((err) => {
-        console.error("로그인 사용자 조회 실패:", err);
-      });
+    // 회원 정보 인증 조회
+    let userId = getConfig('user.mbrId')
+    if(userId) setCurrentUserId(userId)
   }, []);
 
   // 내 AI 일정 목록 조회

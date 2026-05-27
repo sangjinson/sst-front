@@ -29,6 +29,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
+    // 인증 처리 일때 실패한다면 에러 발생으로 중지.
     if (originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/refresh')) {
       return Promise.reject(error);
     }

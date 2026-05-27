@@ -9,12 +9,16 @@ import ImageUpload from "@components/modules/community/write/ImageUpload";
 import api from "@api/axios";
 import { useAuth } from "@hooks/useAuth";
 
+import { useApi } from '@hooks/useApi';       // API 사용
+
 // 공통 글쓰기 폼
 import WriteForm from "@components/modules/community/write/WriteForm";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const CommunityHotplaceWrite = () => {
+  const apiTool = useApi(); // Api 의 사용
+
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
@@ -74,7 +78,7 @@ const CommunityHotplaceWrite = () => {
 
         // 수정 모드 게시글 조회
         if (isEditMode) {
-          const res = await api.get(`/community/${id}`);
+          const res = await apiTool.getCommunityDetail(id);
           const post = res.data;
 
           const serverImages = post.images?.length
