@@ -81,7 +81,6 @@ const CommunityLifeDetail = () => {
           if (!regionName || regionName === "장소 정보 없음") {
             return "/images/community/default-life.jpg";
           }
-
           return `/banners/${regionName}.webp`;
         };
 
