@@ -233,81 +233,83 @@ const CommunityHotplace = () => {
           }}
         />
       )}
-    <div className="paperlogy container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20 font-sans">
-      <CommunityListHeader
-        breadcrumb={[
-          { label: "홈", to: "/" },
-          { label: "핫플거리", to: "/showcase" },
-        ]}
-        label="Hotplace"
-        title="핫플거리"
-        description="여행자들이 직접 발견한 장소와 분위기를 사진 카드로 모아봤어요."
-        switchTo={{ label: "인생거리", to: "/showcase/life" }}
-        writeText="글쓰기"
-        onWriteClick={() => {
-          if (!currentUserId) {
-            setShowLoginModal(true);
-            return;
-          }
+    <div className="paperlogy min-h-screen bg-[#f7f8fa] font-sans">
+      <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20">
+        <CommunityListHeader
+          breadcrumb={[
+            { label: "홈", to: "/" },
+            { label: "핫플거리", to: "/showcase" },
+          ]}
+          label="Hotplace"
+          title="핫플거리"
+          description="여행자들이 직접 발견한 장소와 분위기를 사진 카드로 모아봤어요."
+          switchTo={{ label: "인생거리", to: "/showcase/life" }}
+          writeText="글쓰기"
+          onWriteClick={() => {
+            if (!currentUserId) {
+              setShowLoginModal(true);
+              return;
+            }
 
-          navigate("/showcase/hotplace/write");
-        }}
-      />
+            navigate("/showcase/hotplace/write");
+          }}
+        />
 
-      <CommunitySearchBar
-        keyword={keyword}
-        setKeyword={(value) => {
-          setKeyword(value);
-          setCurrentPage(1);
-        }}
-        searchType={searchType}
-        setSearchType={(value) => {
-          setSearchType(value);
-          setCurrentPage(1);
-        }}
-        sortType={sortType}
-        setSortType={(value) => {
-          setSortType(value);
-          setCurrentPage(1);
-        }}
-        totalCount={totalCount}
-        onSearch={fetchPosts}
-        onReset={() => {
-          setKeyword("");
-          setSearchType("all");
-          setSortType("latest");
-          setCurrentPage(1);
-        }}
-        popularTags={popularTags}
-      />
+        <CommunitySearchBar
+          keyword={keyword}
+          setKeyword={(value) => {
+            setKeyword(value);
+            setCurrentPage(1);
+          }}
+          searchType={searchType}
+          setSearchType={(value) => {
+            setSearchType(value);
+            setCurrentPage(1);
+          }}
+          sortType={sortType}
+          setSortType={(value) => {
+            setSortType(value);
+            setCurrentPage(1);
+          }}
+          totalCount={totalCount}
+          onSearch={fetchPosts}
+          onReset={() => {
+            setKeyword("");
+            setSearchType("all");
+            setSortType("latest");
+            setCurrentPage(1);
+          }}
+          popularTags={popularTags}
+        />
 
-      {posts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
-          {posts.map((post) => (
-            <div key={post.id} data-aos="fade-up" data-aos-once="true">
-            <CommunityHotplaceCard
-              post={post}
-              liked={!!likedPosts[post.id]}
-              onClick={() => navigate(`/showcase/hotplace/view/${post.id}`)}
-              onToggleLike={() => toggleLike(post.id)}
-              onTagClick={(tag) => {
-                setSearchType("hashtag");
-                setKeyword(tag);
-                setCurrentPage(1);
-              }}/>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
-          검색 결과가 없습니다.
-        </div>
-      )}
-      <AreaPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+        {posts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
+            {posts.map((post) => (
+              <div key={post.id} data-aos="fade-up" data-aos-once="true">
+              <CommunityHotplaceCard
+                post={post}
+                liked={!!likedPosts[post.id]}
+                onClick={() => navigate(`/showcase/hotplace/view/${post.id}`)}
+                onToggleLike={() => toggleLike(post.id)}
+                onTagClick={(tag) => {
+                  setSearchType("hashtag");
+                  setKeyword(tag);
+                  setCurrentPage(1);
+                }}/>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
+            검색 결과가 없습니다.
+          </div>
+        )}
+        <AreaPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
      </div>
     </>
   );
