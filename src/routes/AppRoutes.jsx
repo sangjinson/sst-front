@@ -11,14 +11,12 @@ import LandingLayout from '@layouts/LandingLayout';
 import LandingPage from '@pages/landing/LandingPage';
 
 import MainPage from '@pages/main/MainPage';
-import AdminDashboard from '@pages/admin/Dashboard';
 import Unauthorized from '@pages/error/Unauthorized';
 import NotFoundPage from '@pages/error/NotFoundPage';
 import MyPage from '@pages/user/MyPage';
 
 import Notice from "@pages/customersupport/Notice";
 import Faq from "@pages/customersupport/Faq";
-import AreaBaseTemplate from '@pages/area/AreaBaseTemplate';
 import AreaListTemplate from '@pages/area/AreaListTemplate';
 import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 
@@ -40,60 +38,46 @@ import SignupPage from '@pages/auth/SignupPage';
 
 import OAuthRedirectHandler from '@pages/auth/OAuthRedirectHandler';
 
-import AdminHome from '@pages/user/Home';
 
-import AreaPostList from '@pages/admin/AreaPostList';
-import ReportList from '@pages/admin/ReportList';
-import ReportDetail from '@pages/admin/ReportDetail';
-import HotplaceList from '@pages/admin/HotplaceList';
-import LifeList from '@pages/admin/LifeList';
-import NoticeManage from '@pages/admin/NoticeManage';
-import FaqManage from '@pages/admin/FaqManage';
+
 import CommonCodeList from '@pages/admin/CommonCodeList';
 
 import { AIPlanProvider } from '@pages/aiplan/AIPlanContext';
 
 
-/* 관리자 */
-{/* 
-import SignIn from '@layouts/admin/tailadmin/layout/pages/AuthPages/SignIn';
-import SignUp from '@layouts/admin/tailadmin/layout/pages/AuthPages/SignUp';
-import NotFound from '@layouts/admin/tailadmin/layout/pages/OtherPage/NotFound';
-import UserProfiles from '@layouts/admin/tailadmin/layout/pages/UserProfiles';
-import Videos from '@layouts/admin/tailadmin/layout/pages/UiElements/Videos';
-import Images from '@layouts/admin/tailadmin/layout/pages/UiElements/Images';
-import Alerts from '@layouts/admin/tailadmin/layout/pages/UiElements/Alerts';
-import Badges from '@layouts/admin/tailadmin/layout/pages/UiElements/Badges';
-import Avatars from '@layouts/admin/tailadmin/layout/pages/UiElements/Avatars';
-import Buttons from '@layouts/admin/tailadmin/layout/pages/UiElements/Buttons';
-import LineChart from '@layouts/admin/tailadmin/layout/pages/Charts/LineChart';
-import BarChart from '@layouts/admin/tailadmin/layout/pages/Charts/BarChart';
-import Calendar from '@layouts/admin/tailadmin/layout/pages/Calendar';
-import BasicTables from '@layouts/admin/tailadmin/layout/pages/Tables/BasicTables';
-import FormElements from '@layouts/admin/tailadmin/layout/pages/Forms/FormElements';
-import Blank from '@layouts/admin/tailadmin/layout/pages/Blank';
-import AppLayout from '@layouts/admin/tailadmin/layout/layout/AppLayout';
-import { ScrollToTop } from '@layouts/admin/tailadmin/layout/components/common/ScrollToTop';
-*/}
+{/* 관리자 - 대시보드 */}
 import Home from '@pages/admin/Dashboard.jsx';
+
 {/* 관리자 - 회원 관리 */}
-import AdinMemberList from '@themeadmin/pages/Members/AdminMemberList';
-import AdminManagerList from '@themeadmin/pages/Members/AdminManagerList';
-import AdminMemberInfoForm from '@themeadmin/pages/Members/AdminMemberInfoForm';
+import AdminMemberList from '@pages/admin/AdminMemberList';
+import AdminManagerList from '@pages/admin/AdminManagerList';
+import AdminMemberInfoForm from '@pages/admin/AdminMemberInfoForm';
+import AdminMemberEdit from '@pages/admin/AdminMemberEdit';
+
+{/* 관리자 - 관리자 관리 */}
+import AdminManagerCreate from '@pages/admin/AdminManagerCreate';
 
 {/* 관리자 - 놀거리, 먹거리, 잘거리, 볼거리 */}
-import AdminStreetListPage from '@themeadmin/pages/Streets/AdminStreetListPage';
-import AdminStreetForm from '@themeadmin/pages/Streets/AdminStreetForm';
-
-import AdminMemberEdit from '@pages/admin/AdminMemberEdit';
-import AdminReport from '@pages/admin/AdminReport';
+import AdminStreetListPage from '@pages/admin/AdminStreetListPage';
+import AdminStreetForm from '@pages/admin/AdminStreetForm';
 import AdminSeeModify from '@pages/admin/area/AdminSeeModify';
 import AdminFoodModify from '@pages/admin/area/AdminFoodModify';
 import AdminPlayModify from '@pages/admin/area/AdminPlayModify';
 import AdminSleepModify from '@pages/admin/area/AdminSleepModify';
-import AdminManagerCreate from '@pages/admin/AdminManagerCreate';
-import AdminReviewList from '@pages/admin/comments/AdminReviewList';
-import AdminComment from '@pages/admin/comments/AdminComment';
+
+{/* 관리자 - 핫플,인생거리 관리 */}
+import AdminShowcaseList from '@pages/admin/AdminShowcaseList';
+// import HotplaceList from '@pages/admin/HotplaceList';
+// import LifeList from '@pages/admin/LifeList';
+
+{/* 관리자 - 리뷰, 댓글 관리 */}
+import AdminReplyList from '@pages/admin/AdminReplyList';
+
+{/* 관리자 - 신고 관리 */}
+import AdminReport from '@pages/admin/AdminReport';
+
+{/* 관리자 - 고객 지원 관리 */}
+import AdminSupportManage from '@pages/admin/AdminSupportManage';
 
 
 const AppRoutes = () => {
@@ -168,12 +152,11 @@ const AppRoutes = () => {
           <Route path="faq" element={<FaqManage />} />
           {/* 추가된 어드민 라우트들이 있다면 여기에 넣으면 돼! */}
           <Route index element={<Home />} />
-          <Route path="members" element={<AdinMemberList />} />
           <Route path="common-codes" element={<CommonCodeList />} />
 
           {/* 회원 관리 */}
           <Route path="members">
-            <Route index element={<AdinMemberList />} />
+            <Route index element={<AdminMemberList />} />
             <Route path="create" element={<AdminMemberInfoForm />} />
             <Route path="update" element={<AdminMemberInfoForm />} />
             <Route path="edit/:id" element={<AdminMemberEdit />} />
@@ -199,19 +182,16 @@ const AppRoutes = () => {
           <Route path="report" element={<AdminReport />} />
 
           <Route path="support">
-            <Route path="notices" element={<NoticeManage />} />
-            <Route path="faq" element={<FaqManage />} />
+            <Route path=":type" element={<AdminSupportManage />} />
           </Route>
 
-          {/* 🚀 뽐낼거리(커뮤니티) 관리 라우터 추가 */}
+          {/* 뽐낼거리(커뮤니티) 관리 */}
           <Route path="showcase">
-            {/* /admin/showcase/hotplace 로 접속 시 HotplaceList 렌더링 */}
-            <Route path="hotplace" element={<HotplaceList />} />
-            {/* 💡 추후 인생거리를 작업하면 아래에 추가하세요 */}
-            <Route path="life" element={<LifeList />} /> 
+            <Route path=":type" element={<AdminShowcaseList />} />
           </Route>
-          <Route path="reviews" element={<AdminReviewList />} />
-          <Route path="comments" element={<AdminComment />} />
+          {/* 댓글 관리 */}
+            <Route path=":type" element={<AdminReplyList />} />
+          
         </Route>
       </Route> 
 

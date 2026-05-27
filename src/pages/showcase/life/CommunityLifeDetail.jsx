@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import CommunityDetailHeader from "@components/modules/community/common/CommunityDetailHeader";
@@ -14,7 +13,7 @@ import ImageSlider from "@components/modules/community/common/ImageSlider";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 import CommunityLifeDetailSkeleton from "@components/skeleton/CommunityLifeDetailSkeleton";
 
- const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const CommunityLifeDetail = () => {
   const { id } = useParams();
@@ -89,7 +88,7 @@ const CommunityLifeDetail = () => {
         const imageUrl = item.commMainImgUrl
           ? item.commMainImgUrl.startsWith("http")
             ? item.commMainImgUrl
-            : `http://localhost:8080${item.commMainImgUrl}`
+            : `${import.meta.env.VITE_API_URL}${item.commMainImgUrl}`
           : getRegionBannerImage(item.rgnName || item.plcName);
 
         const mappedPost = {
@@ -99,6 +98,7 @@ const CommunityLifeDetail = () => {
           title: item.commTitle,
           description: item.commContent,
           author: item.mbrNickname,
+          mbrProfileImgUrl: item.mbrProfileImgUrl,
           theme1Name: item.theme1Name,
           theme2Name: item.theme2Name,
           theme3Name: item.theme3Name,
@@ -126,14 +126,15 @@ const CommunityLifeDetail = () => {
   }, [id]);
 
   const fetchComments = (commNo) => {
-    axios
-      .get(`http://localhost:8080/api/comments/${commNo}`)
+    api
+      .get(`/comments/${commNo}`)
       .then((res) => {
         const mappedComments = res.data.map((comment) => ({
           id: comment.cmntNo,
           user: comment.mbrNickname,
           text: comment.cmntContent,
           date: comment.cmntRegDate?.substring(0, 10),
+          mbrProfileImgUrl: comment.mbrProfileImgUrl,
           cmntNo: comment.cmntNo,
           cmntCommNo: comment.cmntCommNo,
           cmntMbrId: comment.cmntMbrId,
@@ -289,8 +290,8 @@ const CommunityLifeDetail = () => {
       return;
     }
     const commNo = post.commNo ?? post.id;
-    axios
-      .post("http://localhost:8080/api/comments", {
+    api
+      .post("/comments", {
         cmntCommNo: commNo,
         cmntMbrId: currentUserId,
         cmntContent: newComment,
@@ -315,8 +316,8 @@ const CommunityLifeDetail = () => {
       return;
     }
     const commNo = post.commNo ?? post.id;
-    axios
-      .put(`http://localhost:8080/api/comments/${commentId}`, {
+    api
+      .put(`/comments/${commentId}`, {
         cmntContent: editText,
       })
       .then(() => {
@@ -332,8 +333,8 @@ const CommunityLifeDetail = () => {
   const handleDeleteComment = (commentId) => {
     if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
     const commNo = post.commNo ?? post.id;
-    axios
-      .delete(`http://localhost:8080/api/comments/${commentId}`)
+    api
+      .delete(`/comments/${commentId}`)
       .then(() => {
         fetchComments(commNo);
       })

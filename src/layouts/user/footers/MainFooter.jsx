@@ -36,7 +36,7 @@ const MainFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10 pb-5 border-b border-white/10 items-start">
 
           {/* 왼쪽: Contract */}
-          <div className="flex flex-col gap-2 md:gap-4" data-aos="slide-right" data-aos-once="true">
+          <div className="flex flex-col gap-2 md:gap-4" >
             <h3 className="text-gray-100 font-bold fs-6 fs-md-8 leading-none border-b border-white/20 pb-3 md:pb-6">
               Contract
             </h3>
@@ -57,7 +57,7 @@ const MainFooter = () => {
           </div>
 
           {/* 오른쪽: Dev Team */}
-          <div className="flex flex-col gap-2 md:gap-4" data-aos="slide-left" data-aos-once="true">
+          <div className="flex flex-col gap-2 md:gap-4">
             <h3 className="text-gray-100 font-bold fs-6 fs-md-8 leading-none border-b border-white/20 pb-3 md:pb-6">
               Dev Team
             </h3>
@@ -70,7 +70,7 @@ const MainFooter = () => {
             </ul>
 
             <div className="text-gray-300 border-t border-white/20 pt-3 md:border-t-0 md:pt-0 font-bold">
-              <ul className="flex items-center text-gray-300 border-t border-white/20 pt-3 md:border-t-0 md:pt-0 font-bold list-none">
+              <ul className="flex items-center text-gray-300 border-white/20 pt-3 md:pt-0 font-bold list-none">
                 <li>
                   <Link to="/customersupport/notice" className="text-white hover:text-sky-400! transition-colors duration-200">공지사항</Link>
                 </li>

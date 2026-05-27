@@ -1,46 +1,24 @@
-import React from 'react';
-import { ThemeProvider } from '@layouts/admin/tailadmin/context/ThemeContext';
-import { SidebarProvider, useSidebar } from '@layouts/admin/tailadmin/context/SidebarContext';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import AppHeader from '@layouts/admin/tailadmin/layout/AppHeader';
-import Backdrop from '@layouts/admin/tailadmin/layout/Backdrop';
-import AppSidebar from '@layouts/admin/tailadmin/layout/AppSidebar';
+import AppHeader from '@layouts/AppHeader';
+import AppSidebar from '@layouts/AppSidebar';
 import '@assets/css/admin.css';
 
-import BasicBreadcrumb from '@layouts/admin/tailadmin/components/ui/breadcrumb/BasicBreadcrumb';
-
-// 1. 실제 UI 렌더링을 담당하는 컴포넌트 (useSidebar 사용 가능)
-function AdminLayoutContent() {
-  const { isExpanded, isHovered, isMobileOpen } = useSidebar();
-
-  return (
-    <div className="min-h-screen xl:flex">
-      <div>
+function AdminLayout() {
+return (
+    // 최상위 html에 자동으로 .dark가 붙기 때문에, 
+    // 여기를 포함한 모든 하위 컴포넌트는 오직 Tailwind의 dark: 유틸리티 클래스로만 반응하면 됩니다.
+    <div className="min-h-screen">
+      <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
         <AppSidebar />
-        <Backdrop />
-      </div>
-      <div
-        className={`flex-1 transition-all duration-300 ease-in-out ${
-          isExpanded || isHovered ? "lg:ml-[290px]" : "lg:ml-[90px]"
-        } ${isMobileOpen ? "ml-0" : ""}`}
-      >
-        <AppHeader />
-        <div className="p-4 mx-auto md:p-6">
-          <Outlet />
+        <div className="ml-[90px] xl:ml-[290px]">
+          <AppHeader />
+          <main className="p-6">
+            <Outlet />
+          </main>
         </div>
       </div>
     </div>
-  );
-}
-
-// 2. 외부에서 Provider로 감싸주는 메인 컴포넌트
-function AdminLayout() {
-  return (
-    <ThemeProvider>
-      <SidebarProvider>
-        <AdminLayoutContent />
-      </SidebarProvider>
-    </ThemeProvider>
   );
 }
 

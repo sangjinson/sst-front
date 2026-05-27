@@ -1,6 +1,7 @@
 import React from "react";
 import { ClipButton } from "@components/modules/ActionButtons";
 
+
 const DownloadIcon = () => (
   <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M12 3v12" />
@@ -24,29 +25,28 @@ const CalendarPlanIcon = () => (
   </svg>
 );
 
+const UserIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21a8 8 0 0 0-16 0" />
+    <circle cx="12" cy="8" r="4" />
+  </svg>
+);
 
-/**
- * LifeAside
- *
- * 인생거리 상세페이지 오른쪽 사이드 정보 영역입니다.
- *
- * 사용 예시:
- *
- * <LifeAside
- *   post={post}
- *   region={region}
- *   courseList={courseList}
- *   viewCount={viewCount}
- *   comments={comments}
- *   wishCount={wishCount}
- *   isLiked={isLiked}
- *   setIsLiked={setIsLiked}
- *   isLogin={isLogin}
- *   navigate={navigate}
- *   handleImportSchedule={handleImportSchedule}
- *   handleMakePlan={handleMakePlan}
- * />
- */
+const getProfileImageUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${import.meta.env.VITE_API_URL}${url}`;
+  return `${import.meta.env.VITE_API_URL}/${url}`;
+};
+
 const LifeAside = ({
   post,
   courseList,
@@ -96,8 +96,15 @@ const LifeAside = ({
 
       {/* 작성자 */}
       <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 text-xl shadow-sm">
-          😊
+        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-emerald-100 bg-emerald-50 shadow-sm flex items-center justify-center text-emerald-600">
+          {post.mbrProfileImgUrl ? (
+            <img
+              src={getProfileImageUrl(post.mbrProfileImgUrl)}
+              alt={post.author}
+              className="h-full w-full object-cover"/>
+          ) : (
+            <UserIcon />
+          )}
         </div>
 
         <div>

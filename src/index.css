@@ -3,6 +3,8 @@
 /* 1. Tailwind v4 불러오기 */
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* 2. 로컬 폰트 등록 */
 @font-face {
   font-family: 'GriunFont'; 
@@ -42,3 +44,4 @@
     margin: 0;
   }
 }
+

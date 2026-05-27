@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import api from "@api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import CommunityDetailHeader from "@components/modules/community/common/CommunityDetailHeader";
@@ -60,7 +59,7 @@ const CommunityHotplaceDetail = () => {
       const imageUrl = item.commMainImgUrl
         ? item.commMainImgUrl.startsWith("http")
           ? item.commMainImgUrl
-          : `http://localhost:8080${item.commMainImgUrl}`
+          : `${import.meta.env.VITE_API_URL}${item.commMainImgUrl}`
         : "https://placehold.co/900x650";
 
       setCurrentPost({
@@ -71,6 +70,7 @@ const CommunityHotplaceDetail = () => {
         description: item.commContent,
         content: item.commContent,
         author: item.mbrNickname,
+        mbrProfileImgUrl: item.mbrProfileImgUrl,
         place: item.plcName || "장소 미등록",
         region: item.rgnName || "지역 미정",
         hashtags: item.hashtagText ? item.hashtagText.split(",") : [],
@@ -80,7 +80,7 @@ const CommunityHotplaceDetail = () => {
             ? item.images.map((img) =>
                 img.startsWith("http")
                   ? img
-                  : `http://localhost:8080${img}`
+                  : `${import.meta.env.VITE_API_URL}${img}`
               )
             : [imageUrl],
         regDt: item.commRegDate,
@@ -118,14 +118,15 @@ const CommunityHotplaceDetail = () => {
 
   // 댓글 조회 함수
   const fetchComments = (commNo) => {
-    axios
-      .get(`http://localhost:8080/api/comments/${commNo}`)
+    api
+      .get(`/comments/${commNo}`)
       .then((res) => {
         const mappedComments = res.data.map((comment) => ({
           id: comment.cmntNo,
           user: comment.mbrNickname,
           text: comment.cmntContent,
           date: comment.cmntRegDate?.substring(0, 10),
+          mbrProfileImgUrl: comment.mbrProfileImgUrl,
           cmntNo: comment.cmntNo,
           cmntCommNo: comment.cmntCommNo,
           cmntMbrId: comment.cmntMbrId,
@@ -174,8 +175,8 @@ const CommunityHotplaceDetail = () => {
 
     const commNo = currentPost.commNo ?? currentPost.id;
 
-    axios
-      .post("http://localhost:8080/api/comments", {
+    api
+      .post("/comments", {
         cmntCommNo: commNo,
         cmntMbrId: currentUserId,
         cmntContent: newComment,
@@ -203,8 +204,8 @@ const CommunityHotplaceDetail = () => {
 
     const commNo = currentPost.commNo ?? currentPost.id;
 
-    axios
-      .put(`http://localhost:8080/api/comments/${commentId}`, {
+    api
+      .put(`/comments/${commentId}`, {
         cmntContent: editText,
       })
       .then(() => {
@@ -222,8 +223,8 @@ const CommunityHotplaceDetail = () => {
   const handleDeleteComment = (commentId) => {
     if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
     const commNo = currentPost.commNo ?? currentPost.id;
-    axios
-      .delete(`http://localhost:8080/api/comments/${commentId}`)
+    api
+      .delete(`/comments/${commentId}`)
       .then(() => {
         fetchComments(commNo);
       })

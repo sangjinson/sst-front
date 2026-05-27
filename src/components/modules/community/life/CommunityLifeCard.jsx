@@ -76,6 +76,21 @@ const LikeIcon = () => (
   </svg>
 );
 
+const UserIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21a8 8 0 0 0-16 0" />
+    <circle cx="12" cy="8" r="4" />
+  </svg>
+);
+
 const CommunityLifeCard = ({
   post,
   onClick,
@@ -88,6 +103,13 @@ const CommunityLifeCard = ({
 }) => {
   // 화면에 보여줄 좋아요 수
   const likeCount = post.wishCnt;
+
+  const getProfileImageUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    if (url.startsWith("/")) return `${import.meta.env.VITE_API_URL}${url}`;
+    return `${import.meta.env.VITE_API_URL}/${url}`;
+  };
 
   return (
     <article
@@ -123,24 +145,20 @@ const CommunityLifeCard = ({
           <div className="overflow-hidden pr-20 md:pr-28">
             {/* 작성자 */}
             <div className="mb-2 flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-sm">
-                😊
+              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-emerald-100 bg-emerald-50 shadow-sm flex items-center justify-center text-emerald-600">
+                {post.mbrProfileImgUrl ? (
+                  <img
+                    src={getProfileImageUrl(post.mbrProfileImgUrl)}
+                    alt={post.author}
+                    className="h-full w-full object-cover"/>
+                ) : (
+                  <UserIcon />
+                )}
               </div>
 
-              <span className="fs-down-1 font-semibold text-[#E8956D] truncate">
+              <span className="fs-down-1 font-semibold text-[#E8956D] truncate mr-3">
                 {post.author}
               </span>
-            </div>
-
-            {/* 제목 */}
-            <h3 className="fs-down-3 font-extrabold text-gray-900 mb-2 line-clamp-1 hover:text-[#0F9B73] transition break-all">
-              {post.title}
-            </h3>
-
-            {/* 설명 */}
-            <p className="fs-down-1 text-gray-500 leading-relaxed line-clamp-2 mb-3 break-all">
-              {post.description}
-            </p>
 
             {/* 테마 뱃지 */}
             {(post.themes || []).length > 0 && (
@@ -152,6 +170,30 @@ const CommunityLifeCard = ({
                       THEME_COLOR[i % THEME_COLOR.length]
                     }`}>
                     {theme}
+                  </span>
+                ))}
+              </div>
+            )}
+            </div>
+
+            {/* 제목 */}
+            <h3 className="fs-down-3 font-extrabold text-gray-900 mb-3 mt-5 line-clamp-1 hover:text-[#0F9B73] transition break-all">
+              {post.title}
+            </h3>
+
+            {/* 설명 */}
+            <p className="fs-down-1 text-gray-500 leading-relaxed line-clamp-2 mb-4 break-all">
+              {post.description}
+            </p>
+
+            {/* 해시태그 */}
+            {(post.hashtags || []).length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {post.hashtags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="rounded-full bg-emerald-50 px-2 py-1 fs-down-1 font-semibold text-[#0F9B73]">
+                    #{tag.replace("#", "")}
                   </span>
                 ))}
               </div>

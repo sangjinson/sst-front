@@ -8,6 +8,8 @@ import CommunityLifeSkeleton from "@components/skeleton/CommunityLifeSkeleton";
 import CommunityListHeader from "@components/modules/community/common/CommunityListHeader";
 import SchedulePickerModal from "@components/modules/community/life/SchedulePickerModal";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const CommunityLife = () => {
   const navigate = useNavigate();
@@ -40,6 +42,17 @@ const CommunityLife = () => {
         console.error("로그인 사용자 조회 실패:", err);
       });
   }, []);
+
+  // AOS 스크롤 애니메이션
+  useEffect(() => {
+    AOS.init();
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      AOS.refreshHard();
+    }
+  }, [loading, posts]);
 
   // 내 AI 일정 목록 조회
   useEffect(() => {
@@ -117,7 +130,7 @@ const CommunityLife = () => {
     // 업로드 이미지가 있는 경우
     if (url) {
       if (url.startsWith("http")) return url;
-      return `http://localhost:8080${url}`;
+      return `${import.meta.env.VITE_API_URL}${url}`;
     }
 
     // 업로드 이미지가 없으면 지역 배너 사용
@@ -149,16 +162,18 @@ const CommunityLife = () => {
             title: item.commTitle,
             description: item.commContent,
             author: item.mbrNickname,
+            mbrProfileImgUrl: item.mbrProfileImgUrl,
             place: item.plcName || "장소 미정",
             region: item.rgnName || "지역 미정",
-            hashtags: item.hashtagText
-              ? item.hashtagText.split(",")
-              : [],
-              themes: [
-              item.theme1Name,
-              item.theme2Name,
-              item.theme3Name,
-            ].filter(Boolean),
+            hashtags: (item.hashtagText || "")
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean),
+            themes: [
+            item.theme1Name,
+            item.theme2Name,
+            item.theme3Name,
+              ].filter(Boolean),
             thumbnail: imageUrl,
             images: item.commMainImgUrl ? [imageUrl] : [],
             regDt: item.commRegDate,
@@ -334,8 +349,8 @@ const CommunityLife = () => {
       {posts.length > 0 ? (
         <div className="flex flex-col gap-8">
           {posts.map((post) => (
+            <div key={post.id} data-aos="fade-up" data-aos-once="true">
             <CommunityLifeCard
-              key={post.id}
               post={post}
 
               //  좋아요 상태 전달
@@ -347,8 +362,8 @@ const CommunityLife = () => {
               // 카드 클릭
               onClick={() =>
                 navigate(`/showcase/life/view/${post.id}`)
-              }
-            />
+              }/>
+            </div>
           ))}
         </div>
       ) : (
