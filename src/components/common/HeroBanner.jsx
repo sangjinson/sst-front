@@ -26,7 +26,7 @@ const HeroBanner = ({ bgImage, title, subtitle, className = '', to }) => {
           {title}
         </h1>
         {subtitle && (
-          <p className="text-[18px] md:text-[24px] font-medium tracking-[2px]" data-aos="fade-up" data-aos-once="true">
+          <p className="mx-auto max-w-[320px] px-4 text-center text-[20px] md:max-w-[900px] md:text-[24px] font-medium leading-relaxed break-keep md:tracking-[2px]" data-aos="fade-up" data-aos-once="true">
             {subtitle}
           </p>
         )}

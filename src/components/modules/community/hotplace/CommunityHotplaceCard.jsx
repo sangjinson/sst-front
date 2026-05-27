@@ -44,6 +44,21 @@ const LikeIcon = () => (
   </svg>
 );
 
+const UserIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21a8 8 0 0 0-16 0" />
+    <circle cx="12" cy="8" r="4" />
+  </svg>
+);
+
 const CommunityHotplaceCard = ({
   post,
   liked,
@@ -55,6 +70,13 @@ const CommunityHotplaceCard = ({
     if (size === "wide") return "aspect-[4/3]";
     if (size === "square") return "aspect-square";
     return "aspect-[3/4]";
+  };
+
+  const getProfileImageUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    if (url.startsWith("/")) return `${import.meta.env.VITE_API_URL}${url}`;
+    return `${import.meta.env.VITE_API_URL}/${url}`;
   };
 
   return (
@@ -86,14 +108,28 @@ const CommunityHotplaceCard = ({
         </p>
 
         <div className="mb-3 flex items-center justify-between gap-3 fs-down-2 text-gray-500">
-          <div className="min-w-0">
-            <span className="mr-2 fs-down-1">by</span>
-            <strong className="fs-down-2 text-[#E8956D] truncate">
-              {post.author}
-            </strong>
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-emerald-100 bg-emerald-50 shadow-sm flex items-center justify-center text-emerald-600">
+              {post.mbrProfileImgUrl ? (
+                <img
+                  src={getProfileImageUrl(post.mbrProfileImgUrl)}
+                  alt={post.author}
+                  className="h-full w-full object-cover"/>
+              ) : (
+                <UserIcon />
+              )}
+            </div>
+
+            <div className="min-w-0">
+              <strong className="fs-down-2 text-[#E8956D] truncate">
+                {post.author}
+              </strong>
+            </div>
           </div>
 
-          <span className="shrink-0 fs-down-1">{post.regDt}</span>
+          <span className="shrink-0 fs-down-1">
+            {post.regDt}
+          </span>
         </div>
 
         <div className="mb-4 h-7 flex flex-wrap gap-2">
