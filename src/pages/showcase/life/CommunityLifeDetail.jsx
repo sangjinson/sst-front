@@ -36,35 +36,44 @@ const CommunityLifeDetail = () => {
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  // 최초 진입 시 맨 위로 스크롤 이동
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
 
+  // 로그인 사용자 정보 조회
   useEffect(() => {
     // 회원 정보 인증 조회
     let userId = getConfig('user.mbrId')
     if(userId) setCurrentUserId(userId)
   }, []);
 
+  // 인생거리 상세 게시글 조회
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
+        // 조회수 중복 방지 키
         const viewedKey = `life_viewed_${id}`;
 
+        // 처음 조회 시에만 조회수 증가
         if (!sessionStorage.getItem(viewedKey)) {
           sessionStorage.setItem(viewedKey, "true");
           await api.put(`/community/${id}/view`);
         }
+        // 게시글 상세 조회
         const res = await apiTool.getCommunityDetail(id);
         const item = res.data;
 
+        // 여행 코스 목록
         let course = [];
 
+        // AI 일정 기반 코스 조회
         if (item.commAisNo) {
           const placeRes = await api.get(
             `/community/life/schedules/${item.commAisNo}/places`
           );
 
+          // 코스 데이터 매핑
           course = placeRes.data.map((place, index) => ({
             order: index + 1,
             name: place.name || place.plcName || "",
@@ -77,6 +86,7 @@ const CommunityLifeDetail = () => {
           }));
         }
 
+        // 지역 기본 배너 이미지 반환
         const getRegionBannerImage = (regionName) => {
           if (!regionName || regionName === "장소 정보 없음") {
             return "/images/community/default-life.jpg";
@@ -84,12 +94,14 @@ const CommunityLifeDetail = () => {
           return `/banners/${regionName}.webp`;
         };
 
+        // 대표 이미지 URL 생성
         const imageUrl = item.commMainImgUrl
           ? item.commMainImgUrl.startsWith("http")
             ? item.commMainImgUrl
             : `${import.meta.env.VITE_API_URL}${item.commMainImgUrl}`
           : getRegionBannerImage(item.rgnName || item.plcName);
 
+        // 게시글 데이터 매핑
         const mappedPost = {
           id: item.commNo,
           commNo: item.commNo,
@@ -121,9 +133,11 @@ const CommunityLifeDetail = () => {
       }
     };
 
+    // 상세 게시글 조회 실행
     fetchPostDetail();
   }, [id]);
 
+  // 댓글 목록 조회 함수
   const fetchComments = (commNo) => {
     api
       .get(`/comments/${commNo}`)
@@ -145,12 +159,14 @@ const CommunityLifeDetail = () => {
       });
   };
 
+  // 게시글 변경 시 댓글 목록 조회
   useEffect(() => {
     if (!post) return;
     const commNo = post.commNo ?? post.id;
     fetchComments(commNo);
   }, [post]);
 
+  // 게시글 좋아요 상태 조회
   useEffect(() => {
     if (!currentUserId || !post?.commNo) return;
     api
@@ -169,6 +185,7 @@ const CommunityLifeDetail = () => {
     return <CommunityLifeDetailSkeleton />;
   }
 
+  // 게시글이 존재하지 않을 경우
   if (!post) {
     return (
       <div className="py-20 text-center font-bold text-gray-500">
@@ -177,16 +194,19 @@ const CommunityLifeDetail = () => {
     );
   }
 
+  // 대표 이미지 및 게시글 정보 추출
   const thumbnail = post.thumbnail || post.img;
   const region = post.region || post.place || "장소 정보 없음";
   const courseList = post.course || [];
   const viewCount = post.viewCnt || 0;
   const wishCount = post.wishCnt || 0;
 
+  // 댓글 영역으로 스크롤 이동
   const scrollToComments = () => {
     document.getElementById("life-comments")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // 이미지 URL 정규화
   const normalizeImageUrl = (url) => {
     if (!url) return null;
     if (url.startsWith("http")) return url;
@@ -194,12 +214,13 @@ const CommunityLifeDetail = () => {
     return `${BASE_URL}/${url}`;
   };
 
+  // 이미지 슬라이드 데이터 생성
   const slideImages =
     post.images?.length > 0
       ? post.images.map(normalizeImageUrl).filter(Boolean)
       : [thumbnail || "/images/community/default-life.jpg"];
 
-  // ✅ 내 일정으로 가져오기 - DB 저장
+  // 내 일정으로 가져오기 - DB 저장
   const handleImportSchedule = async () => {
     if (!isLogin) {
       navigate("/login");
@@ -283,6 +304,7 @@ const CommunityLifeDetail = () => {
     navigate("/plan/result");
   };
 
+  // 댓글 등록
   const handleCommentSubmit = () => {
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
@@ -304,11 +326,13 @@ const CommunityLifeDetail = () => {
       });
   };
 
+  // 댓글 수정 시작
   const startEditing = (commentId, text) => {
     setEditingId(commentId);
     setEditText(text);
   };
 
+  // 댓글 수정 저장
   const handleSaveEdit = (commentId) => {
     if (!editText.trim()) {
       alert("수정할 내용을 입력해주세요.");
@@ -329,6 +353,7 @@ const CommunityLifeDetail = () => {
       });
   };
 
+  // 댓글 삭제
   const handleDeleteComment = (commentId) => {
     if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
     const commNo = post.commNo ?? post.id;
@@ -342,6 +367,7 @@ const CommunityLifeDetail = () => {
       });
   };
 
+  // 게시글 삭제
   const handleDeletePost = async () => {
     if (!window.confirm("게시글을 삭제하시겠습니까?")) return;
     try {
@@ -354,6 +380,7 @@ const CommunityLifeDetail = () => {
     }
   };
 
+  // 게시글 좋아요 처리
   const handleLikeClick = async () => {
     if (!currentUserId) {
       setShowLoginModal(true);
@@ -377,6 +404,7 @@ const CommunityLifeDetail = () => {
     }
   };
 
+  // 게시글 작성자 여부 확인
   const isOwner =
     currentUserId !== null &&
     post.mbrId !== null &&
