@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import StarRating from '@components/modules/StarRating';
 import Swal from 'sweetalert2';
 import { useAuth } from '@hooks/useAuth';
-import { getReviews, createReview, updateReview, deleteReview } from '@api/reviewApi';
+import { getReviews } from '@api/reviewApi';
+import { useApi } from '@hooks/useApi';
 
 const REVIEWS_PER_PAGE = 3;
 
@@ -65,11 +66,12 @@ const AreaReview = ({
   plcNo,
   placeholder = '리뷰를 남겨주세요.',
 }) => {
+  const apiTool = useApi(); // Api 의 사용
   const navigate = useNavigate();
   const { user } = useAuth();
   const isLoggedIn = !!user;
 
-  const [reviews, setReviews]           = useState([]);
+  const [reviews, setReviews]               = useState([]);
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
@@ -82,19 +84,28 @@ const AreaReview = ({
   // ─────────────────────────────────────────
   useEffect(() => {
     if (!plcNo) return;
-    getReviews(plcNo)
-      .then((data) => {
-        setReviews(data.map((r) => ({
-          ...r,
-          id     : r.rvwNo,
-          user   : r.nickname ?? '익명',
-          rating : r.rvwRating,
-          comment: r.rvwContent,
-          isMine : r.rvwMbrId === user?.mbrId,
-          date   : r.rvwRegDate ? formatDate(r.rvwRegDate) : '',
-        })));
-      })
-      .catch(() => {});
+
+    const fetchReviewsData = async () => {
+      try {
+        // 리뷰 목록 불러오기
+        const data = await apiTool.getReviews(plcNo);
+        if (data && Array.isArray(data)) {
+          setReviews(data.map((r) => ({
+            ...r,
+            id     : r.rvwNo,
+            user   : r.nickname ?? '익명',
+            rating : r.rvwRating,
+            comment: r.rvwContent,
+            isMine : r.rvwMbrId === user?.mbrId,
+            date   : r.rvwRegDate ? formatDate(r.rvwRegDate) : '',
+          })));
+        }
+      } catch (error) {
+        // console.error("리뷰 목록 로드 실패:", error);
+      }
+    };
+    fetchReviewsData();
+    
   }, [plcNo, user]);
 
   // 평균 평점 계산
@@ -109,12 +120,13 @@ const AreaReview = ({
     if (reviewRating === 0)      { alert('별점을 선택해주세요.'); return; }
     if (!reviewComment.trim())   { alert('리뷰 내용을 입력해주세요.'); return; }
     try {
-      const newReview = await createReview({
+      const newReview = await apiTool.createReview({
         rvwPlcNo  : plcNo,
         rvwMbrId  : user.mbrId,
         rvwRating : reviewRating,
         rvwContent: reviewComment.trim(),
       });
+
       setReviews((prev) => [{
         ...newReview,
         id     : newReview.rvwNo,
@@ -144,12 +156,13 @@ const AreaReview = ({
     if (editRating === 0)      { alert('별점을 선택해주세요.'); return; }
     if (!editComment.trim())   { alert('리뷰 내용을 입력해주세요.'); return; }
     try {
-      await updateReview(id, {
+      await apiTool.updateReview(id, {
         rvwPlcNo  : plcNo,
         rvwMbrId  : user.mbrId,
         rvwRating : editRating,
         rvwContent: editComment.trim(),
       });
+      
       setReviews((prev) =>
         prev.map((r) => r.id === id
           ? { ...r, rating: editRating, comment: editComment.trim(), date: formatDate(new Date()) }
@@ -168,10 +181,12 @@ const AreaReview = ({
   const handleDelete = async (id) => {
     if (window.confirm('리뷰를 삭제하시겠습니까?')) {
       try {
-        await deleteReview(id, {
+
+        await apiTool.deleteReview(id, {
           rvwPlcNo: plcNo,
           rvwMbrId: user.mbrId,
         });
+
         setReviews((prev) => prev.filter((r) => r.id !== id));
       } catch {
         alert('리뷰 삭제에 실패했습니다. 다시 시도해주세요.');

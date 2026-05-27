@@ -13,9 +13,15 @@ import ImageSlider from "@components/modules/community/common/ImageSlider";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 import CommunityLifeDetailSkeleton from "@components/skeleton/CommunityLifeDetailSkeleton";
 
+import { useApi } from '@hooks/useApi';       // API 사용
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const CommunityLifeDetail = () => {
+  const apiTool = useApi(); // Api 의 사용
+  const {getConfig} = useConfig();   // Config 값 가져오기
+  
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -35,14 +41,9 @@ const CommunityLifeDetail = () => {
   }, []);
 
   useEffect(() => {
-    api
-      .get("/auth/me")
-      .then((res) => {
-        setCurrentUserId(res.data.data.mbrId);
-      })
-      .catch((err) => {
-        console.error("로그인 사용자 조회 실패:", err);
-      });
+    // 회원 정보 인증 조회
+    let userId = getConfig('user.mbrId')
+    if(userId) setCurrentUserId(userId)
   }, []);
 
   useEffect(() => {
@@ -50,12 +51,11 @@ const CommunityLifeDetail = () => {
       try {
         const viewedKey = `life_viewed_${id}`;
 
-        if (!localStorage.getItem(viewedKey)) {
-          localStorage.setItem(viewedKey, "true");
+        if (!sessionStorage.getItem(viewedKey)) {
+          sessionStorage.setItem(viewedKey, "true");
           await api.put(`/community/${id}/view`);
         }
-
-        const res = await api.get(`/community/${id}`);
+        const res = await apiTool.getCommunityDetail(id);
         const item = res.data;
 
         let course = [];

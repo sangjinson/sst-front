@@ -18,7 +18,7 @@ const authButtonIconClass = 'w-4 h-4 text-white! transition-all duration-200 gro
 
 const Header = () => {
 
-  const {getConfig, setConfig} = useConfig();   // Config 값 가져오기
+  const {getConfig} = useConfig();   // Config 값 가져오기
 
   const [isMenuOpen, setIsMenuOpen]     = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -165,7 +165,7 @@ const Header = () => {
             <Search className="w-8 h-8 text-gray-600" />
           </button>
 
-          {user ? (
+          {getConfig('user.isAuth') ? (
             <div className="hidden items-center gap-3 md:flex">
               {/* 프로필 + 아코디언 */}
               <div className="relative"

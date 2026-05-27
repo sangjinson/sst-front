@@ -10,7 +10,13 @@ import CommentSection from "@components/modules/community/common/CommentSection"
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 import CommunityHotplaceDetailSkeleton from "@components/skeleton/CommunityHotplaceDetailSkeleton";
 
+import { useApi } from '@hooks/useApi';       // API 사용
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+
+
 const CommunityHotplaceDetail = () => {
+  const apiTool = useApi(); // Api 의 사용
+  const {getConfig} = useConfig();   // Config 값 가져오기
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -27,17 +33,10 @@ const CommunityHotplaceDetail = () => {
 
   useEffect(() => {
 
-  window.scrollTo({ top: 0 });
-
-  // 로그인 사용자 조회
-  api
-    .get("/auth/me")
-    .then((res) => {
-      setCurrentUserId(res.data.data.mbrId);
-    })
-    .catch((err) => {
-      console.error("로그인 사용자 조회 실패:", err);
-    });
+    window.scrollTo({ top: 0 });
+    // 회원 정보 인증 조회
+    let userId = getConfig('user.mbrId')
+    if(userId) setCurrentUserId(userId)
 
   // 게시글 조회 함수
   const fetchPost = async () => {
@@ -47,13 +46,13 @@ const CommunityHotplaceDetail = () => {
       const viewedKey = `hotplace_viewed_${id}`;
 
       // 처음 조회 시에만 조회수 증가
-      if (!localStorage.getItem(viewedKey)) {
-        localStorage.setItem(viewedKey, "true");
+      if (!sessionStorage.getItem(viewedKey)) {
+        sessionStorage.setItem(viewedKey, "true");
         await api.put(`/community/${id}/view`);
       }
 
       // 게시글 상세 조회
-      const res = await api.get(`/community/${id}`);
+      const res = await apiTool.getCommunityDetail(id);
       const item = res.data;
 
       const imageUrl = item.commMainImgUrl

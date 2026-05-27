@@ -11,9 +11,13 @@ import WriteForm from "@components/modules/community/write/WriteForm";
 import SchedulePickerModal from "@components/modules/community/life/SchedulePickerModal";
 import CourseSection from "@components/modules/community/life/CourseSection";
 
+import { useApi } from '@hooks/useApi';       // API 사용
+
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const CommunityLifeWrite = () => {
+  const apiTool = useApi(); // Api 의 사용
+
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
@@ -96,7 +100,7 @@ const CommunityLifeWrite = () => {
 
     const fetchEditPost = async () => {
       try {
-        const res = await api.get(`/community/${id}`);
+        const res = await apiTool.getCommunityDetail(id);
         const item = res.data;
 
         let serverImages = [];
