@@ -417,7 +417,7 @@ const CommunityLifeDetail = () => {
           />
 
           <article className="bg-white rounded-3xl border border-gray-100 p-6 md:p-10 shadow-sm">
-            <p className="whitespace-pre-wrap text-base md:text-lg leading-9 text-gray-700">
+            <p className="whitespace-pre-wrap text-base md:text-lg leading-9 tracking-[0.012em] text-gray-700">
               {post.description}
             </p>
           </article>

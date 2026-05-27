@@ -142,7 +142,7 @@ const HotplaceAside = ({
       {/* 본문 */}
       <div>
         <span className="fs-down-1 font-semibold text-gray-400 mb-3 block">본문</span>
-        <p className="whitespace-pre-wrap fs-down-1 leading-8 text-gray-700">{currentPost.description}</p>
+        <p className="whitespace-pre-wrap text-justify fs-down-1 leading-9 tracking-[0.01em] break-keep text-gray-700">{currentPost.description}</p>
       </div>
     </aside>
   );
