@@ -17,7 +17,7 @@ export default function OAuthRedirectHandler() {
     
     // 가장 깔끔한 방법: isLogin만 켜주고 메인으로 보낸다.
     // AuthContext가 알아서 백엔드의 /auth/me 를 찔러 정확한 유저 정보(memberRole 등)를 세팅함.
-    localStorage.setItem('isLogin', 'true');
+    sessionStorage.setItem('isLogin', 'true');
     
     // 혹시 백엔드에서 실패했을 때 ?error=true 같은 걸 달고 왔다면 예외 처리
     const searchParams = new URLSearchParams(location.search);

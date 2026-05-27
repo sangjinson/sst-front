@@ -6,7 +6,7 @@ const ProfileImage = ({ user: propsUser, size = 'sm', className = "", preview = 
   
   // 🚀 1. 전역 설정(Config)에 저장된 최신 유저 정보를 우선 참조
   // 이렇게 하면 MemberInfo에서 수정한 내용이 즉시 반영됩니다.
-  const globalUser = getConfig('profile');
+  const globalUser = getConfig('user');
   const currentUser = propsUser || globalUser;
 
   const defaultProfile = "/images/user/default-user.png";
@@ -34,7 +34,7 @@ const ProfileImage = ({ user: propsUser, size = 'sm', className = "", preview = 
   // [1순위] 로컬 파일 선택 시 미리보기(preview) 
   // [2순위] 전역 상태 혹은 props의 서버 이미지 경로
   // [3순위] 닉네임 첫 글자 아바타 (이미지 없을 시)
-  const displayImage = preview || currentUser?.profileIcon?.filePath  ;
+  const displayImage = preview || currentUser?.profileIcon?.filePath || globalUser?.mbrProfileIcon?.filePath;
 
   
 

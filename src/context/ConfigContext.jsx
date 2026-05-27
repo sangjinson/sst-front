@@ -9,7 +9,7 @@ import { toast, confirm, mapDataToState } from '@utils/common'
 export const ConfigContext = createContext(null);
 
 export const ConfigProvider = ({ children }) => {
-    const { user } = useAuth(); // 인증 hook (기본 로그인 정보)
+    // const { user } = useAuth(); // 인증 hook (기본 로그인 정보)
     const { region, type } = useParams();
 
     const [siteConfig, setSiteConfig] = useState({
@@ -18,7 +18,7 @@ export const ConfigProvider = ({ children }) => {
         curRegion: {},
         curRegionEn: '',
         curRegionKr: '',
-        isUser: false,
+        user : {},
         profile: null, // 🚀 여기에 상세 프로필 데이터가 저장됩니다.
         navs: {},
         theme: 'light',
@@ -48,21 +48,18 @@ export const ConfigProvider = ({ children }) => {
         return result ?? defaultValue;
     }, [siteConfig]);
 
-    const makeConfig = useCallback((path, value) => {
+   const makeConfig = useCallback((path, value) => {
         setSiteConfig(prev => {
             const keys = path.split('.');
-            let currentRaw = prev;
-            for (let i = 0; i < keys.length; i++) {
-                currentRaw = currentRaw?.[keys[i]];
-            }
-
-            if (currentRaw === value) return prev;
-
+            
+            // 1. 새로운 객체 구조 생성 (불변성 유지)
             const newConfig = { ...prev };
             let current = newConfig;
 
+            // 2. 경로 끝 직전까지 탐색
             for (let i = 0; i < keys.length - 1; i++) {
                 const key = keys[i];
+                // 경로가 없거나 객체가 아니면 새로 생성
                 if (!current[key] || typeof current[key] !== 'object') {
                     current[key] = {};
                 } else {
@@ -71,7 +68,29 @@ export const ConfigProvider = ({ children }) => {
                 current = current[key];
             }
 
-            current[keys[keys.length - 1]] = value;
+            const lastKey = keys[keys.length - 1];
+            const existingValue = current[lastKey];
+
+            // 3. 병합 로직 강화
+            // 기존 값이 객체이고, 들어오는 value도 객체라면 병합 수행
+            if (
+                existingValue !== null &&
+                typeof existingValue === 'object' &&
+                value !== null &&
+                typeof value === 'object' &&
+                !Array.isArray(value)
+            ) {
+                // 값이 같으면 굳이 업데이트 안 함 (성능 최적화)
+                if (JSON.stringify(existingValue) === JSON.stringify(value)) return prev;
+                
+                current[lastKey] = { ...existingValue, ...value };
+            } else {
+                // 값이 같으면 굳이 업데이트 안 함 (성능 최적화)
+                if (existingValue === value) return prev;
+                
+                current[lastKey] = value;
+            }
+
             return newConfig;
         });
     }, []);
@@ -90,26 +109,11 @@ export const ConfigProvider = ({ children }) => {
         }
     }, [makeConfig]);
 
+    
     useEffect(() => {
-        // --- 지역 관련 ---
-        makeConfig('Url.region', region ?? '');
-        makeConfig('Url.type', type ?? '');
-
-        const regionEn = region ? toRegionTxt(region, 'en') : '';
-        if (hasRegion(region)) {
-            makeConfig('curRegionEn', regionEn);
-            makeConfig('curRegionKr', toRegionTxt(region, 'ko'));
-            makeConfig('curRegion', toRegion(region));
-            localStorage.setItem('lastVisitedRegion', regionEn);
-        } else if (!siteConfig.curRegionEn) {
-            const savedRegion = localStorage.getItem('lastVisitedRegion');
-            if (savedRegion && hasRegion(savedRegion)) {
-                makeConfig('curRegionEn', toRegionTxt(savedRegion, 'en'));
-                makeConfig('curRegionKr', toRegionTxt(savedRegion, 'ko'));
-                makeConfig('curRegion', toRegion(savedRegion));
-            }
-        }
+        
         // --- 사용자 인증 및 profile 동기화 ---
+        /*
         if (user) {
             // profile 정보가 없거나 로그인이 바뀐 경우에만 호출
             if (!siteConfig.profile || siteConfig.profile.id !== user.mbrId) {
@@ -121,9 +125,10 @@ export const ConfigProvider = ({ children }) => {
             if (siteConfig.profile !== null) makeConfig('profile', null);
             if (siteConfig.isUser) makeConfig('isUser', false);
         }
+        */
 
-    }, [user, region, type, fetchFullProfile, siteConfig.profile, siteConfig.isUser, siteConfig.curRegionEn, makeConfig]);
-
+    }, []);
+    
     const value = useMemo(() => ({ 
         siteConfig, 
         makeConfig, 

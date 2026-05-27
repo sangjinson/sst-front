@@ -11,7 +11,11 @@ import LoginRequiredModal from "@components/modules/community/common/LoginRequir
 import AOS from "aos";
 import "aos/dist/aos.css";
 
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+
 const CommunityLife = () => {
+  const {getConfig} = useConfig();   // Config 값 가져오기
+  
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -33,14 +37,9 @@ const CommunityLife = () => {
 
   // 처음 진입 시 로그인 사용자 조회
   useEffect(() => {
-    api
-      .get("/auth/me")
-      .then((res) => {
-        setCurrentUserId(res.data.data.mbrId);
-      })
-      .catch((err) => {
-        console.error("로그인 사용자 조회 실패:", err);
-      });
+    // 회원 정보 인증 조회
+    let userId = getConfig('user.mbrId')
+    if(userId) setCurrentUserId(userId)
   }, []);
 
   // AOS 스크롤 애니메이션

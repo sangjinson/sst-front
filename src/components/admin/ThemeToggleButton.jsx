@@ -1,4 +1,4 @@
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from '@context/AdminThemeContext'; // 🚀 위치 확인
 
 export const ThemeToggleButton = () => {
   const { theme, toggleTheme } = useTheme();
