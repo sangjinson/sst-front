@@ -5,7 +5,7 @@ const ProfileCover = ({ user: propsUser, preview = null, className = "" }) => {
   const { getConfig } = useConfig();
   
   // 전역 설정의 프로필 정보 참조
-  const globalUser = getConfig('profile');
+  const globalUser = getConfig('user');
   const currentUser = propsUser || globalUser;
   
   // 기본 이미지
@@ -13,7 +13,7 @@ const ProfileCover = ({ user: propsUser, preview = null, className = "" }) => {
 
 
   // 이미지 표시 우선순위: 1. 미리보기(DataURL), 2. 서버 경로, 3. 기본 이미지
-  const displayImage = preview || currentUser?.profileBg?.filePath;
+  const displayImage = preview || currentUser?.profileBg?.filePath || globalUser?.mbrProfileBg?.filePath;
 
 
   return (

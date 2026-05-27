@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom';
 
 import { toRegionTxt, toRegion, hasRegion } from '@utils/regionMap';
 
-export const ThemeContext = createContext();
+export const AdminThemeContext = createContext();
 
-export const ThemeProvider = ({ children }) => {
+export const AdminThemeProvider = ({ children }) => {
   const {getConfig, setConfig} = useConfig();   // Config 값 가져오기
   const { region, type } = useParams();
   const siteConfig = getConfig();
@@ -64,10 +64,10 @@ export const ThemeProvider = ({ children }) => {
   const isDarkMode = theme === 'dark';
 
   return (
-    <ThemeContext.Provider value={{ theme, isDarkMode, toggleTheme }}>
+    <AdminThemeContext.Provider value={{ theme, isDarkMode, toggleTheme }}>
       {children}
-    </ThemeContext.Provider>
+    </AdminThemeContext.Provider>
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => useContext(AdminThemeContext);

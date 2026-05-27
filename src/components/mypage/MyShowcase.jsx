@@ -86,7 +86,7 @@ const MyShowcase = () => {
 
   // 카테고리별 상세 이동
   const handleMoveDetail = (post) => {
-    sessionStorage.setItem("mypageTab", "showcase");
+    localStorage.setItem("mypageTab", "showcase");
 
     if (post.catCd === "CMM001") {
       navigate(`/showcase/life/view/${post.id}`);

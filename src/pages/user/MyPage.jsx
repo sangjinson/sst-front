@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import api from '@api/axios'; 
 import { useConfig } from '@hooks/useConfig'; // setConfig를 위해 추가
 import { useAuth } from '@hooks/useAuth'; // localLogout을 위해 추가
+import { useApi } from '@hooks/useApi';
 
 import { toast, confirm, mapDataToState } from '@utils/common'
 
@@ -29,8 +30,10 @@ const CARDS = [
 ];
 
 const MyPage = () => {
-  const location = useLocation();
+  const apiTool = useApi(); // Api 의 사용
   const { getConfig, setConfig } = useConfig();
+
+  const location = useLocation();
   const { localLogout } = useAuth();
   const [activeSection, setActiveSection] = useState(
     location.state?.tab || sessionStorage.getItem("mypageTab") || "member"
@@ -45,11 +48,10 @@ const MyPage = () => {
 
   const fetchMemberData = async () => {
     try {
-      const response = await api.get('/member/me');
-      const data = response.data.data;
-      setProfile(mapDataToState('profile', data));
+      const response = await apiTool.getProfile();
+      setProfile(mapDataToState('profile', response.data));
+      setConfig('user',mapDataToState('user', response.data));
     } catch (error) {
-      
       console.error('회원 정보 로드 실패:', error);
     } finally {
       setLoading(false);
@@ -62,15 +64,11 @@ const MyPage = () => {
   const handleProfileUpdate = async (formData) => {
     try {
       // 프로필 데이터를 저장
-      const response = await api.post('/member/me', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await apiTool.updateProfile(formData);
       // 코드가 정상으로 들어왔을 경우.
       if(response.data.httpCode == 200){
         // 반환 데이터를 가져온다.
         const updatedData = response.data.data;
-
-        console.log(updatedData)
 
         // 프로필 상태 업데이트
         // 1. 업데이트할 데이터를 미리 변수로 정의 (규격 맞추기)
@@ -78,8 +76,6 @@ const MyPage = () => {
 
         // 2. 상태 업데이트 (Sidebar가 Props로 받는 값)
         setProfile(nextProfile);
-
-        console.log(nextProfile)
 
         // 3. 전역 설정 동기화 (가공된 데이터를 넘겨야 Sidebar가 useConfig를 써도 반응함)
         setConfig('profile', nextProfile);
@@ -157,9 +153,7 @@ const MyPage = () => {
   
       try {
         // 🚀 2. axios delete 요청 시 body에 데이터를 담으려면 { data: payload } 구조를 사용해야 합니다.
-        await api.delete('/member/me', {
-          data: result.value // { reasonCd, reasonDesc }
-        });
+        await apiTool.withdrawMember(result.value);
         
         await Swal.fire({
           icon: 'success',
@@ -177,7 +171,7 @@ const MyPage = () => {
 
   const sectionLabel = CARDS.find((c) => c.key === activeSection)?.label || '';
 
-
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-6 md:px-10 lg:py-10">
@@ -192,7 +186,7 @@ const MyPage = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 items-start">
-          <Sidebar profile={getConfig('profile')} />
+          <Sidebar profile={profile} />
 
           <section className="flex-1 min-w-0 flex flex-col gap-4 w-full">
             <div className="relative">

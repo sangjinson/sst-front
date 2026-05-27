@@ -1,14 +1,16 @@
 import { Outlet } from 'react-router-dom';
-import { ConfigProvider } from '@context/ConfigContext';
+
+import { ThemeProvider } from '@context/ThemeContext'; // 🚀 위치 확인
 
 {/* Layouts */}
 import LandingHeader from '@layouts/user/headers/LandingHeader';
 import MainFooter from '@layouts/user/footers/MainFooter';
 
 
+
 const LandingLayout = () => {
   return (
-    <ConfigProvider>
+    <ThemeProvider>
       <div className="page-wrapper min-h-screen bg-[#f8f6f0]">
         {/* Header 영역 */}
         <LandingHeader />
@@ -21,7 +23,7 @@ const LandingLayout = () => {
         {/* Footer 영역 */}
         <MainFooter />
       </div>
-    </ConfigProvider>
+    </ThemeProvider>
   );
 };
 

@@ -13,9 +13,15 @@ import ImageSlider from "@components/modules/community/common/ImageSlider";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 import CommunityLifeDetailSkeleton from "@components/skeleton/CommunityLifeDetailSkeleton";
 
+import { useApi } from '@hooks/useApi';       // API 사용
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const CommunityLifeDetail = () => {
+  const apiTool = useApi(); // Api 의 사용
+  const {getConfig} = useConfig();   // Config 값 가져오기
+  
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -35,14 +41,9 @@ const CommunityLifeDetail = () => {
   }, []);
 
   useEffect(() => {
-    api
-      .get("/auth/me")
-      .then((res) => {
-        setCurrentUserId(res.data.data.mbrId);
-      })
-      .catch((err) => {
-        console.error("로그인 사용자 조회 실패:", err);
-      });
+    // 회원 정보 인증 조회
+    let userId = getConfig('user.mbrId')
+    if(userId) setCurrentUserId(userId)
   }, []);
 
   useEffect(() => {
@@ -50,12 +51,11 @@ const CommunityLifeDetail = () => {
       try {
         const viewedKey = `life_viewed_${id}`;
 
-        if (!localStorage.getItem(viewedKey)) {
-          localStorage.setItem(viewedKey, "true");
+        if (!sessionStorage.getItem(viewedKey)) {
+          sessionStorage.setItem(viewedKey, "true");
           await api.put(`/community/${id}/view`);
         }
-
-        const res = await api.get(`/community/${id}`);
+        const res = await apiTool.getCommunityDetail(id);
         const item = res.data;
 
         let course = [];
@@ -81,7 +81,6 @@ const CommunityLifeDetail = () => {
           if (!regionName || regionName === "장소 정보 없음") {
             return "/images/community/default-life.jpg";
           }
-
           return `/banners/${regionName}.webp`;
         };
 
@@ -384,117 +383,119 @@ const CommunityLifeDetail = () => {
     Number(currentUserId) === Number(post.mbrId);
 
   return (
-    <div className="paperlogy container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20 font-sans">
-      <CommunityDetailHeader
-        breadcrumb={[
-          { label: "홈", to: "/" },
-          { label: "인생거리", to: "/showcase/life" },
-          { label: "상세보기" },
-        ]}
-        label="Life Course Detail"
-        title="인생거리"
-        description="여행자들이 남긴 인생샷 장소와 순간을 모아봤어요."
-        onBack={() => navigate("/showcase/life")}
-      />
+    <div className="paperlogy min-h-screen bg-[#f7f8fa] font-sans">
+      <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20">
+        <CommunityDetailHeader
+          breadcrumb={[
+            { label: "홈", to: "/" },
+            { label: "인생거리", to: "/showcase/life" },
+            { label: "상세보기" },
+          ]}
+          label="Life Course Detail"
+          title="인생거리"
+          description="여행자들이 남긴 인생샷 장소와 순간을 모아봤어요."
+          onBack={() => navigate("/showcase/life")}
+        />
 
-      <section className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
-        <div className="space-y-6">
-          <div className="relative">
-            <ImageSlider images={slideImages} alt={post.title} height="h-[400px]" />
-            <span className="absolute left-4 top-4 z-10 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 fs-down-1 font-semibold text-gray-900 shadow-sm">
-              <IconSVG name="location" size={16} className="shrink-0 fill-none stroke-gray-900" strokeWidth={2} />
-              {region}
-            </span>
+        <section className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
+          <div className="space-y-6">
+            <div className="relative">
+              <ImageSlider images={slideImages} alt={post.title} height="h-[400px]" />
+              <span className="absolute left-4 top-4 z-10 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 fs-down-1 font-semibold text-gray-900 shadow-sm">
+                <IconSVG name="location" size={16} className="shrink-0 fill-none stroke-gray-900" strokeWidth={2} />
+                {region}
+              </span>
+            </div>
+
+            <LifePostHeader
+              post={post}
+              viewCount={viewCount}
+              comments={comments}
+              wishCount={wishCount}
+              isLiked={isLiked}
+              handleLikeClick={handleLikeClick}
+              onCommentClick={scrollToComments}
+            />
+
+            <article className="bg-white rounded-3xl border border-gray-100 p-6 md:p-10 shadow-sm">
+              <p className="whitespace-pre-wrap text-base md:text-lg leading-9 tracking-[0.012em] text-gray-700">
+                {post.description}
+              </p>
+            </article>
+
+            <LifeCourseView
+              courseList={courseList}
+              region={region}
+              thumbnail={thumbnail}
+              navigate={navigate}
+              handleImportSchedule={handleImportSchedule}
+              handleMakePlan={handleMakePlan}
+            />
           </div>
 
-          <LifePostHeader
+          <LifeAside
             post={post}
+            region={region}
+            courseList={courseList}
             viewCount={viewCount}
             comments={comments}
             wishCount={wishCount}
             isLiked={isLiked}
+            setIsLiked={setIsLiked}
             handleLikeClick={handleLikeClick}
-            onCommentClick={scrollToComments}
-          />
-
-          <article className="bg-white rounded-3xl border border-gray-100 p-6 md:p-10 shadow-sm">
-            <p className="whitespace-pre-wrap text-base md:text-lg leading-9 text-gray-700">
-              {post.description}
-            </p>
-          </article>
-
-          <LifeCourseView
-            courseList={courseList}
-            region={region}
-            thumbnail={thumbnail}
+            isLogin={isLogin}
+            isOwner={isOwner}
             navigate={navigate}
             handleImportSchedule={handleImportSchedule}
             handleMakePlan={handleMakePlan}
+            handleDeletePost={handleDeletePost}
+            openReportModal={async () => {
+              const result = await openReportModal({
+                type: "post",
+                commNo: post.commNo ?? post.id,
+              });
+              if (result?.blinded) {
+                navigate("/showcase/life");
+              }
+            }}
+            onCommentClick={scrollToComments}
+          />
+        </section>
+
+        <div id="life-comments" className="scroll-mt-24">
+          <CommentSection
+            comments={comments}
+            newComment={newComment}
+            setNewComment={setNewComment}
+            handleCommentSubmit={handleCommentSubmit}
+            editingId={editingId}
+            setEditingId={setEditingId}
+            editText={editText}
+            setEditText={setEditText}
+            startEditing={startEditing}
+            handleSaveEdit={handleSaveEdit}
+            handleDeleteComment={handleDeleteComment}
+            openReportModal={(comment) =>
+              openReportModal({
+                type: "comment",
+                cmntNo: comment.cmntNo ?? comment.id,
+              })
+            }
+            openLoginModal={() => setShowLoginModal(true)}
+            currentUserId={currentUserId}
+            postAuthor={post.author}
           />
         </div>
-
-        <LifeAside
-          post={post}
-          region={region}
-          courseList={courseList}
-          viewCount={viewCount}
-          comments={comments}
-          wishCount={wishCount}
-          isLiked={isLiked}
-          setIsLiked={setIsLiked}
-          handleLikeClick={handleLikeClick}
-          isLogin={isLogin}
-          isOwner={isOwner}
-          navigate={navigate}
-          handleImportSchedule={handleImportSchedule}
-          handleMakePlan={handleMakePlan}
-          handleDeletePost={handleDeletePost}
-          openReportModal={async () => {
-            const result = await openReportModal({
-              type: "post",
-              commNo: post.commNo ?? post.id,
-            });
-            if (result?.blinded) {
-              navigate("/showcase/life");
-            }
-          }}
-          onCommentClick={scrollToComments}
-        />
-      </section>
-
-      <div id="life-comments" className="scroll-mt-24">
-        <CommentSection
-          comments={comments}
-          newComment={newComment}
-          setNewComment={setNewComment}
-          handleCommentSubmit={handleCommentSubmit}
-          editingId={editingId}
-          setEditingId={setEditingId}
-          editText={editText}
-          setEditText={setEditText}
-          startEditing={startEditing}
-          handleSaveEdit={handleSaveEdit}
-          handleDeleteComment={handleDeleteComment}
-          openReportModal={(comment) =>
-            openReportModal({
-              type: "comment",
-              cmntNo: comment.cmntNo ?? comment.id,
-            })
-          }
-          openLoginModal={() => setShowLoginModal(true)}
-          currentUserId={currentUserId}
-          postAuthor={post.author}
-        />
+        {showLoginModal && (
+          <LoginRequiredModal
+            onClose={() => setShowLoginModal(false)}
+            onLogin={() => {
+              setShowLoginModal(false);
+              navigate("/login");
+            }}
+          />
+        )}
       </div>
-      {showLoginModal && (
-        <LoginRequiredModal
-          onClose={() => setShowLoginModal(false)}
-          onLogin={() => {
-            setShowLoginModal(false);
-            navigate("/login");
-          }}
-        />
-      )}
     </div>
   );
 };
