@@ -13,7 +13,7 @@ const MyShowcase = () => {
   const getImageUrl = (url) => {
     if (!url) return "https://placehold.co/400x240";
     if (url.startsWith("http")) return url;
-    return `http://localhost:8080${url}`;
+    return `${import.meta.env.VITE_API_URL}${url}`;
   };
 
   useEffect(() => {
