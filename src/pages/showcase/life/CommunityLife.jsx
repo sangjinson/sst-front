@@ -8,8 +8,14 @@ import CommunityLifeSkeleton from "@components/skeleton/CommunityLifeSkeleton";
 import CommunityListHeader from "@components/modules/community/common/CommunityListHeader";
 import SchedulePickerModal from "@components/modules/community/life/SchedulePickerModal";
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
+import AOS from "aos";
+import "aos/dist/aos.css";
+
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 
 const CommunityLife = () => {
+  const {getConfig} = useConfig();   // Config 값 가져오기
+  
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -31,15 +37,21 @@ const CommunityLife = () => {
 
   // 처음 진입 시 로그인 사용자 조회
   useEffect(() => {
-    api
-      .get("/auth/me")
-      .then((res) => {
-        setCurrentUserId(res.data.data.mbrId);
-      })
-      .catch((err) => {
-        console.error("로그인 사용자 조회 실패:", err);
-      });
+    // 회원 정보 인증 조회
+    let userId = getConfig('user.mbrId')
+    if(userId) setCurrentUserId(userId)
   }, []);
+
+  // AOS 스크롤 애니메이션
+  useEffect(() => {
+    AOS.init();
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      AOS.refreshHard();
+    }
+  }, [loading, posts]);
 
   // 내 AI 일정 목록 조회
   useEffect(() => {
@@ -149,6 +161,7 @@ const CommunityLife = () => {
             title: item.commTitle,
             description: item.commContent,
             author: item.mbrNickname,
+            mbrProfileImgUrl: item.mbrProfileImgUrl,
             place: item.plcName || "장소 미정",
             region: item.rgnName || "지역 미정",
             hashtags: (item.hashtagText || "")
@@ -282,86 +295,88 @@ const CommunityLife = () => {
         }}
       />
     )}
-    <div className="paperlogy container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20 font-sans">
-      <CommunityListHeader
-        breadcrumb={[
-          { label: "홈", to: "/" },
-          { label: "인생거리", to: "/showcase/life" },
-        ]}
-        label="Life Course"
-        title="인생거리"
-        description="여행자들이 직접 만든 인생 여행 코스를 공유해요."
-        switchTo={{ label: "핫플거리", to: "/showcase/hotplace" }}
-        writeText="내거리 공유하기"
-        onWriteClick={() => {
-          if (!currentUserId) {
-            setShowLoginModal(true);
-            return;
-          }
+    <div className="paperlogy min-h-screen bg-[#f7f8fa] font-sans">
+      <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20">
+        <CommunityListHeader
+          breadcrumb={[
+            { label: "홈", to: "/" },
+            { label: "인생거리", to: "/showcase/life" },
+          ]}
+          label="Life Course"
+          title="인생거리"
+          description="여행자들이 직접 만든 인생 여행 코스를 공유해요."
+          switchTo={{ label: "핫플거리", to: "/showcase/hotplace" }}
+          writeText="내거리 공유하기"
+          onWriteClick={() => {
+            if (!currentUserId) {
+              setShowLoginModal(true);
+              return;
+            }
 
-          setShowModal(true);
-        }}
-      />
+            setShowModal(true);
+          }}
+        />
 
-      {/* 검색/필터 */}
-      <CommunitySearchBar
-        keyword={keyword}
-        setKeyword={(value) => {
-          setKeyword(value);
-          setPage(1);
-        }}
-        searchType={searchType}
-        setSearchType={(value) => {
-          setSearchType(value);
-          setPage(1);
-        }}
-        sortType={sortType}
-        setSortType={(value) => {
-          setSortType(value);
-          setPage(1);
-        }}
-        totalCount={totalCount}
-        onSearch={fetchPosts}
-        onReset={() => {
-          setKeyword("");
-          setSearchType("all");
-          setSortType("latest");
-          setPage(1);
-        }}
-        popularTags={popularTags}
-      />
+        {/* 검색/필터 */}
+        <CommunitySearchBar
+          keyword={keyword}
+          setKeyword={(value) => {
+            setKeyword(value);
+            setPage(1);
+          }}
+          searchType={searchType}
+          setSearchType={(value) => {
+            setSearchType(value);
+            setPage(1);
+          }}
+          sortType={sortType}
+          setSortType={(value) => {
+            setSortType(value);
+            setPage(1);
+          }}
+          totalCount={totalCount}
+          onSearch={fetchPosts}
+          onReset={() => {
+            setKeyword("");
+            setSearchType("all");
+            setSortType("latest");
+            setPage(1);
+          }}
+          popularTags={popularTags}
+        />
 
-      {/* 게시글 목록 */}
-      {posts.length > 0 ? (
-        <div className="flex flex-col gap-8">
-          {posts.map((post) => (
-            <CommunityLifeCard
-              key={post.id}
-              post={post}
+        {/* 게시글 목록 */}
+        {posts.length > 0 ? (
+          <div className="flex flex-col gap-8">
+            {posts.map((post) => (
+              <div key={post.id} data-aos="fade-up" data-aos-once="true">
+              <CommunityLifeCard
+                post={post}
 
-              //  좋아요 상태 전달
-              liked={!!likedPosts[post.id]}
+                //  좋아요 상태 전달
+                liked={!!likedPosts[post.id]}
 
-              //  좋아요 클릭 이벤트 전달
-              onToggleLike={toggleLike}
+                //  좋아요 클릭 이벤트 전달
+                onToggleLike={toggleLike}
 
-              // 카드 클릭
-              onClick={() =>
-                navigate(`/showcase/life/view/${post.id}`)
-              }
-            />
-          ))}
+                // 카드 클릭
+                onClick={() =>
+                  navigate(`/showcase/life/view/${post.id}`)
+                }/>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
+            검색 결과가 없습니다.
+          </div>
+        )}
+        <AreaPagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
         </div>
-      ) : (
-        <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
-          검색 결과가 없습니다.
-        </div>
-      )}
-      <AreaPagination
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
       </div>
     </>
   );

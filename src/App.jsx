@@ -1,33 +1,37 @@
 import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 import AppRoutes from '@routes/AppRoutes';
-import { ThemeProvider } from '@context/ThemeContext'; // 🚀 위치 확인
-import { SidebarProvider } from '@context/SidebarContext'; // 🚀 위치 확인
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false, // 401 에러 발생 시 불필요한 재시도 방지
-      refetchOnWindowFocus: false, // 창 포커스 시 API 자동 재호출 방지
-      staleTime: 1000 * 60 * 5, // 5분 동안 캐시된 데이터를 신선(stale)하다고 판단
-    },
-  },
-});
+import { useAuth } from '@hooks/useAuth';
+import { useConfig } from '@hooks/useConfig';
 
 function App() {
+  // 1. 인증 상태 확인
+  const { loading } = useAuth();
+  
+  // 2. 설정값에서 현재 페이지 제목 가져오기
+  const { getConfig } = useConfig();
+  const pageTitle = getConfig('pageTitle') || '거리에섯';
+
+  // 3. 로딩 처리
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center font-bold text-gray-500">
+        인증 정보를 확인 중입니다...
+      </div>
+    );
+  }
+
   return (
-    // 🚀 Context 최상단 배치: Router보다 위에 있어야 전체 페이지가 상태를 공유함
-    <ThemeProvider>
-      <SidebarProvider>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </SidebarProvider>
-    </ThemeProvider>
+    <HelmetProvider>
+      {/* 🚀 앱 최상단에서 통합 관리되는 전역 Helmet */}
+      <Helmet>
+        <title>{pageTitle}</title>
+      </Helmet>
+      
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }
 

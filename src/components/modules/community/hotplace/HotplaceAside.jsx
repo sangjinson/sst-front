@@ -24,11 +24,33 @@
 
 import { ClipButton } from "@components/modules/ActionButtons";
 
+const getProfileImageUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return `${import.meta.env.VITE_API_URL}${url}`;
+  return `${import.meta.env.VITE_API_URL}/${url}`;
+};
+
 // 라이프 뷰페이지와 통일한 좋아요 아이콘
 const LikeIcon = () => (
   <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M7 11v10H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h3z" />
     <path d="M7 11l4.4-7.1A2 2 0 0 1 15 5v4h4a2 2 0 0 1 2 2.3l-1.2 8A2 2 0 0 1 17.8 21H7V11z" />
+  </svg>
+);
+
+const UserIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21a8 8 0 0 0-16 0" />
+    <circle cx="12" cy="8" r="4" />
   </svg>
 );
 
@@ -74,8 +96,15 @@ const HotplaceAside = ({
       <div className="flex items-center justify-between pb-4 border-b border-gray-100">
         {/* 왼쪽: 작성자 */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 text-xl shadow-sm">
-            😊
+          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-emerald-100 bg-emerald-50 shadow-sm flex items-center justify-center text-emerald-600">
+            {currentPost.mbrProfileImgUrl ? (
+              <img
+                src={getProfileImageUrl(currentPost.mbrProfileImgUrl)}
+                alt={currentPost.author}
+                className="h-full w-full object-cover"/>
+            ) : (
+              <UserIcon />
+            )}
           </div>
 
           <div className="min-w-0">
@@ -107,13 +136,13 @@ const HotplaceAside = ({
       {/* 제목 */}
       <div className="pb-4 border-b border-gray-100">
         <span className="fs-down-1 font-semibold text-emerald-600 mb-1 block">제목</span>
-        <h3 className="fs-down-2 font-extrabold text-gray-900">{currentPost.title}</h3>
+        <h3 className="fs-down-3 font-extrabold text-gray-900">{currentPost.title}</h3>
       </div>
 
       {/* 본문 */}
       <div>
         <span className="fs-down-1 font-semibold text-gray-400 mb-3 block">본문</span>
-        <p className="whitespace-pre-wrap fs-down-1 leading-8 text-gray-700">{currentPost.description}</p>
+        <p className="whitespace-pre-wrap text-justify text-[15px] leading-9 tracking-[0.01em] break-keep text-gray-700">{currentPost.description}</p>
       </div>
     </aside>
   );

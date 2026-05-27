@@ -34,9 +34,9 @@ const getCommunityPath = (commCatCd, commNo) => {
 };
 
 const getRegionFromAddr = (addr) => {
-  if (!addr) return localStorage.getItem('lastVisitedRegion') || '수원시';
+  if (!addr) return sessionStorage.getItem('lastVisitedRegion') || '수원시';
   const match = addr.match(/경기도\s+(\S+시|\S+군)/);
-  return match ? match[1] : localStorage.getItem('lastVisitedRegion') || '수원시';
+  return match ? match[1] : sessionStorage.getItem('lastVisitedRegion') || '수원시';
 };
 
 const SearchPage = () => {

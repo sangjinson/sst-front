@@ -33,14 +33,25 @@ const CommunitySearchBar = ({
           ))}
         </select>
 
-        {/* 검색어 입력 */}
-        <input
-          type="text"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          placeholder="검색어를 입력하세요"
-          className="h-11 rounded-xl border border-gray-200 px-4 fs-down-1 text-gray-700 outline-none focus:border-emerald-500"
-        />
+        <div className="relative">
+          <input
+            type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="검색어를 입력하세요"
+            className="h-11 w-full rounded-xl border border-gray-200 px-4 pr-10 fs-down-1 text-gray-700 outline-none focus:border-emerald-500"
+          />
+
+          {keyword && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-600 transition"
+              aria-label="검색 초기화">
+              ✕
+            </button>
+          )}
+        </div>
 
         {/* 정렬 */}
         <select
@@ -55,41 +66,30 @@ const CommunitySearchBar = ({
       </div>
 
       {/* 하단 영역 */}
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 fs-down-1 text-gray-400">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="pl-2">
-          총{" "}
-          <strong className="text-emerald-600">
-            {totalCount}
-          </strong>
-          개의 게시글
-        </span>
+      <div className="mt-4 flex flex-wrap items-center gap-3 fs-down-1 text-gray-400">
+      <span className="pl-2">
+        총{" "}
+        <strong className="text-emerald-600">
+          {totalCount}
+        </strong>
+        개의 게시글
+      </span>
 
-        {popularTags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {popularTags.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => {
-                  setSearchType("hashtag");
-                  setKeyword(tag);
-                }}
-                className="rounded-full bg-emerald-50 px-3 py-1 fs-down-1 font-semibold text-emerald-600 transition hover:bg-emerald-100 hover:text-emerald-700">
-                #{tag}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {keyword && (
-        <button
-          type="button"
-          onClick={onReset}
-          className="rounded-full border border-gray-200 px-3 py-1 fs-down-1 font-semibold text-gray-400 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-600">
-          검색 초기화
-        </button>
+      {popularTags.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {popularTags.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => {
+                setSearchType("hashtag");
+                setKeyword(tag);
+              }}
+              className="rounded-full bg-emerald-50 px-3 py-1 fs-down-1 font-semibold text-emerald-600 transition hover:bg-emerald-100 hover:text-emerald-700">
+              #{tag}
+            </button>
+          ))}
+        </div>
       )}
     </div>
     </section>

@@ -29,6 +29,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
+    // 인증 처리 일때 실패한다면 에러 발생으로 중지.
     if (originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/refresh')) {
       return Promise.reject(error);
     }
@@ -55,7 +56,7 @@ api.interceptors.response.use(
         // 만료 알럿 띄우기 및 로컬 플래그 강제 삭제
         if (!originalRequest.url?.includes('/auth/me')) {
           alert('보안을 위해 로그인이 만료되었습니다. 다시 로그인해 주세요.');
-          localStorage.removeItem('isLogin'); // 🚀 React Query가 다음번엔 찌르지 않도록 차단
+          localStorage.removeItem('isLogin');
           window.location.href = '/login'; 
         }
         

@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import api from '@api/axios';
 import PasswordChange from './PasswordChange'; 
 import ProfileImage from '@modules/member/ProfileImage';
 import ProfileCover from '@modules/member/ProfileCover';
 
+import { useApi } from '@hooks/useApi'; // API 사용
+
 const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
+  const apiTool = useApi(); // Api 의 사용
+
   const imgRef = useRef(null);
   const coverRef = useRef(null);
   const isInitialized = useRef(false); 
@@ -90,7 +93,7 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
       return; 
     }
     try {
-      const response = await api.get(`/auth/check-nickname`, { params: { nickname: trimmedNickname } });
+      const response = await apiTool.checkNickname(trimmedNickname);
       if (response.data.data) {
         setNicknameMsg('이미 사용 중인 닉네임입니다.');
         setNicknameChecked(false);

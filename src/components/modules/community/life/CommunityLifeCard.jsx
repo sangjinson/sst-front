@@ -76,6 +76,21 @@ const LikeIcon = () => (
   </svg>
 );
 
+const UserIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21a8 8 0 0 0-16 0" />
+    <circle cx="12" cy="8" r="4" />
+  </svg>
+);
+
 const CommunityLifeCard = ({
   post,
   onClick,
@@ -88,6 +103,13 @@ const CommunityLifeCard = ({
 }) => {
   // 화면에 보여줄 좋아요 수
   const likeCount = post.wishCnt;
+
+  const getProfileImageUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    if (url.startsWith("/")) return `${import.meta.env.VITE_API_URL}${url}`;
+    return `${import.meta.env.VITE_API_URL}/${url}`;
+  };
 
   return (
     <article
@@ -123,8 +145,15 @@ const CommunityLifeCard = ({
           <div className="overflow-hidden pr-20 md:pr-28">
             {/* 작성자 */}
             <div className="mb-2 flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-sm">
-                😊
+              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-emerald-100 bg-emerald-50 shadow-sm flex items-center justify-center text-emerald-600">
+                {post.mbrProfileImgUrl ? (
+                  <img
+                    src={getProfileImageUrl(post.mbrProfileImgUrl)}
+                    alt={post.author}
+                    className="h-full w-full object-cover"/>
+                ) : (
+                  <UserIcon />
+                )}
               </div>
 
               <span className="fs-down-1 font-semibold text-[#E8956D] truncate mr-3">
