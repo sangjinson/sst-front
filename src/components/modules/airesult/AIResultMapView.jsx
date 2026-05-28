@@ -137,7 +137,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
 
   const handleGoDetail = () => {
     if (!selectedItem) return;
-    navigate(getDetailPath(selectedItem, selectedRegion));
+    window.open(getDetailPath(selectedItem, selectedRegion), '_blank');
   };
 
   const currentIdx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
