@@ -12,6 +12,7 @@ import {
 } from '@components/modules/airesult';
 import AIResultMapView from '@components/modules/airesult/AIResultMapView';
 import AIPlanLoading from '@components/modules/aiplan/AIPlanLoading';
+import SavedScheduleLoading from '@components/modules/aiplan/SavedScheduleLoading';
 import { useAIPlan } from '@pages/aiplan/AIPlanContext';
 import '@assets/css/common.css';
 import api from '@api/axios';
@@ -401,7 +402,11 @@ const AIPlanResultPage = () => {
         />
 
         {scheduleLoading ? (
-          <AIPlanLoading isFinishing={loadingFinishing} />
+          aisNo ? (
+            <SavedScheduleLoading />
+          ) : (
+            <AIPlanLoading isFinishing={loadingFinishing} />
+          )
         ) : (
           <div className="print-area bg-white rounded-2xl shadow-sm">
             <div className="flex flex-col md:flex-row">
