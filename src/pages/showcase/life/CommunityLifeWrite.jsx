@@ -436,7 +436,7 @@ const CommunityLifeWrite = () => {
         }
         onSubmit={handleSubmit}
         onCancel={() => navigate(-1)}
-        submitText={isEditMode ? "수정하기" : "등록하기"}>
+        submitText="저장하기">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <RegionSelect
             selectedRegion={selectedRegion}

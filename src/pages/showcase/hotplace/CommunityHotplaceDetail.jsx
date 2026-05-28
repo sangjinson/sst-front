@@ -21,7 +21,7 @@ const CommunityHotplaceDetail = () => {
   const navigate = useNavigate();
 
   const [currentUserId, setCurrentUserId] = useState(null);
-  const isLogin = !!currentUserId;
+  const isLogin = getConfig('user.isAuth');
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
@@ -43,13 +43,21 @@ const CommunityHotplaceDetail = () => {
     try {
       setLoading(true);
 
-      const viewedKey = `hotplace_viewed_${id}`;
+      const userId = getConfig("user.mbrId");
 
-      // 처음 조회 시에만 조회수 증가
-      if (!sessionStorage.getItem(viewedKey)) {
-        sessionStorage.setItem(viewedKey, "true");
-        await api.put(`/community/${id}/view`);
-      }
+    if (userId) {
+      setCurrentUserId(userId);
+    }
+
+    const viewedKey = userId
+      ? `hotplace_viewed_user_${userId}_${id}`
+      : `hotplace_viewed_guest_${id}`;
+
+    // 처음 조회 시에만 조회수 증가
+    if (!sessionStorage.getItem(viewedKey)) {
+      await api.put(`/community/${id}/view`);
+      sessionStorage.setItem(viewedKey, "true");
+    }
 
       // 게시글 상세 조회
       const res = await apiTool.getCommunityDetail(id);
@@ -252,7 +260,7 @@ const CommunityHotplaceDetail = () => {
 
   // 게시글 좋아요 처리
   const handleLikeClick = async () => {
-    if (!currentUserId) {
+    if (!currentUserId && !isLogin) {
       setShowLoginModal(true);
       return;
     }
@@ -274,10 +282,9 @@ const CommunityHotplaceDetail = () => {
   };
 
   // 게시글 작성자 여부 확인
-  const isOwner =
-  currentUserId !== null &&
-  currentPost.mbrId !== null &&
-  Number(currentUserId) === Number(currentPost.mbrId);
+  const isOwner = currentUserId !== null &&
+                  currentPost.mbrId !== null &&
+                  Number(currentUserId) === Number(currentPost.mbrId);
 
   return (
     <div className="paperlogy min-h-screen bg-[#f7f8fa] font-sans">
