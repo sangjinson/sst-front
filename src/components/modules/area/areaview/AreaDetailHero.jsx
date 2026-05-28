@@ -25,12 +25,17 @@ const AreaDetailHero = ({
       setImages([{ pimgOgImgUrl: image }]);
       return;
     }
+    
     getPlaceImages(plcNo)
       .then((data) => {
         if (data.length === 0) {
           setImages([{ pimgOgImgUrl: image }]);
         } else {
-          setImages(data);
+          // 🚀 핵심 수정: 외부에서 받은 image를 강제로 첫 번째(index 0)에 고정하고, 
+          // 서버에서 받아온 데이터는 그 뒤에 이어 붙입니다.
+          // 중복 방지를 위해 서버 데이터 중 image와 동일한 URL이 있다면 필터링합니다.
+          const filteredData = data.filter(item => item.pimgOgImgUrl !== image);
+          setImages([{ pimgOgImgUrl: image }, ...filteredData]);
         }
       })
       .catch(() => {

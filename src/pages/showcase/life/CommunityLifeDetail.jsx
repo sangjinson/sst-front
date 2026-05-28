@@ -52,13 +52,21 @@ const CommunityLifeDetail = () => {
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
+        const userId = getConfig("user.mbrId");
+
+        if (userId) {
+          setCurrentUserId(userId);
+        }
+
         // 조회수 중복 방지 키
-        const viewedKey = `life_viewed_${id}`;
+        const viewedKey = userId
+          ? `life_viewed_user_${userId}_${id}`
+          : `life_viewed_guest_${id}`;
 
         // 처음 조회 시에만 조회수 증가
         if (!sessionStorage.getItem(viewedKey)) {
-          sessionStorage.setItem(viewedKey, "true");
           await api.put(`/community/${id}/view`);
+          sessionStorage.setItem(viewedKey, "true");
         }
         // 게시글 상세 조회
         const res = await apiTool.getCommunityDetail(id);
@@ -446,7 +454,7 @@ const CommunityLifeDetail = () => {
             />
 
             <article className="bg-white rounded-3xl border border-gray-100 p-6 md:p-10 shadow-sm">
-              <p className="whitespace-pre-wrap text-base md:text-lg leading-9 tracking-[0.012em] text-gray-700">
+              <p className="whitespace-pre-wrap break-all text-left text-base md:text-lg leading-10 text-gray-700">
                 {post.description}
               </p>
             </article>

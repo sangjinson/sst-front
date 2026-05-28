@@ -53,7 +53,7 @@ const ProfileImage = ({ user: propsUser, size = 'sm', className = "", preview = 
       ) : (
         <div className="w-full h-full bg-gray-50 flex items-center justify-center">
           <span className={`text-gray-500 font-bold ${currentStyle.text}`}>
-            {currentUser?.mbrNickname?.charAt(0) || 'U'}
+            {(currentUser?.nickname || currentUser?.mbrNickname)?.charAt(0) || 'U'}
           </span>
         </div>
       )}
@@ -67,6 +67,7 @@ export default memo(ProfileImage, (prev, next) => {
     prev.preview === next.preview &&
     prev.user?.profileIcon?.filePath === next.user?.profileIcon?.filePath &&
     prev.user?.mbrNickname === next.user?.mbrNickname &&
+    prev.user?.nickname === next.user?.nickname &&
     prev.size === next.size &&
     prev.className === next.className
   );
