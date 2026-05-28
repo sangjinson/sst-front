@@ -30,6 +30,8 @@ const CommunityHotplaceDetail = () => {
   const [editText, setEditText] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isReported, setIsReported] = useState(false);
+  const [reportedCommentIds, setReportedCommentIds] = useState([]);
 
   // 최초 진입 시 스크롤 이동 및 로그인 사용자 조회
   useEffect(() => {
@@ -123,6 +125,25 @@ const CommunityHotplaceDetail = () => {
       });
   }, [currentUserId, currentPost]);
 
+  // 게시글 신고 상태 조회
+  useEffect(() => {
+    if (!currentUserId || !currentPost?.commNo) return;
+
+    api
+      .get("/reports/check", {
+        params: {
+          type: "post",
+          commNo: currentPost.commNo ?? currentPost.id,
+        },
+      })
+      .then((res) => {
+        setIsReported(res.data);
+      })
+      .catch((err) => {
+        console.error("게시글 신고 상태 조회 실패:", err);
+      });
+  }, [currentUserId, currentPost?.commNo]);
+
   // 댓글 목록 조회 함수
   const fetchComments = (commNo) => {
     api
@@ -153,6 +174,36 @@ const CommunityHotplaceDetail = () => {
     fetchComments(commNo);
   }, [currentPost]);
 
+  // 댓글 신고 여부 조회
+  useEffect(() => {
+    if (!currentUserId || comments.length === 0) return;
+
+    const fetchReportedComments = async () => {
+      try {
+        const reportedIds = [];
+
+        for (const comment of comments) {
+          const cmntNo = comment.cmntNo ?? comment.id;
+          const res = await api.get("/reports/check", {
+            params: {
+              type: "comment",
+              cmntNo,
+            },
+          });
+
+          if (res.data) {
+            reportedIds.push(cmntNo);
+          }
+        }
+        setReportedCommentIds(reportedIds);
+
+      } catch (err) {
+        console.error("댓글 신고 상태 조회 실패:", err);
+      }
+    };
+    fetchReportedComments();
+  }, [currentUserId, comments]);
+
   if (loading) {
     return <CommunityHotplaceDetailSkeleton />;
   }
@@ -177,8 +228,20 @@ const CommunityHotplaceDetail = () => {
   const viewCount = currentPost.viewCnt;
   const wishCount = currentPost.wishCnt;
 
+  // 댓글 영역으로 스크롤 이동
+  const scrollToComments = () => {
+    document
+      .getElementById("hotplace-comments")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   // 댓글 등록
   const handleCommentSubmit = () => {
+      if (!currentUserId && !isLogin) {
+      setShowLoginModal(true);
+      return;
+    }
+
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
       return;
@@ -316,7 +379,9 @@ const CommunityHotplaceDetail = () => {
               comments={comments}
               wishCount={wishCount}
               isLogin={isLogin}
+              isLiked={isLiked}
               isOwner={isOwner}
+              onCommentClick={scrollToComments}
               handleLikeClick={handleLikeClick}
               navigate={navigate}
               handleDeletePost={handleDeletePost}
@@ -330,41 +395,56 @@ const CommunityHotplaceDetail = () => {
             isLiked={isLiked}
             wishCount={wishCount}
             handleLikeClick={handleLikeClick}
+            isReported={isReported}
             openReportModal={async () => {
-
-            const result = await openReportModal({
-              type: "post",
-              commNo: currentPost.commNo ?? currentPost.id,
-            });
-
-            if (result?.blinded) {
-              navigate("/showcase/hotplace");
-            }
-          }}
+              const result = await openReportModal({
+                  type: "post",
+                  commNo: currentPost.commNo ?? currentPost.id,
+                });
+                if (result) {
+                  setIsReported(true);
+                }
+                if (result?.blinded) {
+                  navigate("/showcase/hotplace");
+                }
+              }}
           />
         </section>
 
-        <CommentSection
-          comments={comments}
-          newComment={newComment}
-          setNewComment={setNewComment}
-          handleCommentSubmit={handleCommentSubmit}
-          editingId={editingId}
-          setEditingId={setEditingId}
-          editText={editText}
-          setEditText={setEditText}
-          startEditing={startEditing}
-          handleSaveEdit={handleSaveEdit}
-          handleDeleteComment={handleDeleteComment}
-          openReportModal={(comment) =>
-            openReportModal({
-              type: "comment",
-              cmntNo: comment.cmntNo ?? comment.id,
-            })
-          }
-          openLoginModal={() => setShowLoginModal(true)}
-          currentUserId={currentUserId}
-        />
+        <div id="hotplace-comments" className="scroll-mt-24">
+          <CommentSection
+            comments={comments}
+            newComment={newComment}
+            setNewComment={setNewComment}
+            handleCommentSubmit={handleCommentSubmit}
+            editingId={editingId}
+            setEditingId={setEditingId}
+            editText={editText}
+            setEditText={setEditText}
+            startEditing={startEditing}
+            handleSaveEdit={handleSaveEdit}
+            handleDeleteComment={handleDeleteComment}
+            openReportModal={async (comment) => {
+              const result = await openReportModal({
+                type: "comment",
+                cmntNo: comment.cmntNo ?? comment.id,
+              });
+
+              if (result) {
+                setReportedCommentIds((prev) => [
+                  ...prev,
+                  comment.cmntNo ?? comment.id,
+                ]);
+              }
+
+              return result;
+            }}
+            openLoginModal={() => setShowLoginModal(true)}
+            currentUserId={currentUserId}
+            reportedCommentIds={reportedCommentIds}
+            setReportedCommentIds={setReportedCommentIds}
+          />
+        </div>
         {showLoginModal && (
           <LoginRequiredModal
             onClose={() => setShowLoginModal(false)}

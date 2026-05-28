@@ -7,6 +7,7 @@ const ImageSlider = ({
   height = "h-[400px]",
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!images.length) return null;
 
@@ -24,11 +25,15 @@ const ImageSlider = ({
 
   return (
     <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
-      <div className={`relative ${height} overflow-hidden bg-gray-100`}>
+      <div className={`relative ${height} overflow-hidden bg-gray-100`}
+        onContextMenu={(e) => e.preventDefault()}>
         <img
           src={images[currentIndex]}
           alt={alt}
-          className="h-full w-full object-cover"
+          onClick={() => setIsOpen(true)}
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+          className="h-full w-full cursor-zoom-in object-cover"
         />
 
         {/* label 값이 있을 때만 표시 */}
@@ -70,6 +75,30 @@ const ImageSlider = ({
                 }`}
               />
             ))}
+          </div>
+        )}
+
+        {isOpen && (
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4"
+            onClick={() => setIsOpen(false)}
+          >
+            <img
+              src={images[currentIndex]}
+              alt={alt}
+              onClick={(e) => e.stopPropagation()}
+              onContextMenu={(e) => e.preventDefault()}
+              draggable={false}
+              className="max-h-[90vh] max-w-[90vw] object-contain"
+            />
+
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="absolute right-5 top-5 rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-gray-700"
+            >
+              닫기
+            </button>
           </div>
         )}
       </div>

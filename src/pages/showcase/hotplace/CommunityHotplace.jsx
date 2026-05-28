@@ -184,7 +184,7 @@ const CommunityHotplace = () => {
 
   // 좋아요 토글 처리
   const toggleLike = (postId) => {
-    if (!currentUserId) {
+    if (!currentUserId && !getConfig('user.isAuth')) {
       setShowLoginModal(true);
       return;
     }
@@ -249,7 +249,7 @@ const CommunityHotplace = () => {
           switchTo={{ label: "인생거리", to: "/showcase/life" }}
           writeText="글쓰기"
           onWriteClick={() => {
-            if (!currentUserId) {
+            if (!currentUserId && !getConfig('user.isAuth')) {
               setShowLoginModal(true);
               return;
             }
