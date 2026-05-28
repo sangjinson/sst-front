@@ -6,9 +6,20 @@ import ReqTextInput from '@components/modules/form/ReqTextInput';
 
 const autoHyphenPhone = (value) => {
   const onlyNums = value.replace(/[^0-9]/g, '');
+  
+  // 1. 서울 지역번호 (02) 처리
+  if (onlyNums.startsWith('02')) {
+    if (onlyNums.length <= 2) return onlyNums;
+    if (onlyNums.length <= 5) return onlyNums.replace(/(\d{2})(\d{1,3})/, '$1-$2');
+    if (onlyNums.length <= 9) return onlyNums.replace(/(\d{2})(\d{3})(\d{1,4})/, '$1-$2-$3'); // 예: 02-123-4567
+    return onlyNums.replace(/(\d{2})(\d{4})(\d{1,4})/, '$1-$2-$3'); // 예: 02-1234-5678
+  } 
+  
+  // 2. 핸드폰 및 그 외 지역번호 (010, 054, 063 등) 처리
   if (onlyNums.length <= 3) return onlyNums;
-  if (onlyNums.length <= 7) return onlyNums.replace(/(\d{3})(\d{1,4})/, '$1-$2');
-  return onlyNums.replace(/(\d{3})(\d{3,4})(\d{1,4})/, '$1-$2-$3');
+  if (onlyNums.length <= 6) return onlyNums.replace(/(\d{3})(\d{1,3})/, '$1-$2');
+  if (onlyNums.length <= 10) return onlyNums.replace(/(\d{3})(\d{3})(\d{1,4})/, '$1-$2-$3'); // 예: 054-123-4567
+  return onlyNums.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3'); // 예: 010-1234-5678
 };
 
 export default function SignupPage() {
@@ -22,7 +33,6 @@ export default function SignupPage() {
   // 🚀 추가: 각 필드별 메시지(에러/성공) 상태 관리
   const [msg, setMsg] = useState({ email: '', nickname: '', password: '', global: '' });
   const [check, setCheck] = useState({ email: false, nickname: false });
-  const [terms, setTerms] = useState({ all: false, service: false, privacy: false });
   
   // 🚀 추가: 비밀번호 보기 토글 상태
   const [showPw, setShowPw] = useState({ pw: false, confirm: false });
@@ -56,11 +66,24 @@ export default function SignupPage() {
 
   const handleCheck = async (type) => {
     const value = form[type].trim();
+    
+    // 1. 빈 값 검사
     if (!value) {
       setMsg(prev => ({ ...prev, [type]: `${type === 'email' ? '이메일' : '닉네임'}을 입력해주세요.` }));
       return;
     }
     
+    // 🚀 2. 이메일 형식 검사 추가 (중복 확인 API 호출 전)
+    if (type === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        setMsg(prev => ({ ...prev, email: '올바른 이메일 형식을 입력해주세요.' }));
+        setCheck(prev => ({ ...prev, email: false }));
+        return; // 형식이 맞지 않으면 여기서 함수 종료 (API 호출 안 함)
+      }
+    }
+    
+    // 3. 중복 확인 API 호출
     try {
       const response = await api.get(`/auth/check-${type}`, { params: { [type]: value } });
       const isDuplicate = response.data.data; 
@@ -92,7 +115,6 @@ export default function SignupPage() {
   const handleSignup = async () => {
     if (form.password !== form.passwordConfirm) return alert('비밀번호를 확인해주세요.');
     if (!check.email || !check.nickname) return alert('중복 확인을 진행해주세요.');
-    if (!terms.service || !terms.privacy) return alert('필수 약관에 동의해주세요.');
 
     try {
       await api.post('/auth/signup', {
@@ -181,25 +203,10 @@ export default function SignupPage() {
 
         {msg.global && <p className="text-red-500 text-sm mt-4 text-center">{msg.global}</p>}
 
-        {/* 약관 동의 */}
-        <div className="bg-gray-50 p-4 rounded-xl mt-6 mb-8 space-y-3">
-          <label className="flex items-center gap-2 font-bold text-gray-800 cursor-pointer">
-            <input type="checkbox" checked={terms.all} onChange={(e) => {
-              const c = e.target.checked; setTerms({ all: c, service: c, privacy: c });
-            }} className="w-4 h-4 accent-[#0F9B73]" /> 전체 약관에 동의합니다.
-          </label>
-          <hr className="border-gray-200" />
-          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-            <input type="checkbox" checked={terms.service} onChange={(e) => setTerms(p => ({ ...p, service: e.target.checked, all: e.target.checked && p.privacy }))} className="w-4 h-4 accent-[#0F9B73]" /> [필수] 서비스 이용약관 동의
-          </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-            <input type="checkbox" checked={terms.privacy} onChange={(e) => setTerms(p => ({ ...p, privacy: e.target.checked, all: p.service && e.target.checked }))} className="w-4 h-4 accent-[#0F9B73]" /> [필수] 개인정보 수집 및 이용 동의
-          </label>
-        </div>
-
-        <button onClick={handleSignup} className="w-full py-4 bg-[#0F9B73] rounded-xl text-white font-bold text-base hover:bg-[#0d8a66] transition">
+        <button onClick={handleSignup} className="w-full mt-8 py-4 bg-[#0F9B73] rounded-xl text-white font-bold text-base hover:bg-[#0d8a66] transition">
           가입하기
         </button>
+
         <p className="text-center text-sm text-gray-400 mt-6">
           이미 계정이 있으신가요? <Link to="/login" className="text-[#0F9B73] font-semibold hover:underline">로그인</Link>
         </p>

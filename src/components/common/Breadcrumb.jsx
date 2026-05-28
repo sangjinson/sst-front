@@ -21,7 +21,7 @@ import IconSVG from "@components/Icon/IconSVG";
 const Breadcrumb = ({ paths, className = '' }) => {
   return (
     /* w-full과 flex-end를 유지하여 오른쪽 상단 배치를 살리되, daisyUI의 breadcrumbs 스타일을 입힙니다. */
-    <div className={`text-sm breadcrumbs w-full flex justify-center md:justify-start ${className}`}>
+    <div className={`text-sm breadcrumbs w-full flex justify-start ${className}`}>
       <ul>
         {paths.map((path, index) => {
           const isLast = index === paths.length - 1;
