@@ -47,6 +47,7 @@ const CommunityHotplaceWrite = () => {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isComposing, setIsComposing] = useState(false);
 
+  // 이미지 URL 변환
   const getImageUrl = (url) => {
     if (!url) return "";
     if (url.startsWith("blob:")) return url;
@@ -54,6 +55,7 @@ const CommunityHotplaceWrite = () => {
     return `${BASE_URL}${url}`;
   };
 
+  // 서버 이미지 경로 추출
   const getServerPath = (url) => {
     if (!url) return "";
     if (url.startsWith(BASE_URL)) {
@@ -62,7 +64,7 @@ const CommunityHotplaceWrite = () => {
     return url;
   };
 
-  // 1. 페이지 처음 열릴 때: 지역, 카테고리, 수정 데이터 조회
+  // 페이지 처음 열릴 때: 지역, 카테고리, 수정 데이터 조회
   useEffect(() => {
     window.scrollTo({ top: 0 });
 
@@ -126,7 +128,7 @@ const CommunityHotplaceWrite = () => {
     fetchData();
   }, [isEditMode, id]);
 
-  // 2. 지역/카테고리가 바뀔 때마다 장소 목록 조회
+  // 지역 및 카테고리 변경 시 장소 목록 조회
   useEffect(() => {
     if (!selectedRegion || !selectedCategory) {
       setPlaces([]);
@@ -148,14 +150,17 @@ const CommunityHotplaceWrite = () => {
       });
   }, [selectedRegion, selectedCategory]);
 
+  // 수정 게시글 로딩 중 표시
   if (loading) {
     return <div className="py-20 text-center font-bold text-gray-500">게시글을 불러오는 중입니다.</div>;
   }
 
+  // 수정 게시글이 존재하지 않을 경우
   if (notFound) {
     return <div className="py-20 text-center font-bold text-gray-500">수정할 게시글이 존재하지 않습니다.</div>;
   }
 
+  // 이미지 업로드 처리
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
 
@@ -169,6 +174,7 @@ const CommunityHotplaceWrite = () => {
     e.target.value = "";
   };
 
+  // 업로드 이미지 삭제 처리
   const handleRemoveImage = (removeIndex) => {
     const removePreview = imagePreviews[removeIndex];
 
@@ -203,12 +209,14 @@ const CommunityHotplaceWrite = () => {
       .replace(/^#/, "")
       .replace(/\s+/g, "");
 
+  // 해시태그 문자열 분리
   const parseTags = (value) =>
     value
       .split(/[,\s#]+/)
       .map((tag) => tag.trim())
       .filter(Boolean);
 
+  // 해시태그 입력 처리
   const handleTagKeyDown = (e) => {
 
     if (isComposing || e.nativeEvent.isComposing) return;
@@ -231,6 +239,7 @@ const CommunityHotplaceWrite = () => {
     }
   };
 
+  // multipart/form-data 생성
   const createFormData = (payload) => {
     const formData = new FormData();
 
@@ -248,10 +257,12 @@ const CommunityHotplaceWrite = () => {
     return formData;
   };
 
+  // 입력한 장소와 실제 장소 매칭
   const matchedPlace = places.find(
     (place) => place.plcName.trim() === placeName.trim()
   );
 
+  // 게시글 등록 및 수정 처리
   const handleSubmit = async(e) => {
     e.preventDefault();
     
