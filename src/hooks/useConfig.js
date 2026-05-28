@@ -43,7 +43,6 @@ export const useConfig = () => {
   });
 
   const getConfig = (path, defaultValue) => {
-    console.log(path);
 
     if (!path) return siteConfig;
 

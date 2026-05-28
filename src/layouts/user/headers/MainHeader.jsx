@@ -173,7 +173,7 @@ const Header = () => {
                 onMouseLeave={() => setIsProfileOpen(false)}
               >
                 {/* 프로필 이미지 */}
-                <ProfileImage user={getConfig('profile', null)} size="sm"/>
+                <ProfileImage user={getConfig('profile')} size="sm"/>
 
                 {isProfileOpen && (
                   <div className="absolute left-1/2 -translate-x-1/2 top-full z-[1001] mt-2 w-48 rounded-2xl border border-gray-100 bg-white p-2 shadow-[0_16px_36px_rgba(15,23,42,0.12)]">
