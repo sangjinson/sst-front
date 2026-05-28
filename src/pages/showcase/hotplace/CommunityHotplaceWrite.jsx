@@ -312,7 +312,7 @@ const CommunityHotplaceWrite = () => {
         // 수정 완료 후 상세페이지 이동
         navigate(`/showcase/hotplace/view/${id}`);
       } catch (error) {
-        console.error("글 수정 실패:", error);
+          console.error("글 수정 실패:", error);
         alert("글 수정에 실패했습니다.");
       }
     } else {
@@ -344,7 +344,7 @@ const CommunityHotplaceWrite = () => {
         alert("글이 등록되었습니다!");
         navigate("/showcase/hotplace");
       } catch (error) {
-        console.error("글 등록 실패:", error);
+          console.error("글 등록 실패:", error);
         alert("글 등록에 실패했습니다.");
       }
     }

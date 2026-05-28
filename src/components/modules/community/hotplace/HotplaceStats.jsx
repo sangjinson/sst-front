@@ -27,6 +27,8 @@ const HotplaceStats = ({
   wishCount,
   isLogin,
   isOwner,
+  isLiked,
+  onCommentClick,
   navigate,
   handleDeletePost,
   handleLikeClick,
@@ -60,14 +62,30 @@ const HotplaceStats = ({
           <button
             type="button"
             onClick={handleLikeClick}
-            className="rounded-2xl bg-gray-50 px-3 py-4 transition hover:bg-blue-50 active:scale-95 cursor-pointer">
-            <p className="fs-down-1 text-gray-400">좋아요</p>
-            <strong className="mt-1 block text-lg text-gray-900">{wishCount}</strong>
+            className={`rounded-2xl cursor-pointer border border-transparent px-3 py-4 transition active:scale-95 ${
+              isLiked
+                ? "bg-blue-100 ring-2 ring-blue-100"
+                : "bg-gray-50 hover:border-blue-200 hover:bg-blue-50"
+            }`}>
+            <p className={`fs-down-1 ${isLiked ? "text-blue-500" : "text-gray-400"}`}>
+              좋아요
+            </p>
+            <strong
+              className={`mt-1 block text-lg ${
+                isLiked ? "text-blue-700" : "text-gray-900"
+              }`}>
+              {wishCount}
+            </strong>
           </button>
-          <div className="rounded-2xl bg-gray-50 px-3 py-4">
+          <button
+            type="button"
+            onClick={onCommentClick}
+            className="rounded-2xl bg-gray-50 px-3 py-4 transition hover:bg-emerald-50 cursor-pointer">
             <p className="fs-down-1 text-gray-400">댓글</p>
-            <strong className="mt-1 block text-lg text-gray-900">{comments.length}</strong>
-          </div>
+            <strong className="mt-1 block text-lg text-gray-900">
+              {comments.length}
+            </strong>
+          </button>
           <div className="rounded-2xl bg-gray-50 px-3 py-4">
             <p className="fs-down-1 text-gray-400">조회</p>
             <strong className="mt-1 block text-lg text-gray-900">{viewCount}</strong>
