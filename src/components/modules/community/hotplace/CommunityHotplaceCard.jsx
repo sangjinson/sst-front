@@ -80,11 +80,7 @@ const CommunityHotplaceCard = ({
   };
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
-      <button
-        type="button"
-        onClick={onClick}
-        className="block w-full cursor-pointer text-left">
+    <article onClick={onClick} className="cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl group">
         <div className={`relative w-full overflow-hidden bg-gray-100 ${getImageRatio(post.size)}`}>
           <img
             src={post.img}
@@ -100,7 +96,6 @@ const CommunityHotplaceCard = ({
             </span>
           </div>
         </div>
-      </button>
 
       <div className="p-4 bg-white">
         <p className="mb-8 line-clamp-2 fs-down-2 leading-relaxed text-gray-700">
@@ -137,7 +132,10 @@ const CommunityHotplaceCard = ({
             <button
               key={tag}
               type="button"
-              onClick={() => onTagClick(tag)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onTagClick(tag);
+              }}
               className="fs-down-1 cursor-pointer font-semibold text-emerald-600 hover:text-emerald-700">
               #{tag}
             </button>
@@ -148,7 +146,10 @@ const CommunityHotplaceCard = ({
           <div className="flex items-center gap-2 font-bold text-gray-900">
             <button
               type="button"
-              onClick={onToggleLike}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleLike();
+              }}
               className={`inline-flex min-w-[58px] cursor-pointer items-center gap-1.5 transition-colors active:scale-95 ${
                 liked ? "text-blue-500" : "hover:text-blue-500"}`}>
               <LikeIcon />
