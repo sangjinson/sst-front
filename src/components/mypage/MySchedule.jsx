@@ -118,7 +118,8 @@ const MySchedule = () => {
                     <tr
                       key={s.aisNo}
                       onClick={() => {
-                        localStorage.removeItem('currentSchedule');
+                        sessionStorage.removeItem('currentSchedule');  // ← sessionStorage로 수정
+                        sessionStorage.removeItem('scheduleMetaData');
                         navigate('/plan/result', { state: { aisNo: s.aisNo } });
                       }}
                       className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors cursor-pointer"

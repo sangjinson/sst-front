@@ -11,8 +11,6 @@ import AOS from "aos";
 
 import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 
-
-
 const CommunityHotplace = () => {
   const {getConfig} = useConfig();   // Config 값 가져오기
   const navigate = useNavigate();
@@ -38,6 +36,7 @@ const CommunityHotplace = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  // 게시글 목록 조회
   const fetchPosts = () => {
     api
       .get("/community", {
@@ -129,6 +128,7 @@ const CommunityHotplace = () => {
       });
   }, []);
 
+  // 검색 조건 변경 시 URL 쿼리 파라미터 동기화
   useEffect(() => {
     const nextParams = {};
 
@@ -140,6 +140,7 @@ const CommunityHotplace = () => {
     setSearchParams(nextParams, { replace: true });
   }, [currentPage, searchType, keyword, sortType, setSearchParams]);
 
+  // 검색 조건 또는 페이지 변경 시 게시글 목록 재조회
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchPosts();
@@ -148,11 +149,12 @@ const CommunityHotplace = () => {
     return () => clearTimeout(timer);
   }, [keyword, searchType, sortType, currentPage]);
 
-  // AOS 스크롤 애니메이션
+  // AOS 스크롤 애니메이션 초기화
   useEffect(() => {
     AOS.init();
   }, []);
 
+  // 게시글 로딩 완료 후 AOS 위치 재계산
   useEffect(() => {
     if (!loading) {
       AOS.refreshHard();
@@ -167,7 +169,7 @@ const CommunityHotplace = () => {
     });
   }, [currentPage]);
 
-  // 페이지 이동 시 검색 상태 초기화
+  // URL 쿼리 파라미터 변경 시 검색 상태 동기화
   useEffect(() => {
     const nextKeyword = searchParams.get("keyword") || "";
     const nextSearchType = searchParams.get("searchType") || "all";
@@ -180,6 +182,7 @@ const CommunityHotplace = () => {
     setCurrentPage(nextPage);
   }, [searchParams]);
 
+  // 좋아요 토글 처리
   const toggleLike = (postId) => {
     if (!currentUserId) {
       setShowLoginModal(true);

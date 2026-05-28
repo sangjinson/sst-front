@@ -42,18 +42,19 @@ const CommunityLife = () => {
     if(userId) setCurrentUserId(userId)
   }, []);
 
-  // AOS 스크롤 애니메이션
+  // AOS 스크롤 애니메이션 초기화
   useEffect(() => {
     AOS.init();
   }, []);
 
+  // 게시글 로딩 완료 후 AOS 위치 재계산
   useEffect(() => {
     if (!loading) {
       AOS.refreshHard();
     }
   }, [loading, posts]);
 
-  // 내 AI 일정 목록 조회
+  // 로그인 사용자의 AI 일정 목록 조회
   useEffect(() => {
     if (!currentUserId) return;
 
@@ -79,6 +80,7 @@ const CommunityLife = () => {
     });
   }, [page]);
 
+  // 인기 해시태그 목록 조회
   useEffect(() => {
     api
       .get("/community/popular-hashtags", {
@@ -94,6 +96,7 @@ const CommunityLife = () => {
       });
   }, []);
 
+  // 검색 상태 변경 시 URL 쿼리 파라미터 동기화
   useEffect(() => {
     const nextParams = {};
 
@@ -105,6 +108,7 @@ const CommunityLife = () => {
     setSearchParams(nextParams, { replace: true });
   }, [page, searchType, keyword, sortType, setSearchParams]);
 
+  // URL 쿼리 파라미터 변경 시 검색 상태 동기화
   useEffect(() => {
     const nextKeyword = searchParams.get("keyword") || "";
     const nextSearchType = searchParams.get("searchType") || "all";
@@ -117,6 +121,7 @@ const CommunityLife = () => {
     setPage(nextPage);
   }, [searchParams]);
 
+  // 지역별 기본 배너 이미지 반환
   const getRegionBannerImage = (regionName) => {
     if (!regionName || regionName === "지역 미정") {
       return "/images/community/default-life.jpg";
@@ -125,6 +130,7 @@ const CommunityLife = () => {
     return `/banners/${regionName}.webp`;
   };
 
+  // 게시글 대표 이미지 URL 생성
   const getImageUrl = (url, regionName) => {
     // 업로드 이미지가 있는 경우
     if (url) {
@@ -136,6 +142,7 @@ const CommunityLife = () => {
     return getRegionBannerImage(regionName);
   };
 
+  // 인생거리 게시글 목록 조회
   const fetchPosts = () => {
     setLoading(true);
     api
@@ -193,7 +200,8 @@ const CommunityLife = () => {
         setLoading(false);
       });
   };
-
+  
+  // 검색 조건 변경 시 게시글 목록 재조회
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchPosts();
@@ -227,7 +235,7 @@ const CommunityLife = () => {
       });
   }, [currentUserId, posts]);
 
-  //  좋아요 토글 함수 (핵심 추가)
+  // 좋아요 토글 함수
   const toggleLike = (postId) => {
     if (!currentUserId) {
       setShowLoginModal(true);

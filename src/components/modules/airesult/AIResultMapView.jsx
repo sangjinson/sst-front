@@ -137,13 +137,13 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
 
   const handleGoDetail = () => {
     if (!selectedItem) return;
-    navigate(getDetailPath(selectedItem, selectedRegion));
+    window.open(getDetailPath(selectedItem, selectedRegion), '_blank');
   };
 
   const currentIdx = currentDayItems.findIndex(i => i.placeId === selectedItem?.placeId);
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 order-first md:order-none">
+    <div className="print-map flex-1 flex flex-col min-w-0 order-first md:order-none">
 
       <div className="w-full relative h-[240px] md:h-[500px]">
         <div
@@ -154,8 +154,7 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
       </div>
 
       {selectedItem ? (
-        <div className="hidden md:flex border-t border-gray-100 bg-white px-4 py-4 items-center gap-4 h-[140px]">
-
+        <div className="print-hide hidden md:flex border-t border-gray-100 bg-white px-4 py-4 items-center gap-4 h-[140px]">
           <button
             onClick={handlePrev}
             disabled={currentIdx === 0}
@@ -194,7 +193,6 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
             </p>
           </div>
 
-          {/* 지도 하단 하트 버튼 유지 */}
           <div onClick={(e) => e.stopPropagation()} className="shrink-0">
             <WishlistHeartButton
               item={{
@@ -218,11 +216,10 @@ const AIResultMapView = ({ selectedRegion, schedule, activeDay, selectedItem, on
           </button>
         </div>
       ) : (
-        <div className="hidden md:flex border-t border-gray-100 bg-white px-4 py-4 items-center gap-4 h-[140px]">
+        <div className="print-hide hidden md:flex border-t border-gray-100 bg-white px-4 py-4 items-center gap-4 h-[140px]">
           왼쪽 일정 목록에서 장소를 클릭하면 상세 정보를 볼 수 있어요
         </div>
       )}
-
     </div>
   );
 };

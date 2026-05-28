@@ -42,7 +42,7 @@ export const useConfig = () => {
     initialData: defaultValues,
   });
 
-  const getConfig = (path, defaultValue = null) => {
+  const getConfig = (path, defaultValue = '경기도') => {
     if (!path) return siteConfig;
     return path.split('.').reduce((acc, key) => acc?.[key], siteConfig) ?? defaultValue;
   };
