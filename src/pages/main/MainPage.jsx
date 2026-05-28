@@ -188,7 +188,7 @@ const MainPage = () => {
             <section className="mb-[6vw]">
               <div className="text-center mb-8 md:mb-10 border-b-2 border-gray-800 pb-3 md:pb-4">
                 <h2 className="fs-up-6 font-bold text-gray-900">
-                  방방곳곳 숨어있는 추천을 찾다
+                  방방곡곡 숨어있는 추천을 찾다
                 </h2>
               </div>
               <TopPickDeck items={topPicks} onDetailClick={handleCardClick} />
