@@ -27,15 +27,13 @@ const WriteForm = ({
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-5 py-2.5 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200 transition-all"
-              >
+                className="px-5 py-2.5 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200 transition-all">
                 취소
               </button>
 
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-[#009277] text-white font-semibold rounded-lg hover:bg-[#007a63] shadow-md transition-all"
-              >
+                className="px-6 py-2.5 bg-[#009277] text-white font-semibold rounded-lg hover:bg-[#007a63] shadow-md transition-all">
                 {submitText}
               </button>
             </div>
