@@ -82,6 +82,7 @@ const fieldMap = {
         mbrName: 'mbrName',
         mbrNickname: 'mbrNickname',
         mbrEmail: 'mbrEmail',
+        mbrProviderCd: 'mbrProviderCd',
         mbrProfileFileNo: 'mbrProfileFileNo',
         mbrProfileIcon: 'mbrProfileIcon',
         mbrProfileBg: 'mbrProfileBg'
