@@ -196,7 +196,7 @@ function AreaListTemplate() {
             <Breadcrumb
               paths={[
                 { label: '홈', to: '/' },
-                { label: regionKor, to: `/${region}` },
+                { label: regionKor, to: `/${region === '경기도' ? '' : region}` },
                 { label: currentConfig.label, to: `/${region}/${type}/list` },
               ]}
               className="mb-3"

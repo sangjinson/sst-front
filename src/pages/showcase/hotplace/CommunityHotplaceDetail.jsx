@@ -31,8 +31,8 @@ const CommunityHotplaceDetail = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // 최초 진입 시 스크롤 이동 및 로그인 사용자 조회
   useEffect(() => {
-
     window.scrollTo({ top: 0 });
     // 회원 정보 인증 조회
     let userId = getConfig('user.mbrId')
@@ -115,7 +115,7 @@ const CommunityHotplaceDetail = () => {
       });
   }, [currentUserId, currentPost]);
 
-  // 댓글 조회 함수
+  // 댓글 목록 조회 함수
   const fetchComments = (commNo) => {
     api
       .get(`/comments/${commNo}`)
@@ -138,6 +138,7 @@ const CommunityHotplaceDetail = () => {
       });
   };
 
+  // 게시글 변경 시 댓글 목록 조회
   useEffect(() => {
     if (!currentPost) return;
     const commNo = currentPost.commNo ?? currentPost.id;
@@ -148,6 +149,7 @@ const CommunityHotplaceDetail = () => {
     return <CommunityHotplaceDetailSkeleton />;
   }
 
+  // 게시글이 존재하지 않을 경우
   if (!currentPost) {
     return (
       <div className="py-20 text-center font-bold text-gray-500">
@@ -156,12 +158,14 @@ const CommunityHotplaceDetail = () => {
     );
   }
 
+  // 이미지 슬라이드 데이터 생성
   const slideImages = currentPost.images || [
     currentPost.img,
     `https://picsum.photos/seed/hotplace-${currentPost.id}-sub1/900/650`,
     `https://picsum.photos/seed/hotplace-${currentPost.id}-sub2/900/650`,
   ];
 
+  // 조회수 / 좋아요 수 추출
   const viewCount = currentPost.viewCnt;
   const wishCount = currentPost.wishCnt;
 
@@ -189,12 +193,13 @@ const CommunityHotplaceDetail = () => {
       });
   };
 
+  // 댓글 수정 시작
   const startEditing = (commentId, text) => {
     setEditingId(commentId);
     setEditText(text);
   };
 
-  // 댓글 수정
+  // 댓글 수정 저장
   const handleSaveEdit = (commentId) => {
     if (!editText.trim()) {
       alert("수정할 내용을 입력해주세요.");
@@ -245,7 +250,7 @@ const CommunityHotplaceDetail = () => {
     }
   };
 
-  // 좋아요 처리
+  // 게시글 좋아요 처리
   const handleLikeClick = async () => {
     if (!currentUserId) {
       setShowLoginModal(true);
@@ -268,6 +273,7 @@ const CommunityHotplaceDetail = () => {
     }
   };
 
+  // 게시글 작성자 여부 확인
   const isOwner =
   currentUserId !== null &&
   currentPost.mbrId !== null &&
