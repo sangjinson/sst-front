@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import CustomerSupportLayout from "@components/modules/customersupport/CustomerSupportLayout";
 import CustomerSupportAccordion from "@components/modules/customersupport/CustomerSupportAccordion";
 import AreaPagination from "@components/modules/area/arealist/AreaPagination";
+import api from "@api/axios";
 
 /* 한 페이지에 보여줄 FAQ 개수 */
 const ITEMS_PER_PAGE = 10;
@@ -33,20 +34,10 @@ const Faq = () => {
 
   /* FAQ 데이터 조회 */
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/customersupport/faq`)
-      .then((res) => {
-
-        /* 응답 실패 처리 */
-        if (!res.ok) {
-          throw new Error(`FAQ 조회 실패: ${res.status}`);
-        }
-
-        return res.json();
-      })
-
+    api.get("/customersupport/faq")
       /* 조회 성공 */
-      .then((data) => {
-        setFaqList(Array.isArray(data) ? data : []);
+      .then((res) => {
+        setFaqList(Array.isArray(res.data) ? res.data : []);
       })
 
       /* 조회 실패 */

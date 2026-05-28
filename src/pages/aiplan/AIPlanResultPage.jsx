@@ -12,9 +12,11 @@ import {
 } from '@components/modules/airesult';
 import AIResultMapView from '@components/modules/airesult/AIResultMapView';
 import AIPlanLoading from '@components/modules/aiplan/AIPlanLoading';
+import SavedScheduleLoading from '@components/modules/aiplan/SavedScheduleLoading';
 import { useAIPlan } from '@pages/aiplan/AIPlanContext';
 import '@assets/css/common.css';
 import api from '@api/axios';
+import aiApi from '@api/aiAxios';
 import { CAT_LABEL_MAP, TYPE_LABEL } from '@components/modules/airesult/aiResultUtils';
 import { useAuth } from '@hooks/useAuth';
 import { getWishlist } from '@hooks/useWishlist';
@@ -159,16 +161,16 @@ const AIPlanResultPage = () => {
       setLoadingFinishing(false);
       window.clearTimeout(loadingFinishTimer.current);
       try {
-        const params = new URLSearchParams({
+        const params = {
           region    : selectedRegion,
           days      : selectedDays,
           start_date: startDate,
           end_date  : endDate,
           themes    : selectedThemes.join(','),
-        });
+        };
 
-        const res  = await fetch(`${import.meta.env.VITE_FASTAPI_URL}/ai/travel/plan?${params}`);
-        const json = await res.json();
+        const res  = await aiApi.get('/ai/travel/plan', { params });
+        const json = res.data;
 
         if (json.success) {
           setSchedule(json.data.schedule);
@@ -401,7 +403,11 @@ const AIPlanResultPage = () => {
         />
 
         {scheduleLoading ? (
-          <AIPlanLoading isFinishing={loadingFinishing} />
+          aisNo ? (
+            <SavedScheduleLoading />
+          ) : (
+            <AIPlanLoading isFinishing={loadingFinishing} />
+          )
         ) : (
           <div className="print-area bg-white rounded-2xl shadow-sm">
             <div className="flex flex-col md:flex-row">

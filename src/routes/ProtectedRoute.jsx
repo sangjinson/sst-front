@@ -23,28 +23,28 @@ const SkeletonLoader = () => {
   );
 };
 
-const ProtectedRoute = ({ allowedRoles }) => {
+const ProtectedRoute = ({ allowedRoles = [] }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && !user) {
-        Swal.fire({
-          icon: 'warning',
-          title: '로그인이 필요합니다',
-          text: '로그인 후 이용 가능한 페이지입니다.',
-          confirmButtonText: '로그인하러 가기',
-          confirmButtonColor: '#0F9B73',
-          cancelButtonText: '닫기',
-          cancelButtonColor: '#9ca3af',
-          showCancelButton: true,
-          allowOutsideClick: false,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate('/login', {
-              state: { from: location },
-              replace: true,
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용 가능한 페이지입니다.',
+        confirmButtonText: '로그인하러 가기',
+        confirmButtonColor: '#0F9B73',
+        cancelButtonText: '닫기',
+        cancelButtonColor: '#9ca3af',
+        showCancelButton: true,
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/login', {
+            state: { from: location },
+            replace: true,
           });
         } else {
           navigate(-1); // 닫기 누르면 이전 페이지로
@@ -56,7 +56,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   if (loading || !user) return <SkeletonLoader />;
 
   if (!allowedRoles.includes(user.memberRole)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to="/403" replace />;
   }
 
   return <Outlet />;
