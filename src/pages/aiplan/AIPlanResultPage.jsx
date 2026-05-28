@@ -256,57 +256,68 @@ const AIPlanResultPage = () => {
   };
 
   const handleSave = async () => {
-    const { value: tripName, isConfirmed } = await Swal.fire({
-      title: aisNo ? '일정 이름을 수정하세요' : '여행 이름을 지어주세요',
-      input: 'text',
-      inputPlaceholder: '예) 수원 가족 여행',
-      inputAttributes: { maxlength: 14 },
-      showCancelButton: true,
-      confirmButtonText: aisNo ? '수정' : '저장',
-      cancelButtonText: '취소',
-      confirmButtonColor: '#0F9B73',
-      cancelButtonColor: '#9ca3af',
-      inputValidator: (value) => {
-        if (!value || value.trim().length < 3) return '최소 3자 이상 입력해주세요.';
-        if (value.trim().length >= 15) return '15자 미만으로 입력해주세요.';
-      },
-    });
-
-    if (isConfirmed && tripName) {
-      try {
-        const requestBody = {
-          scheduleName: tripName.trim(),
-          startDate   : (currentStartDate && currentStartDate !== '') ? currentStartDate : null,
-          endDate     : (currentEndDate && currentEndDate !== '') ? currentEndDate : null,
-          totalDays   : currentTotalDays ?? schedule.length,
-          rgnName     : currentRegion    ?? '',
-          themes      : currentThemes    ?? [],
-          schedule,
-        };
-
-        if (aisNo) {
-          await api.put('/ai/schedule/update', requestBody, { params: { aisNo } });
-        } else {
-          await api.post('/ai/schedule/save', requestBody);
-        }
-
-        sessionStorage.removeItem('currentSchedule');
-        sessionStorage.removeItem('scheduleMetaData');
-
-        await Swal.fire({
-          icon : 'success',
-          title: aisNo ? '수정되었습니다!' : '저장되었습니다!',
-          text : `"${tripName}" 일정이 마이페이지에 저장되었어요.`,
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-      } catch (err) {
-        console.error('저장 실패:', err);
-        Swal.fire({ icon: 'error', title: '저장 실패', text: '다시 시도해주세요.' });
-      }
+  let existingName = '';
+  if (aisNo) {
+    try {
+      const res = await api.get('/ai/schedule/detail', { params: { aisNo } });
+      existingName = res.data?.scheduleName ?? res.data?.aisSchdulName ?? '';
+    } catch (err) {
+      console.error('기존 일정명 조회 실패:', err);
     }
-  };
+  }
+
+  const { value: tripName, isConfirmed } = await Swal.fire({
+    title: aisNo ? '일정 이름을 수정하세요' : '여행 이름을 지어주세요',
+    input: 'text',
+    inputValue: existingName,
+    inputPlaceholder: aisNo ? existingName || '기존 일정명' : '예) 수원 가족 여행',
+    inputAttributes: { maxlength: 14 },
+    showCancelButton: true,
+    confirmButtonText: aisNo ? '수정' : '저장',
+    cancelButtonText: '취소',
+    confirmButtonColor: '#0F9B73',
+    cancelButtonColor: '#9ca3af',
+    inputValidator: (value) => {
+      if (!value || value.trim().length < 3) return '최소 3자 이상 입력해주세요.';
+      if (value.trim().length >= 15) return '15자 미만으로 입력해주세요.';
+    },
+  });
+
+  if (isConfirmed && tripName) {
+    try {
+      const requestBody = {
+        scheduleName: tripName.trim(),
+        startDate   : (currentStartDate && currentStartDate !== '') ? currentStartDate : null,
+        endDate     : (currentEndDate && currentEndDate !== '') ? currentEndDate : null,
+        totalDays   : currentTotalDays ?? schedule.length,
+        rgnName     : currentRegion    ?? '',
+        themes      : currentThemes    ?? [],
+        schedule,
+      };
+
+      if (aisNo) {
+        await api.put('/ai/schedule/update', requestBody, { params: { aisNo } });
+      } else {
+        await api.post('/ai/schedule/save', requestBody);
+      }
+
+      sessionStorage.removeItem('currentSchedule');
+      sessionStorage.removeItem('scheduleMetaData');
+
+      await Swal.fire({
+        icon : 'success',
+        title: aisNo ? '수정되었습니다!' : '저장되었습니다!',
+        text : `"${tripName}" 일정이 마이페이지에 저장되었어요.`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+    } catch (err) {
+      console.error('저장 실패:', err);
+      Swal.fire({ icon: 'error', title: '저장 실패', text: '다시 시도해주세요.' });
+    }
+  }
+};
 
   const handleAddPlace = (item) => {
     const rawId   = String(item.id || '');
@@ -367,7 +378,7 @@ const AIPlanResultPage = () => {
       <div className="container mx-auto py-6 px-4 max-w-[1200px]">
 
         <AIResultBreadcrumb />
-        <AIResultHeader onSave={handleSave} onRestart={handleRestart} />
+        <AIResultHeader existingId={aisNo} onSave={handleSave} onRestart={handleRestart} />
         <AIResultTags
           selectedRegion={currentRegion}
           selectedPeriod={selectedPeriod}
@@ -392,7 +403,7 @@ const AIPlanResultPage = () => {
         {scheduleLoading ? (
           <AIPlanLoading isFinishing={loadingFinishing} />
         ) : (
-          <div className="bg-white rounded-2xl shadow-sm">
+          <div className="print-area bg-white rounded-2xl shadow-sm">
             <div className="flex flex-col md:flex-row">
               <AIResultScheduleList
                 schedule={schedule}
