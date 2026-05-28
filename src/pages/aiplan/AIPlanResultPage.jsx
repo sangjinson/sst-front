@@ -350,7 +350,7 @@ const AIPlanResultPage = () => {
     });
   };
 
-  const handleGoDetail  = (item) => navigate(getDetailPath(item, currentRegion));
+  const handleGoDetail = (item) => window.open(getDetailPath(item, currentRegion), '_blank');
   const currentDayItems = schedule[activeDay]?.plans || [];
 
   const handleDayChange = (i) => {
