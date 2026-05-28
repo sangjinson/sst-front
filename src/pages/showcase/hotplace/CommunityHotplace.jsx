@@ -11,8 +11,6 @@ import AOS from "aos";
 
 import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 
-
-
 const CommunityHotplace = () => {
   const {getConfig} = useConfig();   // Config 값 가져오기
   const navigate = useNavigate();
@@ -38,6 +36,7 @@ const CommunityHotplace = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  // 게시글 목록 조회
   const fetchPosts = () => {
     api
       .get("/community", {
@@ -129,6 +128,7 @@ const CommunityHotplace = () => {
       });
   }, []);
 
+  // 검색 조건 변경 시 URL 쿼리 파라미터 동기화
   useEffect(() => {
     const nextParams = {};
 
@@ -140,6 +140,7 @@ const CommunityHotplace = () => {
     setSearchParams(nextParams, { replace: true });
   }, [currentPage, searchType, keyword, sortType, setSearchParams]);
 
+  // 검색 조건 또는 페이지 변경 시 게시글 목록 재조회
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchPosts();
@@ -148,11 +149,12 @@ const CommunityHotplace = () => {
     return () => clearTimeout(timer);
   }, [keyword, searchType, sortType, currentPage]);
 
-  // AOS 스크롤 애니메이션
+  // AOS 스크롤 애니메이션 초기화
   useEffect(() => {
     AOS.init();
   }, []);
 
+  // 게시글 로딩 완료 후 AOS 위치 재계산
   useEffect(() => {
     if (!loading) {
       AOS.refreshHard();
@@ -167,7 +169,7 @@ const CommunityHotplace = () => {
     });
   }, [currentPage]);
 
-  // 페이지 이동 시 검색 상태 초기화
+  // URL 쿼리 파라미터 변경 시 검색 상태 동기화
   useEffect(() => {
     const nextKeyword = searchParams.get("keyword") || "";
     const nextSearchType = searchParams.get("searchType") || "all";
@@ -180,6 +182,7 @@ const CommunityHotplace = () => {
     setCurrentPage(nextPage);
   }, [searchParams]);
 
+  // 좋아요 토글 처리
   const toggleLike = (postId) => {
     if (!currentUserId) {
       setShowLoginModal(true);
@@ -233,81 +236,83 @@ const CommunityHotplace = () => {
           }}
         />
       )}
-    <div className="paperlogy container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20 font-sans">
-      <CommunityListHeader
-        breadcrumb={[
-          { label: "홈", to: "/" },
-          { label: "핫플거리", to: "/showcase" },
-        ]}
-        label="Hotplace"
-        title="핫플거리"
-        description="여행자들이 직접 발견한 장소와 분위기를 사진 카드로 모아봤어요."
-        switchTo={{ label: "인생거리", to: "/showcase/life" }}
-        writeText="글쓰기"
-        onWriteClick={() => {
-          if (!currentUserId) {
-            setShowLoginModal(true);
-            return;
-          }
+    <div className="paperlogy min-h-screen bg-[#f7f8fa] font-sans">
+      <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20">
+        <CommunityListHeader
+          breadcrumb={[
+            { label: "홈", to: "/" },
+            { label: "핫플거리", to: "/showcase" },
+          ]}
+          label="Hotplace"
+          title="핫플거리"
+          description="여행자들이 직접 발견한 장소와 분위기를 사진 카드로 모아봤어요."
+          switchTo={{ label: "인생거리", to: "/showcase/life" }}
+          writeText="글쓰기"
+          onWriteClick={() => {
+            if (!currentUserId) {
+              setShowLoginModal(true);
+              return;
+            }
 
-          navigate("/showcase/hotplace/write");
-        }}
-      />
+            navigate("/showcase/hotplace/write");
+          }}
+        />
 
-      <CommunitySearchBar
-        keyword={keyword}
-        setKeyword={(value) => {
-          setKeyword(value);
-          setCurrentPage(1);
-        }}
-        searchType={searchType}
-        setSearchType={(value) => {
-          setSearchType(value);
-          setCurrentPage(1);
-        }}
-        sortType={sortType}
-        setSortType={(value) => {
-          setSortType(value);
-          setCurrentPage(1);
-        }}
-        totalCount={totalCount}
-        onSearch={fetchPosts}
-        onReset={() => {
-          setKeyword("");
-          setSearchType("all");
-          setSortType("latest");
-          setCurrentPage(1);
-        }}
-        popularTags={popularTags}
-      />
+        <CommunitySearchBar
+          keyword={keyword}
+          setKeyword={(value) => {
+            setKeyword(value);
+            setCurrentPage(1);
+          }}
+          searchType={searchType}
+          setSearchType={(value) => {
+            setSearchType(value);
+            setCurrentPage(1);
+          }}
+          sortType={sortType}
+          setSortType={(value) => {
+            setSortType(value);
+            setCurrentPage(1);
+          }}
+          totalCount={totalCount}
+          onSearch={fetchPosts}
+          onReset={() => {
+            setKeyword("");
+            setSearchType("all");
+            setSortType("latest");
+            setCurrentPage(1);
+          }}
+          popularTags={popularTags}
+        />
 
-      {posts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
-          {posts.map((post) => (
-            <div key={post.id} data-aos="fade-up" data-aos-once="true">
-            <CommunityHotplaceCard
-              post={post}
-              liked={!!likedPosts[post.id]}
-              onClick={() => navigate(`/showcase/hotplace/view/${post.id}`)}
-              onToggleLike={() => toggleLike(post.id)}
-              onTagClick={(tag) => {
-                setSearchType("hashtag");
-                setKeyword(tag);
-                setCurrentPage(1);
-              }}/>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
-          검색 결과가 없습니다.
-        </div>
-      )}
-      <AreaPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+        {posts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
+            {posts.map((post) => (
+              <div key={post.id} data-aos="fade-up" data-aos-once="true">
+              <CommunityHotplaceCard
+                post={post}
+                liked={!!likedPosts[post.id]}
+                onClick={() => navigate(`/showcase/hotplace/view/${post.id}`)}
+                onToggleLike={() => toggleLike(post.id)}
+                onTagClick={(tag) => {
+                  setSearchType("hashtag");
+                  setKeyword(tag);
+                  setCurrentPage(1);
+                }}/>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
+            검색 결과가 없습니다.
+          </div>
+        )}
+        <AreaPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
      </div>
     </>
   );

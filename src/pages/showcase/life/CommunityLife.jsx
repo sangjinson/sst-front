@@ -42,18 +42,19 @@ const CommunityLife = () => {
     if(userId) setCurrentUserId(userId)
   }, []);
 
-  // AOS 스크롤 애니메이션
+  // AOS 스크롤 애니메이션 초기화
   useEffect(() => {
     AOS.init();
   }, []);
 
+  // 게시글 로딩 완료 후 AOS 위치 재계산
   useEffect(() => {
     if (!loading) {
       AOS.refreshHard();
     }
   }, [loading, posts]);
 
-  // 내 AI 일정 목록 조회
+  // 로그인 사용자의 AI 일정 목록 조회
   useEffect(() => {
     if (!currentUserId) return;
 
@@ -79,6 +80,7 @@ const CommunityLife = () => {
     });
   }, [page]);
 
+  // 인기 해시태그 목록 조회
   useEffect(() => {
     api
       .get("/community/popular-hashtags", {
@@ -94,6 +96,7 @@ const CommunityLife = () => {
       });
   }, []);
 
+  // 검색 상태 변경 시 URL 쿼리 파라미터 동기화
   useEffect(() => {
     const nextParams = {};
 
@@ -105,6 +108,7 @@ const CommunityLife = () => {
     setSearchParams(nextParams, { replace: true });
   }, [page, searchType, keyword, sortType, setSearchParams]);
 
+  // URL 쿼리 파라미터 변경 시 검색 상태 동기화
   useEffect(() => {
     const nextKeyword = searchParams.get("keyword") || "";
     const nextSearchType = searchParams.get("searchType") || "all";
@@ -117,6 +121,7 @@ const CommunityLife = () => {
     setPage(nextPage);
   }, [searchParams]);
 
+  // 지역별 기본 배너 이미지 반환
   const getRegionBannerImage = (regionName) => {
     if (!regionName || regionName === "지역 미정") {
       return "/images/community/default-life.jpg";
@@ -125,6 +130,7 @@ const CommunityLife = () => {
     return `/banners/${regionName}.webp`;
   };
 
+  // 게시글 대표 이미지 URL 생성
   const getImageUrl = (url, regionName) => {
     // 업로드 이미지가 있는 경우
     if (url) {
@@ -136,6 +142,7 @@ const CommunityLife = () => {
     return getRegionBannerImage(regionName);
   };
 
+  // 인생거리 게시글 목록 조회
   const fetchPosts = () => {
     setLoading(true);
     api
@@ -193,7 +200,8 @@ const CommunityLife = () => {
         setLoading(false);
       });
   };
-
+  
+  // 검색 조건 변경 시 게시글 목록 재조회
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchPosts();
@@ -227,7 +235,7 @@ const CommunityLife = () => {
       });
   }, [currentUserId, posts]);
 
-  //  좋아요 토글 함수 (핵심 추가)
+  // 좋아요 토글 함수
   const toggleLike = (postId) => {
     if (!currentUserId) {
       setShowLoginModal(true);
@@ -295,86 +303,88 @@ const CommunityLife = () => {
         }}
       />
     )}
-    <div className="paperlogy container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20 font-sans">
-      <CommunityListHeader
-        breadcrumb={[
-          { label: "홈", to: "/" },
-          { label: "인생거리", to: "/showcase/life" },
-        ]}
-        label="Life Course"
-        title="인생거리"
-        description="여행자들이 직접 만든 인생 여행 코스를 공유해요."
-        switchTo={{ label: "핫플거리", to: "/showcase/hotplace" }}
-        writeText="내거리 공유하기"
-        onWriteClick={() => {
-          if (!currentUserId) {
-            setShowLoginModal(true);
-            return;
-          }
+    <div className="paperlogy min-h-screen bg-[#f7f8fa] font-sans">
+      <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20">
+        <CommunityListHeader
+          breadcrumb={[
+            { label: "홈", to: "/" },
+            { label: "인생거리", to: "/showcase/life" },
+          ]}
+          label="Life Course"
+          title="인생거리"
+          description="여행자들이 직접 만든 인생 여행 코스를 공유해요."
+          switchTo={{ label: "핫플거리", to: "/showcase/hotplace" }}
+          writeText="내거리 공유하기"
+          onWriteClick={() => {
+            if (!currentUserId) {
+              setShowLoginModal(true);
+              return;
+            }
 
-          setShowModal(true);
-        }}
-      />
+            setShowModal(true);
+          }}
+        />
 
-      {/* 검색/필터 */}
-      <CommunitySearchBar
-        keyword={keyword}
-        setKeyword={(value) => {
-          setKeyword(value);
-          setPage(1);
-        }}
-        searchType={searchType}
-        setSearchType={(value) => {
-          setSearchType(value);
-          setPage(1);
-        }}
-        sortType={sortType}
-        setSortType={(value) => {
-          setSortType(value);
-          setPage(1);
-        }}
-        totalCount={totalCount}
-        onSearch={fetchPosts}
-        onReset={() => {
-          setKeyword("");
-          setSearchType("all");
-          setSortType("latest");
-          setPage(1);
-        }}
-        popularTags={popularTags}
-      />
+        {/* 검색/필터 */}
+        <CommunitySearchBar
+          keyword={keyword}
+          setKeyword={(value) => {
+            setKeyword(value);
+            setPage(1);
+          }}
+          searchType={searchType}
+          setSearchType={(value) => {
+            setSearchType(value);
+            setPage(1);
+          }}
+          sortType={sortType}
+          setSortType={(value) => {
+            setSortType(value);
+            setPage(1);
+          }}
+          totalCount={totalCount}
+          onSearch={fetchPosts}
+          onReset={() => {
+            setKeyword("");
+            setSearchType("all");
+            setSortType("latest");
+            setPage(1);
+          }}
+          popularTags={popularTags}
+        />
 
-      {/* 게시글 목록 */}
-      {posts.length > 0 ? (
-        <div className="flex flex-col gap-8">
-          {posts.map((post) => (
-            <div key={post.id} data-aos="fade-up" data-aos-once="true">
-            <CommunityLifeCard
-              post={post}
+        {/* 게시글 목록 */}
+        {posts.length > 0 ? (
+          <div className="flex flex-col gap-8">
+            {posts.map((post) => (
+              <div key={post.id} data-aos="fade-up" data-aos-once="true">
+              <CommunityLifeCard
+                post={post}
 
-              //  좋아요 상태 전달
-              liked={!!likedPosts[post.id]}
+                //  좋아요 상태 전달
+                liked={!!likedPosts[post.id]}
 
-              //  좋아요 클릭 이벤트 전달
-              onToggleLike={toggleLike}
+                //  좋아요 클릭 이벤트 전달
+                onToggleLike={toggleLike}
 
-              // 카드 클릭
-              onClick={() =>
-                navigate(`/showcase/life/view/${post.id}`)
-              }/>
-            </div>
-          ))}
+                // 카드 클릭
+                onClick={() =>
+                  navigate(`/showcase/life/view/${post.id}`)
+                }/>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
+            검색 결과가 없습니다.
+          </div>
+        )}
+        <AreaPagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
         </div>
-      ) : (
-        <div className="rounded-2xl border border-gray-100 bg-white py-20 text-center text-gray-400">
-          검색 결과가 없습니다.
-        </div>
-      )}
-      <AreaPagination
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
       </div>
     </>
   );

@@ -166,7 +166,12 @@ const LifeCourseView = ({
     }
 
     const type = getPlaceType(place.type);
-    navigate(`/${region}/${type}/view?id=${place.placeId}`);
+    
+    window.open(
+      `/${region}/${type}/view?id=${place.placeId}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   };
 
   return (

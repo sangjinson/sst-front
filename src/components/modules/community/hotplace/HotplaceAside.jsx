@@ -136,13 +136,13 @@ const HotplaceAside = ({
       {/* 제목 */}
       <div className="pb-4 border-b border-gray-100">
         <span className="fs-down-1 font-semibold text-emerald-600 mb-1 block">제목</span>
-        <h3 className="fs-down-2 font-extrabold text-gray-900">{currentPost.title}</h3>
+        <h3 className="fs-down-3 font-extrabold text-gray-900">{currentPost.title}</h3>
       </div>
 
       {/* 본문 */}
       <div>
         <span className="fs-down-1 font-semibold text-gray-400 mb-3 block">본문</span>
-        <p className="whitespace-pre-wrap fs-down-1 leading-8 text-gray-700">{currentPost.description}</p>
+        <p className="whitespace-pre-wrap break-all text-left text-[15px] leading-10 text-gray-700">{currentPost.description}</p>
       </div>
     </aside>
   );

@@ -1,23 +1,41 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
-// 상단 버튼 (뒤로/공유/인쇄/저장)
 const AIResultHeader = ({ existingId, onSave, onRestart }) => {
   const navigate = useNavigate();
 
   return (
     <div className="flex items-center justify-between mb-4">
       <button
-        onClick={() => existingId
-          ? navigate('/user/mypage', { state: { tab: 'schedule' } })
-          : onRestart()
-        }
-        className="text-sm text-gray-500 hover:text-gray-800 transition flex items-center gap-1"
+        onClick={() => {
+          if (existingId) {
+            Swal.fire({
+              title: '정말 돌아가시겠습니까?',
+              text: '지금까지 수정한 내용은 모두 사라집니다.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: '돌아가기',
+              cancelButtonText: '취소',
+              confirmButtonColor: '#0F9B73',
+              cancelButtonColor: '#9ca3af',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                sessionStorage.removeItem('currentSchedule');
+                sessionStorage.removeItem('scheduleMetaData');
+                navigate('/user/mypage', { state: { tab: 'schedule' } });
+              }
+            });
+          } else {
+            onRestart();
+          }
+        }}
+        className="print-hide flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-600 hover:bg-gray-100 hover:border-gray-400 transition"
       >
         {existingId ? '← 마이페이지로' : '← 다시 선택하기'}
       </button>
 
-      <div className="hidden md:flex items-center gap-2">
+      <div className="print-hide hidden md:flex items-center gap-2">
         <button
           onClick={() => window.print()}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-100 transition"
@@ -29,7 +47,7 @@ const AIResultHeader = ({ existingId, onSave, onRestart }) => {
           </svg>
           인쇄/PDF 저장
         </button>
-        {/* ✅ 저장 버튼도 헤더에 */}
+
         <button
           onClick={onSave}
           className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#0F9B73] text-white text-sm font-semibold hover:bg-[#0d8a66] transition"

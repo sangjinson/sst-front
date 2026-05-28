@@ -42,9 +42,21 @@ export const useConfig = () => {
     initialData: defaultValues,
   });
 
-  const getConfig = (path, defaultValue = null) => {
+  const getConfig = (path, defaultValue) => {
+
     if (!path) return siteConfig;
-    return path.split('.').reduce((acc, key) => acc?.[key], siteConfig) ?? defaultValue;
+
+    const value = path
+      .split('.')
+      .reduce((acc, key) => acc?.[key], siteConfig);
+
+    // curRegion.textEn 만 경기도 기본값
+    if (path === 'curRegion.textEn') {
+      return value ?? '경기도';
+    }
+
+    // 나머지는 null 허용
+    return value ?? null;
   };
 
   const setConfig = (path, value) => {

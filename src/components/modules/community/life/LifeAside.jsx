@@ -73,8 +73,8 @@ const LifeAside = ({
           <ClipButton />
         </div>
 
-        {/* 로그인 + 내 글 아님 */}
-        {isLogin && !isOwner && (
+        {/* 내 글이 아닐 때 */}
+        {!isOwner && (
           <button
             type="button"
             onClick={() => openReportModal("post")}
@@ -139,8 +139,7 @@ const LifeAside = ({
           {(post.hashtags || []).map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-emerald-50 px-3 py-1.5 fs-down-1 font-bold text-emerald-600"
-            >
+              className="rounded-full bg-emerald-50 px-3 py-1.5 fs-down-1 font-bold text-emerald-600">
               #{tag}
             </span>
           ))}
@@ -199,15 +198,17 @@ const LifeAside = ({
       )}
 
       {/* 사이드바 일정 버튼 */}
-      <div className="border-t border-gray-100 pt-4 space-y-2">
-        <button
-          type="button"
-          onClick={handleImportSchedule}
-          className="inline-flex w-full items-center justify-center gap-2 py-3 leading-none bg-[#0F9B73] text-white fs-down-1 font-bold rounded-xl hover:bg-[#0d8a66] transition">
-          <DownloadIcon />
-          <span className="leading-none">내 일정으로 가져오기</span>
-        </button>
-      </div>
+      {!isOwner && (
+        <div className="border-t border-gray-100 pt-4 space-y-2">
+          <button
+            type="button"
+            onClick={handleImportSchedule}
+            className="inline-flex w-full items-center justify-center gap-2 py-3 leading-none bg-[#0F9B73] text-white fs-down-1 font-bold rounded-xl hover:bg-[#0d8a66] transition">
+            <DownloadIcon />
+            <span className="leading-none">내 일정으로 가져오기</span>
+          </button>
+        </div>
+      )}
     </aside>
   );
 };

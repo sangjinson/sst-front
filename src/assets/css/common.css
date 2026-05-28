@@ -166,6 +166,47 @@ html, body{
   .fs-3xl-10 { font-size: 2.8em; }
 }
 
+@media print {
+  /* 헤더/푸터/네비 숨기기 */
+  header,
+  footer,
+  nav {
+    display: none !important;
+  }
+
+  /* 인쇄 시 숨길 요소 */
+  .print-hide {
+    display: none !important;
+  }
+
+  /* 배경색/여백 초기화 */
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 인쇄 영역 */
+  .print-area {
+    display: block !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* 지도 고정 높이 */
+  .print-map {
+    width: 100% !important;
+    height: 400px !important;
+    page-break-inside: avoid;
+  }
+
+  /* 페이지 여백 */
+  @page {
+    margin: 1cm;
+  }
+}
+
 .fs-up-1 {
   font-size: clamp(0.75rem, 0.6rem + 1vw, 0.9rem);
 }
