@@ -2,8 +2,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth';
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 
 export default function OAuthRedirectHandler() {
+
+  const {getConfig, setConfig} = useConfig();   // Config 값 가져오기
   const navigate = useNavigate();
   // 🚀 비동기 통신 없이 전역 상태를 업데이트하기 위해 AuthContext의 login을 가져옴
   const { login } = useAuth();
@@ -18,6 +21,7 @@ export default function OAuthRedirectHandler() {
     // 가장 깔끔한 방법: isLogin만 켜주고 메인으로 보낸다.
     // AuthContext가 알아서 백엔드의 /auth/me 를 찔러 정확한 유저 정보(memberRole 등)를 세팅함.
     localStorage.setItem('isLogin', 'true');
+    // setConfig('user.isAuth', true); // 사이트의 로그인 처리
     
     // 혹시 백엔드에서 실패했을 때 ?error=true 같은 걸 달고 왔다면 예외 처리
     const searchParams = new URLSearchParams(location.search);

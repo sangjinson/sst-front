@@ -1,40 +1,54 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@api/axios';
+import { useApi } from '@hooks/useApi';
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 
-// 🚀 1. 백엔드에서 HttpOnly 쿠키를 이용해 내 정보를 가져오는 Fetcher 함수
-const fetchUser = async () => {
-  // 🚀 최적화: 브라우저에 로그인 플래그가 없으면 백엔드(Spring)를 찌르지 않고 바로 null 반환 (서버 부하 방지)
-  if (!localStorage.getItem('isLogin')) return null;
 
-  try {
-    const response = await api.get('/auth/me');
-    return response.data.data;
-  } catch (error) {
-    // 🚀 서버 세션 만료 등 예외 발생 시 로컬 플래그 지우기
-    localStorage.removeItem('isLogin');
-    return null;
-  }
-};
 
 export const useAuth = () => {
+  const apiTool = useApi(); // Api 의 사용
+  const {getConfig, setConfig} = useConfig();   // Config 값 가져오기
+
   const queryClient = useQueryClient();
+
+  // 🚀 1. 백엔드에서 HttpOnly 쿠키를 이용해 내 정보를 가져오는 Fetcher 함수
+  const fetchUser = async () => {
+    // 🚀 최적화: 브라우저에 로그인 플래그가 없으면 백엔드(Spring)를 찌르지 않고 바로 null 반환 (서버 부하 방지)
+    if (!localStorage.getItem('isLogin')) return null;
+    try {
+      const authData = await apiTool.fetchMe(); // 회원여부를 확인
+      console.log("test");
+      console.log(authData);
+
+      setConfig('user', authData.data)
+      setConfig('user.isAuth', true)
+      return authData.data;
+    } catch (error) {
+      // 🚀 서버 세션 만료 등 예외 발생 시 로컬 플래그 지우기
+      localStorage.removeItem('isLogin');
+      return null;
+    }
+  };
 
   // 🚀 2. useQuery: 기존 Context의 user, loading 상태를 완벽히 대체합니다.
   const { data: user = null, isLoading: isUserLoading } = useQuery({
     queryKey: ['auth', 'user'],
     queryFn: fetchUser,
+    //staleTime: 1000, // 🚀 5분 동안은 화면을 이동해도 /auth/me API를 중복 호출하지 않음 (캐시 활용)
     staleTime: 1000 * 60 * 5, // 🚀 5분 동안은 화면을 이동해도 /auth/me API를 중복 호출하지 않음 (캐시 활용)
   });
 
   // 🚀 3. useMutation: 로그인 요청 처리
   const loginMutation = useMutation({
     mutationFn: async (credentials) => {
-      const response = await api.post('/auth/login', credentials);
-      return response.data.data;
+      const loginRes = await apiTool.login(credentials);
+      return loginRes.data;
     },
     onSuccess: (userData) => {
       // 🚀 로그인 성공 시 서버가 HttpOnly 쿠키를 구워주므로, 프론트는 가벼운 인증 플래그만 남김
       localStorage.setItem('isLogin', 'true');
+      setConfig('user', userData)
+      setConfig('user.isAuth', true)
       // 🚀 /auth/me 재호출 없이 받아온 유저 데이터로 캐시 즉시 업데이트
       queryClient.setQueryData(['auth', 'user'], userData);
     },
@@ -43,10 +57,12 @@ export const useAuth = () => {
   // 🚀 4. useMutation: 로그아웃 요청 처리
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await api.post('/auth/logout'); // Spring Security 측 쿠키 만료(Max-Age=0) 요청
+      await apiTool.logout()
     },
     onSuccess: () => {
       localStorage.removeItem('isLogin');
+      setConfig('user', {})
+      setConfig('user.isAuth', false)
       queryClient.setQueryData(['auth', 'user'], null);
       queryClient.clear(); // 🚀 다른 모든 API 캐시(일정, 커뮤니티 등) 일괄 초기화
       window.location.href = '/'; // 🚀 상태 완전 초기화를 위해 하드 리다이렉트

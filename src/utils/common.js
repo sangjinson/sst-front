@@ -76,6 +76,18 @@ export const confirm = async ({
 
 // 1. 매핑 정의서 (확장성을 위해 외부에 정의하거나 함수 내부에 배치)
 const fieldMap = {
+    'user': {
+        mbrId: 'mbrId',
+        memberRole: 'memberRole',
+        mbrName: 'mbrName',
+        mbrNickname: 'mbrNickname',
+        mbrEmail: 'mbrEmail',
+        mbrProviderCd: 'mbrProviderCd',
+        mbrProfileFileNo: 'mbrProfileFileNo',
+        mbrProfileIcon: 'mbrProfileIcon',
+        mbrProfileBg: 'mbrProfileBg'
+    },
+
     // 회원 정보
     'profile': {
         mbrId: 'id',

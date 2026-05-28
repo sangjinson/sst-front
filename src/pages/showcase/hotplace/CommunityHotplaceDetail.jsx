@@ -10,12 +10,18 @@ import CommentSection from "@components/modules/community/common/CommentSection"
 import LoginRequiredModal from "@components/modules/community/common/LoginRequiredModal";
 import CommunityHotplaceDetailSkeleton from "@components/skeleton/CommunityHotplaceDetailSkeleton";
 
+import { useApi } from '@hooks/useApi';       // API 사용
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
+
+
 const CommunityHotplaceDetail = () => {
+  const apiTool = useApi(); // Api 의 사용
+  const {getConfig} = useConfig();   // Config 값 가져오기
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [currentUserId, setCurrentUserId] = useState(null);
-  const isLogin = !!currentUserId;
+  const isLogin = getConfig('user.isAuth');
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
@@ -25,35 +31,36 @@ const CommunityHotplaceDetail = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // 최초 진입 시 스크롤 이동 및 로그인 사용자 조회
   useEffect(() => {
-
-  window.scrollTo({ top: 0 });
-
-  // 로그인 사용자 조회
-  api
-    .get("/auth/me")
-    .then((res) => {
-      setCurrentUserId(res.data.data.mbrId);
-    })
-    .catch((err) => {
-      console.error("로그인 사용자 조회 실패:", err);
-    });
+    window.scrollTo({ top: 0 });
+    // 회원 정보 인증 조회
+    let userId = getConfig('user.mbrId')
+    if(userId) setCurrentUserId(userId)
 
   // 게시글 조회 함수
   const fetchPost = async () => {
     try {
       setLoading(true);
 
-      const viewedKey = `hotplace_viewed_${id}`;
+      const userId = getConfig("user.mbrId");
 
-      // 처음 조회 시에만 조회수 증가
-      if (!localStorage.getItem(viewedKey)) {
-        localStorage.setItem(viewedKey, "true");
-        await api.put(`/community/${id}/view`);
-      }
+    if (userId) {
+      setCurrentUserId(userId);
+    }
+
+    const viewedKey = userId
+      ? `hotplace_viewed_user_${userId}_${id}`
+      : `hotplace_viewed_guest_${id}`;
+
+    // 처음 조회 시에만 조회수 증가
+    if (!sessionStorage.getItem(viewedKey)) {
+      await api.put(`/community/${id}/view`);
+      sessionStorage.setItem(viewedKey, "true");
+    }
 
       // 게시글 상세 조회
-      const res = await api.get(`/community/${id}`);
+      const res = await apiTool.getCommunityDetail(id);
       const item = res.data;
 
       const imageUrl = item.commMainImgUrl
@@ -116,7 +123,7 @@ const CommunityHotplaceDetail = () => {
       });
   }, [currentUserId, currentPost]);
 
-  // 댓글 조회 함수
+  // 댓글 목록 조회 함수
   const fetchComments = (commNo) => {
     api
       .get(`/comments/${commNo}`)
@@ -139,6 +146,7 @@ const CommunityHotplaceDetail = () => {
       });
   };
 
+  // 게시글 변경 시 댓글 목록 조회
   useEffect(() => {
     if (!currentPost) return;
     const commNo = currentPost.commNo ?? currentPost.id;
@@ -149,6 +157,7 @@ const CommunityHotplaceDetail = () => {
     return <CommunityHotplaceDetailSkeleton />;
   }
 
+  // 게시글이 존재하지 않을 경우
   if (!currentPost) {
     return (
       <div className="py-20 text-center font-bold text-gray-500">
@@ -157,12 +166,14 @@ const CommunityHotplaceDetail = () => {
     );
   }
 
+  // 이미지 슬라이드 데이터 생성
   const slideImages = currentPost.images || [
     currentPost.img,
     `https://picsum.photos/seed/hotplace-${currentPost.id}-sub1/900/650`,
     `https://picsum.photos/seed/hotplace-${currentPost.id}-sub2/900/650`,
   ];
 
+  // 조회수 / 좋아요 수 추출
   const viewCount = currentPost.viewCnt;
   const wishCount = currentPost.wishCnt;
 
@@ -190,12 +201,13 @@ const CommunityHotplaceDetail = () => {
       });
   };
 
+  // 댓글 수정 시작
   const startEditing = (commentId, text) => {
     setEditingId(commentId);
     setEditText(text);
   };
 
-  // 댓글 수정
+  // 댓글 수정 저장
   const handleSaveEdit = (commentId) => {
     if (!editText.trim()) {
       alert("수정할 내용을 입력해주세요.");
@@ -246,9 +258,9 @@ const CommunityHotplaceDetail = () => {
     }
   };
 
-  // 좋아요 처리
+  // 게시글 좋아요 처리
   const handleLikeClick = async () => {
-    if (!currentUserId) {
+    if (!currentUserId && !isLogin) {
       setShowLoginModal(true);
       return;
     }
@@ -269,98 +281,100 @@ const CommunityHotplaceDetail = () => {
     }
   };
 
-  const isOwner =
-  currentUserId !== null &&
-  currentPost.mbrId !== null &&
-  Number(currentUserId) === Number(currentPost.mbrId);
+  // 게시글 작성자 여부 확인
+  const isOwner = currentUserId !== null &&
+                  currentPost.mbrId !== null &&
+                  Number(currentUserId) === Number(currentPost.mbrId);
 
   return (
-    <div className="paperlogy container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20 font-sans">
-      <CommunityDetailHeader
-        breadcrumb={[
-          { label: "홈", to: "/" },
-          { label: "핫플거리", to: "/showcase/hotplace" },
-          { label: "상세보기" },
-        ]}
-        label="Hotplace Detail"
-        title="핫플거리"
-        description="여행자가 남긴 장소의 분위기와 이야기를 자세히 확인해보세요."
-        onBack={() => navigate("/showcase/hotplace")}
-      />
+    <div className="paperlogy min-h-screen bg-[#f7f8fa] font-sans">
+      <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px] mb-20">
+        <CommunityDetailHeader
+          breadcrumb={[
+            { label: "홈", to: "/" },
+            { label: "핫플거리", to: "/showcase/hotplace" },
+            { label: "상세보기" },
+          ]}
+          label="Hotplace Detail"
+          title="핫플거리"
+          description="여행자가 남긴 장소의 분위기와 이야기를 자세히 확인해보세요."
+          onBack={() => navigate("/showcase/hotplace")}
+        />
 
-      <section className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr] lg:gap-8 lg:items-stretch">
-        <div className="space-y-6">
-          <ImageSlider
-            images={slideImages}
-            alt={currentPost.title}
-            label={currentPost.place}
-            height="h-[400px]"
-          />
+        <section className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr] lg:gap-8 lg:items-stretch">
+          <div className="space-y-6">
+            <ImageSlider
+              images={slideImages}
+              alt={currentPost.title}
+              label={currentPost.place}
+              height="h-[400px]"
+            />
 
-          <HotplaceStats
+            <HotplaceStats
+              currentPost={currentPost}
+              viewCount={viewCount}
+              comments={comments}
+              wishCount={wishCount}
+              isLogin={isLogin}
+              isOwner={isOwner}
+              handleLikeClick={handleLikeClick}
+              navigate={navigate}
+              handleDeletePost={handleDeletePost}
+            />
+          </div>
+
+          <HotplaceAside
             currentPost={currentPost}
-            viewCount={viewCount}
-            comments={comments}
-            wishCount={wishCount}
             isLogin={isLogin}
             isOwner={isOwner}
+            isLiked={isLiked}
+            wishCount={wishCount}
             handleLikeClick={handleLikeClick}
-            navigate={navigate}
-            handleDeletePost={handleDeletePost}
-          />
-        </div>
+            openReportModal={async () => {
 
-        <HotplaceAside
-          currentPost={currentPost}
-          isLogin={isLogin}
-          isOwner={isOwner}
-          isLiked={isLiked}
-          wishCount={wishCount}
-          handleLikeClick={handleLikeClick}
-          openReportModal={async () => {
+            const result = await openReportModal({
+              type: "post",
+              commNo: currentPost.commNo ?? currentPost.id,
+            });
 
-          const result = await openReportModal({
-            type: "post",
-            commNo: currentPost.commNo ?? currentPost.id,
-          });
-
-          if (result?.blinded) {
-            navigate("/showcase/hotplace");
-          }
-        }}
-        />
-      </section>
-
-      <CommentSection
-        comments={comments}
-        newComment={newComment}
-        setNewComment={setNewComment}
-        handleCommentSubmit={handleCommentSubmit}
-        editingId={editingId}
-        setEditingId={setEditingId}
-        editText={editText}
-        setEditText={setEditText}
-        startEditing={startEditing}
-        handleSaveEdit={handleSaveEdit}
-        handleDeleteComment={handleDeleteComment}
-        openReportModal={(comment) =>
-          openReportModal({
-            type: "comment",
-            cmntNo: comment.cmntNo ?? comment.id,
-          })
-        }
-        openLoginModal={() => setShowLoginModal(true)}
-        currentUserId={currentUserId}
-      />
-      {showLoginModal && (
-        <LoginRequiredModal
-          onClose={() => setShowLoginModal(false)}
-          onLogin={() => {
-            setShowLoginModal(false);
-            navigate("/login");
+            if (result?.blinded) {
+              navigate("/showcase/hotplace");
+            }
           }}
+          />
+        </section>
+
+        <CommentSection
+          comments={comments}
+          newComment={newComment}
+          setNewComment={setNewComment}
+          handleCommentSubmit={handleCommentSubmit}
+          editingId={editingId}
+          setEditingId={setEditingId}
+          editText={editText}
+          setEditText={setEditText}
+          startEditing={startEditing}
+          handleSaveEdit={handleSaveEdit}
+          handleDeleteComment={handleDeleteComment}
+          openReportModal={(comment) =>
+            openReportModal({
+              type: "comment",
+              cmntNo: comment.cmntNo ?? comment.id,
+            })
+          }
+          openLoginModal={() => setShowLoginModal(true)}
+          currentUserId={currentUserId}
         />
-      )}
+        {showLoginModal && (
+          <LoginRequiredModal
+            onClose={() => setShowLoginModal(false)}
+            onLogin={() => {
+              setShowLoginModal(false);
+              navigate("/login");
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };

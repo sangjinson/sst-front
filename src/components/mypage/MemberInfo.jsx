@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import api from '@api/axios';
 import PasswordChange from './PasswordChange'; 
 import ProfileImage from '@modules/member/ProfileImage';
 import ProfileCover from '@modules/member/ProfileCover';
 
+import { useApi } from '@hooks/useApi'; // API 사용
+
 const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
+  const apiTool = useApi(); // Api 의 사용
+
   const imgRef = useRef(null);
   const coverRef = useRef(null);
   const isInitialized = useRef(false); 
@@ -45,11 +48,22 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
   }, [profile]);
 
   const autoHyphenPhone = (value) => {
+    // 숫자만 추출
     const onlyNums = value.replace(/[^0-9]/g, '');
-    const limitedNums = onlyNums.slice(0, 11);
-    if (limitedNums.length <= 3) return limitedNums;
-    if (limitedNums.length <= 7) return limitedNums.replace(/(\d{3})(\d{1,4})/, '$1-$2');
-    return limitedNums.replace(/(\d{3})(\d{3,4})(\d{1,4})/, '$1-$2-$3');
+
+    // 1. 서울 지역번호 (02) 처리
+    if (onlyNums.startsWith('02')) {
+      if (onlyNums.length <= 2) return onlyNums;
+      if (onlyNums.length <= 5) return onlyNums.replace(/(\d{2})(\d{1,3})/, '$1-$2');
+      if (onlyNums.length <= 9) return onlyNums.replace(/(\d{2})(\d{3})(\d{1,4})/, '$1-$2-$3'); // 예: 02-123-4567
+      return onlyNums.replace(/(\d{2})(\d{4})(\d{1,4})/, '$1-$2-$3'); // 예: 02-1234-5678
+    } 
+    
+    // 2. 핸드폰 및 그 외 지역번호 (010, 054, 063 등) 처리
+    if (onlyNums.length <= 3) return onlyNums;
+    if (onlyNums.length <= 6) return onlyNums.replace(/(\d{3})(\d{1,3})/, '$1-$2');
+    if (onlyNums.length <= 10) return onlyNums.replace(/(\d{3})(\d{3})(\d{1,4})/, '$1-$2-$3'); // 예: 054-123-4567
+    return onlyNums.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3'); // 예: 010-1234-5678
   };
 
   const handleChange = (e) => {
@@ -90,7 +104,7 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
       return; 
     }
     try {
-      const response = await api.get(`/auth/check-nickname`, { params: { nickname: trimmedNickname } });
+      const response = await apiTool.checkNickname(trimmedNickname);
       if (response.data.data) {
         setNicknameMsg('이미 사용 중인 닉네임입니다.');
         setNicknameChecked(false);

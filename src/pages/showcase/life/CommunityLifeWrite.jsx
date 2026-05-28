@@ -11,27 +11,23 @@ import WriteForm from "@components/modules/community/write/WriteForm";
 import SchedulePickerModal from "@components/modules/community/life/SchedulePickerModal";
 import CourseSection from "@components/modules/community/life/CourseSection";
 
+import { useApi } from '@hooks/useApi';       // API 사용
+
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const CommunityLifeWrite = () => {
+  const apiTool = useApi(); // Api 의 사용
+
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
   const isEditMode = !!id;
   const { user } = useAuth();
-
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-
-  // 화면 미리보기용 이미지
   const [imagePreviews, setImagePreviews] = useState([]);
-
-  // 새로 선택한 실제 파일
   const [imageFiles, setImageFiles] = useState([]);
-
-  // 수정 모드에서 기존 서버 이미지 경로
   const [existingImageUrls, setExistingImageUrls] = useState([]);
-
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState(null);
@@ -44,6 +40,7 @@ const CommunityLifeWrite = () => {
   const [regions, setRegions] = useState([]);
   const [isComposing, setIsComposing] = useState(false);
 
+  // 이미지 URL 생성
   const getImageUrl = (url) => {
     if (!url) return "";
     if (url.startsWith("blob:")) return url;
@@ -51,6 +48,7 @@ const CommunityLifeWrite = () => {
     return `${BASE_URL}${url}`;
   };
 
+  // 서버 이미지 경로 추출
   const getServerPath = (url) => {
     if (!url) return "";
     if (url.startsWith(BASE_URL)) {
@@ -59,10 +57,12 @@ const CommunityLifeWrite = () => {
     return url;
   };
 
+  // 최초 진입 시 맨 위로 이동
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
 
+  // 지역 목록 조회
   useEffect(() => {
     api
       .get("/regions")
@@ -74,6 +74,7 @@ const CommunityLifeWrite = () => {
       });
   }, []);
 
+  // 로그인 사용자의 AI 일정 목록 조회
   useEffect(() => {
     if (!user?.mbrId) return;
 
@@ -91,14 +92,17 @@ const CommunityLifeWrite = () => {
       });
   }, [user]);
 
+  // 수정 모드 게시글 데이터 조회
   useEffect(() => {
     if (!isEditMode) return;
 
     const fetchEditPost = async () => {
       try {
-        const res = await api.get(`/community/${id}`);
+        // 게시글 상세 조회
+        const res = await apiTool.getCommunityDetail(id);
         const item = res.data;
 
+        // 기존 서버 이미지 목록
         let serverImages = [];
 
         if (item.images?.length > 0) {
@@ -109,6 +113,7 @@ const CommunityLifeWrite = () => {
           serverImages = [item.commMainImgUrl];
         }
 
+        // 게시글 데이터 상태 저장
         setExistingImageUrls(serverImages);
         setImagePreviews(serverImages.map(getImageUrl));
 
@@ -116,6 +121,7 @@ const CommunityLifeWrite = () => {
         setContent(item.commContent || "");
         setTags(item.hashtagText ? item.hashtagText.split(",") : []);
 
+        // AI 일정 기반 코스 조회
         if (item.commAisNo) {
           setSelectedSchedule({ aisNo: item.commAisNo });
           setImportedSchedule({ aisNo: item.commAisNo });
@@ -138,6 +144,7 @@ const CommunityLifeWrite = () => {
               "지역 정보 없음",
           });
 
+          // 코스 데이터 매핑
           const mappedCourse = placeRes.data.map((place, index) => ({
             order: index + 1,
             name: place.name || place.plcName || "",
@@ -154,9 +161,11 @@ const CommunityLifeWrite = () => {
       }
     };
 
+    // 수정 게시글 조회 실행
     fetchEditPost();
   }, [isEditMode, id]);
 
+  // 이미지 업로드 처리
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
 
@@ -170,6 +179,7 @@ const CommunityLifeWrite = () => {
     e.target.value = "";
   };
 
+  // 업로드 이미지 삭제 처리
   const handleRemoveImage = (removeIndex) => {
     const removePreview = imagePreviews[removeIndex];
 
@@ -197,6 +207,7 @@ const CommunityLifeWrite = () => {
     }
   };
 
+  // AI 일정 장소 선택 처리
   const handleSelectPlaces = (allPlaces, schedule) => {
     setImportedSchedule(schedule);
 
@@ -225,6 +236,7 @@ const CommunityLifeWrite = () => {
       rgnName: scheduleRegionName,
     });
 
+    // 코스 데이터 생성
     const newCourse = allPlaces.map((item, i) => ({
       order: i + 1,
       name: item.name || "",
@@ -258,6 +270,7 @@ const CommunityLifeWrite = () => {
     }
   }, [location.state, isEditMode]);
 
+  // 코스 항목 삭제
   const removeCourseItem = (idx) => {
     setCourse((prev) =>
       prev
@@ -266,24 +279,28 @@ const CommunityLifeWrite = () => {
     );
   };
 
+  // 코스 항목 수정
   const updateCourseItem = (idx, field, value) => {
     setCourse((prev) =>
       prev.map((c, i) => (i === idx ? { ...c, [field]: value } : c))
     );
   };
 
+  // 해시태그 공백 및 # 제거
   const normalizeTag = (tag) =>
     tag
       .trim()
       .replace(/^#/, "")
       .replace(/\s+/g, "");
 
+  // 해시태그 문자열 분리
   const parseTags = (value) =>
     value
       .split(/[,\s#]+/)
       .map((tag) => tag.trim())
       .filter(Boolean);
 
+  // 해시태그 입력 처리
   const handleTagKeyDown = (e) => {
     if (isComposing || e.nativeEvent.isComposing) return;
 
@@ -305,6 +322,7 @@ const CommunityLifeWrite = () => {
     }
   };
 
+  // multipart/form-data 생성
   const createFormData = (payload) => {
     const formData = new FormData();
 
@@ -322,6 +340,7 @@ const CommunityLifeWrite = () => {
     return formData;
   };
 
+  // 게시글 등록 및 수정 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -417,7 +436,7 @@ const CommunityLifeWrite = () => {
         }
         onSubmit={handleSubmit}
         onCancel={() => navigate(-1)}
-        submitText={isEditMode ? "수정하기" : "등록하기"}>
+        submitText="저장하기">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <RegionSelect
             selectedRegion={selectedRegion}

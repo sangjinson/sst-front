@@ -13,7 +13,7 @@ const MyShowcase = () => {
   const getImageUrl = (url) => {
     if (!url) return "https://placehold.co/400x240";
     if (url.startsWith("http")) return url;
-    return `http://localhost:8080${url}`;
+    return `${import.meta.env.VITE_API_URL}${url}`;
   };
 
   useEffect(() => {
@@ -86,7 +86,7 @@ const MyShowcase = () => {
 
   // 카테고리별 상세 이동
   const handleMoveDetail = (post) => {
-    sessionStorage.setItem("mypageTab", "showcase");
+    localStorage.setItem("mypageTab", "showcase");
 
     if (post.catCd === "CMM001") {
       navigate(`/showcase/life/view/${post.id}`);
