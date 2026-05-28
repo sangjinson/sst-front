@@ -61,6 +61,7 @@ const HotplaceAside = ({
   isLiked,
   wishCount,
   handleLikeClick,
+  isReported,
   openReportModal,
 }) => {
   return (
@@ -76,8 +77,17 @@ const HotplaceAside = ({
         {isLogin && !isOwner && (
           <button
             type="button"
-            onClick={() => openReportModal("post")}
-            className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500 flex items-center gap-1.5">
+            disabled={isReported}
+            onClick={() => {
+              if (isReported) return;
+              openReportModal("post");
+            }}
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition flex items-center gap-1.5
+              ${
+                isReported
+                  ? "border-orange-200 bg-orange-50 text-orange-500 cursor-default"
+                  : "border-gray-200 text-gray-500 hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+              }`}>
             <svg viewBox="0 0 64 64" className="w-4 h-4">
               <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor"/>
               <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(45 32 32)"/>
@@ -88,7 +98,8 @@ const HotplaceAside = ({
               <rect x="10" y="34" width="44" height="11" rx="5" fill="currentColor"/>
               <rect x="8" y="45" width="48" height="10" rx="5" fill="#2d2d4e"/>
             </svg>
-            신고
+
+            {isReported ? "신고 완료" : "신고"}
           </button>
         )}
       </div>

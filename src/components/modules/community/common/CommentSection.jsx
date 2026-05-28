@@ -127,6 +127,8 @@ const CommentSection = ({
   openLoginModal,
   currentUserId,
   postAuthor,
+  reportedCommentIds = [],
+  setReportedCommentIds,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -171,23 +173,41 @@ const CommentSection = ({
         </div>
 
         {/* 댓글 작성 */}
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-gray-50 p-3 transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-100 md:p-5">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="h-20 w-full resize-none bg-transparent text-base text-gray-700 outline-none"
-            placeholder="이 여행지에 대해 궁금한 점이나 감상을 남겨주세요."
-          />
+        {currentUserId ? (
+          <div className="mb-6 rounded-2xl border border-gray-200 bg-gray-50 p-3 transition-all focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-100 md:p-5">
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="h-20 w-full resize-none bg-transparent text-base text-gray-700 outline-none"
+              placeholder="이 여행지에 대해 궁금한 점이나 감상을 남겨주세요."
+            />
 
-          <div className="mt-3 flex justify-end">
+            <div className="mt-3 flex justify-end">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="rounded-xl bg-emerald-600 px-6 py-2.5 fs-down-1 font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95">
+                댓글 등록
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-6 rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center">
+            <p className="font-bold text-gray-600">
+              로그인 후 댓글을 작성할 수 있습니다.
+            </p>
+            <p className="mt-1 fs-down-1 text-gray-400">
+              여행지에 대한 의견을 남기려면 로그인이 필요해요.
+            </p>
+
             <button
               type="button"
-              onClick={handleSubmit}
-              className="rounded-xl bg-emerald-600 px-6 py-2.5 fs-down-1 font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95">
-              댓글 등록
+              onClick={() => window.location.href = "/login"}
+              className="mt-4 rounded-xl bg-emerald-600 px-6 py-2.5 fs-down-1 font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95">
+              로그인하기
             </button>
           </div>
-        </div>
+        )}
 
         {/* 댓글 목록 */}
         <div className="space-y-4">
@@ -207,6 +227,10 @@ const CommentSection = ({
               const canEdit = isOwnComment;
               const canDelete = isOwnComment;
               const canReport = currentUserId && !isOwnComment;
+
+              const isCommentReported = reportedCommentIds.includes(
+                comment.cmntNo ?? comment.id
+              );
 
               return (
                 <div
@@ -235,10 +259,31 @@ const CommentSection = ({
                     canReport && (
                       <button
                         type="button"
-                        onClick={() => openReportModal?.(comment)}
-                        className="absolute right-5 top-5 inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-orange-50 hover:text-orange-500 active:scale-95 md:right-6 md:top-6"
+                        disabled={isCommentReported}
+                        onClick={async () => {
+                          if (isCommentReported) return;
+
+                          const result = await openReportModal?.(comment);
+
+                          if (result && setReportedCommentIds) {
+                            setReportedCommentIds((prev) => [
+                              ...prev,
+                              comment.cmntNo ?? comment.id,
+                            ]);
+                          }
+                        }}
+                        className={`absolute right-5 top-5 inline-flex h-9 items-center justify-center rounded-full px-3 text-sm transition md:right-6 md:top-6
+                          ${
+                            isCommentReported
+                              ? "bg-orange-50 text-orange-500 cursor-default"
+                              : "text-gray-500 hover:bg-orange-50 hover:text-orange-500 active:scale-95"
+                          }`}
                         aria-label="댓글 신고">
                         <ReportIcon />
+
+                        <span className="ml-1">
+                          {isCommentReported ? "신고완료" : "신고"}
+                        </span>
                       </button>
                     )
                   )}
