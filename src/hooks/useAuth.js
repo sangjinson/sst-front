@@ -17,6 +17,9 @@ export const useAuth = () => {
     if (!localStorage.getItem('isLogin')) return null;
     try {
       const authData = await apiTool.fetchMe(); // 회원여부를 확인
+      console.log("test");
+      console.log(authData);
+
       setConfig('user', authData.data)
       setConfig('user.isAuth', true)
       return authData.data;
