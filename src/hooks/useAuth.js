@@ -75,8 +75,8 @@ export const useAuth = () => {
       setConfig('user.isAuth', false)
       queryClient.setQueryData(['auth', 'user'], null);
       queryClient.clear();
-      // 내거리 페이지에서 로그아웃 시 랜딩페이지로 이동
-      if (currentPath.startsWith('/plan')) {
+      const restrictedPaths = ['/plan', '/showcase/hotplace/write', '/showcase/life/write'];
+      if (restrictedPaths.some(path => currentPath.startsWith(path))) {
         window.location.href = '/';
       } else {
         window.location.href = currentPath;

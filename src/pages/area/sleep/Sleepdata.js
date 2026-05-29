@@ -106,10 +106,12 @@ export const getSleepDataPaged = async (region, page = 1, size = 12, keyword = '
 export const getSleepDataById = async (id) => {
   try {
     const res = await axios.get(`${BASE_URL}/api/sleep/${id}`);
+    if (!res.data?.plcNo) return null;
     return normalizeApiItem(res.data);
   } catch (err) {
     console.error('잘거리 상세 조회 실패:', err);
-    return null;
+    if (err.response?.status === 404) return null;
+    throw err;
   }
 };
 
