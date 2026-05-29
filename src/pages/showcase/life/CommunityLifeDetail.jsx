@@ -138,7 +138,11 @@ const CommunityLifeDetail = () => {
 
         setPost(mappedPost);
       } catch (err) {
-          console.error("인생거리 상세 조회 실패:", err);
+        if (err.response?.status === 404) {
+          navigate('/404', { replace: true });
+          return;
+        }
+        console.error("인생거리 상세 조회 실패:", err);
       } finally {
         setLoading(false);
       }

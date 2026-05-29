@@ -92,6 +92,7 @@ const AppRoutes = () => {
       </Route>
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/403" element={<Unauthorized />} />
+      <Route path="/404" element={<NotFoundPage />} />
       <Route path="/500" element={<ServerErrorPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/login/signup" element={<SignupPage />} />
@@ -204,4 +205,3 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
-

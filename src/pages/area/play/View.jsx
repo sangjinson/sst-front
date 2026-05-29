@@ -15,6 +15,7 @@ import IconSVG from '@components/Icon/IconSVG';
 import ViewSkeleton from '@components/skeleton/ViewSkeleton';
 
 const CATEGORIES = ['전체', '액티비티', '테마파크', '체험', '공연/축제', '스포츠'];
+const isValidId = (value) => /^\d+$/.test(value || '');
 
 const PlayView = () => {
   const { region } = useParams();
@@ -29,13 +30,28 @@ const PlayView = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) { setLoading(false); return; }
+    if (!isValidId(id)) {
+      navigate('/404', { replace: true });
+      return;
+    }
     const fetchDetail = async () => {
       setLoading(true);
       try {
         const data = await getPlayDataById(id);
+        if (!data) {
+          navigate('/404', { replace: true });
+          return;
+        }
         setItem(data);
       } catch (err) {
+        if (err.response?.status === 400 || err.response?.status === 404) {
+          navigate('/404', { replace: true });
+          return;
+        }
+        if (err.response?.status >= 500) {
+          navigate('/500', { replace: true });
+          return;
+        }
         console.error('상세 조회 실패:', err);
         setItem(null);
       } finally {
@@ -43,7 +59,7 @@ const PlayView = () => {
       }
     };
     fetchDetail();
-  }, [id]);
+  }, [id, navigate]);
 
   useEffect(() => {
     if (!item) return;
