@@ -28,7 +28,7 @@ const Header = () => {
 
   const { user, logout } = useAuth();
   const navigate         = useNavigate();
-  const { pathname }     = useLocation();
+  const { pathname, search }     = useLocation();
   const headerRef        = useRef(null);
 
   const curRegionEn = getConfig('curRegion.textEn');        // 지역 영문명
@@ -215,7 +215,7 @@ const Header = () => {
             </div>
           ) : (
             <div className="hidden md:block">
-              <Link to="/login" className={authButtonClass}>
+              <Link to="/login" state={{ from: pathname + search }} className={authButtonClass}>
                 <span className={authButtonTextClass}>Login</span>
                 <LogIn className={`${authButtonIconClass} rotate-180 group-hover:-translate-x-0.5`} aria-hidden="true" />
               </Link>
@@ -305,6 +305,7 @@ const Header = () => {
               ) : (
                 <Link
                   to="/login"
+                  state={{ from: pathname + search }}
                   onClick={closeMenu}
                   className="flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 text-[15px] font-bold text-gray-800 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:text-[#0F9B73] hover:shadow-sm active:scale-[0.98]"
                 >

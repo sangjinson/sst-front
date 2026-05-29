@@ -1,12 +1,14 @@
 // src/pages/auth/LoginPage.jsx
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail } from 'lucide-react';
 import api from '@api/axios'; 
 import { useAuth } from '@hooks/useAuth';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || '/';
   
   const { login } = useAuth();
 
@@ -17,6 +19,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async () => {
+
     if (!email.trim() || !password.trim()) {
       alert('이메일과 비밀번호를 입력해주세요.');
       return;
@@ -32,9 +35,9 @@ export default function LoginPage() {
       const userData = await login(payload); 
       
       if (userData.memberRole === 'ROLE_ADMIN') {
-        navigate('/admin'); // 🚀 관리자면 회원 목록 페이지(또는 대시보드)로 바로 이동
+        navigate('/admin'); // 관리자면 회원 목록 페이지(또는 대시보드)로 바로 이동
       } else {
-        navigate('/'); // 🚀 일반 유저면 메인 페이지로 이동
+        navigate(from); // 일반 유저면 메인 페이지로 이동
       }
     } catch (error) {
       console.error('로그인 실패:', error);
@@ -48,14 +51,13 @@ export default function LoginPage() {
     }
   };
 
-  // 🚀 추가: 카카오 로그인 버튼 클릭 핸들러
+  // 추가: 카카오 로그인 버튼 클릭 핸들러
   const handleKakaoLogin = () => {
-    // 🚀 주의: 백엔드 Spring Security 설정에 따라 주소가 다를 수 있어. 
+    // 주의: 백엔드 Spring Security 설정에 따라 주소가 다를 수 있어. 
     // 보통 Spring Security 기본값은 아래와 같아. 백엔드 코드 확인 후 맞춰줘!
     // 백엔드 주소로 아예 브라우저를 이동시킴 (CORS 이슈 없음)
     window.location.href = `${import.meta.env.VITE_API_URL}/api/oauth2/authorization/kakao`; 
   };
-
   return (
     <>
       <style>{`

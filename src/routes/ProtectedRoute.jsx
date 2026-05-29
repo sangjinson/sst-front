@@ -43,8 +43,7 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
       }).then((result) => {
         if (result.isConfirmed) {
           navigate('/login', {
-            state: { from: location },
-            replace: true,
+            state: { from: location.pathname + location.search },
           });
         } else {
           navigate(-1); // 닫기 누르면 이전 페이지로
