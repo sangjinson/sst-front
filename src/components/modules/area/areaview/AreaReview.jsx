@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import StarRating from '@components/modules/StarRating';
 import Swal from 'sweetalert2';
 import { useAuth } from '@hooks/useAuth';
@@ -65,6 +65,7 @@ const formatDate = (date) => {
 const AreaReview = ({ plcNo, placeholder = '리뷰를 남겨주세요.' }) => {
   const apiTool = useApi();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const isLoggedIn = !!user;
 
@@ -329,7 +330,8 @@ const AreaReview = ({ plcNo, placeholder = '리뷰를 남겨주세요.' }) => {
         <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100 text-center">
           <p className="text-sm text-gray-500 mb-2">리뷰를 등록하려면 로그인이 필요합니다.</p>
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => {
+              navigate('/login', { state: { from: location.pathname + location.search } })}}
             className="px-5 py-2 border border-[#E8956D] text-[#E8956D] rounded-lg text-sm font-medium hover:bg-[#f07e48] hover:text-white transition-colors"
           >
             로그인하러 가기

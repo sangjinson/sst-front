@@ -65,15 +65,22 @@ export const useAuth = () => {
   // 🚀 4. useMutation: 로그아웃 요청 처리
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiTool.logout()
+      const currentPath = window.location.pathname + window.location.search;
+      await apiTool.logout();
+      return currentPath;
     },
-    onSuccess: () => {
+    onSuccess: (currentPath) => {
       localStorage.removeItem('isLogin');
       setConfig('user', {})
       setConfig('user.isAuth', false)
       queryClient.setQueryData(['auth', 'user'], null);
-      queryClient.clear(); // 🚀 다른 모든 API 캐시(일정, 커뮤니티 등) 일괄 초기화
-      window.location.href = '/'; // 🚀 상태 완전 초기화를 위해 하드 리다이렉트
+      queryClient.clear();
+      // 내거리 페이지에서 로그아웃 시 랜딩페이지로 이동
+      if (currentPath.startsWith('/plan')) {
+        window.location.href = '/';
+      } else {
+        window.location.href = currentPath;
+      }
     },
     onError: () => {
       // 🚀 서버 로그아웃 실패(네트워크 오류 등) 시에도 프론트 상태는 강제 초기화하여 사용자 보호

@@ -18,7 +18,7 @@ const HeroBanner = ({ bgImage, title, subtitle, className = '', to }) => {
 
       {/* ✅ to가 있으면 호버 효과 */}
       {to && (
-        <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 z-10" />
+        <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-300 z-30" />
       )}
 
       <div className="relative z-20 text-center text-white drop-shadow-md">
