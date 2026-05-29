@@ -202,7 +202,7 @@ const TopPickDeck = ({ items, onDetailClick }) => {
       e.stopPropagation();
       onDetailClick(item.type, item);
     }}
-    className={`absolute right-0 top-[78%] z-30 flex cursor-pointer items-center gap-2 rounded-l-2xl rounded-r-none border border-r-0 border-white/65 bg-white/90 px-5 py-3 text-base font-semibold text-gray-900 shadow-[0_14px_30px_rgba(15,23,42,0.22)] backdrop-blur-sm transition-[translate,opacity,color,background-color,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[#0F9B73]/50 hover:bg-white hover:text-[#0F9B73] active:brightness-95 ${
+    className={`absolute right-0 top-[72%] z-30 flex cursor-pointer items-center gap-2 rounded-l-2xl rounded-r-none border border-r-0 border-white/65 bg-white/90 px-5 py-3 text-base font-semibold text-gray-900 shadow-[0_14px_30px_rgba(15,23,42,0.22)] backdrop-blur-sm transition-[translate,opacity,color,background-color,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[#0F9B73]/50 hover:bg-white hover:text-[#0F9B73] active:brightness-95 ${
       shouldExpand
         ? 'translate-x-0 opacity-100 delay-[220ms] hover:delay-0'
         : 'translate-x-full opacity-0 delay-0'
