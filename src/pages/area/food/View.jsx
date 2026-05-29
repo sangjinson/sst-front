@@ -15,6 +15,7 @@ import IconSVG from '@components/Icon/IconSVG';
 import ViewSkeleton from '@components/skeleton/ViewSkeleton';
 
 const CATEGORIES = ['전체', '한식', '일식', '양식', '중식', '카페'];
+const isValidId = (value) => /^\d+$/.test(value || '');
 
 const FoodView = () => {
   const { region } = useParams();
@@ -29,13 +30,28 @@ const FoodView = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) { setLoading(false); return; }
+    if (!isValidId(id)) {
+      navigate('/404', { replace: true });
+      return;
+    }
     const fetchDetail = async () => {
       setLoading(true);
       try {
         const data = await getFoodDataById(id);
+        if (!data) {
+          navigate('/404', { replace: true });
+          return;
+        }
         setItem(data);
       } catch (err) {
+        if (err.response?.status === 400 || err.response?.status === 404) {
+          navigate('/404', { replace: true });
+          return;
+        }
+        if (err.response?.status >= 500) {
+          navigate('/500', { replace: true });
+          return;
+        }
         console.error('먹거리 상세 조회 실패:', err);
         setItem(null);
       } finally {
@@ -43,7 +59,7 @@ const FoodView = () => {
       }
     };
     fetchDetail();
-  }, [id]);
+  }, [id, navigate]);
 
   useEffect(() => {
     if (!item) return;

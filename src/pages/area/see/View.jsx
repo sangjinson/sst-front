@@ -15,6 +15,7 @@ import IconSVG from '@components/Icon/IconSVG';
 import ViewSkeleton from '@components/skeleton/ViewSkeleton';
 
 const CATEGORIES = ['전체', '역사', '자연', '랜드마크', '도시공원', '전시장'];
+const isValidId = (value) => /^\d+$/.test(value || '');
 
 const View = () => {
   const { region } = useParams();
@@ -28,13 +29,28 @@ const View = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) { setLoading(false); return; }
+    if (!isValidId(id)) {
+      navigate('/404', { replace: true });
+      return;
+    }
     const fetchDetail = async () => {
       setLoading(true);
       try {
         const data = await getSeeDataById(id);
+        if (!data) {
+          navigate('/404', { replace: true });
+          return;
+        }
         setItem(data);
       } catch (err) {
+        if (err.response?.status === 400 || err.response?.status === 404) {
+          navigate('/404', { replace: true });
+          return;
+        }
+        if (err.response?.status >= 500) {
+          navigate('/500', { replace: true });
+          return;
+        }
         console.error('상세 조회 실패:', err);
         setItem(null);
       } finally {
@@ -42,7 +58,7 @@ const View = () => {
       }
     };
     fetchDetail();
-  }, [id]);
+  }, [id, navigate]);
 
   useEffect(() => {
     if (!item) return;

@@ -126,6 +126,10 @@ const AIPlanResultPage = () => {
             aisTotDays  : data.aisTotDays,
           }));
         } catch (err) {
+          if (err.response?.status === 404) {
+            navigate('/404', { replace: true });
+            return;
+          }
           console.error('일정 불러오기 실패:', err);
           setSchedule([]);
         } finally {

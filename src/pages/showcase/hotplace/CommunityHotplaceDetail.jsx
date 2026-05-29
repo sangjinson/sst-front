@@ -100,6 +100,10 @@ const CommunityHotplaceDetail = () => {
         size: "wide",
       });
     } catch (err) {
+      if (err.response?.status === 404) {
+        navigate('/404', { replace: true });
+        return;
+      }
       console.error("게시글 상세 조회 실패:", err);
     } finally {
       setLoading(false);
