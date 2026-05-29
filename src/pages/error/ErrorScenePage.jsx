@@ -270,14 +270,6 @@ const ErrorScenePage = ({
         </g>
       </svg>
 
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="absolute bottom-[500px] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/25 bg-slate-950/45 px-7 py-3 text-base font-bold text-white shadow-[0_14px_34px_rgba(2,6,23,0.24)] backdrop-blur-md transition-all duration-200 hover:-translate-x-1/2 hover:-translate-y-0.5 hover:border-white/50 hover:bg-white hover:text-slate-950 active:-translate-x-1/2 active:translate-y-0 md:bottom-[150px] md:px-14 md:py-6 md:text-2xl"
-      >
-        ← 뒤로가기
-      </button>
-
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1500px] flex-col items-center px-5 pt-[18vh] text-center">
         <p className="mb-4 text-base font-bold uppercase tracking-[0.28em] text-[#8ED0FF] md:text-lg">
           {label}
@@ -290,10 +282,17 @@ const ErrorScenePage = ({
         <p className="mt-5 max-w-2xl text-lg font-medium leading-8 text-slate-300 md:text-xl">
           {description}
         </p>
+
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="mt-8 rounded-full border border-white/25 bg-slate-950/45 px-8 py-3.5 text-lg font-bold text-white shadow-[0_14px_34px_rgba(2,6,23,0.24)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-white/50 hover:bg-white hover:text-slate-950 active:translate-y-0 md:mt-10 md:px-14 md:py-5 md:text-2xl"
+        >
+          ← 뒤로가기
+        </button>
       </div>
     </main>
   );
 };
 
 export default ErrorScenePage;
-
