@@ -52,7 +52,7 @@ export const useConfig = () => {
 
     // curRegion.textEn 만 경기도 기본값
     if (path === 'curRegion.textEn') {
-      return value ?? '경기도';
+      return value ?? null;
     }
 
     // 나머지는 null 허용
