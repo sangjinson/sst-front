@@ -6,6 +6,7 @@ import HeroBanner from '@components/common/HeroBanner';
 import CategorySection from '@components/card/CategorySection';
 import Breadcrumb from '@components/common/Breadcrumb';
 import MainSkeleton from '@components/skeleton/MainSkeleton';
+import api from '@api/axios';
 
 import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 
@@ -78,10 +79,10 @@ const MainPage = () => {
         try {
             setIsLoading(true);
             // URL 파라미터 뒤질 필요 없이, Context에 있는 코드를 바로 꽂아버립니다.
-            const response = await fetch(`/api/home/places?regionCode=${curRegionCode}`);
-            if (!response.ok) throw new Error(`API 요청 실패: ${response.status}`);
-
-            const data = await response.json();
+            const response = await api.get('/home/places', {
+              params: { regionCode: curRegionCode },
+            });
+            const data = response.data;
             const convertedData = Array.isArray(data) ? data.map(convertPlaceToCardItem) : [];
 
             setPlaceList(convertedData);  // 플레이 리스트를 갱신한다.
