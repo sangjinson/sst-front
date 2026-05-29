@@ -202,7 +202,7 @@ const CommentSection = ({
 
             <button
               type="button"
-              onClick={() => window.location.href = "/login"}
+              onClick={() => openLoginModal?.()}
               className="mt-4 rounded-xl bg-emerald-600 px-6 py-2.5 fs-down-1 font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95">
               로그인하기
             </button>

@@ -12,7 +12,6 @@ import {
 } from '@components/modules/airesult';
 import AIResultMapView from '@components/modules/airesult/AIResultMapView';
 import AIPlanLoading from '@components/modules/aiplan/AIPlanLoading';
-import SavedScheduleLoading from '@components/modules/aiplan/SavedScheduleLoading';
 import { useAIPlan } from '@pages/aiplan/AIPlanContext';
 import '@assets/css/common.css';
 import api from '@api/axios';
@@ -204,7 +203,7 @@ const AIPlanResultPage = () => {
 
     const fetchSearch = async () => {
       try {
-        // ✅ 찜목록 카테고리 선택 시 현재 지역 찜 목록만
+        // 찜목록 카테고리 선택 시 현재 지역 찜 목록만
         if (searchCategory === '찜목록') {
           if (!user?.mbrId) {
             setSearchResults([]);
@@ -273,15 +272,24 @@ const AIPlanResultPage = () => {
     input: 'text',
     inputValue: existingName,
     inputPlaceholder: aisNo ? existingName || '기존 일정명' : '예) 수원 가족 여행',
-    inputAttributes: { maxlength: 14 },
+    inputAttributes: { maxlength: 30 },
     showCancelButton: true,
     confirmButtonText: aisNo ? '수정' : '저장',
     cancelButtonText: '취소',
     confirmButtonColor: '#0F9B73',
     cancelButtonColor: '#9ca3af',
     inputValidator: (value) => {
-      if (!value || value.trim().length < 3) return '최소 3자 이상 입력해주세요.';
-      if (value.trim().length >= 15) return '15자 미만으로 입력해주세요.';
+      if (!value || value.trim().length < 2) return '최소 2자 이상 입력해주세요.';
+      if (value.trim().length >= 31) return '30자 미만으로 입력해주세요.';
+    },
+    didOpen: () => {
+      const input = document.querySelector('.swal2-input');
+      if (input) {
+        const hint = document.createElement('p');
+        hint.textContent = '30자 이하로 입력해주세요.';
+        hint.className = 'text-gray-400 text-center text-sm mt-1';
+        input.insertAdjacentElement('afterend', hint);
+      }
     },
   });
 
@@ -404,7 +412,7 @@ const AIPlanResultPage = () => {
 
         {scheduleLoading ? (
           aisNo ? (
-            <SavedScheduleLoading />
+            <AIPlanLoading />
           ) : (
             <AIPlanLoading isFinishing={loadingFinishing} />
           )

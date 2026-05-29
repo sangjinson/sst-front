@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import api from "@api/axios";
 import CommunityLifeCard from "@components/modules/community/life/CommunityLifeCard";
 import AreaPagination from "@components/modules/area/arealist/AreaPagination";
@@ -17,6 +17,7 @@ const CommunityLife = () => {
   const {getConfig} = useConfig();   // Config 값 가져오기
   
   const navigate = useNavigate();
+  const location = useLocation(); // 추가
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [keyword, setKeyword] = useState(searchParams.get("keyword") || "");
@@ -285,7 +286,7 @@ const CommunityLife = () => {
         onClose={() => setShowLoginModal(false)}
         onLogin={() => {
           setShowLoginModal(false);
-          navigate("/login");
+          navigate("/login", { state: { from: location.pathname + location.search } });
         }}
       />
     )}

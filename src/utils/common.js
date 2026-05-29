@@ -147,14 +147,22 @@ export const mapDataToState = (type, updatedData, profileState = {}) => {
     // 4. 이미지 캐시 방지 및 객체 안전성 체크
     // profileIcon 처리
     if (result.profileIcon && result.profileIcon.filePath) {
-        const separator = result.profileIcon.filePath.includes('?') ? '&' : '?';
-        result.profileIcon.filePath += `${separator}t=${new Date().getTime()}`;
+        let filePath = result.profileIcon.filePath;
+        if (filePath.startsWith('/attachment')) {
+            filePath = `${import.meta.env.VITE_API_URL}${filePath}`;
+        }
+        const separator = filePath.includes('?') ? '&' : '?';
+        result.profileIcon.filePath = filePath + `${separator}t=${new Date().getTime()}`;
     }
-    
+        
     // profileBg 처리 (배경화면도 캐시 방지가 필요하다면 추가)
     if (result.profileBg && result.profileBg.filePath) {
-        const separator = result.profileBg.filePath.includes('?') ? '&' : '?';
-        result.profileBg.filePath += `${separator}t=${new Date().getTime()}`;
+        let filePath = result.profileBg.filePath;
+        if (filePath.startsWith('/attachment')) {
+            filePath = `${import.meta.env.VITE_API_URL}${filePath}`;
+        }
+        const separator = filePath.includes('?') ? '&' : '?';
+        result.profileBg.filePath = filePath + `${separator}t=${new Date().getTime()}`;
     }
 
     return result;

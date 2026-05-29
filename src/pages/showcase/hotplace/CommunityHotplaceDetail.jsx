@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "@api/axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import CommunityDetailHeader from "@components/modules/community/common/CommunityDetailHeader";
 import { openReportModal } from "@components/modules/community/common/reportModal";
 import ImageSlider from "@components/modules/community/common/ImageSlider";
@@ -19,6 +19,7 @@ const CommunityHotplaceDetail = () => {
   const {getConfig} = useConfig();   // Config 값 가져오기
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation(); // 추가
 
   const [currentUserId, setCurrentUserId] = useState(null);
   const isLogin = getConfig('user.isAuth');
@@ -439,7 +440,9 @@ const CommunityHotplaceDetail = () => {
 
               return result;
             }}
-            openLoginModal={() => setShowLoginModal(true)}
+            openLoginModal={() => {
+              setShowLoginModal(true);
+            }}
             currentUserId={currentUserId}
             reportedCommentIds={reportedCommentIds}
             setReportedCommentIds={setReportedCommentIds}
@@ -450,7 +453,7 @@ const CommunityHotplaceDetail = () => {
             onClose={() => setShowLoginModal(false)}
             onLogin={() => {
               setShowLoginModal(false);
-              navigate("/login");
+              navigate("/login", { state: { from: location.pathname + location.search } });
             }}
           />
         )}
