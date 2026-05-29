@@ -58,7 +58,6 @@ export default function LoginPage() {
     // 백엔드 주소로 아예 브라우저를 이동시킴 (CORS 이슈 없음)
     window.location.href = `${import.meta.env.VITE_API_URL}/api/oauth2/authorization/kakao`; 
   };
-
   return (
     <>
       <style>{`
