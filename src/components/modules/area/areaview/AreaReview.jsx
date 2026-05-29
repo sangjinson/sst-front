@@ -239,7 +239,7 @@ const AreaReview = ({ plcNo, placeholder = '리뷰를 남겨주세요.' }) => {
         rptReasonContent: result.value.reasonContent,
       });
 
-      const blinded = res.data;
+      const blinded = res.data === 2;
 
       if (blinded) {
         // 블라인드 처리된 경우 목록에서 제거

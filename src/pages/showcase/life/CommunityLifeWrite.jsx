@@ -157,7 +157,7 @@ const CommunityLifeWrite = () => {
           setCourse(mappedCourse);
         }
       } catch (err) {
-        console.error("인생거리 수정 데이터 조회 실패:", err);
+          console.error("인생거리 수정 데이터 조회 실패:", err);
       }
     };
 
@@ -409,10 +409,10 @@ const CommunityLifeWrite = () => {
       alert("글이 등록되었습니다!");
       navigate("/showcase/life");
     } catch (err) {
-      console.error(
-        isEditMode ? "인생거리 수정 실패:" : "인생거리 등록 실패:",
-        err
-      );
+        console.error(
+          isEditMode ? "인생거리 수정 실패:" : "인생거리 등록 실패:",
+          err
+        );
       alert(isEditMode ? "글 수정에 실패했습니다." : "글 등록에 실패했습니다.");
     }
   };

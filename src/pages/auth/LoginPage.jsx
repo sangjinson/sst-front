@@ -53,7 +53,7 @@ export default function LoginPage() {
     // 🚀 주의: 백엔드 Spring Security 설정에 따라 주소가 다를 수 있어. 
     // 보통 Spring Security 기본값은 아래와 같아. 백엔드 코드 확인 후 맞춰줘!
     // 백엔드 주소로 아예 브라우저를 이동시킴 (CORS 이슈 없음)
-    window.location.href = `${import.meta.env.VITE_API_URL}/oauth2/authorization/kakao`; 
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/oauth2/authorization/kakao`; 
   };
   return (
     <>

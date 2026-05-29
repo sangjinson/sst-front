@@ -6,6 +6,7 @@ import Pagination from '@components/common/Pagination';
 import ListSkeleton from '@components/skeleton/ListSkeleton';
 import { WishlistHeartButton } from '@components/modules/ActionButtons';
 import { useAuth } from '@hooks/useAuth';
+import { toEnRegion } from '@utils/regionMap';
 
 const PLACE_CATEGORIES = [
   { code: 'ALL',    name: '전체' },
@@ -34,9 +35,14 @@ const getCommunityPath = (commCatCd, commNo) => {
 };
 
 const getRegionFromAddr = (addr) => {
-  if (!addr) return sessionStorage.getItem('lastVisitedRegion') || '수원시';
-  const match = addr.match(/경기도\s+(\S+시|\S+군)/);
-  return match ? match[1] : sessionStorage.getItem('lastVisitedRegion') || '수원시';
+  if (!addr) return sessionStorage.getItem('lastVisitedRegion') || 'suwon';
+  const match = addr.match(/(\S+시|\S+군)/);
+  const korRegion = match ? match[1] : null;
+  if (korRegion) {
+    const enRegion = toEnRegion(korRegion);
+    return enRegion || korRegion;
+  }
+  return sessionStorage.getItem('lastVisitedRegion') || 'suwon';
 };
 
 const SearchPage = () => {
