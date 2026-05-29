@@ -44,7 +44,7 @@ const AreaListCard = ({ item, categories, liked, onLike, onClick, renderHeart })
             <img
               src={item.image || defaultImg}
               alt={name}
-              className="w-full h-full aspect-[3/4] sm:aspect-[4/4] object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full aspect-[4/3] sm:aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-500"
               onError={(e) => { e.target.src = defaultImg; }}
             />
             <span className={`absolute top-3 left-3 px-4 py-1 rounded-full fs-up-1 font-semibold ${badgeColor}`}>

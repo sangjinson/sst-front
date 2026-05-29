@@ -312,7 +312,7 @@ const CommunityHotplaceWrite = () => {
         // 수정 완료 후 상세페이지 이동
         navigate(`/showcase/hotplace/view/${id}`);
       } catch (error) {
-        console.error("글 수정 실패:", error);
+          console.error("글 수정 실패:", error);
         alert("글 수정에 실패했습니다.");
       }
     } else {
@@ -344,7 +344,7 @@ const CommunityHotplaceWrite = () => {
         alert("글이 등록되었습니다!");
         navigate("/showcase/hotplace");
       } catch (error) {
-        console.error("글 등록 실패:", error);
+          console.error("글 등록 실패:", error);
         alert("글 등록에 실패했습니다.");
       }
     }
@@ -356,7 +356,7 @@ const CommunityHotplaceWrite = () => {
       descriptionText={isEditMode ? "작성한 경기도 여행 순간을 수정해보세요." : "나만의 경기도 여행 순간을 기록해 보세요."}
       onSubmit={handleSubmit}
       onCancel={() => navigate(-1)}
-      submitText={isEditMode ? "수정하기" : "등록하기"}>
+      submitText="저장하기">
       {/* 지역 및 장소 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <RegionSelect

@@ -34,7 +34,7 @@ const SchedulePickerModal = ({ onClose, onSelect, schedules = [] }) => {
       onSelect(res.data, schedule);
       onClose();
     } catch (err) {
-      console.error("일정 장소 목록 조회 실패:", err);
+        console.error("일정 장소 목록 조회 실패:", err);
       alert("일정의 장소 목록을 불러오지 못했습니다.");
     } finally {
       setLoadingId(null);

@@ -108,7 +108,7 @@ export const openReportModal = async ({
 
     const res = await api.post("/reports", result.value);
 
-    const blinded = res.data;
+    const blinded = res.data === 2;
 
     if (blinded) {
 

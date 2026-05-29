@@ -26,7 +26,7 @@ const CommunityLifeDetail = () => {
   const navigate = useNavigate();
 
   const [currentUserId, setCurrentUserId] = useState(null);
-  const isLogin = !!currentUserId;
+  const isLogin = getConfig('user.isAuth');
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
@@ -35,6 +35,8 @@ const CommunityLifeDetail = () => {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isReported, setIsReported] = useState(false);
+  const [reportedCommentIds, setReportedCommentIds] = useState([]);
 
   // 최초 진입 시 맨 위로 스크롤 이동
   useEffect(() => {
@@ -52,13 +54,21 @@ const CommunityLifeDetail = () => {
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
+        const userId = getConfig("user.mbrId");
+
+        if (userId) {
+          setCurrentUserId(userId);
+        }
+
         // 조회수 중복 방지 키
-        const viewedKey = `life_viewed_${id}`;
+        const viewedKey = userId
+          ? `life_viewed_user_${userId}_${id}`
+          : `life_viewed_guest_${id}`;
 
         // 처음 조회 시에만 조회수 증가
         if (!sessionStorage.getItem(viewedKey)) {
-          sessionStorage.setItem(viewedKey, "true");
           await api.put(`/community/${id}/view`);
+          sessionStorage.setItem(viewedKey, "true");
         }
         // 게시글 상세 조회
         const res = await apiTool.getCommunityDetail(id);
@@ -127,7 +137,7 @@ const CommunityLifeDetail = () => {
 
         setPost(mappedPost);
       } catch (err) {
-        console.error("인생거리 상세 조회 실패:", err);
+          console.error("인생거리 상세 조회 실패:", err);
       } finally {
         setLoading(false);
       }
@@ -166,6 +176,36 @@ const CommunityLifeDetail = () => {
     fetchComments(commNo);
   }, [post]);
 
+  // 댓글 신고 여부 조회
+  useEffect(() => {
+    if (!currentUserId || comments.length === 0) return;
+
+    const fetchReportedComments = async () => {
+      try {
+        const reportedIds = [];
+
+        for (const comment of comments) {
+          const cmntNo = comment.cmntNo ?? comment.id;
+          const res = await api.get("/reports/check", {
+            params: {
+              type: "comment",
+              cmntNo,
+            },
+          });
+
+          if (res.data) {
+            reportedIds.push(cmntNo);
+          }
+        }
+        setReportedCommentIds(reportedIds);
+      } catch (err) {
+        console.error("댓글 신고 상태 조회 실패:", err);
+      }
+    };
+
+    fetchReportedComments();
+  }, [currentUserId, comments]);
+
   // 게시글 좋아요 상태 조회
   useEffect(() => {
     if (!currentUserId || !post?.commNo) return;
@@ -178,6 +218,25 @@ const CommunityLifeDetail = () => {
       })
       .catch((err) => {
         console.error("좋아요 상태 조회 실패:", err);
+      });
+  }, [currentUserId, post?.commNo]);
+
+  // 게시글 신고 상태 조회
+  useEffect(() => {
+    
+    if (!currentUserId || !post?.commNo) return;
+    api
+      .get("/reports/check", {
+        params: {
+          type: "post",
+          commNo: post.commNo ?? post.id,
+        },
+      })
+      .then((res) => {
+        setIsReported(res.data);
+      })
+      .catch((err) => {
+        console.error("게시글 신고 상태 조회 실패:", err);
       });
   }, [currentUserId, post?.commNo]);
 
@@ -222,8 +281,8 @@ const CommunityLifeDetail = () => {
 
   // 내 일정으로 가져오기 - DB 저장
   const handleImportSchedule = async () => {
-    if (!isLogin) {
-      navigate("/login");
+    if (!currentUserId && !isLogin) {
+      setShowLoginModal(true);
       return;
     }
 
@@ -257,7 +316,7 @@ const CommunityLifeDetail = () => {
         navigate("/user/mypage", { state: { tab: "schedule" } });
       }
     } catch (err) {
-      console.error("일정 복사 실패:", err);
+        console.error("일정 복사 실패:", err);
       Swal.fire({ icon: "error", title: "가져오기 실패", text: "다시 시도해주세요." });
     }
   };
@@ -306,6 +365,12 @@ const CommunityLifeDetail = () => {
 
   // 댓글 등록
   const handleCommentSubmit = () => {
+
+    if (!currentUserId && !isLogin) {
+      setShowLoginModal(true);
+      return;
+    }
+
     if (!newComment.trim()) {
       alert("댓글 내용을 입력해주세요.");
       return;
@@ -375,14 +440,14 @@ const CommunityLifeDetail = () => {
       alert("게시글이 삭제되었습니다.");
       navigate("/showcase/life");
     } catch (err) {
-      console.error("게시글 삭제 실패:", err);
+        console.error("게시글 삭제 실패:", err);
       alert("게시글 삭제에 실패했습니다.");
     }
   };
 
   // 게시글 좋아요 처리
   const handleLikeClick = async () => {
-    if (!currentUserId) {
+    if (!currentUserId && !isLogin) {
       setShowLoginModal(true);
       return;
     }
@@ -446,7 +511,7 @@ const CommunityLifeDetail = () => {
             />
 
             <article className="bg-white rounded-3xl border border-gray-100 p-6 md:p-10 shadow-sm">
-              <p className="whitespace-pre-wrap text-base md:text-lg leading-9 tracking-[0.012em] text-gray-700">
+              <p className="whitespace-pre-wrap break-all text-left text-base md:text-lg leading-10 text-gray-700">
                 {post.description}
               </p>
             </article>
@@ -482,11 +547,15 @@ const CommunityLifeDetail = () => {
                 type: "post",
                 commNo: post.commNo ?? post.id,
               });
+              if (result) {
+                setIsReported(true);
+              }
               if (result?.blinded) {
                 navigate("/showcase/life");
               }
             }}
             onCommentClick={scrollToComments}
+            isReported={isReported}
           />
         </section>
 
@@ -503,15 +572,26 @@ const CommunityLifeDetail = () => {
             startEditing={startEditing}
             handleSaveEdit={handleSaveEdit}
             handleDeleteComment={handleDeleteComment}
-            openReportModal={(comment) =>
-              openReportModal({
+            openReportModal={async (comment) => {
+              const result = await openReportModal({
                 type: "comment",
                 cmntNo: comment.cmntNo ?? comment.id,
-              })
-            }
+              });
+
+              if (result) {
+                setReportedCommentIds((prev) => [
+                  ...prev,
+                  comment.cmntNo ?? comment.id,
+                ]);
+              }
+
+              return result;
+            }}
             openLoginModal={() => setShowLoginModal(true)}
             currentUserId={currentUserId}
             postAuthor={post.author}
+            reportedCommentIds={reportedCommentIds}
+            setReportedCommentIds={setReportedCommentIds}
           />
         </div>
         {showLoginModal && (

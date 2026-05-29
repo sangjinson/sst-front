@@ -2,8 +2,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth';
+import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 
 export default function OAuthRedirectHandler() {
+
+  const {getConfig, setConfig} = useConfig();   // Config 값 가져오기
   const navigate = useNavigate();
   // 🚀 비동기 통신 없이 전역 상태를 업데이트하기 위해 AuthContext의 login을 가져옴
   const { login } = useAuth();

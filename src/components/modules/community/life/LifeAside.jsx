@@ -58,6 +58,7 @@ const LifeAside = ({
   handleLikeClick,
   isLogin,
   isOwner,
+  isReported,
   navigate,
   handleImportSchedule,
   handleMakePlan,
@@ -73,12 +74,20 @@ const LifeAside = ({
           <ClipButton />
         </div>
 
-        {/* 로그인 + 내 글 아님 */}
+        {/* 로그인 상태이고, 내 글이 아닐 때 */}
         {isLogin && !isOwner && (
           <button
             type="button"
-            onClick={() => openReportModal("post")}
-            className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500 flex items-center gap-1.5">
+            disabled={isReported}
+            onClick={() => {
+              if (isReported) return;
+              openReportModal("post");
+            }}
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition flex items-center gap-1.5 ${
+              isReported
+                ? "cursor-not-allowed border-orange-200 bg-orange-50 text-orange-500"
+                : "border-gray-200 text-gray-500 hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+            }`}>
             <svg viewBox="0 0 64 64" className="w-4 h-4">
               <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor"/>
               <rect x="30" y="2" width="4" height="7" rx="2" fill="currentColor" transform="rotate(45 32 32)"/>
@@ -89,7 +98,7 @@ const LifeAside = ({
               <rect x="10" y="34" width="44" height="11" rx="5" fill="currentColor"/>
               <rect x="8" y="45" width="48" height="10" rx="5" fill="#2d2d4e"/>
             </svg>
-            신고
+            {isReported ? "신고 완료" : "신고"}
           </button>
         )}
       </div>
@@ -139,8 +148,7 @@ const LifeAside = ({
           {(post.hashtags || []).map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-emerald-50 px-3 py-1.5 fs-down-1 font-bold text-emerald-600"
-            >
+              className="rounded-full bg-emerald-50 px-3 py-1.5 fs-down-1 font-bold text-emerald-600">
               #{tag}
             </span>
           ))}
@@ -152,11 +160,16 @@ const LifeAside = ({
         <button
           type="button"
           onClick={handleLikeClick}
-          className={`rounded-2xl cursor-pointer px-3 py-4 transition ${
-            isLiked ? "bg-blue-50" : "bg-gray-50 hover:bg-blue-50"
+          className={`rounded-2xl cursor-pointer border border-transparent px-3 py-4 transition ${
+            isLiked
+              ? "bg-blue-100 ring-2 ring-blue-100"
+              : "bg-gray-50 hover:border-blue-200 hover:bg-blue-50"
           }`}>
-          <p className="fs-down-1 text-gray-400">좋아요</p>
-          <strong className="mt-1 block text-lg text-gray-900">
+          <p className={`fs-down-1 ${isLiked ? "text-blue-500" : "text-gray-400"}`}>
+            좋아요
+          </p>
+
+          <strong className={`mt-1 block text-lg ${isLiked ? "text-blue-700" : "text-gray-900"}`}>
             {wishCount}
           </strong>
         </button>
@@ -164,8 +177,7 @@ const LifeAside = ({
         <button
           type="button"
           onClick={onCommentClick}
-          className="rounded-2xl bg-gray-50 px-3 py-4 transition hover:bg-emerald-50 cursor-pointer"
-        >
+          className="rounded-2xl bg-gray-50 px-3 py-4 transition hover:bg-emerald-50 cursor-pointer">
           <p className="fs-down-1 text-gray-400">댓글</p>
           <strong className="mt-1 block text-lg text-gray-900">
             {comments.length}
@@ -199,15 +211,17 @@ const LifeAside = ({
       )}
 
       {/* 사이드바 일정 버튼 */}
-      <div className="border-t border-gray-100 pt-4 space-y-2">
-        <button
-          type="button"
-          onClick={handleImportSchedule}
-          className="inline-flex w-full items-center justify-center gap-2 py-3 leading-none bg-[#0F9B73] text-white fs-down-1 font-bold rounded-xl hover:bg-[#0d8a66] transition">
-          <DownloadIcon />
-          <span className="leading-none">내 일정으로 가져오기</span>
-        </button>
-      </div>
+      {!isOwner && (
+        <div className="border-t border-gray-100 pt-4 space-y-2">
+          <button
+            type="button"
+            onClick={handleImportSchedule}
+            className="inline-flex w-full items-center justify-center gap-2 py-3 leading-none bg-[#0F9B73] text-white fs-down-1 font-bold rounded-xl hover:bg-[#0d8a66] transition">
+            <DownloadIcon />
+            <span className="leading-none">내 일정으로 가져오기</span>
+          </button>
+        </div>
+      )}
     </aside>
   );
 };
