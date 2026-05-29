@@ -13,6 +13,7 @@ import LandingPage from '@pages/landing/LandingPage';
 import MainPage from '@pages/main/MainPage';
 import Unauthorized from '@pages/error/Unauthorized';
 import NotFoundPage from '@pages/error/NotFoundPage';
+import ServerErrorPage from '@pages/error/ServerErrorPage';
 import MyPage from '@pages/user/MyPage';
 
 import Notice from "@pages/customersupport/Notice";
@@ -90,6 +91,8 @@ const AppRoutes = () => {
         <Route path="/" element={<LandingPage />} />
       </Route>
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/403" element={<Unauthorized />} />
+      <Route path="/500" element={<ServerErrorPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/login/signup" element={<SignupPage />} />
       
@@ -121,7 +124,7 @@ const AppRoutes = () => {
         
         {/* 🚀 3. 반드시 로그인이 필요한 페이지 영역 */}
         
-      <Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>
         <Route element={<UserLayout />}>
           
           {/* 마이페이지 */}
@@ -140,7 +143,7 @@ const AppRoutes = () => {
           </Route>
 
           </Route>
-        </Route>
+          </Route>
 
       {/* 4. 관리자 전용 권한 (ROLE_ 접두사 확인 주의!) */}
       <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
@@ -201,3 +204,4 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
+
