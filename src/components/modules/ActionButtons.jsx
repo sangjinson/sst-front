@@ -99,8 +99,7 @@ export const WishlistHeartButton = ({ item, itemType, region, initialWished }) =
       }).then((result) => {
         if (result.isConfirmed) {
           navigate('/login', {
-            state: { from: location },
-            replace: true,
+            state: { from: location.pathname + location.search },
           });
         }
       });

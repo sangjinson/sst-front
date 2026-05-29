@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "@api/axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import CommunityDetailHeader from "@components/modules/community/common/CommunityDetailHeader";
 import Swal from "sweetalert2";
 import CommentSection from "@components/modules/community/common/CommentSection";
@@ -24,6 +24,7 @@ const CommunityLifeDetail = () => {
   
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation(); // 추가
 
   const [currentUserId, setCurrentUserId] = useState(null);
   const isLogin = getConfig('user.isAuth');
@@ -137,7 +138,11 @@ const CommunityLifeDetail = () => {
 
         setPost(mappedPost);
       } catch (err) {
-          console.error("인생거리 상세 조회 실패:", err);
+        if (err.response?.status === 404) {
+          navigate('/404', { replace: true });
+          return;
+        }
+        console.error("인생거리 상세 조회 실패:", err);
       } finally {
         setLoading(false);
       }
@@ -587,7 +592,9 @@ const CommunityLifeDetail = () => {
 
               return result;
             }}
-            openLoginModal={() => setShowLoginModal(true)}
+            openLoginModal={() => {
+              setShowLoginModal(true);
+            }}
             currentUserId={currentUserId}
             postAuthor={post.author}
             reportedCommentIds={reportedCommentIds}
@@ -599,7 +606,7 @@ const CommunityLifeDetail = () => {
             onClose={() => setShowLoginModal(false)}
             onLogin={() => {
               setShowLoginModal(false);
-              navigate("/login");
+              navigate("/login", { state: { from: location.pathname + location.search } });
             }}
           />
         )}

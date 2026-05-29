@@ -1,8 +1,8 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { Navigate, useParams, useLocation } from 'react-router-dom';
 import HeroBanner from '../../components/common/HeroBanner';
 import Breadcrumb from '@components/common/Breadcrumb';
-import { toKorRegion } from '@utils/regionMap';
+import { hasRegion, toKorRegion } from '@utils/regionMap';
 import ListSkeleton from '@components/skeleton/ListSkeleton';
 import { getSeeDataByRegion } from './see/seeData';
 import { getSleepDataByRegion } from './sleep/Sleepdata';
@@ -174,41 +174,40 @@ function AreaListTemplate() {
   }, [type, regionKor, user?.mbrId]);
 
   const currentConfig = LIST_CONFIG[type];
+  const isInvalidRoute = !hasRegion(region) || !currentConfig;
   const regionBanner  = REGION_BANNER[regionKor];
   const bgImage  = regionBanner?.bgImage || currentConfig?.bgImage;
   const subtitle = `${regionKor}${currentConfig?.subtitleSuffix}`;
 
+  if (isInvalidRoute) {
+    return <Navigate to="/404" replace />;
+  }
+
   return (
     <Suspense fallback={<ListSkeleton />}>
-      {!currentConfig ? (
-        <div className="flex justify-center items-center h-screen text-gray-500">
-          잘못된 접근입니다. (Not Found)
-        </div>
-      ) : (
-        <div className="bg-[#f8f6f0] min-h-screen">
-          <HeroBanner
-            bgImage={bgImage}
-            title={regionKor}
-            subtitle={subtitle}
-            to={`/${region}`}
+      <div className="bg-[#f8f6f0] min-h-screen">
+        <HeroBanner
+          bgImage={bgImage}
+          title={regionKor}
+          subtitle={subtitle}
+          to={`/${region}`}
+        />
+        <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px]">
+          <Breadcrumb
+            paths={[
+              { label: '홈', to: '/' },
+              { label: regionKor, to: `/${region}` },
+              { label: currentConfig.label, to: `/${region}/${type}/list` },
+            ]}
+            className="mb-3"
           />
-          <div className="container mx-auto py-8 px-5 lg:px-[50px] xl:px-[250px]">
-            <Breadcrumb
-              paths={[
-                { label: '홈', to: '/' },
-                { label: regionKor, to: `/${region === '경기도' ? '' : region}` },
-                { label: currentConfig.label, to: `/${region}/${type}/list` },
-              ]}
-              className="mb-3"
-            />
-            {loading ? (
-              <ListSkeleton />
-            ) : (
-              <currentConfig.Component rows={dataSet} wishedPlcNos={wishedPlcNos} /> // ✅ 추가
-            )}
-          </div>
+          {loading ? (
+            <ListSkeleton />
+          ) : (
+            <currentConfig.Component rows={dataSet} wishedPlcNos={wishedPlcNos} /> // ✅ 추가
+          )}
         </div>
-      )}
+      </div>
     </Suspense>
   );
 }

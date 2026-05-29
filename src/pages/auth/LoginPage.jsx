@@ -1,12 +1,14 @@
 // src/pages/auth/LoginPage.jsx
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail } from 'lucide-react';
 import api from '@api/axios'; 
 import { useAuth } from '@hooks/useAuth';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || '/';
   
   const { login } = useAuth();
 
@@ -17,6 +19,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async () => {
+
     if (!email.trim() || !password.trim()) {
       alert('이메일과 비밀번호를 입력해주세요.');
       return;
@@ -32,9 +35,9 @@ export default function LoginPage() {
       const userData = await login(payload); 
       
       if (userData.memberRole === 'ROLE_ADMIN') {
-        navigate('/admin'); // 🚀 관리자면 회원 목록 페이지(또는 대시보드)로 바로 이동
+        navigate('/admin'); // 관리자면 회원 목록 페이지(또는 대시보드)로 바로 이동
       } else {
-        navigate('/'); // 🚀 일반 유저면 메인 페이지로 이동
+        navigate(from); // 일반 유저면 메인 페이지로 이동
       }
     } catch (error) {
       console.error('로그인 실패:', error);
@@ -52,7 +55,6 @@ export default function LoginPage() {
   const handleKakaoLogin = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/api/oauth2/authorization/kakao`; 
   };
-
   return (
     <>
       <style>{`

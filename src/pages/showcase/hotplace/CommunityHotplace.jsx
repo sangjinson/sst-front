@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import AreaPagination from "@components/modules/area/arealist/AreaPagination";
 import CommunitySearchBar from "@components/modules/community/common/CommunitySearchBar";
 import api from "@api/axios";
@@ -14,6 +14,7 @@ import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
 const CommunityHotplace = () => {
   const {getConfig} = useConfig();   // Config 값 가져오기
   const navigate = useNavigate();
+  const location = useLocation(); // 추가
   const [searchParams, setSearchParams] = useSearchParams();
 
   const getImageUrl = (url) => {
@@ -232,7 +233,7 @@ const CommunityHotplace = () => {
           onClose={() => setShowLoginModal(false)}
           onLogin={() => {
             setShowLoginModal(false);
-            navigate("/login");
+            navigate("/login", { state: { from: location.pathname + location.search } });
           }}
         />
       )}

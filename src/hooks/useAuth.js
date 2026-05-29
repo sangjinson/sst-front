@@ -44,28 +44,43 @@ export const useAuth = () => {
       const loginRes = await apiTool.login(credentials);
       return loginRes.data;
     },
-    onSuccess: (userData) => {
-      // 🚀 로그인 성공 시 서버가 HttpOnly 쿠키를 구워주므로, 프론트는 가벼운 인증 플래그만 남김
+    onSuccess: async (userData) => {
       localStorage.setItem('isLogin', 'true');
-      setConfig('user', userData)
-      setConfig('user.isAuth', true)
-      // 🚀 /auth/me 재호출 없이 받아온 유저 데이터로 캐시 즉시 업데이트
+      setConfig('user', userData);
+      setConfig('user.isAuth', true);
       queryClient.setQueryData(['auth', 'user'], userData);
+
+      // 로그인 성공 후 프로필 정보도 함께 로드
+      try {
+        const profileRes = await apiTool.getProfile();
+        const { mapDataToState } = await import('@utils/common');
+        const profileData = mapDataToState('profile', profileRes.data);
+        setConfig('profile', profileData);
+      } catch (e) {
+        console.error('프로필 로드 실패:', e);
+      }
     },
   });
 
   // 🚀 4. useMutation: 로그아웃 요청 처리
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiTool.logout()
+      const currentPath = window.location.pathname + window.location.search;
+      await apiTool.logout();
+      return currentPath;
     },
-    onSuccess: () => {
+    onSuccess: (currentPath) => {
       localStorage.removeItem('isLogin');
       setConfig('user', {})
       setConfig('user.isAuth', false)
       queryClient.setQueryData(['auth', 'user'], null);
-      queryClient.clear(); // 🚀 다른 모든 API 캐시(일정, 커뮤니티 등) 일괄 초기화
-      window.location.href = '/'; // 🚀 상태 완전 초기화를 위해 하드 리다이렉트
+      queryClient.clear();
+      const restrictedPaths = ['/plan', '/showcase/hotplace/write', '/showcase/life/write'];
+      if (restrictedPaths.some(path => currentPath.startsWith(path))) {
+        window.location.href = '/';
+      } else {
+        window.location.href = currentPath;
+      }
     },
     onError: () => {
       // 🚀 서버 로그아웃 실패(네트워크 오류 등) 시에도 프론트 상태는 강제 초기화하여 사용자 보호

@@ -154,7 +154,7 @@ const AIPlanLoading = ({ isFinishing = false }) => {
 
       <div className="relative z-10 flex min-h-[520px] flex-col items-center justify-center px-6 text-center">
         <div className="px-7 py-6">
-          <p className="text-sm font-bold text-[#0F9B73]">AI 여행코스 생성 중</p>
+          <p className="text-sm font-bold text-[#0F9B73]">여행코스 로딩 중</p>
           <h2 className="mt-2 text-2xl font-black text-gray-900 md:text-3xl">
             여행 일정을 불러오고 있어요
           </h2>
