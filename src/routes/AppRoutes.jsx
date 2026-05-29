@@ -36,6 +36,8 @@ import CommunityLifeWrite from "@pages/showcase/life/CommunityLifeWrite";
 import SearchPage from '@pages/search/SearchPage';
 import LoginPage from '@pages/auth/LoginPage';
 import SignupPage from '@pages/auth/SignupPage';
+import FindEmailPage from '@pages/auth/FindEmailPage';
+import ResetPasswordPage from '@pages/auth/ResetPasswordPage';
 
 import OAuthRedirectHandler from '@pages/auth/OAuthRedirectHandler';
 
@@ -99,6 +101,8 @@ const AppRoutes = () => {
       
       {/* 백엔드가 돌려보내 줄 주소와 정확히 일치시켜야 해! */}
       <Route path="/oauth/redirect" element={<OAuthRedirectHandler />} />
+      <Route path="/find-email" element={<FindEmailPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* 2. 비로그인 사용자도 "조회"는 가능한 페이지 영역 (UserLayout 적용) */}
       <Route element={<UserLayout />}>
