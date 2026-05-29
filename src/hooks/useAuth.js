@@ -51,6 +51,16 @@ export const useAuth = () => {
       setConfig('user.isAuth', true)
       // 🚀 /auth/me 재호출 없이 받아온 유저 데이터로 캐시 즉시 업데이트
       queryClient.setQueryData(['auth', 'user'], userData);
+
+      // 로그인 성공 후 프로필 정보도 함께 로드
+      try {
+        const profileRes = await apiTool.getProfile();
+        const { mapDataToState } = await import('@utils/common');
+        const profileData = mapDataToState('profile', profileRes.data);
+        setConfig('profile', profileData);
+      } catch (e) {
+        console.error('프로필 로드 실패:', e);
+      }
     },
   });
 
