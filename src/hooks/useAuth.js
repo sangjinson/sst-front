@@ -44,13 +44,21 @@ export const useAuth = () => {
       const loginRes = await apiTool.login(credentials);
       return loginRes.data;
     },
-    onSuccess: (userData) => {
-      // 🚀 로그인 성공 시 서버가 HttpOnly 쿠키를 구워주므로, 프론트는 가벼운 인증 플래그만 남김
+    onSuccess: async (userData) => {
       localStorage.setItem('isLogin', 'true');
-      setConfig('user', userData)
-      setConfig('user.isAuth', true)
-      // 🚀 /auth/me 재호출 없이 받아온 유저 데이터로 캐시 즉시 업데이트
+      setConfig('user', userData);
+      setConfig('user.isAuth', true);
       queryClient.setQueryData(['auth', 'user'], userData);
+
+      // 로그인 성공 후 프로필 정보도 함께 로드
+      try {
+        const profileRes = await apiTool.getProfile();
+        const { mapDataToState } = await import('@utils/common');
+        const profileData = mapDataToState('profile', profileRes.data);
+        setConfig('profile', profileData);
+      } catch (e) {
+        console.error('프로필 로드 실패:', e);
+      }
     },
   });
 
