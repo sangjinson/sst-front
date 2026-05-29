@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useConfig } from '@hooks/useConfig'; // 사이트 전반의 설정 값
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 
 import { toRegionTxt, toRegion, hasRegion } from '@utils/regionMap';
 
@@ -11,23 +11,26 @@ export const ThemeProvider = ({ children }) => {
   const { region, type } = useParams();
   const siteConfig = getConfig();
 
+  
   useEffect(() => {
-      setConfig('Url.region', region ?? '');
-      setConfig('Url.type', type ?? '');
-
       const regionEn = region ? toRegionTxt(region, 'en') : '';
-      if (hasRegion(region)) {
-        
-          sessionStorage.setItem('lastVisitedRegion', regionEn);
-          setConfig('curRegionEn', regionEn);
-          setConfig('curRegionKr', toRegionTxt(region, 'ko'));
-          setConfig('curRegion', toRegion(region));
-      } else if (!siteConfig.curRegionEn) {
+      if (region) {
+          if(hasRegion(region)){
+            sessionStorage.setItem('lastVisitedRegion', regionEn);
+            setConfig('curRegionEn', regionEn);
+            setConfig('curRegionKr', toRegionTxt(region, 'ko'));
+            setConfig('curRegion', toRegion(region));
+          }else{
+            
+          }
+      } else if (sessionStorage.getItem('lastVisitedRegion')) {
           const savedRegion = sessionStorage.getItem('lastVisitedRegion');
           if (savedRegion && hasRegion(savedRegion)) {
               setConfig('curRegionEn', toRegionTxt(savedRegion, 'en'));
               setConfig('curRegionKr', toRegionTxt(savedRegion, 'ko'));
               setConfig('curRegion', toRegion(savedRegion));
+          }else{
+            
           }
       }
   }, [region, type]); // siteConfig.curRegionEn은 제거하여 무한 루프 방지
@@ -63,6 +66,12 @@ export const ThemeProvider = ({ children }) => {
 
   const isDarkMode = theme === 'dark';
 
+  if (region) {
+    if(region == null || region == "null" || !hasRegion(region)){
+      return <Navigate to="/" replace />  
+    }
+  }
+  
   return (
     <ThemeContext.Provider value={{ theme, isDarkMode, toggleTheme }}>
       {children}
