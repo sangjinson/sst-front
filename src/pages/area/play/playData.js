@@ -87,10 +87,12 @@ export const getPlayDataPaged = async (region, page = 1, size = 12, keyword = ''
 export const getPlayDataById = async (id) => {
   try {
     const res = await axios.get(`${BASE_URL}/api/play/${id}`);
+    if (!res.data?.plcNo) return null;
     return normalizeApiItem(res.data);
   } catch (err) {
     console.error('놀거리 상세 조회 실패:', err);
-    return null;
+    if (err.response?.status === 404) return null;
+    throw err;
   }
 };
 

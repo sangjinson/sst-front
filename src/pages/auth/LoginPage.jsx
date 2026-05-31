@@ -51,11 +51,8 @@ export default function LoginPage() {
     }
   };
 
-  // 추가: 카카오 로그인 버튼 클릭 핸들러
+  // 🚀 카카오 로그인 버튼 클릭 핸들러
   const handleKakaoLogin = () => {
-    // 주의: 백엔드 Spring Security 설정에 따라 주소가 다를 수 있어. 
-    // 보통 Spring Security 기본값은 아래와 같아. 백엔드 코드 확인 후 맞춰줘!
-    // 백엔드 주소로 아예 브라우저를 이동시킴 (CORS 이슈 없음)
     window.location.href = `${import.meta.env.VITE_API_URL}/api/oauth2/authorization/kakao`; 
   };
   return (
@@ -216,6 +213,7 @@ export default function LoginPage() {
                   </button>
                 </div>
 
+                {/* 🚀 수정된 부분: 이메일 찾기 및 비밀번호 찾기 링크 연결 */}
                 <div className="flex items-center justify-between text-sm text-gray-500 px-1">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -226,9 +224,17 @@ export default function LoginPage() {
                     />
                     로그인 상태 유지
                   </label>
-                  <button className="hover:text-[#0F9B73] transition cursor-pointer">
-                    비밀번호 찾기
-                  </button>
+                  
+                  {/* 🚀 이메일 찾기 | 비밀번호 찾기 영역 */}
+                  <div className="flex items-center gap-2">
+                    <Link to="/find-email" className="hover:text-[#0F9B73] transition cursor-pointer">
+                      이메일 찾기
+                    </Link>
+                    <span className="text-gray-300">|</span>
+                    <Link to="/reset-password" className="hover:text-[#0F9B73] transition cursor-pointer">
+                      비밀번호 찾기
+                    </Link>
+                  </div>
                 </div>
 
                 <button
@@ -256,6 +262,7 @@ export default function LoginPage() {
 
                 <p className="text-center text-sm text-gray-400 pt-3">
                   계정이 없으신가요?{' '}
+                  {/* 🚀 회원가입은 기존 링크 유지 (경로 확인 필요 시 수정하세요) */}
                   <Link to="/login/signup" className="text-gray-600 hover:text-[#0F9B73] font-semibold">
                     회원가입
                   </Link>
