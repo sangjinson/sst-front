@@ -1,3 +1,4 @@
+// adminAreaApi.js
 import api from './axios'; // 🚀 HttpOnly 쿠키 인증이 포함된(인터셉터 적용) axios 인스턴스 필수
 
 // 1. 상세 데이터 불러오기

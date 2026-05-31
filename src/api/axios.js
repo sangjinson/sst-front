@@ -1,3 +1,4 @@
+// axios.js
 import axios from 'axios';
 
 // 🚀 1. Vite 환경변수 적용 (CRA의 process.env 대신 import.meta.env 사용)

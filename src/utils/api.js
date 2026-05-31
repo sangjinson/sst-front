@@ -1,3 +1,4 @@
+// api.js
 import axiosInstance from './axiosInstance';
 
 // 백엔드 엔드포인트 관리

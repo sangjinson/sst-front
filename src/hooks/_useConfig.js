@@ -1,3 +1,4 @@
+// _useConfig.js
 import { useContext, useCallback, useMemo } from 'react';
 import { ConfigContext } from '@context/ConfigContext';
 

@@ -1,3 +1,4 @@
+// adminCommentApi.js
 import api from './axios';
 
 // 🚀 관리자: 댓글 목록 조회 (페이징, 필터, 검색 포함)

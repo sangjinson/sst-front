@@ -1,3 +1,4 @@
+// useConfig.js
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@api/axios';
 import { mapDataToState } from '@utils/common';
