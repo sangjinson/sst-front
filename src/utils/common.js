@@ -1,3 +1,4 @@
+// common.js
 import Swal from 'sweetalert2';
 
 // 1. 기본 설정을 담은 베이스 인스턴스

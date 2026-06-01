@@ -1,3 +1,4 @@
+// index.js
 export { default as AIPlanStepIndicator } from './AIPlanStepIndicator';
 export { default as AIPlanCalendar      } from './AIPlanCalendar';
 export { default as AIPlanCityGrid      } from './AIPlanCityGrid';

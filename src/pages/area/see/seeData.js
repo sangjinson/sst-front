@@ -1,3 +1,4 @@
+// seeData.js
 import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -73,20 +74,6 @@ export const getSeeDataByRegion = async (region) => {
   } catch (err) {
     console.error('볼거리 목록 조회 실패:', err);
     return [];
-  }
-};
-
-export const getSeeDataPaged = async (region, page = 1, size = 12, keyword = '') => {
-  try {
-    const regionKey = normalizeRegionKey(region);
-    const rgnCd = REGION_CODE_MAP[regionKey];
-    const res = await axios.get(`${BASE_URL}/api/see/paged`, {
-      params: { rgnCd, page, size, keyword },
-    });
-    return { ...res.data, list: res.data.list.map(normalizeApiItem) };
-  } catch (err) {
-    console.error('볼거리 페이징 조회 실패:', err);
-    return { list: [], totalCount: 0, totalPages: 1, currentPage: 1, pageSize: size };
   }
 };
 

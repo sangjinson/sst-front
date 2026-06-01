@@ -1,3 +1,4 @@
+// index.js
 export { default as AreaDetailHero  } from './AreaDetailHero';
 export { default as AreaDescription } from './AreaDescription';
 export { default as AreaInfoSection } from './AreaInfoSection';

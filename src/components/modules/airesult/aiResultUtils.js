@@ -1,3 +1,4 @@
+// aiResultUtils.js
 import { getFoodDataByRegion } from '@pages/area/food/foodData';
 import { getSeeDataByRegion } from '@pages/area/see/seeData';
 import { getSleepDataByRegion } from '@pages/area/sleep/Sleepdata';
