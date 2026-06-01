@@ -1,3 +1,4 @@
+// playData.js
 import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -67,19 +68,6 @@ export const getPlayDataByRegion = async (region) => {
   } catch (err) {
     console.error('놀거리 목록 조회 실패:', err);
     return [];
-  }
-};
-
-export const getPlayDataPaged = async (region, page = 1, size = 12, keyword = '') => {
-  try {
-    const rgnCd = REGION_CODE_MAP[region];
-    const res = await axios.get(`${BASE_URL}/api/play/paged`, {
-      params: { rgnCd, page, size, keyword },
-    });
-    return { ...res.data, list: res.data.list.map(normalizeApiItem) };
-  } catch (err) {
-    console.error('놀거리 페이징 조회 실패:', err);
-    return { list: [], totalCount: 0, totalPages: 1, currentPage: 1, pageSize: size };
   }
 };
 

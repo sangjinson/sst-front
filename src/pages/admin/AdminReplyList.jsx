@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import api from "@api/axios";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useNavigate } from "react-router-dom";
 import { usePagination } from "@hooks/usePagination";
 import AdminPagination from "@components/admin/AdminPagination";
 import { TrashBinIcon } from "@components/Icon";
+import { REGION_DATA } from "@public/scripts/regions";
+import { getDetailPath } from "@components/modules/airesult/aiResultUtils";
 
 export default function AdminReplyList() {
 
@@ -60,7 +62,7 @@ export default function AdminReplyList() {
       });
       
       const responseData = response.data.data || response.data; 
-      setDataList(responseData.list || responseData.content || responseData || []); 
+      setDataList(responseData.list || responseData.content || responseData || []);
       setTotalCount(responseData.totalCount || responseData.total || responseData.length || 0);
     } catch (error) {
       console.error(`${currentConfig.title} 목록 조회 실패:`, error);
@@ -106,6 +108,41 @@ export default function AdminReplyList() {
     } catch (error) {
       console.error(`${currentConfig.title} 상태 변경 에러:`, error);
       alert("상태 변경 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 댓글, 리뷰 클릭시 새텝으로 상세페이지 이동
+  const handleGoTarget = (item) => {
+    
+    if (type === "comments") {
+      const showcaseType =
+        item.commCatCd === "CMM001" ? "life" : "hotplace";
+
+      window.open(
+        `/showcase/${showcaseType}/view/${item.commNo}`,
+        "_blank"
+      );
+      return;
+    }
+
+    if (type === "reviews") {
+      const region = REGION_DATA.find((r) => r.code === item.plcRgnCd);
+
+      if (!region) {
+        alert("지역 정보를 찾을 수 없습니다.");
+        console.log("지역코드 확인 필요:", item);
+        return;
+      }
+
+      const path = getDetailPath(
+        {
+          id: item.rvwPlcNo,
+          category: item.plcCatCd,
+        },
+        region.textKor
+      );
+      window.open(path, "_blank");
+      return;
     }
   };
 
@@ -176,7 +213,7 @@ export default function AdminReplyList() {
                         </td>
                       )}
                       
-                      <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
+                      <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:text-[#0F9B73] hover:underline" onClick={() => handleGoTarget(item)}>
                         <p className="line-clamp-2" title={item[currentConfig.contentKey]}>{item[currentConfig.contentKey]}</p>
                       </td>
                       
@@ -202,8 +239,7 @@ export default function AdminReplyList() {
                             <button 
                               onClick={() => handleToggleStatus(item[currentConfig.idKey], 'N', '휴지통으로 이동')} 
                               className="p-2 text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900 rounded-lg flex items-center justify-center"
-                              title="휴지통으로 이동"
-                            >
+                              title="휴지통으로 이동">
                               <TrashBinIcon className="w-5 h-5" />
                             </button>
                           )}
@@ -211,8 +247,7 @@ export default function AdminReplyList() {
                           {useYnFilter === 'N' && (
                             <button 
                               onClick={() => handleToggleStatus(item[currentConfig.idKey], 'Y', '정상 복구')} 
-                              className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F9B73] hover:bg-[#0c8261] rounded-lg shadow-sm"
-                            >
+                              className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F9B73] hover:bg-[#0c8261] rounded-lg shadow-sm">
                               복구하기
                             </button>
                           )}
@@ -220,8 +255,7 @@ export default function AdminReplyList() {
                           {useYnFilter === 'B' && (
                             <button 
                               onClick={() => handleToggleStatus(item[currentConfig.idKey], 'Y', '블라인드 해제 및 복구')} 
-                              className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F9B73] hover:bg-[#0c8261] rounded-lg shadow-sm"
-                            >
+                              className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F9B73] hover:bg-[#0c8261] rounded-lg shadow-sm">
                               블라인드 해제
                             </button>
                           )}

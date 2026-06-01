@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useConfig } from '@hooks/useConfig'; 
 import { getNorthRegions, getSouthRegions } from '@utils/regionMap'; 
 
 import '@assets/css/landing.css';

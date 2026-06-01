@@ -1,3 +1,4 @@
+// reviewApi.js
 import api from './axios';  // ← axios.js 기준 상대경로
 
 

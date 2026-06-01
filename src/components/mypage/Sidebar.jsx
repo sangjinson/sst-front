@@ -9,9 +9,6 @@ import ProfileCover from '@modules/member/ProfileCover';
 const Sidebar = ({ profile, coverImg, onImgChange, onCoverChange, imgRef, coverRef }) => {
   const { user } = useAuth();
 
-  // 기본 이미지 경로
-  const defaultProfile = "/assets/images/default-user.png";
-
   const handleCoverBtnClick = () => {
     if (coverRef && coverRef.current) coverRef.current.click();
   };
