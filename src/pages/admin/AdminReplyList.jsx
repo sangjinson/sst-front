@@ -7,7 +7,7 @@ import { TrashBinIcon } from "@components/Icon";
 
 export default function AdminReplyList() {
 
-    const { type } = useParams();
+  const { type } = useParams();
   // 🚀 type에 따른 설정값 동적 매핑
   const CONFIG = {
     comments: {
@@ -115,6 +115,7 @@ export default function AdminReplyList() {
     return "검색 결과가 없습니다.";
   };
 
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -151,17 +152,17 @@ export default function AdminReplyList() {
             <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-semibold">
               <tr>
                 <th className="px-5 py-3 text-center w-16">No</th>
-                {type === 'review' && <th className="px-5 py-3 text-start w-48">장소명</th>}
+                {type === 'reviews' && <th className="px-5 py-3 text-start w-48">장소명</th>}
                 <th className="px-5 py-3 text-start">{currentConfig.title} 내용</th>
                 <th className="px-5 py-3 text-center w-24">작성자</th>
-                {type === 'review' && <th className="px-5 py-3 text-center w-24">별점</th>}
+                {type === 'reviews' && <th className="px-5 py-3 text-center w-24">별점</th>}
                 <th className="px-5 py-3 text-center w-32">등록일</th>
                 <th className="px-5 py-3 text-center w-24">관리</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {dataList.length === 0 ? (
-                  <tr><td colSpan={type === 'review' ? 7 : 5} className="px-5 py-16 text-center text-gray-500 dark:text-gray-400 font-medium">{getEmptyMessage()}</td></tr>
+                  <tr><td colSpan={type === 'reviews' ? 7 : 5} className="px-5 py-16 text-center text-gray-500 dark:text-gray-400 font-medium">{getEmptyMessage()}</td></tr>
                 ) : (
                   dataList.map((item, idx) => (
                     <tr key={item[currentConfig.idKey]} className="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800">
@@ -169,7 +170,7 @@ export default function AdminReplyList() {
                         {(page - 1) * size + idx + 1}
                       </td>
                       
-                      {type === 'review' && (
+                      {type === 'reviews' && (
                         <td className="px-5 py-4 font-semibold text-gray-800 dark:text-gray-200">
                           {item.plcName}
                         </td>
@@ -183,7 +184,7 @@ export default function AdminReplyList() {
                         {item.nickname}
                       </td>
                       
-                      {type === 'review' && (
+                      {type === 'reviews' && (
                         <td className="px-5 py-4 text-center">
                           <div className="flex items-center justify-center text-orange-500 font-bold text-sm">
                             <span className="mr-1">★</span>{item.rvwRating}
