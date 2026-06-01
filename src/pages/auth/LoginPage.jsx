@@ -28,7 +28,8 @@ export default function LoginPage() {
       // (기존 { memberEmail, memberPassword } 는 { memberEmail: memberEmail, memberPassword: memberPassword } 와 같아서 에러 발생)
       const payload = {
         mbrEmail: email,
-        mbrPassword: password
+        mbrPassword: password,
+        rememberMe: rememberMe
       };
 
       const userData = await login(payload); 
@@ -83,8 +84,8 @@ export default function LoginPage() {
         .animate-routeFlag { opacity: 0; animation: routeFlag 0.45s ease-out 3.15s forwards; }
       `}</style>
 
-      <div className="login-wrap min-h-screen bg-[#f8f6f0] flex items-center justify-center px-6 py-10">
-        <div className="w-full max-w-[1100px] min-h-[680px] rounded-[28px] overflow-hidden bg-white shadow-[0_24px_80px_rgba(43,74,72,0.14)] border border-white/70 flex">
+      <div className="login-wrap min-h-screen bg-[#f8f6f0] flex items-start justify-center px-5 py-8 md:items-center md:px-6 md:py-10">
+        <div className="w-full max-w-[1100px] min-h-0 md:min-h-[680px] rounded-[24px] overflow-hidden bg-white shadow-[0_12px_34px_rgba(43,74,72,0.08)] md:shadow-[0_24px_80px_rgba(43,74,72,0.14)] border border-white/70 flex">
 
           {/* 왼쪽: AI 코스 애니메이션 */}
           <div className="relative hidden md:flex w-[52%] bg-[#5cc7b2] items-center justify-center overflow-hidden">
@@ -93,8 +94,12 @@ export default function LoginPage() {
             <div className="absolute right-16 bottom-16 w-32 h-32 border border-white/16 rounded-2xl" />
             <div className="absolute left-16 bottom-28 w-16 h-16 bg-white/8 rounded-xl" />
 
-            <Link to="/" className="absolute left-14 top-12 text-white/95 font-griun text-4xl drop-shadow-sm">
-              거리에섯
+            <Link to="/" className="absolute -left-1 top-5">
+              <img
+                src="/admin-logo.png"
+                alt="거리에섯"
+                className="h-32 w-auto origin-left scale-125 object-contain drop-shadow-sm"
+              />
             </Link>
 
             <div className="relative z-10 flex flex-col items-center">
@@ -157,39 +162,39 @@ export default function LoginPage() {
               </div>
 
               <div className="text-center text-white">
-                <p className="text-4xl font-extrabold mb-4">AI Course Planner</p>
-                <p className="text-base font-medium text-white/90">
-                  저장한 장소를 이어서 나만의 여행 코스로 완성하세요
+                <p className="text-5xl font-extrabold mb-5">AI Course Planner</p>
+                <p className="text-xl font-semibold text-white/90">
+                  AI 추천으로 나만의 여행을 계획해보세요
                 </p>
               </div>
             </div>
           </div>
 
           {/* 오른쪽 로그인 */}
-          <div className="w-full md:w-[48%] bg-white flex items-center justify-center px-8 py-12">
-            <div className="w-full max-w-[360px]">
-              <div className="text-center mb-10">
-                <Link to="/" className="inline-block md:hidden mb-7">
-                  <h1 className="font-griun text-4xl text-gray-900" style={{ fontWeight: 'normal' }}>
+          <div className="w-full md:w-[48%] bg-white flex items-center justify-center px-6 py-10 md:px-10 md:py-14">
+            <div className="w-full max-w-[390px] md:max-w-[360px]">
+              <div className="text-center mb-10 md:mb-12">
+                <Link to="/" className="inline-block md:hidden mb-4">
+                  <h1 className="font-griun text-5xl text-gray-900" style={{ fontWeight: 'normal' }}>
                     거리에섯
                   </h1>
                 </Link>
-                <h2 className="text-5xl font-extrabold text-gray-900 mb-4">
-                  Login
+                <h2 className="hidden md:block font-griun md:text-[54px] text-gray-900 mb-1 md:translate-y-2" style={{ fontWeight: 'normal' }}>
+                  거리에섯
                 </h2>
-                <p className="text-base text-gray-500">
-                  로그인 후 저장한 일정을 AI 코스로 이어가세요
+                <p className="text-base font-medium leading-relaxed text-gray-400 md:hidden">
+                  AI 추천으로 나만의 여행을 계획해보세요
                 </p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 md:space-y-5">
                 <div className="relative">
                   <input
                     type="email"
-                    placeholder="Email Address"
+                    placeholder="예) sstour@sstour.co.kr"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-[52px] rounded-full bg-[#f8f6f0] px-5 pr-12 text-base outline-none text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-[#0F9B73]/25"
+                    className="w-full h-[52px] rounded-2xl bg-[#f8f6f0] px-5 pr-12 text-base outline-none text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-[#0F9B73]/25 md:text-lg"
                   />
                   <Mail className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0F9B73]/60" />
                 </div>
@@ -201,7 +206,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                    className="w-full h-[52px] rounded-full bg-[#f8f6f0] px-5 pr-12 text-base outline-none text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-[#0F9B73]/25"
+                    className="w-full h-[52px] rounded-2xl bg-[#f8f6f0] px-5 pr-12 text-base outline-none text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-[#0F9B73]/25 md:text-lg"
                   />
                   <button
                     type="button"
@@ -214,8 +219,8 @@ export default function LoginPage() {
                 </div>
 
                 {/* 🚀 수정된 부분: 이메일 찾기 및 비밀번호 찾기 링크 연결 */}
-                <div className="flex items-center justify-between text-sm text-gray-500 px-1">
-                  <label className="flex items-center gap-2 cursor-pointer">
+                <div className="flex items-center justify-between gap-3 text-[13px] text-gray-500 px-1 md:text-base">
+                  <label className="flex shrink-0 items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={rememberMe}
@@ -226,7 +231,7 @@ export default function LoginPage() {
                   </label>
                   
                   {/* 🚀 이메일 찾기 | 비밀번호 찾기 영역 */}
-                  <div className="flex items-center gap-2">
+                  <div className="ml-auto flex shrink-0 items-center gap-1.5 md:gap-2">
                     <Link to="/find-email" className="hover:text-[#0F9B73] transition cursor-pointer">
                       이메일 찾기
                     </Link>
@@ -239,20 +244,20 @@ export default function LoginPage() {
 
                 <button
                   onClick={handleLogin}
-                  className="w-full h-[52px] rounded-full bg-[#24B99F] text-white text-base font-bold ring-1 ring-[#24B99F]/20 hover:bg-[#5cc7b2] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                  className="!mt-8 w-full h-[52px] rounded-2xl bg-[#24B99F] text-white text-base font-bold ring-1 ring-[#24B99F]/20 hover:bg-[#5cc7b2] active:scale-[0.98] transition-all duration-200 cursor-pointer md:text-lg"
                 >
                   로그인
                 </button>
 
-                <div className="flex items-center gap-4 py-4">
+                <div className="!mt-2 flex items-center gap-4 py-0.5 md:py-1">
                   <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-sm text-gray-400">or</span>
+                  <span className="text-sm text-gray-400 md:text-base">or</span>
                   <div className="flex-1 h-px bg-gray-200" />
                 </div>
 
                 <button
                   onClick={handleKakaoLogin}
-                  className="w-full h-[52px] rounded-full bg-[#FEE500] text-gray-900 font-semibold text-base hover:brightness-95 active:scale-[0.98] transition flex items-center justify-center gap-2 cursor-pointer"
+                  className="!mt-2 w-full h-[50px] md:h-[52px] rounded-2xl bg-[#FEE500] text-gray-900 font-semibold text-sm md:text-lg hover:brightness-95 active:scale-[0.98] transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 3C6.48 3 2 6.48 2 10.8c0 2.7 1.6 5.1 4 6.6l-1 3.6 4.2-2.8c.9.2 1.8.3 2.8.3 5.52 0 10-3.48 10-7.7S17.52 3 12 3z"/>
@@ -260,7 +265,7 @@ export default function LoginPage() {
                   카카오 로그인
                 </button>
 
-                <p className="text-center text-sm text-gray-400 pt-3">
+                <p className="text-center text-sm text-gray-400 pt-3 md:pt-4 md:text-base">
                   계정이 없으신가요?{' '}
                   {/* 🚀 회원가입은 기존 링크 유지 (경로 확인 필요 시 수정하세요) */}
                   <Link to="/login/signup" className="text-gray-600 hover:text-[#0F9B73] font-semibold">

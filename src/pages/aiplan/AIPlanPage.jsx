@@ -26,7 +26,7 @@ const SelectionSummary = ({ selectedRegion, selectedPeriod, startDate, endDate, 
 
 
   return (
-    <div className="mb-7 rounded-3xl border border-gray-100 bg-white px-5 py-4 shadow-sm md:px-6">
+    <div className="mb-5 rounded-3xl border border-gray-100 bg-white px-5 py-3 shadow-sm md:px-6">
       <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
         <span className="shrink-0 text-base font-bold text-gray-600 md:text-lg">내 여행 조건</span>
         <div className="flex min-h-[38px] flex-wrap gap-2.5 md:min-h-[40px] md:gap-3">
@@ -104,7 +104,7 @@ const AIPlanPage = () => {
 
   return (
     <div className="min-h-screen bg-[#f7f8fa]">
-      <div className="container mx-auto max-w-[1040px] px-4 py-10 md:py-14">
+      <div className="container mx-auto max-w-[1040px] px-4 py-8 md:py-8">
 
         <Breadcrumb
           paths={[{ label: '홈', to: '/' }, { label: '내거리' }]}
@@ -121,7 +121,7 @@ const AIPlanPage = () => {
           selectedThemes={selectedThemes}
         />
 
-        <div className="min-h-[500px] rounded-3xl border border-gray-100 bg-white px-6 py-12 shadow-sm md:px-12 md:py-16" data-aos="flip-down" data-aos-once="true">
+        <div className="rounded-3xl border border-gray-100 bg-white px-6 py-8 shadow-sm md:px-10 md:py-10" data-aos="flip-down" data-aos-once="true">
 
           {/* STEP 0: 지역 선택 */}
           {step === 0 && (
@@ -156,7 +156,7 @@ const AIPlanPage = () => {
         </div>
 
         {/* 하단 버튼 */}
-        <div className="mt-9 flex items-center justify-between md:mt-10">
+        <div className="mt-5 flex items-center justify-between md:mt-6">
           <button
             onClick={() => setStep(s => s - 1)}
             disabled={step === 0}

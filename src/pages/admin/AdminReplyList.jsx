@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import api from "@api/axios";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useNavigate } from "react-router-dom";
 import { usePagination } from "@hooks/usePagination";
 import AdminPagination from "@components/admin/AdminPagination";
 import { TrashBinIcon } from "@components/Icon";
+import { REGION_DATA } from "@public/scripts/regions";
+import { getDetailPath } from "@components/modules/airesult/aiResultUtils";
 
 export default function AdminReplyList() {
 
-    const { type } = useParams();
+  const { type } = useParams();
   // 🚀 type에 따른 설정값 동적 매핑
   const CONFIG = {
     comments: {
@@ -60,7 +62,7 @@ export default function AdminReplyList() {
       });
       
       const responseData = response.data.data || response.data; 
-      setDataList(responseData.list || responseData.content || responseData || []); 
+      setDataList(responseData.list || responseData.content || responseData || []);
       setTotalCount(responseData.totalCount || responseData.total || responseData.length || 0);
     } catch (error) {
       console.error(`${currentConfig.title} 목록 조회 실패:`, error);
@@ -109,11 +111,47 @@ export default function AdminReplyList() {
     }
   };
 
+  // 댓글, 리뷰 클릭시 새텝으로 상세페이지 이동
+  const handleGoTarget = (item) => {
+    
+    if (type === "comments") {
+      const showcaseType =
+        item.commCatCd === "CMM001" ? "life" : "hotplace";
+
+      window.open(
+        `/showcase/${showcaseType}/view/${item.commNo}`,
+        "_blank"
+      );
+      return;
+    }
+
+    if (type === "reviews") {
+      const region = REGION_DATA.find((r) => r.code === item.plcRgnCd);
+
+      if (!region) {
+        alert("지역 정보를 찾을 수 없습니다.");
+        console.log("지역코드 확인 필요:", item);
+        return;
+      }
+
+      const path = getDetailPath(
+        {
+          id: item.rvwPlcNo,
+          category: item.plcCatCd,
+        },
+        region.textKor
+      );
+      window.open(path, "_blank");
+      return;
+    }
+  };
+
   const getEmptyMessage = () => {
     if (useYnFilter === 'N') return "휴지통이 비어 있습니다.";
     if (useYnFilter === 'B') return `신고 누적된 ${currentConfig.title}이(가) 없습니다.`;
     return "검색 결과가 없습니다.";
   };
+
 
   return (
     <div className="space-y-6">
@@ -151,17 +189,17 @@ export default function AdminReplyList() {
             <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-semibold">
               <tr>
                 <th className="px-5 py-3 text-center w-16">No</th>
-                {type === 'review' && <th className="px-5 py-3 text-start w-48">장소명</th>}
+                {type === 'reviews' && <th className="px-5 py-3 text-start w-48">장소명</th>}
                 <th className="px-5 py-3 text-start">{currentConfig.title} 내용</th>
                 <th className="px-5 py-3 text-center w-24">작성자</th>
-                {type === 'review' && <th className="px-5 py-3 text-center w-24">별점</th>}
+                {type === 'reviews' && <th className="px-5 py-3 text-center w-24">별점</th>}
                 <th className="px-5 py-3 text-center w-32">등록일</th>
                 <th className="px-5 py-3 text-center w-24">관리</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {dataList.length === 0 ? (
-                  <tr><td colSpan={type === 'review' ? 7 : 5} className="px-5 py-16 text-center text-gray-500 dark:text-gray-400 font-medium">{getEmptyMessage()}</td></tr>
+                  <tr><td colSpan={type === 'reviews' ? 7 : 5} className="px-5 py-16 text-center text-gray-500 dark:text-gray-400 font-medium">{getEmptyMessage()}</td></tr>
                 ) : (
                   dataList.map((item, idx) => (
                     <tr key={item[currentConfig.idKey]} className="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800">
@@ -169,13 +207,13 @@ export default function AdminReplyList() {
                         {(page - 1) * size + idx + 1}
                       </td>
                       
-                      {type === 'review' && (
+                      {type === 'reviews' && (
                         <td className="px-5 py-4 font-semibold text-gray-800 dark:text-gray-200">
                           {item.plcName}
                         </td>
                       )}
                       
-                      <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
+                      <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:text-[#0F9B73] hover:underline" onClick={() => handleGoTarget(item)}>
                         <p className="line-clamp-2" title={item[currentConfig.contentKey]}>{item[currentConfig.contentKey]}</p>
                       </td>
                       
@@ -183,7 +221,7 @@ export default function AdminReplyList() {
                         {item.nickname}
                       </td>
                       
-                      {type === 'review' && (
+                      {type === 'reviews' && (
                         <td className="px-5 py-4 text-center">
                           <div className="flex items-center justify-center text-orange-500 font-bold text-sm">
                             <span className="mr-1">★</span>{item.rvwRating}
@@ -201,8 +239,7 @@ export default function AdminReplyList() {
                             <button 
                               onClick={() => handleToggleStatus(item[currentConfig.idKey], 'N', '휴지통으로 이동')} 
                               className="p-2 text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900 rounded-lg flex items-center justify-center"
-                              title="휴지통으로 이동"
-                            >
+                              title="휴지통으로 이동">
                               <TrashBinIcon className="w-5 h-5" />
                             </button>
                           )}
@@ -210,8 +247,7 @@ export default function AdminReplyList() {
                           {useYnFilter === 'N' && (
                             <button 
                               onClick={() => handleToggleStatus(item[currentConfig.idKey], 'Y', '정상 복구')} 
-                              className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F9B73] hover:bg-[#0c8261] rounded-lg shadow-sm"
-                            >
+                              className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F9B73] hover:bg-[#0c8261] rounded-lg shadow-sm">
                               복구하기
                             </button>
                           )}
@@ -219,8 +255,7 @@ export default function AdminReplyList() {
                           {useYnFilter === 'B' && (
                             <button 
                               onClick={() => handleToggleStatus(item[currentConfig.idKey], 'Y', '블라인드 해제 및 복구')} 
-                              className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F9B73] hover:bg-[#0c8261] rounded-lg shadow-sm"
-                            >
+                              className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F9B73] hover:bg-[#0c8261] rounded-lg shadow-sm">
                               블라인드 해제
                             </button>
                           )}
