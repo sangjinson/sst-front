@@ -22,7 +22,7 @@ const AIPlanCityGrid = ({ selectedRegion, onSelect }) => {
 
   return (
     <div data-aos="zoom-in" data-aos-once="true">
-      <div className="mb-10 text-center md:mb-12">
+      <div className="mb-7 text-center md:mb-8">
         <div className="mb-3 flex items-center justify-center gap-2.5">
           <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-[#0F9B73] md:h-8 md:w-8" strokeWidth="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -34,7 +34,7 @@ const AIPlanCityGrid = ({ selectedRegion, onSelect }) => {
       </div>
 
       {/* 남부/북부 탭 */}
-      <div className="mb-10 flex justify-center gap-3">
+      <div className="mb-7 flex justify-center gap-3">
         {['남부', '북부'].map(tab => (
           <button
             key={tab}
@@ -51,12 +51,12 @@ const AIPlanCityGrid = ({ selectedRegion, onSelect }) => {
       </div>
 
       {/* 도시 그리드 */}
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-3 md:grid-cols-5 md:gap-5" data-aos="zoom-in-up" data-aos-once="true">
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-3 md:grid-cols-5 md:gap-4" data-aos="zoom-in-up" data-aos-once="true">
         {cities.map(city => (
           <button
             key={city}
             onClick={() => onSelect(city)}
-            className={`h-12 rounded-2xl px-2 text-base font-semibold transition-all duration-200 active:scale-[0.98] md:h-[70px] md:px-4 md:text-xl ${
+            className={`h-12 rounded-2xl px-2 text-base font-semibold transition-all duration-200 active:scale-[0.98] md:h-[58px] md:px-4 md:text-lg ${
               selectedRegion === city
                 ? 'border border-gray-200 bg-white text-[#0F9B73] shadow-[0_10px_24px_rgba(15,23,42,0.08)]'
                 : 'border border-gray-200 bg-gray-50 text-gray-600 hover:-translate-y-0.5 hover:border-[#0F9B73]/30 hover:bg-white hover:text-gray-800 hover:shadow-sm'
