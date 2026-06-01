@@ -1,3 +1,4 @@
+// aiAxios.js
 import axios from 'axios';
 
 const AI_API_URL = (import.meta.env.VITE_FASTAPI_URL || 'http://localhost:8090').replace(/\/+$/, '');

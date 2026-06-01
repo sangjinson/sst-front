@@ -1,3 +1,4 @@
+// regionMap.js
 import { REGION_DATA, DEFAULT_REGION } from '@public/scripts/regions';
 
 // 1. 지역( 한글 → 영어 )

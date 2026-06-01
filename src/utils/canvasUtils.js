@@ -1,3 +1,4 @@
+// canvasUtils.js
 /**
  * @param {string} imageSrc - 원본 이미지 데이터 (base64)
  * @param {Object} pixelCrop - react-easy-crop에서 받은 픽셀 좌표
