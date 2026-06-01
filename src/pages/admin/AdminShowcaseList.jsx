@@ -172,8 +172,13 @@ export default function AdminShowcaseList() {
                     </td>
                     <td
                       className="px-5 py-4 text-gray-800 dark:text-gray-200 font-medium cursor-pointer hover:underline hover:text-emerald-600 dark:hover:text-emerald-400"
-                      onClick={() => navigate(`/showcase/${type}/view/${post.commNo}`)}
-                    >
+                      onClick={() =>
+                        window.open(
+                          `/showcase/${type}/view/${post.commNo}`,
+                          "_blank",
+                          "noopener,noreferrer"
+                        )
+                      }>
                       {post.commTitle}
                     </td>
                     <td className="px-5 py-4 text-center text-sm text-gray-700 dark:text-gray-300">
