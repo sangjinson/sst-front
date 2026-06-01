@@ -226,7 +226,7 @@ export default function AdminMemberList() {
         </span>
     )},
     { label: "관리", key: "manage", render: (m) => (
-        <button onClick={() => handleToggle(m.mbrId)} className="text-[#0F9B73]">상태변경</button>
+        <button onClick={() => handleToggleStatus(m.mbrId)} className="text-[#0F9B73]">상태변경</button>
     )}
   ];
   return (

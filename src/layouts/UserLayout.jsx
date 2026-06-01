@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom';
-import { ConfigProvider } from '@context/ConfigContext';
 
 import { ThemeProvider } from '@context/ThemeContext'; // 🚀 위치 확인
 

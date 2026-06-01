@@ -72,19 +72,6 @@ export const getFoodDataByRegion = async (regionName) => {
   }
 };
 
-export const getFoodDataPaged = async (region, page = 1, size = 12, keyword = '') => {
-  try {
-    const rgnCd = REGION_CODE_MAP[region];
-    const res = await axios.get(`${BASE_URL}/api/food/paged`, {
-      params: { rgnCd, page, size, keyword },
-    });
-    return { ...res.data, list: res.data.list.map(normalizeApiItem) };
-  } catch (err) {
-    console.error('먹거리 페이징 조회 실패:', err);
-    return { list: [], totalCount: 0, totalPages: 1, currentPage: 1, pageSize: size };
-  }
-};
-
 export const getFoodDataById = async (id) => {
   try {
     const res = await axios.get(`${BASE_URL}/api/food/${id}`);

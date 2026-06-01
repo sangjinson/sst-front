@@ -71,19 +71,6 @@ export const getPlayDataByRegion = async (region) => {
   }
 };
 
-export const getPlayDataPaged = async (region, page = 1, size = 12, keyword = '') => {
-  try {
-    const rgnCd = REGION_CODE_MAP[region];
-    const res = await axios.get(`${BASE_URL}/api/play/paged`, {
-      params: { rgnCd, page, size, keyword },
-    });
-    return { ...res.data, list: res.data.list.map(normalizeApiItem) };
-  } catch (err) {
-    console.error('놀거리 페이징 조회 실패:', err);
-    return { list: [], totalCount: 0, totalPages: 1, currentPage: 1, pageSize: size };
-  }
-};
-
 export const getPlayDataById = async (id) => {
   try {
     const res = await axios.get(`${BASE_URL}/api/play/${id}`);
