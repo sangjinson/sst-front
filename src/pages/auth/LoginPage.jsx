@@ -8,7 +8,7 @@ import { useAuth } from '@hooks/useAuth';
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || '/';
+  const from = location.state?.from?.pathname || '/';
   
   const { login } = useAuth();
 
@@ -35,9 +35,10 @@ export default function LoginPage() {
       const userData = await login(payload); 
       
       if (userData.memberRole === 'ROLE_ADMIN') {
-        navigate('/admin'); // 관리자면 회원 목록 페이지(또는 대시보드)로 바로 이동
+        navigate('/admin');
       } else {
-        navigate(from); // 일반 유저면 메인 페이지로 이동
+        const safePath = from.startsWith('/admin') ? '/' : from;
+        navigate(safePath);
       }
     } catch (error) {
       console.error('로그인 실패:', error);
