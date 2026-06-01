@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Checkout source Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: 'yarn'
@@ -53,7 +53,7 @@ jobs:
 
       # GitHub Release에 dist.tar.gz 업로드
       - name: Upload dist to GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: front-deploy-latest
           name: "Front Latest Deploy"
