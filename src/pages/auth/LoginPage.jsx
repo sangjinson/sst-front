@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail } from 'lucide-react';
-import api from '@api/axios'; 
 import { useAuth } from '@hooks/useAuth';
 
 export default function LoginPage() {

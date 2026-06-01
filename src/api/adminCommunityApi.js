@@ -1,3 +1,4 @@
+// adminCommunityApi.js
 import api from './axios';
 
 // 🚀 백엔드와 통신하는 API 함수들을 깔끔하게 모아둡니다.

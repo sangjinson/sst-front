@@ -1,3 +1,4 @@
+// adminReviewApi.js
 import api from './axios';
 
 // 🚀 페이징 및 필터링을 포함한 리뷰 목록 조회

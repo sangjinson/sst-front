@@ -1,3 +1,4 @@
+// index.js
 export { default as AIResultScheduleList } from './AIResultScheduleList';
 export { default as AIResultSearchPanel }  from './AIResultSearchPanel';
 export { default as AIResultShareButton }  from './AIResultShareButton';

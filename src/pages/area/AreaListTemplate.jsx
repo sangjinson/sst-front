@@ -144,7 +144,7 @@ function AreaListTemplate() {
           items,
         });
 
-        // ✅ 찜 상태 한번에 조회
+        // 찜 상태 한번에 조회
         if (user?.mbrId && items.length > 0) {
           const plcNos = items.map(item => item.id).filter(Boolean);
           try {
