@@ -279,7 +279,7 @@ const ErrorScenePage = ({
           {title}
         </h1>
 
-        <p className="mt-5 max-w-2xl text-lg font-medium leading-8 text-slate-300 md:text-xl">
+        <p className="mt-5 max-w-2xl whitespace-pre-line text-lg font-medium leading-8 text-slate-300 md:text-xl">
           {description}
         </p>
 
