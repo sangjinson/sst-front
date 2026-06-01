@@ -415,11 +415,10 @@ const AIPlanResultPage = () => {
         />
 
         {scheduleLoading ? (
-          aisNo ? (
-            <AIPlanLoading />
-          ) : (
-            <AIPlanLoading isFinishing={loadingFinishing} />
-          )
+          <AIPlanLoading
+            isFinishing={loadingFinishing}
+            title={aisNo ? '저장된 일정을 불러오고 있어요' : undefined}
+          />
         ) : (
           <div className="print-area bg-white rounded-2xl shadow-sm">
             <div className="flex flex-col md:flex-row">

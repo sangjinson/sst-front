@@ -3,7 +3,10 @@ import capybaraHat from '@assets/images/aiplan-capybara-hat.png';
 import capybaraGirlfriend from '@assets/images/aiplan-capybara-girlfriend.png';
 // import goalFlag from '@assets/images/aiplan-goal-flag.png';
 
-const AIPlanLoading = ({ isFinishing = false }) => {
+const AIPlanLoading = ({
+  isFinishing = false,
+  title = '여행 일정을 불러오고 있어요',
+}) => {
   const containerRef = useRef(null);
   const capybaraRef = useRef(null);
   const girlfriendRef = useRef(null);
@@ -156,7 +159,7 @@ const AIPlanLoading = ({ isFinishing = false }) => {
         <div className="px-7 py-6">
           <p className="text-sm font-bold text-[#0F9B73]">여행코스 로딩 중</p>
           <h2 className="mt-2 text-2xl font-black text-gray-900 md:text-3xl">
-            여행 일정을 불러오고 있어요
+            {title}
           </h2>
           <p className="mt-3 text-sm font-medium text-gray-500 md:text-base">
             선택한 지역과 테마를 바탕으로 동선을 정리하는 중이에요.
