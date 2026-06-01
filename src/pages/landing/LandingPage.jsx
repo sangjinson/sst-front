@@ -28,6 +28,13 @@ const LandingPage = () => {
     navigate(`/search/${encodeURIComponent(searchKeyword.trim())}`);
   };
 
+  const searchInputProps = {
+    type: 'text',
+    value: searchKeyword,
+    onChange: (e) => setSearchKeyword(e.target.value),
+    onKeyDown: (e) => e.key === 'Enter' && handleSearch(),
+  };
+
   useEffect(() => {
     // 타이틀 설정
     //setConfig('pageTitle', '거리에섯 | 나만의 완벽한 여행 일정');
@@ -41,12 +48,14 @@ const LandingPage = () => {
         <div className="w-full md:w-8/12 mx-auto">
           <div className="flex flex-col md:flex-row items-center bg-white rounded-[20px] md:rounded-[50px] p-4 md:py-[10px] md:px-[20px] w-full shadow-[0_4px_15px_rgba(0,0,0,0.05)] mb-10 md:mb-[50px] gap-3 md:gap-0">
             <input
-              type="text"
+              {...searchInputProps}
+              placeholder="어디로 떠날까요?"
+              className="block md:hidden min-w-0 w-full border-none px-4 text-xl outline-none text-center bg-transparent placeholder:text-gray-400"
+            />
+            <input
+              {...searchInputProps}
               placeholder="떠나고 싶은 지역이나 검색 하고 싶은 내용을 입력하세요"
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1 border-none px-[20px] outline-none w-full text-center md:text-left bg-transparent"
+              className="hidden md:block min-w-0 flex-1 border-none px-[20px] text-left outline-none bg-transparent placeholder:text-gray-400"
             />
             <button
               onClick={handleSearch}
