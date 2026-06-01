@@ -14,7 +14,7 @@ const AIPlanStepIndicator = ({ current }) => {
   const steps = ['지역 선택', '여행 기간', '여행 테마'];
 
   return (
-    <div className="mb-9 flex items-center justify-center md:mb-10">
+    <div className="mb-7 flex items-center justify-center md:mb-8">
       {steps.map((label, i) =>  (
         <React.Fragment key={i}>
           <div className="flex flex-col items-center" data-aos="zoom-in" data-aos-once="true">
