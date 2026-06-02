@@ -79,7 +79,7 @@ const MemberInfo = ({ profile, onUpdate, onWithdraw }) => {
     }
   };
 
-  // 🚀 파일 변경 공통 핸들러
+  //  파일 변경 공통 핸들러
   const handleFileChange = (e, type) => {
     const file = e.target.files[0];
     if (!file) return;

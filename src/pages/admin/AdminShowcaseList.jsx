@@ -8,7 +8,7 @@ import { usePagination } from "@hooks/usePagination";
 import AdminPagination from "@components/admin/AdminPagination";
 
 
-// 🚀 type에 따른 카테고리 매핑 정보 사전 정의
+//  type에 따른 카테고리 매핑 정보 사전 정의
 const TYPE_MAP = {
   hotplace: { catCd: "CMM002", title: "핫플거리 관리" },
   life: { catCd: "CMM001", title: "인생거리 관리" },
@@ -18,7 +18,7 @@ export default function AdminShowcaseList() {
   const { type } = useParams(); // URL에서 'hotplace' 또는 'life' 추출
   const navigate = useNavigate();
   
-  // 🚀 유효하지 않은 type 접근 방어 로직
+  //  유효하지 않은 type 접근 방어 로직
   const currentConfig = TYPE_MAP[type];
   if (!currentConfig) {
     navigate("/admin/dashboard", { replace: true });
@@ -32,7 +32,7 @@ export default function AdminShowcaseList() {
   
   const { page, size, totalCount, totalPages, setPage, setTotalCount } = usePagination(1, 10);
 
-  // 🚀 백엔드 통합 API 호출
+  //  백엔드 통합 API 호출
   const fetchPosts = async () => {
     try {
       const response = await api.get("/admin/community/list", {
@@ -53,13 +53,13 @@ export default function AdminShowcaseList() {
     }
   };
 
-  // 🚀 type(메뉴 이동), page, statusTab, 검색어가 변경될 때마다 재조회
+  //  type(메뉴 이동), page, statusTab, 검색어가 변경될 때마다 재조회
   useEffect(() => {
     fetchPosts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, page, statusTab, searchKeyword]);
 
-  // 🚀 메뉴(type)가 바뀔 때 상태 초기화
+  //  메뉴(type)가 바뀔 때 상태 초기화
   useEffect(() => {
     setStatusTab("Y");
     setSearchInput("");
@@ -79,7 +79,7 @@ export default function AdminShowcaseList() {
     if (!window.confirm(msg)) return;
 
     try {
-      // 🚀 백엔드의 상태 변경 API 호출 (PatchMapping("/{commNo}/status"))
+      //  백엔드의 상태 변경 API 호출 (PatchMapping("/{commNo}/status"))
       await api.patch(`/admin/community/${commNo}/status`, null, {
         params: { useYn: newStatus },
       });
@@ -123,7 +123,7 @@ export default function AdminShowcaseList() {
         ))}
       </div>
 
-      {/* 검색 바: 🚀 검색 버튼 청록색(emerald-600) 적용 */}
+      {/* 검색 바:  검색 버튼 청록색(emerald-600) 적용 */}
       <div className="flex flex-col sm:flex-row gap-3 p-4 bg-white border border-gray-200 rounded-xl dark:bg-white/[0.03] dark:border-white/[0.05]">
         <input
           type="text"

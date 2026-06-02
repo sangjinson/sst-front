@@ -129,7 +129,7 @@ function AreaListTemplate() {
       try {
         const listDataConfig = LIST_DATA_CONFIG[type];
 
-        // 🚀 listDataConfig.getItems가 무조건 있다고 가정하고 로직을 단순화합니다.
+        //  listDataConfig.getItems가 무조건 있다고 가정하고 로직을 단순화합니다.
         if (!listDataConfig || !listDataConfig.getItems) {
           throw new Error("유효하지 않은 카테고리입니다.");
         }
@@ -158,7 +158,7 @@ function AreaListTemplate() {
         }
       } catch (err) {
         console.error('데이터 로딩 실패:', err);
-        // 🚀 에러가 나거나 데이터가 없을 때는 가짜 데이터를 보여주지 말고 빈 화면을 구성합니다.
+        //  에러가 나거나 데이터가 없을 때는 가짜 데이터를 보여주지 말고 빈 화면을 구성합니다.
         setDataSet({
           totalCount: 0,
           perPage: 12,

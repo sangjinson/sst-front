@@ -7,10 +7,10 @@ export default function AdminFoodModify() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // 🚀 목록에서 넘어온 데이터를 받습니다 (AppRoutes의 라우팅 구조에 맞춤)
+  //  목록에서 넘어온 데이터를 받습니다 (AppRoutes의 라우팅 구조에 맞춤)
   const passedPlace = location.state?.place || location.state?.item;
 
-  // 🚀 먹거리(Food) 전용 필드들로 초기 상태 구성
+  //  먹거리(Food) 전용 필드들로 초기 상태 구성
   const [form, setForm] = useState({
     plcName: passedPlace?.plcName || "",
     plcAddr: passedPlace?.plcAddr || "",
@@ -25,7 +25,7 @@ export default function AdminFoodModify() {
     foodInfocenter: passedPlace?.foodInfocenter || "",
   });
 
-  // 🚀 새로고침 시 데이터 유지 로직
+  //  새로고침 시 데이터 유지 로직
   useEffect(() => {
     if (!passedPlace) {
       const fetchDetail = async () => {
@@ -66,7 +66,7 @@ export default function AdminFoodModify() {
     if (!window.confirm("먹거리 정보를 수정하시겠습니까?")) return;
 
     try {
-      // 🚀 백엔드에 PUT 요청 (인터셉터가 쿠키/토큰을 알아서 처리합니다)
+      //  백엔드에 PUT 요청 (인터셉터가 쿠키/토큰을 알아서 처리합니다)
       await api.put(`/admin/food/${plcNo}`, form);
       alert("성공적으로 수정되었습니다.");
       navigate("/admin/area/food"); // 먹거리 목록으로 복귀
@@ -116,7 +116,7 @@ export default function AdminFoodModify() {
           </div>
         </div>
 
-        {/* 🚀 먹거리(Food) 전용 상세 정보 영역 */}
+        {/*  먹거리(Food) 전용 상세 정보 영역 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 border border-gray-100 rounded-lg">
           <div className="md:col-span-2 border-b pb-2 mb-2">
             <h3 className="font-semibold text-gray-800">먹거리 전용 상세 정보</h3>

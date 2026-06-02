@@ -7,10 +7,10 @@ export default function AdminPlayModify() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // 🚀 목록에서 넘어온 데이터를 받습니다.
+  //  목록에서 넘어온 데이터를 받습니다.
   const passedPlace = location.state?.place || location.state?.item;
 
-  // 🚀 놀거리(Play) 전용 필드들로 초기 상태 구성
+  //  놀거리(Play) 전용 필드들로 초기 상태 구성
   const [form, setForm] = useState({
     plcName: passedPlace?.plcName || "",
     plcAddr: passedPlace?.plcAddr || "",
@@ -26,7 +26,7 @@ export default function AdminPlayModify() {
     playEventEnd: passedPlace?.playEventEnd || "",
   });
 
-  // 🚀 새로고침 시 데이터 유지 로직
+  //  새로고침 시 데이터 유지 로직
   useEffect(() => {
     if (!passedPlace) {
       const fetchDetail = async () => {
@@ -67,7 +67,7 @@ export default function AdminPlayModify() {
     e.preventDefault();
     if (!window.confirm("놀거리 정보를 수정하시겠습니까?")) return;
 
-    // 🚀 행사 시작일이 종료일보다 늦은 경우 프론트 단 방어 로직
+    //  행사 시작일이 종료일보다 늦은 경우 프론트 단 방어 로직
     if (form.playEventStart && form.playEventEnd && form.playEventStart > form.playEventEnd) {
       alert("행사 종료일이 시작일보다 빠를 수 없습니다.");
       return;
@@ -76,7 +76,7 @@ export default function AdminPlayModify() {
     try {
       await api.put(`/admin/play/${plcNo}`, form);
       alert("성공적으로 수정되었습니다.");
-      navigate("/admin/area/play"); // 🚀 목록으로 복귀
+      navigate("/admin/area/play"); //  목록으로 복귀
     } catch (error) {
       console.error("수정 실패:", error);
       alert("수정 중 오류가 발생했습니다.");
@@ -123,7 +123,7 @@ export default function AdminPlayModify() {
           </div>
         </div>
 
-        {/* 🚀 놀거리(Play) 전용 상세 정보 영역 */}
+        {/*  놀거리(Play) 전용 상세 정보 영역 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 border border-gray-100 rounded-lg">
           <div className="md:col-span-2 border-b pb-2 mb-2">
             <h3 className="font-semibold text-gray-800">놀거리 전용 상세 정보</h3>

@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 
-import { ThemeProvider } from '@context/ThemeContext'; // 🚀 위치 확인
+import { ThemeProvider } from '@context/ThemeContext'; //  위치 확인
 
 {/* Layouts */}
 import MainHeader from '@layouts/user/headers/MainHeader';

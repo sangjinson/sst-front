@@ -9,7 +9,7 @@ export default function AdminSleepModify() {
   
   const passedPlace = location.state?.place || location.state?.item;
 
-  // 🚀 잘거리(Sleep) 전용 필드들 구성
+  //  잘거리(Sleep) 전용 필드들 구성
   const [form, setForm] = useState({
     plcName: passedPlace?.plcName || "",
     plcAddr: passedPlace?.plcAddr || "",
@@ -88,7 +88,7 @@ export default function AdminSleepModify() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🚀 체크박스는 0 또는 1로 변환하여 저장
+  //  체크박스는 0 또는 1로 변환하여 저장
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setForm((prev) => ({ ...prev, [name]: checked ? 1 : 0 }));
@@ -108,7 +108,7 @@ export default function AdminSleepModify() {
     }
   };
 
-  // 🚀 부대시설 목록 배열화 (렌더링 맵핑용)
+  //  부대시설 목록 배열화 (렌더링 맵핑용)
   const facilities = [
     { key: "sleepBarbecu", label: "바비큐장" },
     { key: "sleepBeauty", label: "뷰티시설" },
@@ -164,7 +164,7 @@ export default function AdminSleepModify() {
           </div>
         </div>
 
-        {/* 🚀 잘거리(Sleep) 전용 상세 정보 영역 */}
+        {/*  잘거리(Sleep) 전용 상세 정보 영역 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 border border-gray-100 rounded-lg">
           <div className="md:col-span-2 border-b pb-2 mb-2">
             <h3 className="font-semibold text-gray-800">숙박 전용 상세 정보</h3>

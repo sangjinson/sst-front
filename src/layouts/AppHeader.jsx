@@ -2,16 +2,16 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSidebar } from "@context/SidebarContext";
 import { ThemeToggleButton } from "@components/admin/ThemeToggleButton";
-// 🚀 1. 전역 인증 상태와 로그아웃 함수를 가져오기 위해 useAuth 훅 추가
+//  1. 전역 인증 상태와 로그아웃 함수를 가져오기 위해 useAuth 훅 추가
 import { useAuth } from "@hooks/useAuth"; 
-// 🚀 2. 직관적인 UI를 위해 lucide-react에서 아이콘 임포트
+//  2. 직관적인 UI를 위해 lucide-react에서 아이콘 임포트
 import { LogOut, UserCircle } from "lucide-react"; 
 
 const AppHeader = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
   
-  // 🚀 3. useAuth에서 user 정보와 logout 로직 추출
+  //  3. useAuth에서 user 정보와 logout 로직 추출
   const { user, logout } = useAuth(); 
 
   const handleToggle = () => {
@@ -74,7 +74,7 @@ const AppHeader = () => {
           <div className="flex items-center gap-4">
             <ThemeToggleButton />
             
-            {/* 🚀 4. 분리하지 않고 헤더 내부에 직접 구현한 관리자 인증 섹션 */}
+            {/*  4. 분리하지 않고 헤더 내부에 직접 구현한 관리자 인증 섹션 */}
             <div className="flex items-center gap-4 border-l border-gray-200 dark:border-gray-700 pl-4 ml-2">
               <div className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
                 <UserCircle className="w-5 h-5 text-gray-400 dark:text-gray-500" />

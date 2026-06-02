@@ -19,7 +19,7 @@ export const ConfigProvider = ({ children }) => {
         curRegionEn: '',
         curRegionKr: '',
         user : {},
-        profile: null, // 🚀 여기에 상세 프로필 데이터가 저장됩니다.
+        profile: null, //  여기에 상세 프로필 데이터가 저장됩니다.
         navs: {},
         theme: 'light',
         footer: {
@@ -95,7 +95,7 @@ export const ConfigProvider = ({ children }) => {
         });
     }, []);
 
-    // 🚀 상세 정보를 가져와 'profile' 경로에 저장
+    //  상세 정보를 가져와 'profile' 경로에 저장
     const fetchFullProfile = useCallback(async () => {
         try {
             const response = await api.get('/member/me');

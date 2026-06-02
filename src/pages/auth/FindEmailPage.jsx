@@ -9,7 +9,7 @@ const FindEmailPage = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [isSearched, setIsSearched] = useState(false);
 
-  // 🚀 전화번호 자동 하이픈(-) 적용 함수
+  //  전화번호 자동 하이픈(-) 적용 함수
   const formatPhoneNumber = (value) => {
     const nums = value.replace(/[^0-9]/g, ''); // 숫자만 추출
     if (nums.length <= 3) return nums;
@@ -19,7 +19,7 @@ const FindEmailPage = () => {
     return nums;
   };
 
-  // 🚀 입력 핸들러: 값 변경 시 실시간으로 정규식 포맷팅 적용
+  //  입력 핸들러: 값 변경 시 실시간으로 정규식 포맷팅 적용
   const handleTelnoChange = (e) => {
     const formattedValue = formatPhoneNumber(e.target.value);
     setFormData({ ...formData, telno: formattedValue });
@@ -32,7 +32,7 @@ const FindEmailPage = () => {
     setIsSearched(false);
 
     try {
-      // 🚀 주의: 만약 백엔드 DB(MEMBER.MBR_TELNO)에 하이픈 없이 숫자만 저장되어 있다면 
+      //  주의: 만약 백엔드 DB(MEMBER.MBR_TELNO)에 하이픈 없이 숫자만 저장되어 있다면 
       // API 전송 시 formData.telno.replace(/-/g, '') 로 하이픈을 빼고 넘겨야 합니다.
       // (현재는 화면에 보이는 하이픈 포함 상태 그대로 전송합니다.)
       const emails = await findEmail(formData.name, formData.telno);
@@ -62,7 +62,7 @@ const FindEmailPage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">전화번호</label>
-            {/* 🚀 수정된 부분: onChange에 handleTelnoChange 적용, maxLength 제한 */}
+            {/*  수정된 부분: onChange에 handleTelnoChange 적용, maxLength 제한 */}
             <input 
               type="text" 
               value={formData.telno}

@@ -10,7 +10,7 @@ import { getDetailPath } from "@components/modules/airesult/aiResultUtils";
 export default function AdminReplyList() {
 
   const { type } = useParams();
-  // 🚀 type에 따른 설정값 동적 매핑
+  //  type에 따른 설정값 동적 매핑
   const CONFIG = {
     comments: {
       title: "댓글",
