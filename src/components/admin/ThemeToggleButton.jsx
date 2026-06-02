@@ -1,4 +1,4 @@
-import { useTheme } from '@context/AdminThemeContext'; // 🚀 위치 확인
+import { useTheme } from '@context/AdminThemeContext'; //  위치 확인
 
 export const ThemeToggleButton = () => {
   const { theme, toggleTheme } = useTheme();
@@ -9,7 +9,7 @@ export const ThemeToggleButton = () => {
       className="flex items-center justify-center w-10 h-10 text-gray-500 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
       aria-label="Toggle dark mode"
     >
-      {/* 🚀 테마 상태에 따라 달/해 아이콘 스위칭 */}
+      {/*  테마 상태에 따라 달/해 아이콘 스위칭 */}
       {theme === 'dark' ? (
         // 해 아이콘 (다크모드일 때 클릭하면 라이트모드로 변경)
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

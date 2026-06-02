@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
 });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  // 🚀 가장 먼저 QueryClientProvider가 있어야 합니다.
+  //  가장 먼저 QueryClientProvider가 있어야 합니다.
   <QueryClientProvider client={queryClient}>
     <SidebarProvider>
       <App />

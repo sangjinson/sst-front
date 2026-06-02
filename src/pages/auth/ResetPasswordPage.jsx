@@ -16,7 +16,7 @@ const ResetPasswordPage = () => {
     try {
       await resetPassword(formData.email, formData.name);
       
-      // 🚀 메일 발송 완료 시 알림 후 로그인 페이지로 이동
+      //  메일 발송 완료 시 알림 후 로그인 페이지로 이동
       alert('입력하신 이메일로 임시 비밀번호가 발송되었습니다.\n로그인 후 보안을 위해 반드시 비밀번호를 변경해 주세요.');
       navigate('/login'); 
       

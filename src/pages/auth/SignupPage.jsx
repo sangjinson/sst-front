@@ -30,15 +30,15 @@ export default function SignupPage() {
     email: '', password: '', passwordConfirm: '', name: '', nickname: '', phone: '', zip: '', addr: '', daddr: ''
   });
   
-  // 🚀 추가: 각 필드별 메시지(에러/성공) 상태 관리
+  //  추가: 각 필드별 메시지(에러/성공) 상태 관리
   const [msg, setMsg] = useState({ email: '', nickname: '', password: '', global: '' });
   const [check, setCheck] = useState({ email: false, nickname: false });
   
-  // 🚀 추가: 비밀번호 보기 토글 상태
+  //  추가: 비밀번호 보기 토글 상태
   const [showPw, setShowPw] = useState({ pw: false, confirm: false });
   const [isOpenPost, setIsOpenPost] = useState(false);
 
-  // 🚀 추가: 비밀번호 일치 실시간 검사
+  //  추가: 비밀번호 일치 실시간 검사
   useEffect(() => {
     if (form.passwordConfirm) {
       if (form.password !== form.passwordConfirm) {
@@ -73,7 +73,7 @@ export default function SignupPage() {
       return;
     }
     
-    // 🚀 2. 이메일 형식 검사 추가 (중복 확인 API 호출 전)
+    //  2. 이메일 형식 검사 추가 (중복 확인 API 호출 전)
     if (type === 'email') {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value)) {
@@ -130,7 +130,7 @@ export default function SignupPage() {
       alert('회원가입 완료! 로그인해주세요.');
       navigate('/login'); 
     } catch (error) {
-      // 🚀 백엔드 유효성 검사(@Valid) 실패 시 넘어오는 메시지를 매핑
+      //  백엔드 유효성 검사(@Valid) 실패 시 넘어오는 메시지를 매핑
       if (error.response?.status === 400 && error.response.data?.data) {
         const fieldErrors = error.response.data.data; // [{field: "mbrEmail", message: "이메일형식..."}]
         alert(`입력값을 확인해주세요: \n${fieldErrors.map(e => e.message).join('\n')}`);
@@ -155,7 +155,7 @@ export default function SignupPage() {
               <ReqTextInput name="email" value={form.email} onChange={handleChange} placeholder="이메일" />
               <button onClick={() => handleCheck('email')} className="bg-[#0F9B73] text-white px-4 rounded-lg text-sm shrink-0">중복확인</button>
             </div>
-            {/* 🚀 에러/성공 메시지 출력부 */}
+            {/*  에러/성공 메시지 출력부 */}
             {msg.email && <p className={`text-xs mt-1 ${check.email ? 'text-[#0F9B73]' : 'text-red-500'}`}>{msg.email}</p>}
           </div>
           
@@ -175,7 +175,7 @@ export default function SignupPage() {
                 {showPw.confirm ? '숨김' : '보기'}
               </button>
             </div>
-            {/* 🚀 비밀번호 일치 검사 결과 */}
+            {/*  비밀번호 일치 검사 결과 */}
             {msg.password && <p className={`text-xs mt-1 ${form.password === form.passwordConfirm ? 'text-[#0F9B73]' : 'text-red-500'}`}>{msg.password}</p>}
           </div>
 
