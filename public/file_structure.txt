@@ -32,7 +32,6 @@ sst-front/
 │  │  └─ video-thumb/
 │  ├─ scripts/
 │  ├─ favicon.svg
-│  ├─ icons.svg
 │  └─ file_structure.txt        현재 문서
 │
 ├─ src/
@@ -1186,5 +1185,4 @@ src/layouts/LandingLayout.jsx
 ├─ List.jsx와 _List.jsx가 같이 남아 있음
 ├─ API 인스턴스가 src/api와 src/utils에 나뉘어 있음
 └─ 한글 인코딩이 깨진 파일이 있음
-
 
