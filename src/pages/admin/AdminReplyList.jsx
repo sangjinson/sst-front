@@ -9,9 +9,8 @@ import { getDetailPath } from "@components/modules/airesult/aiResultUtils";
 
 export default function AdminReplyList() {
 
-    const { type } = useParams();
-    const navigate = useNavigate();
-  // type에 따른 설정값 동적 매핑
+  const { type } = useParams();
+  // 🚀 type에 따른 설정값 동적 매핑
   const CONFIG = {
     comments: {
       title: "댓글",
@@ -152,6 +151,7 @@ export default function AdminReplyList() {
     if (useYnFilter === 'B') return `신고 누적된 ${currentConfig.title}이(가) 없습니다.`;
     return "검색 결과가 없습니다.";
   };
+
 
   return (
     <div className="space-y-6">

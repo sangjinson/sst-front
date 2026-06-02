@@ -28,7 +28,8 @@ export default function LoginPage() {
       // (기존 { memberEmail, memberPassword } 는 { memberEmail: memberEmail, memberPassword: memberPassword } 와 같아서 에러 발생)
       const payload = {
         mbrEmail: email,
-        mbrPassword: password
+        mbrPassword: password,
+        rememberMe: rememberMe
       };
 
       const userData = await login(payload); 

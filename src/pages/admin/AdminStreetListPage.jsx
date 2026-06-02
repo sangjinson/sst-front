@@ -5,6 +5,7 @@ import api from "@api/axios";
 import { usePagination } from "@hooks/usePagination";
 import AdminPagination from "@components/admin/AdminPagination";
 
+import { REGION_DATA } from '@public/scripts/regions';
 import { PlusIcon, PencilIcon, TrashBinIcon } from "@components/Icon";
 
 export default function AdminPlaceList() {
@@ -12,11 +13,9 @@ export default function AdminPlaceList() {
   const { type } = useParams(); 
 
   const [places, setPlaces] = useState([]);
-  const [selected, setSelected] = useState([]);
-  const [allChecked, setAllChecked] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   
-  // 🚀 1. 상태 필터 기본값을 'Y'(운영 중)로 세팅. 'N'이면 휴지통!
+  // 🚀 상태 필터 기본값을 'Y'(운영 중)로 세팅. 'N'이면 휴지통!
   const [useYnFilter, setUseYnFilter] = useState('Y');
 
   const { page, size, totalCount, totalPages, setPage, setTotalCount } = usePagination(1, 10);
@@ -30,6 +29,17 @@ export default function AdminPlaceList() {
   
   const currentConfig = typeConfig[type] || typeConfig.see;
 
+  // 🚀 빈 문자열이 나와서 도메인이 깨지는 현상 완벽 방지
+  const getEngRegionFromAddress = (address) => {
+    if (!address) return 'all'; 
+    
+    // textKor가 정상적으로 존재하면서 주소에 포함된 경우만 찾기
+    const matched = REGION_DATA.find((r) => r.textKor && address.includes(r.textKor));
+    
+    // 매칭이 안 됐거나, textEn이 비어있으면 무조건 'all' 반환
+    return (matched && matched.textEn) ? matched.textEn : 'all';
+  };
+
   const fetchPlaces = async () => {
     try {
       const response = await api.get(`/admin/${type}/list`, {
@@ -37,7 +47,7 @@ export default function AdminPlaceList() {
           page,
           size,
           keyword: searchKeyword,
-          useYn: useYnFilter // 🚀 2. 백엔드로 현재 탭의 상태값 전달
+          useYn: useYnFilter 
         }
       });
       
@@ -50,17 +60,15 @@ export default function AdminPlaceList() {
 
   useEffect(() => {
     setSearchKeyword('');
-    setUseYnFilter('Y'); // 🚀 카테고리(type)가 바뀔 때 무조건 정상 탭으로 초기화
+    setUseYnFilter('Y'); 
     if (page !== 1) setPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
   useEffect(() => {
     fetchPlaces();
-    setAllChecked(false);
-    setSelected([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, type, useYnFilter]); // 🚀 3. useYnFilter가 바뀔 때도 데이터 갱신
+  }, [page, type, useYnFilter]); 
 
   const handleSearch = () => {
     if (page === 1) fetchPlaces();
@@ -73,17 +81,6 @@ export default function AdminPlaceList() {
     else setPage(1);
   };
 
-  const toggleAll = () => {
-    if (allChecked) setSelected([]);
-    else setSelected(places.map((p) => p.plcNo)); 
-    setAllChecked(!allChecked);
-  };
-
-  const toggleOne = (id) => {
-    setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
-  };
-
-  // 🚀 4. 물리 삭제 대신 '상태 토글(휴지통 이동 및 복구)' 로직으로 변경
   const handleToggleStatus = async (plcNo, currentStatus) => {
     const nextStatus = currentStatus === 'Y' ? 'N' : 'Y';
     const actionText = currentStatus === 'Y' ? '휴지통으로 이동' : '복구';
@@ -91,7 +88,6 @@ export default function AdminPlaceList() {
     if (!window.confirm(`정말 이 장소를 ${actionText} 하시겠습니까?`)) return;
 
     try {
-      // 🚀 PATCH 메서드를 사용하여 상태값만 부분 업데이트
       await api.patch(`/admin/${type}/${plcNo}/status`, null, {
         params: { useYn: nextStatus }
       });
@@ -104,11 +100,12 @@ export default function AdminPlaceList() {
     }
   };
   
+  console.log(places);
+  
   return (
     <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            {/* 🚀 dark:text-gray-100으로 통일성 부여 */}
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
               {currentConfig.title} 관리
             </h2>
@@ -117,7 +114,6 @@ export default function AdminPlaceList() {
             </p>
           </div>
           
-          {/* 🚀 bg-blue-600 -> bg-[#0F9B73] (청록색)으로 통일 */}
           <button 
             onClick={() => navigate(`/admin/area/${type}/create`)}
             className="flex items-center gap-2 px-4 py-2.5 bg-[#0F9B73] text-white text-sm font-medium rounded-lg hover:bg-[#0c8261] shadow-sm"
@@ -126,7 +122,6 @@ export default function AdminPlaceList() {
           </button>
         </div>
 
-        {/* 🚀 탭 UI 색상 테마 수정 (청록색 계열로 통일) */}
         <div className="flex gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
           <button
             onClick={() => { setUseYnFilter('Y'); setPage(1); }}
@@ -181,9 +176,6 @@ export default function AdminPlaceList() {
           <table className="w-full text-sm text-left whitespace-nowrap">
             <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-semibold">
               <tr>
-                <th className="px-5 py-3 text-center">
-                  <input type="checkbox" checked={allChecked} onChange={toggleAll} className="cursor-pointer" />
-                </th>
                 <th className="px-5 py-3 text-center">No</th>
                 <th className="px-5 py-3 text-start">장소명</th>
                 <th className="px-5 py-3 text-start">주소</th>
@@ -200,15 +192,26 @@ export default function AdminPlaceList() {
                   </td>
                 </tr>
               ) : (
-                // 🚀 { } 대신 ( ) 를 사용하여 JSX를 즉시 반환하도록 수정
                 places.map((p) => (
                   <tr key={p.plcNo} className="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800">
-                    <td className="px-5 py-4 text-center">
-                      <input type="checkbox" checked={selected.includes(p.plcNo)} onChange={() => toggleOne(p.plcNo)} className="cursor-pointer" />
-                    </td>
                     <td className="px-5 py-4 text-center text-gray-500 dark:text-gray-400">{p.plcNo}</td>
                     <td className="px-5 py-4">
-                      <span className="block font-medium text-gray-800 dark:text-gray-200">{p.plcName}</span>
+                      {useYnFilter === 'Y' ? (
+                        <span 
+                          onClick={() => {
+                            const engRegion = getEngRegionFromAddress(p.plcAddr) || 'all';
+                            window.open(`/${engRegion}/${type}/view?id=${p.plcNo}`, '_blank', 'noopener,noreferrer');
+                          }}
+                          className="block font-bold text-[#0F9B73] dark:text-[#24B99F] cursor-pointer hover:underline hover:text-[#0c8261]"
+                          title="실제 서비스 화면에서 보기"
+                        >
+                          {p.plcName}
+                        </span>
+                      ) : (
+                        <span className="block font-medium text-gray-500 dark:text-gray-400" title="삭제된 장소는 조회할 수 없습니다.">
+                          {p.plcName}
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       <span className="block text-sm text-gray-800 dark:text-gray-300 truncate max-w-[200px]" title={p.plcAddr}>{p.plcAddr}</span>
