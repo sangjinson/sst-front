@@ -95,7 +95,7 @@ export default function LoginPage() {
 
             <Link to="/" className="absolute -left-1 top-5">
               <img
-                src="/admin-logo.png"
+                src="/brand-logo.png"
                 alt="거리에섯"
                 className="h-32 w-auto origin-left scale-125 object-contain drop-shadow-sm"
               />
