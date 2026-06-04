@@ -7,7 +7,7 @@ import { useAuth } from '@hooks/useAuth';
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from || sessionStorage.getItem('loginRedirectFrom') || '/';
   
   const { login } = useAuth();
 
@@ -33,6 +33,9 @@ export default function LoginPage() {
       };
 
       const userData = await login(payload); 
+
+      sessionStorage.removeItem('loginRedirectFrom');
+      navigate(from);
       
       if (userData.memberRole === 'ROLE_ADMIN') {
         navigate('/admin');

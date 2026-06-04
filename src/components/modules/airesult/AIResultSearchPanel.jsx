@@ -10,13 +10,49 @@ const AIResultSearchPanel = ({
   onKeywordChange,
   onCategoryChange,
   onAddPlace,
-  onRemovePlace, // ✅ 추가
+  onRemovePlace,
   onClose,
   selectedRegion,
   showSearch,
 }) => {
 
-  const SearchContent = () => (
+  // ✅ 로컬 입력 상태 (부모 리렌더링과 분리)
+  const [localKeyword, setLocalKeyword] = useState(searchKeyword);
+  // ✅ 한글 IME 조합 중 여부 추적
+  const isComposingRef = useRef(false);
+
+  // ✅ 부모 searchKeyword가 외부에서 초기화될 때만 동기화
+  useEffect(() => {
+    if (!isComposingRef.current) {
+      setLocalKeyword(searchKeyword);
+    }
+  }, [searchKeyword]);
+
+  // ✅ 일반 입력 변경: 로컬 상태는 즉시, 부모는 IME 조합 중이 아닐 때만 전달
+  const handleChange = (e) => {
+    const val = e.target.value;
+    setLocalKeyword(val);
+    if (!isComposingRef.current) {
+      onKeywordChange(val);
+    }
+  };
+
+  // ✅ 한글 조합 시작 (onCompositionStart)
+  const handleCompositionStart = () => {
+    isComposingRef.current = true;
+  };
+
+  // ✅ 한글 조합 완료 (onCompositionEnd) → 이때 부모에 전달
+  const handleCompositionEnd = (e) => {
+    isComposingRef.current = false;
+    const val = e.target.value;
+    setLocalKeyword(val);
+    onKeywordChange(val);
+  };
+
+  // ✅ SearchContent를 <SearchContent /> 컴포넌트가 아닌 함수 호출로 변경
+  //    → 부모 리렌더링 시 언마운트/마운트가 발생하지 않음
+  const renderSearchContent = () => (
     <>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-gray-800">장소 검색</h3>
@@ -34,10 +70,13 @@ const AIResultSearchPanel = ({
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
+          {/* ✅ value → localKeyword, 핸들러 교체 */}
           <input
             type="text"
-            value={searchKeyword}
-            onChange={(e) => onKeywordChange(e.target.value)}
+            value={localKeyword}
+            onChange={handleChange}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
             placeholder="장소명을 검색하세요"
             className="flex-1 bg-transparent text-sm outline-none text-gray-700"
           />
@@ -105,7 +144,6 @@ const AIResultSearchPanel = ({
                   <p className="text-sm text-gray-400 truncate">{item.description || item.desc}</p>
                 </div>
 
-                {/* ✅ 선택/취소 버튼 */}
                 <button
                   onClick={() => {
                     if (isAdded) {
@@ -136,10 +174,13 @@ const AIResultSearchPanel = ({
 
   return (
     <>
+      {/* 데스크탑 */}
       <div className="hidden md:block border-t border-gray-100 p-4 h-[400px]">
-        <SearchContent />
+        {/* ✅ <SearchContent /> → {renderSearchContent()} */}
+        {renderSearchContent()}
       </div>
 
+      {/* 모바일 바텀시트 */}
       <div className={`
         fixed inset-0 z-50 md:hidden
         transition-opacity duration-300
@@ -163,7 +204,8 @@ const AIResultSearchPanel = ({
           </div>
 
           <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(70vh - 32px)' }}>
-            <SearchContent />
+            {/* ✅ <SearchContent /> → {renderSearchContent()} */}
+            {renderSearchContent()}
           </div>
         </div>
       </div>
