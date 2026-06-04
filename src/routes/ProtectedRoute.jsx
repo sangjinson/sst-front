@@ -30,6 +30,9 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
 
   useEffect(() => {
     if (!loading && !user) {
+      const savedFrom = location.pathname + location.search;
+      sessionStorage.setItem('loginRedirectFrom', savedFrom);
+      
       Swal.fire({
         icon: 'warning',
         title: '로그인이 필요합니다',
@@ -43,14 +46,14 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
       }).then((result) => {
         if (result.isConfirmed) {
           navigate('/login', {
-            state: { from: location.pathname + location.search },
+            state: { from : sessionStorage.getItem('loginRedirectFrom') },
           });
         } else {
           navigate(-1); // 닫기 누르면 이전 페이지로
         }
       });
     }
-  }, [loading, user, navigate, location]);
+  }, [loading, user]);
 
   if (loading || !user) return <SkeletonLoader />;
 
