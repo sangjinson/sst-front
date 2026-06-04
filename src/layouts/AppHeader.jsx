@@ -46,7 +46,7 @@ const AppHeader = () => {
 
           <Link to="/admin" className="flex items-center gap-2 no-underline lg:hidden">
             <img
-              src="/admin-logo.png"
+              src="/brand-logo.png"
               alt="거리에섯 관리자 로고"
               className="h-12 w-12 shrink-0 rounded-2xl object-cover"
             />

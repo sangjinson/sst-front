@@ -277,7 +277,7 @@ const AppSidebar = () => {
       >
         <Link to="/admin" className="flex items-center gap-4 no-underline">
           <img
-            src="/admin-logo.png"
+            src="/brand-logo.png"
             alt="거리에섯 관리자 로고"
             className={`shrink-0 rounded-2xl object-cover ${isExpanded || isHovered || isMobileOpen ? "h-16 w-16" : "h-12 w-12"}`}
           />
