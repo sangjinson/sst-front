@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toEnRegion } from "@utils/regionMap";
 
 // 장소 유형별 한글 라벨
 const TYPE_LABEL = {
@@ -158,17 +159,26 @@ const LifeCourseView = ({
     return typeMap[type] || "see";
   };
 
-  // 장소 카드 클릭 시 해당 장소 상세페이지로 이동
+  const getRegionFromAddress = (address) => {
+    if (!address) return region;
+
+    const korRegion = address.split(" ")[1];
+    return toEnRegion(korRegion);
+  };
+
   const handlePlaceClick = (place) => {
+    console.log("클릭한 장소", place);
+
     if (!place.placeId) {
       alert("장소 상세 정보를 찾을 수 없습니다.");
       return;
     }
 
     const type = getPlaceType(place.type);
-    
+    const targetRegion = getRegionFromAddress(place.address);
+
     window.open(
-      `/${region}/${type}/view?id=${place.placeId}`,
+      `/${targetRegion}/${type}/view?id=${place.placeId}`,
       "_blank",
       "noopener,noreferrer"
     );
