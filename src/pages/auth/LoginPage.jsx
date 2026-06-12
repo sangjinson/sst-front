@@ -55,7 +55,7 @@ export default function LoginPage() {
     }
   };
 
-  // 🚀 카카오 로그인 버튼 클릭 핸들러
+  //  카카오 로그인 버튼 클릭 핸들러
   const handleKakaoLogin = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/api/oauth2/authorization/kakao`; 
   };
@@ -221,7 +221,7 @@ export default function LoginPage() {
                   </button>
                 </div>
 
-                {/* 🚀 수정된 부분: 이메일 찾기 및 비밀번호 찾기 링크 연결 */}
+                {/*  수정된 부분: 이메일 찾기 및 비밀번호 찾기 링크 연결 */}
                 <div className="flex items-center justify-between gap-3 text-[13px] text-gray-500 px-1 md:text-base">
                   <label className="flex shrink-0 items-center gap-2 cursor-pointer">
                     <input
@@ -233,7 +233,7 @@ export default function LoginPage() {
                     로그인 상태 유지
                   </label>
                   
-                  {/* 🚀 이메일 찾기 | 비밀번호 찾기 영역 */}
+                  {/*  이메일 찾기 | 비밀번호 찾기 영역 */}
                   <div className="ml-auto flex shrink-0 items-center gap-1.5 md:gap-2">
                     <Link to="/find-email" className="hover:text-[#0F9B73] transition cursor-pointer">
                       이메일 찾기
@@ -270,7 +270,7 @@ export default function LoginPage() {
 
                 <p className="text-center text-sm text-gray-400 pt-3 md:pt-4 md:text-base">
                   계정이 없으신가요?{' '}
-                  {/* 🚀 회원가입은 기존 링크 유지 (경로 확인 필요 시 수정하세요) */}
+                  {/*  회원가입은 기존 링크 유지 (경로 확인 필요 시 수정하세요) */}
                   <Link to="/login/signup" className="text-gray-600 hover:text-[#0F9B73] font-semibold">
                     회원가입
                   </Link>

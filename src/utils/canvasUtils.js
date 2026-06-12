@@ -21,7 +21,7 @@ export const getCroppedImg = async (imageSrc, pixelCrop) => {
   canvas.width = pixelCrop.width;
   canvas.height = pixelCrop.height;
 
-  // 🚀 캔버스에 그리기 (가장 중요한 부분!)
+  //  캔버스에 그리기 (가장 중요한 부분!)
   ctx.drawImage(
     image,
     pixelCrop.x, // 원본 이미지에서 자를 시작 X
@@ -34,7 +34,7 @@ export const getCroppedImg = async (imageSrc, pixelCrop) => {
     pixelCrop.height // 캔버스에 그릴 높이
   );
 
-  // 🚀 캔버스 내용을 파일(Blob)로 변환하여 리턴
+  //  캔버스 내용을 파일(Blob)로 변환하여 리턴
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (!blob) {

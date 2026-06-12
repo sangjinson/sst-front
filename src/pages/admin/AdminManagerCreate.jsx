@@ -5,7 +5,7 @@ import api from "@api/axios";
 export default function AdminManagerCreate() {
   const navigate = useNavigate();
 
-  // 🚀 1. 상태 관리: 백엔드 DTO(AdminMemberCreateRequest) 규격에 맞게 초기값 세팅
+  //  1. 상태 관리: 백엔드 DTO(AdminMemberCreateRequest) 규격에 맞게 초기값 세팅
   const [form, setForm] = useState({
     mbrEmail: "",
     mbrPassword: "",
@@ -15,8 +15,8 @@ export default function AdminManagerCreate() {
     mbrZip: "00000",        // 임시 기본값 (필요시 UI 추가)
     mbrAddr: "본사",         // 임시 기본값
     mbrDaddr: "관리자",       // 임시 기본값
-    mbrAuthCd: "ROLE_ADMIN", // 🚀 핵심: 사용자가 선택하지 못하게 관리자 권한으로 하드코딩 고정
-    mbrUseYn: "Y"            // 🚀 생성 시 기본으로 활성화 상태
+    mbrAuthCd: "ROLE_ADMIN", //  핵심: 사용자가 선택하지 못하게 관리자 권한으로 하드코딩 고정
+    mbrUseYn: "Y"            //  생성 시 기본으로 활성화 상태
   });
 
   const handleChange = (e) => {
@@ -34,10 +34,10 @@ export default function AdminManagerCreate() {
     }
 
     try {
-      // 🚀 2. 백엔드 관리자 생성 API 호출 (자동으로 JWT 쿠키가 함께 전송됨)
+      //  2. 백엔드 관리자 생성 API 호출 (자동으로 JWT 쿠키가 함께 전송됨)
       await api.post("/admin/members", form);
       alert("새로운 관리자 계정이 생성되었습니다.");
-      navigate("/admin/managers"); // 🚀 성공 시 목록 페이지로 복귀
+      navigate("/admin/managers"); //  성공 시 목록 페이지로 복귀
     } catch (error) {
       console.error("관리자 생성 실패:", error);
       // 백엔드에서 던진 예외 메시지(예: 이메일 중복 등) 처리

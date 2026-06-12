@@ -6,7 +6,7 @@ import { PencilIcon, TrashBinIcon } from "@components/Icon";
 export default function AdminSupportManage() {
   const { type } = useParams();
 
-  // 🚀 type에 따른 설정값 동적 매핑
+  //  type에 따른 설정값 동적 매핑
   const CONFIG = {
     notices: {
       title: "공지사항",
@@ -138,7 +138,7 @@ export default function AdminSupportManage() {
         </div>
       </div>
 
-      {/* 🚀 작성 폼 영역 */}
+      {/*  작성 폼 영역 */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
           {editId ? `${currentConfig.title} 수정` : `${currentConfig.title} 작성`}
@@ -195,7 +195,7 @@ export default function AdminSupportManage() {
         </div>
       </div>
 
-      {/* 🚀 리스트 테이블 영역 (컴포넌트 제거 및 다크모드 대응) */}
+      {/*  리스트 테이블 영역 (컴포넌트 제거 및 다크모드 대응) */}
       <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm">
         <div className="max-w-full overflow-x-auto">
           <table className="w-full table-fixed text-sm text-center whitespace-nowrap">
