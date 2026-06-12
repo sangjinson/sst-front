@@ -46,7 +46,14 @@ const PortfolioNoticeModal = () => {
           [관리자] <br/> id : admin@sst.com / pw : admin1234 <br/>
         </p>
 
-        <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-gray-500">
+        <button
+          onClick={handleClose}
+          className="w-full rounded-xl bg-[#0F9B73] py-2.5 font-bold text-white hover:bg-[#0d8a66] transition"
+        >
+          확인
+        </button>
+        
+        <label className="flex items-center gap-2 mt-4 cursor-pointer text-sm text-gray-500">
           <input
             type="checkbox"
             checked={dontShowToday}
@@ -56,12 +63,6 @@ const PortfolioNoticeModal = () => {
           오늘 하루 보지 않기
         </label>
 
-        <button
-          onClick={handleClose}
-          className="w-full rounded-xl bg-[#0F9B73] py-2.5 font-bold text-white hover:bg-[#0d8a66] transition"
-        >
-          확인
-        </button>
       </div>
     </div>
   );
