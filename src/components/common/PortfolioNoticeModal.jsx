@@ -43,7 +43,7 @@ const PortfolioNoticeModal = () => {
           일체의 상업적 목적이 없음을 밝힙니다. <br/><br/>
           
           [일반 회원] <br/> id : user@sst.com / pw : user1234 <br/>
-          [관리자] <br/> id : admin@sst.com / pw : admin1234
+          [관리자] <br/> id : admin@sst.com / pw : admin1234 <br/>
         </p>
 
         <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-gray-500">
