@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '@api/axios';
 
-// 🚀 1. 공통 페이지네이션 컴포넌트 임포트
+//  1. 공통 페이지네이션 컴포넌트 임포트
 import AdminPagination from "@components/admin/AdminPagination";
 
 const CODE_PREFIX_MAP = {
@@ -26,7 +26,7 @@ const CommonCodeList = () => {
   const [page, setPage] = useState(1);
   const [size] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
-  // 🚀 2. AdminPagination 컴포넌트에 넘겨줄 totalCount 상태 추가
+  //  2. AdminPagination 컴포넌트에 넘겨줄 totalCount 상태 추가
   const [totalCount, setTotalCount] = useState(0); 
 
   const [sortBy, setSortBy] = useState('groupCode');
@@ -87,7 +87,7 @@ const CommonCodeList = () => {
       });
       setCodes(Array.isArray(response.data.content) ? response.data.content : []);
       setTotalPages(response.data.totalPages || 0);
-      // 🚀 3. totalCount 값 저장 (백엔드의 Page 객체 응답 필드명 방어 코드 적용)
+      //  3. totalCount 값 저장 (백엔드의 Page 객체 응답 필드명 방어 코드 적용)
       setTotalCount(response.data.totalElements ?? response.data.totalCount ?? response.data.content?.length ?? 0);
     } catch (error) {
       console.error('공통코드 조회 실패:', error);
@@ -357,7 +357,7 @@ const CommonCodeList = () => {
         </div>
       </div>
 
-      {/* 🚀 4. AdminPagination 컴포넌트로 완벽 교체 */}
+      {/*  4. AdminPagination 컴포넌트로 완벽 교체 */}
       <AdminPagination 
         page={page} 
         size={size} 

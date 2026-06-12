@@ -2,20 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@api/axios";
 
-// 🚀 공통화한 훅과 컴포넌트 임포트
+//  공통화한 훅과 컴포넌트 임포트
 import { usePagination } from "@hooks/usePagination";
-import { useAuth } from "@hooks/useAuth"; // 🚀 본인 계정 보호를 위해 현재 로그인 정보 가져오기
+import { useAuth } from "@hooks/useAuth"; //  본인 계정 보호를 위해 현재 로그인 정보 가져오기
 import AdminPagination from "@components/admin/AdminPagination";
 
 import { PlusIcon, TrashBinIcon } from "@components/Icon";
 
 export default function AdminManagerList() {
   const navigate = useNavigate();
-  const { user } = useAuth(); // 🚀 전역 상태에서 현재 로그인한 관리자 정보 추출
+  const { user } = useAuth(); //  전역 상태에서 현재 로그인한 관리자 정보 추출
   
   const [managers, setManagers] = useState([]);
   
-  // 🚀 삭제됨: 체크박스 관련 상태 (selected, allChecked)
+  //  삭제됨: 체크박스 관련 상태 (selected, allChecked)
 
   const [searchType, setSearchType] = useState('email');
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -23,7 +23,7 @@ export default function AdminManagerList() {
 
   const { page, size, totalCount, totalPages, setPage, setTotalCount } = usePagination(1, 10);
 
-  // 🚀 1. 관리자 목록 조회 (Override 패턴 적용 & authCd 강제 주입)
+  //  1. 관리자 목록 조회 (Override 패턴 적용 & authCd 강제 주입)
   const fetchManagers = async (overrides = {}) => {
     try {
       const response = await api.get('/admin/members', {
@@ -33,7 +33,7 @@ export default function AdminManagerList() {
           searchType: overrides.searchType ?? searchType,
           keyword: overrides.keyword ?? searchKeyword,
           useYn: overrides.useYn ?? useYnFilter,
-          // 🚀 백엔드에 '관리자(ROLE_ADMIN)'만 달라고 명시적으로 요청!
+          //  백엔드에 '관리자(ROLE_ADMIN)'만 달라고 명시적으로 요청!
           authCd: 'ROLE_ADMIN' 
         }
       });
@@ -48,11 +48,11 @@ export default function AdminManagerList() {
   // 페이지 이동 시 데이터 갱신
   useEffect(() => {
     fetchManagers();
-    // 🚀 삭제됨: 체크박스 상태 초기화 로직
+    //  삭제됨: 체크박스 상태 초기화 로직
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]); 
 
-  // 🚀 2. 상태 셀렉트 박스 변경 시 즉시 조회
+  //  2. 상태 셀렉트 박스 변경 시 즉시 조회
   const handleUseYnChange = (e) => {
     const newVal = e.target.value;
     setUseYnFilter(newVal); 
@@ -60,13 +60,13 @@ export default function AdminManagerList() {
     fetchManagers({ useYn: newVal, page: 1 });
   };
 
-  // 🚀 3. 조회 버튼
+  //  3. 조회 버튼
   const handleSearch = () => {
     setPage(1);
     fetchManagers({ page: 1 }); 
   };
 
-  // 🚀 4. 초기화 버튼: 클릭 즉시 빈 값으로 API 조회!
+  //  4. 초기화 버튼: 클릭 즉시 빈 값으로 API 조회!
   const handleResetSearch = () => {
     setSearchType('email');
     setSearchKeyword('');
@@ -75,9 +75,9 @@ export default function AdminManagerList() {
     fetchManagers({ searchType: 'email', keyword: '', useYn: '', page: 1 });
   };
 
-  // 🚀 삭제됨: toggleAll, toggleOne 함수
+  //  삭제됨: toggleAll, toggleOne 함수
 
-  // 🚀 5. 상태 변경 로직
+  //  5. 상태 변경 로직
   const handleToggleStatus = async (mbrId, currentStatus) => {
     const newStatus = currentStatus === 'Y' ? 'N' : 'Y';
     const actionText = newStatus === 'Y' ? '활성화' : '정지';
@@ -94,7 +94,7 @@ export default function AdminManagerList() {
     }
   };
 
-  // 🚀 6. 강제 탈퇴 (삭제) 로직
+  //  6. 강제 탈퇴 (삭제) 로직
   const handleDelete = async (mbrId) => {
     if (!window.confirm("정말 이 관리자를 강제 탈퇴 처리하시겠습니까?\n(개인정보가 마스킹 처리됩니다.)")) return;
     try {
@@ -113,12 +113,12 @@ export default function AdminManagerList() {
           <div>
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">관리자 계정 관리</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {/* 🚀 text-red-500을 text-[#0F9B73]으로 변경하여 청록색 통일 */}
+              {/*  text-red-500을 text-[#0F9B73]으로 변경하여 청록색 통일 */}
               등록된 관리자 수: <span className="font-bold text-[#0F9B73]">{totalCount}</span>명
             </p>
           </div>
           
-          {/* 🚀 버튼의 다크모드/라이트모드 분리를 없애고 항상 청록색(#0F9B73)이 나오도록 수정 */}
+          {/*  버튼의 다크모드/라이트모드 분리를 없애고 항상 청록색(#0F9B73)이 나오도록 수정 */}
           <button 
             onClick={() => navigate("/admin/managers/create")}
             className="flex items-center gap-2 px-4 py-2.5 bg-[#0F9B73] text-white text-sm font-medium rounded-lg hover:bg-[#0c8261] shadow-sm"
@@ -159,7 +159,7 @@ export default function AdminManagerList() {
           />
           
           <div className="flex gap-2">
-            {/* 🚀 조회 버튼: 항상 청록색(#0F9B73)으로 통일 */}
+            {/*  조회 버튼: 항상 청록색(#0F9B73)으로 통일 */}
             <button 
               onClick={handleSearch} 
               className="px-5 h-10 bg-[#0F9B73] text-white text-sm font-semibold rounded-lg hover:bg-[#0c8261]"
@@ -167,7 +167,7 @@ export default function AdminManagerList() {
               조회
             </button>
             
-            {/* 🚀 초기화 버튼: 항상 어두운 회색(gray-900)으로 통일 */}
+            {/*  초기화 버튼: 항상 어두운 회색(gray-900)으로 통일 */}
             <button 
               onClick={handleResetSearch} 
               className="px-5 h-10 bg-gray-900 border border-gray-700 text-gray-300 text-sm font-semibold rounded-lg hover:bg-gray-800"

@@ -9,7 +9,7 @@ export default function AdminStreetForm() {
   const navigate = useNavigate();
   const isUpdate = !!state?.data;
 
-  // 🚀 공통 및 전용 필드 초기화
+  //  공통 및 전용 필드 초기화
   const [formData, setFormData] = useState({
     plcName: "", plcRgnCd: "", plcAddr: "", plcDaddr: "", 
     plcTelno: "", plcHomepage: "", plcOverview: "",
@@ -47,7 +47,7 @@ export default function AdminStreetForm() {
     }
   };
 
-  // 🚀 타입별 추가 폼 렌더링
+  //  타입별 추가 폼 렌더링
   const renderExtraFields = () => {
     switch (type) {
       case "food":

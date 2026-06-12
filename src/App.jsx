@@ -23,7 +23,7 @@ function App() {
 
   return (
     <HelmetProvider>
-      {/* 🚀 앱 최상단에서 통합 관리되는 전역 Helmet */}
+      {/*  앱 최상단에서 통합 관리되는 전역 Helmet */}
       <Helmet>
         <title>{pageTitle}</title>
       </Helmet>

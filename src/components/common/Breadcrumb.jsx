@@ -14,10 +14,10 @@ import IconSVG from "@components/Icon/IconSVG";
     { label: '먹거리', to: `/${region}/food/list` },
     { label: item.name } 
   ]} 
-  className="mb-4" // 🚀 여기서는 좁은 여백을 던져줍니다!
+  className="mb-4" //  여기서는 좁은 여백을 던져줍니다!
 />
 */
-// 🚀 className을 props로 추가로 받습니다 (기본값은 빈 문자열)
+//  className을 props로 추가로 받습니다 (기본값은 빈 문자열)
 const Breadcrumb = ({ paths, className = '' }) => {
   return (
     /* w-full과 flex-end를 유지하여 오른쪽 상단 배치를 살리되, daisyUI의 breadcrumbs 스타일을 입힙니다. */

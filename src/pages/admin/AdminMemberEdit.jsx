@@ -21,7 +21,7 @@ const AdminMemberEdit = () => {
     mbrUseYn: ''
   });
 
-  // 🚀 1. 닉네임 중복 검사를 위한 상태 추가
+  //  1. 닉네임 중복 검사를 위한 상태 추가
   const [originalNickname, setOriginalNickname] = useState(''); // 기존 닉네임 기억용
   const [nicknameChecked, setNicknameChecked] = useState(true); // 초기값 true (기존 닉네임이니까)
   const [nicknameMsg, setNicknameMsg] = useState('');
@@ -45,7 +45,7 @@ const AdminMemberEdit = () => {
           mbrUseYn: data.mbrUseYn || ''
         });
 
-        // 🚀 2. 데이터 페치 시 원본 닉네임 저장
+        //  2. 데이터 페치 시 원본 닉네임 저장
         setOriginalNickname(data.mbrNickname || '');
         setNicknameChecked(true);
 
@@ -61,7 +61,7 @@ const AdminMemberEdit = () => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
 
-    // 🚀 3. 닉네임이 입력될 때 기존 닉네임과 비교하여 상태 초기화
+    //  3. 닉네임이 입력될 때 기존 닉네임과 비교하여 상태 초기화
     if (name === 'mbrNickname') {
       if (value.trim() === originalNickname) {
         setNicknameChecked(true); // 기존 닉네임으로 되돌리면 검사 통과
@@ -73,7 +73,7 @@ const AdminMemberEdit = () => {
     }
   };
 
-  // 🚀 4. 중복 확인 API 호출 로직 (MemberInfo.jsx와 동일한 API 활용)
+  //  4. 중복 확인 API 호출 로직 (MemberInfo.jsx와 동일한 API 활용)
   const handleNicknameCheck = async () => {
     const trimmedNickname = form.mbrNickname.trim();
     if (!trimmedNickname) { 
@@ -131,7 +131,7 @@ const AdminMemberEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🚀 5. 제출 전 프론트엔드 최종 방어 (UX)
+    //  5. 제출 전 프론트엔드 최종 방어 (UX)
     if (form.mbrNickname !== originalNickname && !nicknameChecked) {
       alert('닉네임 중복 확인을 진행해주세요.');
       return;
@@ -175,7 +175,7 @@ const AdminMemberEdit = () => {
           onChange={handleChange}
         />
 
-        {/* 🚀 닉네임 영역 레이아웃 수정 (버튼 추가) */}
+        {/*  닉네임 영역 레이아웃 수정 (버튼 추가) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TextInput
             id="mbrName"

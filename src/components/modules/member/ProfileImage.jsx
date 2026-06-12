@@ -4,7 +4,7 @@ import { useConfig } from '@hooks/useConfig'; // Config 훅
 const ProfileImage = ({ user: propsUser, size = 'sm', className = "", preview = null }) => {
   const { getConfig } = useConfig();
   
-  // 🚀 1. 전역 설정(Config)에 저장된 최신 유저 정보를 우선 참조
+  //  1. 전역 설정(Config)에 저장된 최신 유저 정보를 우선 참조
   // 이렇게 하면 MemberInfo에서 수정한 내용이 즉시 반영됩니다.
   const globalUser = getConfig('user');
   const currentUser = propsUser || globalUser;

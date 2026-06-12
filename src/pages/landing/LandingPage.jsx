@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getNorthRegions, getSouthRegions } from '@utils/regionMap'; 
+import PortfolioNoticeModal from '@components/common/PortfolioNoticeModal';
 
 import '@assets/css/landing.css';
 import AOS from "aos";
@@ -42,6 +43,8 @@ const LandingPage = () => {
 
   return (
     <>
+      <PortfolioNoticeModal />
+
       {/* 검색 영역 */}
       <div className="container fs-up-3" data-aos="flip-up" data-aos-once="true">
         <div className="w-full md:w-8/12 mx-auto">

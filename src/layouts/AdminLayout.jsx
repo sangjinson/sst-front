@@ -4,7 +4,7 @@ import AppHeader from '@layouts/AppHeader';
 import AppSidebar from '@layouts/AppSidebar';
 import '@assets/css/admin.css';
 import { useSidebar } from "@context/SidebarContext";
-import { AdminThemeProvider } from '@context/AdminThemeContext'; // 🚀 위치 확인
+import { AdminThemeProvider } from '@context/AdminThemeContext'; //  위치 확인
 
 function AdminLayout() {
   const { isExpanded, isHovered } = useSidebar();

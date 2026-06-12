@@ -33,11 +33,11 @@ const PasswordChange = ({ onClose }) => {
         newPassword: form.newPassword
       });
 
-      // 🚀 1. 메시지를 좀 더 자연스럽게 수정
+      //  1. 메시지를 좀 더 자연스럽게 수정
       alert("비밀번호가 성공적으로 변경되었습니다.");
       
-      // 🚀 2. window.location.href = '/login'; 삭제
-      // 🚀 3. 부모 컴포넌트에서 넘겨받은 onClose()를 호출하여 모달만 깔끔하게 닫기
+      //  2. window.location.href = '/login'; 삭제
+      //  3. 부모 컴포넌트에서 넘겨받은 onClose()를 호출하여 모달만 깔끔하게 닫기
       onClose(); 
       
     } catch (error) {

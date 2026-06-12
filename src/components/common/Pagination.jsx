@@ -3,17 +3,17 @@ import React from 'react';
 const Pagination = ({ page, totalPages, onPageChange }) => {
   if (totalPages <= 1) return null; // 1페이지 이하면 숨김 처리
 
-  // 🚀 1. 한 화면에 보여줄 페이지 버튼의 최대 개수 (5개 단위로 끊기)
+  //  1. 한 화면에 보여줄 페이지 버튼의 최대 개수 (5개 단위로 끊기)
   const PAGE_BTN_LIMIT = 5;
 
-  // 🚀 2. 현재 페이지가 속한 블록 계산 (예: page가 3이면 1블록(1~5), 7이면 2블록(6~10))
+  //  2. 현재 페이지가 속한 블록 계산 (예: page가 3이면 1블록(1~5), 7이면 2블록(6~10))
   const currentBlock = Math.ceil(page / PAGE_BTN_LIMIT);
 
-  // 🚀 3. 화면에 그릴 시작 페이지와 끝 페이지 번호 계산
+  //  3. 화면에 그릴 시작 페이지와 끝 페이지 번호 계산
   const startPage = (currentBlock - 1) * PAGE_BTN_LIMIT + 1;
   const endPage = Math.min(startPage + PAGE_BTN_LIMIT - 1, totalPages);
 
-  // 🚀 4. startPage부터 endPage까지의 번호만 배열로 생성
+  //  4. startPage부터 endPage까지의 번호만 배열로 생성
   const pageNumbers = [];
   for (let i = startPage; i <= endPage; i++) {
     pageNumbers.push(i);
@@ -22,7 +22,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
   return (
     <div className="flex justify-center gap-2 mt-7 flex-wrap">
       
-      {/* 🚀 5. 맨 처음 / 이전 블록 이동 (옵션이지만 UX상 넣어주면 좋습니다) */}
+      {/*  5. 맨 처음 / 이전 블록 이동 (옵션이지만 UX상 넣어주면 좋습니다) */}
       <button 
         onClick={() => onPageChange(1)} 
         disabled={page === 1}
@@ -40,7 +40,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
         &lt;
       </button>
 
-      {/* 🚀 6. 전체가 아닌 '계산된 블록(pageNumbers)'만 렌더링 */}
+      {/*  6. 전체가 아닌 '계산된 블록(pageNumbers)'만 렌더링 */}
       {pageNumbers.map((p) => (
         <button 
           key={p} 
@@ -64,7 +64,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
         &gt;
       </button>
 
-      {/* 🚀 7. 맨 끝 블록 이동 */}
+      {/*  7. 맨 끝 블록 이동 */}
       <button 
         onClick={() => onPageChange(totalPages)} 
         disabled={page === totalPages}

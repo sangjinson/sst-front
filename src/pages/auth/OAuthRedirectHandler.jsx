@@ -8,12 +8,12 @@ export default function OAuthRedirectHandler() {
 
   const {getConfig, setConfig} = useConfig();   // Config 값 가져오기
   const navigate = useNavigate();
-  // 🚀 비동기 통신 없이 전역 상태를 업데이트하기 위해 AuthContext의 login을 가져옴
+  //  비동기 통신 없이 전역 상태를 업데이트하기 위해 AuthContext의 login을 가져옴
   const { login } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
-    // 🚀 백엔드가 쿠키를 성공적으로 구웠다면, 이 페이지로 넘어왔을 때 
+    //  백엔드가 쿠키를 성공적으로 구웠다면, 이 페이지로 넘어왔을 때 
     // 로컬 스토리지 상태를 'true'로 만들고 강제로 새로고침 효과를 주어 
     // AuthContext의 초기화 로직(api.get('/auth/me'))이 돌게 만들거나,
     // 혹은 백엔드에서 쿼리파라미터로 넘겨준 최소 정보를 login() 함수에 넣어줄 수 있어.

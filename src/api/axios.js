@@ -1,12 +1,12 @@
 // axios.js
 import axios from 'axios';
 
-// 🚀 1. Vite 환경변수 적용 (CRA의 process.env 대신 import.meta.env 사용)
+//  1. Vite 환경변수 적용 (CRA의 process.env 대신 import.meta.env 사용)
 const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const api = axios.create({
-  baseURL: `${BACKEND_URL}/api`, // 🚀 직접 백엔드를 찌르도록 수정
-  withCredentials: true, // 🚀 쿠키 전송 필수
+  baseURL: `${BACKEND_URL}/api`, //  직접 백엔드를 찌르도록 수정
+  withCredentials: true, //  쿠키 전송 필수
   headers: {
     'Content-Type': 'application/json',
   },
@@ -71,7 +71,7 @@ api.interceptors.response.use(
         // 만료 알럿 띄우기 및 로컬 플래그 강제 삭제
         if (!originalRequest.url?.includes('/auth/me')) {
           alert('보안을 위해 로그인이 만료되었습니다. 다시 로그인해 주세요.');
-          localStorage.removeItem('isLogin'); // 🚀 React Query가 다음번엔 찌르지 않도록 차단
+          localStorage.removeItem('isLogin'); //  React Query가 다음번엔 찌르지 않도록 차단
           window.location.href = '/login'; 
         }
         
