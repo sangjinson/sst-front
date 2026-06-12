@@ -11,8 +11,8 @@ export default function LoginPage() {
   
   const { login } = useAuth();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('user@sst.com');
+  const [password, setPassword] = useState('user1234');
   
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
