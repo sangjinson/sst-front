@@ -24,7 +24,7 @@ import AreaViewTemplate from '@pages/area/AreaViewTemplate';
 import AIPlanPage from '@pages/aiplan/AIPlanPage';
 import AIPlanResultPage from '@pages/aiplan/AIPlanResultPage';
 
-// 🚀 새롭게 분리된 커뮤니티 컴포넌트들
+//  새롭게 분리된 커뮤니티 컴포넌트들
 import CommunityHotplace from "@pages/showcase/hotplace/CommunityHotplace";
 import CommunityHotplaceDetail from "@pages/showcase/hotplace/CommunityHotplaceDetail";
 import CommunityHotplaceWrite from "@pages/showcase/hotplace/CommunityHotplaceWrite";
@@ -112,11 +112,11 @@ const AppRoutes = () => {
         <Route path="/customersupport/notice" element={<Notice />} />
         <Route path="/customersupport/faq" element={<Faq />} />
 
-        {/* 🚀 커뮤니티 - 핫플레이스 (목록 및 상세) */}
+        {/*  커뮤니티 - 핫플레이스 (목록 및 상세) */}
         <Route path="/showcase/hotplace" element={<CommunityHotplace />} /> 
         <Route path="/showcase/hotplace/view/:id" element={<CommunityHotplaceDetail />} />
 
-        {/* 🚀 커뮤니티 - 일상 (목록 및 상세) */}
+        {/*  커뮤니티 - 일상 (목록 및 상세) */}
         <Route path="/showcase/life" element={<CommunityLife />} /> 
         <Route path="/showcase/life/view/:id" element={<CommunityLifeDetail />} />
 
@@ -127,7 +127,7 @@ const AppRoutes = () => {
       </Route>
 
         
-        {/* 🚀 3. 반드시 로그인이 필요한 페이지 영역 */}
+        {/*  3. 반드시 로그인이 필요한 페이지 영역 */}
         
         <Route element={<ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN']} />}>
         <Route element={<UserLayout />}>

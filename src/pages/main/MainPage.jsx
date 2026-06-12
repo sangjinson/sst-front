@@ -17,18 +17,18 @@ import { toRegion } from '@utils/regionMap';
 const getRandomItems = (arr, num) => {
   if (!arr || arr.length === 0) return [];
 
-  // 🚀 1. 이미지가 있는 객체와 없는 객체를 분리
+  //  1. 이미지가 있는 객체와 없는 객체를 분리
   // img 필드가 존재하고 빈 문자열이 아닌 경우를 필터링
   const withImage = arr.filter(item => item.img && item.img.trim() !== '');
   const withoutImage = arr.filter(item => !item.img || item.img.trim() === '');
 
-  // 🚀 2. 배열을 섞어주는 헬퍼 함수
+  //  2. 배열을 섞어주는 헬퍼 함수
   const shuffle = (list) => [...list].sort(() => 0.5 - Math.random());
 
-  // 🚀 3. 이미지가 있는 배열을 우선 배치하고, 그 뒤에 이미지가 없는 배열을 이어붙임
+  //  3. 이미지가 있는 배열을 우선 배치하고, 그 뒤에 이미지가 없는 배열을 이어붙임
   const prioritizedList = [...shuffle(withImage), ...shuffle(withoutImage)];
 
-  // 🚀 4. 최종적으로 필요한 개수(num)만큼 잘라서 반환
+  //  4. 최종적으로 필요한 개수(num)만큼 잘라서 반환
   return prioritizedList.slice(0, num);
 };
 

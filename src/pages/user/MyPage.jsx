@@ -96,7 +96,7 @@ const MyPage = () => {
 
   // 회원 탈퇴 처리
   const handleWithdraw = async () => {
-      // 🚀 1. SweetAlert2로 탈퇴 사유 모달 띄우기
+      //  1. SweetAlert2로 탈퇴 사유 모달 띄우기
       const result = await Swal.fire({
         title: '정말 탈퇴하시겠습니까?',
         html: `
@@ -127,7 +127,7 @@ const MyPage = () => {
         showCancelButton: true,
         confirmButtonText: '탈퇴하기',
         cancelButtonText: '취소',
-        confirmButtonColor: '#ef4444', // 🚀 탈퇴는 위험 행동이므로 빨간색 버튼
+        confirmButtonColor: '#ef4444', //  탈퇴는 위험 행동이므로 빨간색 버튼
         cancelButtonColor: '#9ca3af',
         preConfirm: () => {
           const selected = document.querySelector('input[name="withdraw-reason"]:checked');
@@ -152,7 +152,7 @@ const MyPage = () => {
       if (!result.isConfirmed) return;
   
       try {
-        // 🚀 2. axios delete 요청 시 body에 데이터를 담으려면 { data: payload } 구조를 사용해야 합니다.
+        //  2. axios delete 요청 시 body에 데이터를 담으려면 { data: payload } 구조를 사용해야 합니다.
         await apiTool.withdrawMember(result.value);
         
         await Swal.fire({

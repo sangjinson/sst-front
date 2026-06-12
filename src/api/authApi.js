@@ -1,12 +1,12 @@
-import api from './axios'; // 🚀 기존에 만들어둔 인터셉터 적용 인스턴스 사용
+import api from './axios'; //  기존에 만들어둔 인터셉터 적용 인스턴스 사용
 
-// 🚀 1. 이메일 찾기 API (이름 + 전화번호)
+//  1. 이메일 찾기 API (이름 + 전화번호)
 export const findEmail = async (name, telno) => {
   const response = await api.post('/auth/find-email', { name, telno });
   return response.data.data; // 백엔드의 ApiResponse<List<String>> 에서 배열만 추출
 };
 
-// 🚀 2. 비밀번호 재설정 (임시 비밀번호 발급) API (이메일 + 이름)
+//  2. 비밀번호 재설정 (임시 비밀번호 발급) API (이메일 + 이름)
 export const resetPassword = async (email, name) => {
   const response = await api.post('/auth/reset-password', { email, name });
   return response.data; 

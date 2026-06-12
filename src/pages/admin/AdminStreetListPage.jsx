@@ -15,7 +15,7 @@ export default function AdminPlaceList() {
   const [places, setPlaces] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   
-  // 🚀 상태 필터 기본값을 'Y'(운영 중)로 세팅. 'N'이면 휴지통!
+  //  상태 필터 기본값을 'Y'(운영 중)로 세팅. 'N'이면 휴지통!
   const [useYnFilter, setUseYnFilter] = useState('Y');
 
   const { page, size, totalCount, totalPages, setPage, setTotalCount } = usePagination(1, 10);
@@ -29,7 +29,7 @@ export default function AdminPlaceList() {
   
   const currentConfig = typeConfig[type] || typeConfig.see;
 
-  // 🚀 빈 문자열이 나와서 도메인이 깨지는 현상 완벽 방지
+  //  빈 문자열이 나와서 도메인이 깨지는 현상 완벽 방지
   const getEngRegionFromAddress = (address) => {
     if (!address) return 'all'; 
     

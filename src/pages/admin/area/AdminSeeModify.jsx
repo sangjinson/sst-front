@@ -4,11 +4,11 @@ import api from "@api/axios";
 
 export default function AdminSeeModify() {
   const navigate = useNavigate();
-  // 🚀 1. AppRoutes.jsx에 설정된 /admin/area/see/update/:plcNo 에서 번호 추출
+  //  1. AppRoutes.jsx에 설정된 /admin/area/see/update/:plcNo 에서 번호 추출
   const { plcNo } = useParams();
   const location = useLocation();
 
-  // 🚀 2. 전체 필드를 포괄하는 초기 상태 (상태 변수에는 값을 남겨두어 에러 방지)
+  //  2. 전체 필드를 포괄하는 초기 상태 (상태 변수에는 값을 남겨두어 에러 방지)
   const [formData, setFormData] = useState({
     plcName: "",
     plcAddr: "",
@@ -25,7 +25,7 @@ export default function AdminSeeModify() {
     seeUsetime: "",
   });
 
-  // 🚀 3. 데이터 불러오기 (목록에서 넘겨준 state가 있으면 쓰고, 없으면 API 호출)
+  //  3. 데이터 불러오기 (목록에서 넘겨준 state가 있으면 쓰고, 없으면 API 호출)
   useEffect(() => {
     const fetchDetail = async () => {
       try {
@@ -44,7 +44,7 @@ export default function AdminSeeModify() {
     fetchDetail();
   }, [plcNo, location.state, navigate]);
 
-  // 🚀 4. API 응답 데이터를 폼에 맞게 매핑
+  //  4. API 응답 데이터를 폼에 맞게 매핑
   const fillFormData = (data) => {
     setFormData({
       plcName: data.plcName || "",
@@ -68,13 +68,13 @@ export default function AdminSeeModify() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🚀 5. 수정 전송 로직
+  //  5. 수정 전송 로직
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!window.confirm("수정하시겠습니까?")) return;
 
     try {
-      // 🚀 백엔드 SeeUpdateRequestDto가 받는 정보만 자동으로 매핑되어 전송됩니다.
+      //  백엔드 SeeUpdateRequestDto가 받는 정보만 자동으로 매핑되어 전송됩니다.
       await api.put(`/admin/see/${plcNo}`, formData);
       alert("성공적으로 수정되었습니다.");
       navigate("/admin/area/see"); // 목록으로 복귀
@@ -116,14 +116,14 @@ export default function AdminSeeModify() {
             <input type="text" name="plcTelno" value={formData.plcTelno} onChange={handleChange} className="w-full px-4 py-2 border rounded-md outline-none focus:border-blue-500" />
           </div>
 
-          {/* 🚀 삭제 완료: 필터코드 입력란 제거 */}
+          {/*  삭제 완료: 필터코드 입력란 제거 */}
 
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-1">홈페이지</label>
             <input type="text" name="plcHomepage" value={formData.plcHomepage} onChange={handleChange} className="w-full px-4 py-2 border rounded-md outline-none focus:border-blue-500" />
           </div>
 
-          {/* 🚀 삭제 완료: 멘티 요청으로 위도, 경도 입력란 제거 */}
+          {/*  삭제 완료: 멘티 요청으로 위도, 경도 입력란 제거 */}
 
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-1">장소 개요 (설명)</label>

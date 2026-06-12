@@ -35,7 +35,7 @@ export default function AdminMemberInfoForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🚀 카카오(Daum) 우편번호 API 연동 함수
+  //  카카오(Daum) 우편번호 API 연동 함수
   const handleAddressSearch = () => {
     // index.html에 스크립트가 로드되지 않았을 경우를 대비한 방어 로직
     if (!window.daum) { 
@@ -45,7 +45,7 @@ export default function AdminMemberInfoForm() {
     
     new window.daum.Postcode({
       oncomplete: (data) => {
-        // 🚀 검색 완료 시 formData의 우편번호와 기본 주소를 업데이트
+        //  검색 완료 시 formData의 우편번호와 기본 주소를 업데이트
         setFormData((prev) => ({
           ...prev,
           mbrZip: data.zonecode,
@@ -69,7 +69,7 @@ export default function AdminMemberInfoForm() {
       navigate("/admin/members");
     } catch (error) {
       console.error("저장 실패:", error);
-      // 🚀 백엔드에서 내려주는 에러 메시지가 있다면 표출
+      //  백엔드에서 내려주는 에러 메시지가 있다면 표출
       alert(error.response?.data?.message || "처리 중 오류가 발생했습니다.");
     }
   };
@@ -166,11 +166,11 @@ export default function AdminMemberInfoForm() {
                       type="text"
                       name="mbrZip"
                       value={formData.mbrZip}
-                      readOnly // 🚀 사용자가 직접 수정 못하도록 readOnly 적용
+                      readOnly //  사용자가 직접 수정 못하도록 readOnly 적용
                       placeholder="우편번호"
                       className="w-32 rounded-lg border-[1.5px] border-gray-200 bg-gray-50 px-5 py-3 outline-none focus:border-blue-600 dark:border-gray-700 dark:bg-white/[0.05] cursor-not-allowed"
                     />
-                    {/* 🚀 검색 버튼에 onClick 이벤트 연결 */}
+                    {/*  검색 버튼에 onClick 이벤트 연결 */}
                     <button 
                       type="button" 
                       onClick={handleAddressSearch}
@@ -183,7 +183,7 @@ export default function AdminMemberInfoForm() {
                     type="text"
                     name="mbrAddr"
                     value={formData.mbrAddr}
-                    readOnly // 🚀 도로명/지번 주소도 API 결과로만 세팅
+                    readOnly //  도로명/지번 주소도 API 결과로만 세팅
                     placeholder="기본 주소"
                     className="w-full rounded-lg border-[1.5px] border-gray-200 bg-gray-50 px-5 py-3 outline-none focus:border-blue-600 dark:border-gray-700 dark:bg-white/[0.05] cursor-not-allowed"
                   />

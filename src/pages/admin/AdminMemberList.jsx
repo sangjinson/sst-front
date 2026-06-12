@@ -1,4 +1,4 @@
-// 🚀 파일: src/pages/admin/Members/AdminMemberList.jsx
+//  파일: src/pages/admin/Members/AdminMemberList.jsx
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -85,7 +85,7 @@ export default function AdminMemberList() {
           </div>
         `,
         confirmButtonColor: '#0F9B73',
-        // 🚀 Tailwind Important(!) 속성 적용으로 JS 안에서만 완벽 제어
+        //  Tailwind Important(!) 속성 적용으로 JS 안에서만 완벽 제어
         customClass: {
           popup: 'dark:!bg-gray-900 dark:!border dark:!border-gray-800',
           title: 'dark:!text-gray-100',
@@ -121,7 +121,7 @@ export default function AdminMemberList() {
       confirmButtonColor: targetStatus === 'N' ? '#ef4444' : '#0F9B73',
       confirmButtonText: '처리하기',
       cancelButtonText: '취소',
-      // 🚀 Tailwind Important(!) 속성 적용
+      //  Tailwind Important(!) 속성 적용
       customClass: {
         popup: 'dark:!bg-gray-900 dark:!border dark:!border-gray-800',
         title: 'dark:!text-gray-100',
@@ -177,7 +177,7 @@ export default function AdminMemberList() {
       confirmButtonColor: '#ef4444', 
       confirmButtonText: '영구 탈퇴', 
       cancelButtonText: '취소',
-      // 🚀 Tailwind Important(!) 속성 적용
+      //  Tailwind Important(!) 속성 적용
       customClass: {
         popup: 'dark:!bg-gray-900 dark:!border dark:!border-gray-800',
         title: 'dark:!text-gray-100',
