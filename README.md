@@ -152,59 +152,81 @@
 
 ```
 src/
-├── pages/
-│   ├── auth/
-│   │   ├── LoginPage.jsx
-│   │   ├── SignupPage.jsx
-│   │   ├── OAuthRedirectHandler.jsx
-│   │   ├── FindEmailPage.jsx
-│   │   └── ResetPasswordPage.jsx
-│   ├── landing/
-│   │   └── LandingPage.jsx
-│   ├── main/
-│   │   └── MainPage.jsx
-│   ├── area/
-│   │   ├── AreaListTemplate.jsx
-│   │   └── AreaViewTemplate.jsx
-│   ├── showcase/
-│   │   ├── hotplace/
-│   │   │   ├── CommunityHotplace.jsx
-│   │   │   ├── CommunityHotplaceDetail.jsx
-│   │   │   └── CommunityHotplaceWrite.jsx
-│   │   └── life/
-│   │       ├── CommunityLife.jsx
-│   │       ├── CommunityLifeDetail.jsx
-│   │       └── CommunityLifeWrite.jsx
-│   ├── aiplan/
-│   │   ├── AIPlanPage.jsx
-│   │   └── AIPlanResultPage.jsx
-│   ├── user/
-│   │   └── MyPage.jsx
-│   ├── customersupport/
-│   │   ├── Notice.jsx
-│   │   └── Faq.jsx
-│   ├── search/
-│   │   └── SearchPage.jsx
-│   ├── admin/
-│   │   ├── Dashboard.jsx
-│   │   ├── AdminMemberList.jsx
-│   │   ├── AdminMemberInfoForm.jsx
-│   │   ├── AdminMemberEdit.jsx
-│   │   ├── AdminManagerList.jsx
-│   │   ├── AdminManagerCreate.jsx
-│   │   ├── AdminStreetListPage.jsx
-│   │   ├── AdminSeeModify.jsx
-│   │   ├── AdminFoodModify.jsx
-│   │   ├── AdminPlayModify.jsx
-│   │   ├── AdminSleepModify.jsx
-│   │   ├── AdminShowcaseList.jsx
-│   │   ├── AdminReplyList.jsx
-│   │   ├── AdminReport.jsx
-│   │   ├── AdminSupportManage.jsx
-│   │   └── CommonCodeList.jsx
-│   └── error/
-│       ├── NotFoundPage.jsx
-│       └── Unauthorized.jsx
+├── App.css                 # 전역 스타일시트
+├── App.jsx                 # 라우터 엔트리 컴포넌트
+├── index.css               # 테일윈드 및 전역 기본 스타일 정의
+├── main.jsx                # React DOM 렌더링 엔트리
+├── api/                    # 백엔드 서버와의 API 연결 계층
+│   ├── adminCommentApi.js
+│   ├── adminCommunityApi.js
+│   ├── adminReviewApi.js
+│   ├── aiAxios.js          # AI 전용 Axios 인스턴스
+│   ├── authApi.js          # 인증 관련 API 서비스
+│   ├── axios.js            # 기본 Axios 인스턴스 설정
+│   └── reviewApi.js
+├── assets/                 # 정적 리소스 파일
+│   ├── hero.png, react.svg, vite.svg
+│   ├── css/                # 스타일 리소스 (admin.css, attraction.css 등)
+│   ├── fonts/              # 서비스 서체 (Paperlogy 폰트군 패키지 수록)
+│   └── images/             # 로컬 이미지 리소스
+├── components/             # 프레젠테이션 및 도메인 컴포넌트
+│   ├── admin/              # 관리자 전용 공통 UI 컴포넌트
+│   ├── card/               # 메인 페이지 및 리스트 카드군 컴포넌트
+│   ├── common/             # 전역 공통 레이아웃/UI 컴포넌트
+│   ├── Icon/               # 아이콘 컴포넌트 및 원본 SVG 자원
+│   ├── modules/            # 도메인별 비즈니스 컴포넌트 그룹
+│   │   ├── ActionButtons.jsx
+│   │   ├── AreaActionButtons.jsx
+│   │   ├── StarRating.jsx
+│   │   ├── aiplan/         # AI 여행 코스 수립 단계 컴포넌트군
+│   │   ├── airesult/       # AI 여행 계획 결과 화면 컴포넌트군
+│   │   ├── anim/           # 인터랙티브 모션 컴포넌트 (EyesFollow)
+│   │   ├── area/           # 관광지 정보(리스트/상세/필터) 컴포넌트군
+│   │   ├── community/      # 핫플/인생거리 글 작성 및 피드 컴포넌트군
+│   │   ├── customersupport/# 고객지원 전용 컴포넌트
+│   │   ├── form/           # 폼 입력 컴포넌트 (ReqTextInput 등)
+│   │   ├── GridCard/       # 그리드 레이아웃 카드 모듈
+│   │   └── member/         # 프로필/커버 이미지 관리
+│   ├── mypage/             # 마이페이지 기능별 탭 컴포넌트군
+│   └── skeleton/           # 로딩용 스켈레톤 컴포넌트군
+├── context/                # 전역 상태 관리 Context API
+│   ├── AdminThemeContext.jsx # 관리자 테마 제어
+│   ├── ConfigContext.jsx   # 서비스 전반의 시스템 설정값 공유
+│   ├── SidebarContext.jsx  # 사이드바 상태 제어
+│   └── ThemeContext.jsx    # 다크/라이트 모드 테마 제어
+├── hooks/                  # 커스텀 훅 레이어
+│   ├── useApi.js           # API 핸들링 공통 훅
+│   ├── useAuth.js          # 로그인/인증 정보 접근 및 제어 훅
+│   ├── useConfig.js        # 설정 관리 훅
+│   ├── usePagination.js    # 공통 페이지네이션 훅
+│   └── useWishlist.js      # 찜 목록 관리 훅
+├── layouts/                # 레이아웃 템플릿
+│   ├── AdminLayout.jsx     # 관리자 페이지 프레임 레이아웃
+│   ├── AppHeader.jsx       # 사이드바를 관리하는 공통 상단 영역
+│   ├── AppSidebar.jsx      # 네비게이션 서랍식 사이드바
+│   ├── LandingLayout.jsx   # 첫 진입 랜딩용 레이아웃
+│   ├── UserLayout.jsx      # 일반 사용자 페이지 프레임 레이아웃
+│   └── user/               # 사용자 전용 헤더/푸터 컴포넌트
+├── pages/                  # 라우팅 경로별 메인 페이지 뷰
+│   ├── admin/              # 관리자 전용 관리 페이지 (회원, 댓글, 신고 등)
+│   ├── aiplan/             # AI 일정 계획 및 결과 페이지
+│   ├── area/               # 맛집/볼거리/숙소/놀거리 리스트 및 뷰
+│   ├── auth/               # 로그인, 회원가입, OAuth 연동 처리 페이지
+│   ├── customersupport/    # FAQ 및 공지사항 목록
+│   ├── error/              # 에러 상황별 페이지 (ErrorScene, ServerError 등)
+│   ├── landing/            # 랜딩 페이지
+│   ├── main/               # 메인 페이지 (MainPage.jsx)
+│   ├── search/             # 전역 검색 결과 페이지
+│   ├── showcase/           # 사용자 추천 핫플/인생 코스 피드
+│   └── user/               # 마이페이지 컨테이너
+├── routes/                 # 라우팅 인프라
+│   ├── AppRoutes.jsx       # 전역 페이지 라우팅 맵핑 정의
+│   └── ProtectedRoute.jsx  # 권한(USER/ADMIN) 여부 검증 및 리다이렉트
+└── utils/                  # 헬퍼 및 무상태 유틸리티 함수
+    ├── axiosInstance.js
+    ├── canvasUtils.js
+    ├── common.js
+    └── regionMap.js
 ```
 
 ---
